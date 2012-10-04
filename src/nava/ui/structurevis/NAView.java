@@ -1,13 +1,5 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package nava.ui.structurevis;
 
-/**
- *
- * @author Michael
- */
 /*
  * VARNA is a tool for the automated drawing, visualization and annotation of
  * the secondary structure of RNA, designed as a companion software for web

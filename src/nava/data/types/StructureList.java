@@ -5,6 +5,7 @@
 package nava.data.types;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,7 +43,7 @@ public class StructureList extends DataSource {
     @Override
     public ArrayList<SecondaryStructureData> getObject() {
         try {
-            return FileImport.readDotBracketFile(this.importedDataSourcePath.toFile());
+            return FileImport.readDotBracketFile(Paths.get(importedDataSourcePath).toFile());
         } catch (IOException ex) {
             Logger.getLogger(StructureList.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ParserException ex) {

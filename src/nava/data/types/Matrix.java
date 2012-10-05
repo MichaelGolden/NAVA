@@ -4,6 +4,7 @@
  */
 package nava.data.types;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -27,7 +28,7 @@ public class Matrix extends DataSource {
 
     @Override
     public Object getObject() {
-        return new DenseMatrixData( RNAFoldingTools.loadMatrix(this.importedDataSourcePath.toFile()));
+        return new DenseMatrixData( RNAFoldingTools.loadMatrix(Paths.get(importedDataSourcePath).toFile()));
     }
 
     @Override
@@ -35,7 +36,7 @@ public class Matrix extends DataSource {
         if(object instanceof DenseMatrixData)
         {
             DenseMatrixData denseMatrixData = (DenseMatrixData)object;
-            RNAFoldingTools.writeMatrix(denseMatrixData.matrix, this.importedDataSourcePath.toFile());
+            RNAFoldingTools.writeMatrix(denseMatrixData.matrix, Paths.get(importedDataSourcePath).toFile());
         }
     }
     

@@ -5,6 +5,7 @@
 package nava.data.types;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -46,7 +47,7 @@ public class Alignment extends DataSource {
     @Override
     public AlignmentData getObject() {        
         AlignmentData alignmentData = new AlignmentData();
-        IO.loadFastaSequences(this.importedDataSourcePath.toFile(), alignmentData.sequences, alignmentData.sequenceNames);
+        IO.loadFastaSequences(Paths.get(importedDataSourcePath).toFile(), alignmentData.sequences, alignmentData.sequenceNames);
         return alignmentData;
     }    
     
@@ -55,7 +56,7 @@ public class Alignment extends DataSource {
         if(object instanceof AlignmentData)
         {
             AlignmentData alignmentData = (AlignmentData) object;
-            IO.saveToFASTAfile(alignmentData.sequences, alignmentData.sequenceNames, this.importedDataSourcePath.toFile());
+            IO.saveToFASTAfile(alignmentData.sequences, alignmentData.sequenceNames, Paths.get(importedDataSourcePath).toFile());
         }
     }    
 }

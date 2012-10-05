@@ -26,8 +26,8 @@ public abstract class DataSource implements Serializable
     ProjectInfo projectInfo;
     
     public File originalFile;
-    public Path originalDataSourcePath;
-    public Path importedDataSourcePath;
+    public String originalDataSourcePath;
+    public String importedDataSourcePath;
     
     // title and metadata
     public String title = "";

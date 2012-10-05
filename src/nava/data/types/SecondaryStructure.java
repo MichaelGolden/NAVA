@@ -5,6 +5,7 @@
 package nava.data.types;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -53,7 +54,7 @@ public class SecondaryStructure extends DataSource {
         if(object instanceof SecondaryStructureData)
         {
             SecondaryStructureData structure = (SecondaryStructureData)object;
-            RNAFoldingTools.saveDotBracketFile(this.importedDataSourcePath.toFile(), structure.pairedSites, structure.title, structure.sequence);
+            RNAFoldingTools.saveDotBracketFile(Paths.get(importedDataSourcePath).toFile(), structure.pairedSites, structure.title, structure.sequence);
         }
     }
 

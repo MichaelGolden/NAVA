@@ -4,11 +4,7 @@
  */
 package nava.ui.structurevis;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -16,12 +12,11 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import nava.ui.GraphicsTools;
+import nava.utils.Pair;
 
 /**
  *
@@ -32,6 +27,8 @@ public class AnnotationsLayer extends JPanel {
     //Graphics2D g = null;
     int xoffset = 5;
     AnnotationData annotationData;
+    ArrayList<Pair<Shape, Feature>> featurePositions;
+    
     public int rulerHeight = 20;
     public int blockHeight = 25;
     int maxLevel = 0;
@@ -46,6 +43,7 @@ public class AnnotationsLayer extends JPanel {
     int minorTickMark = 500;
     int majorTickMark = 1000;
     int[] tickMarkPossibilities = {1, 5, 10, 15, 20, 25, 50, 75, 100, 200, 250, 500, 750, 1500, 2000};
+    Font annotationsFont = new Font("Sans serif", Font.PLAIN, 12);
 
     /*
      * Structure selected = null; ArrayList<Structure> structures = null;
@@ -60,8 +58,9 @@ public class AnnotationsLayer extends JPanel {
          * zoomInItem.addActionListener(this);
          * popupMenu.add(zoomOutItem).addActionListener(this);
          * popupMenu.add(autofitItem); popupMenu.add(zoomInItem);
-        popupMenu.add(zoomOutItem);
+         * popupMenu.add(zoomOutItem);
          */
+        ToolTipManager.sharedInstance().registerComponent(this);
     }
     boolean forceRepaint = true;
 
@@ -87,8 +86,7 @@ public class AnnotationsLayer extends JPanel {
      * this.genomeOrganization = g; if (g != null) { for (int i = 0; i <
      * g.genome.size(); i++) { maxLevel = Math.max(maxLevel,
      * g.genome.get(i).level); } setPreferredSize(new Dimension(10000,
-     * rulerHeight + (maxLevel + 1) * blockHeight)); redraw(); }
-    }
+     * rulerHeight + (maxLevel + 1) * blockHeight)); redraw(); } }
      */
     @Override
     public void paintComponent(Graphics graphics) {
@@ -109,8 +107,8 @@ public class AnnotationsLayer extends JPanel {
             minorTickMark = chooseBestTickMarkSize(annotationData.sequenceLength);
             majorTickMark = minorTickMark * 2;
 
-            // draw tick marks
-            //g2.setFont(layerPanel.f2);
+            // draw ruler
+            g2.setFont(annotationsFont);
             for (int i = 0; i < annotationData.sequenceLength; i++) {
                 if (i % majorTickMark == 0) {
                     double x = ((double) i / (double) annotationData.sequenceLength) * getWidth();
@@ -127,20 +125,34 @@ public class AnnotationsLayer extends JPanel {
             }
 
 
-            // draw blocks
-            for (int i = 0; i < annotationData.features.size(); i++) {  
+            // draw blocksn
+            this.featurePositions = new ArrayList<>();
+            for (int i = 0; i < annotationData.features.size(); i++) {
                 Feature feature = annotationData.features.get(i);
-                System.out.println(feature);
                 for (int j = 0; j < feature.blocks.size(); j++) {
-                    double regionLength = feature.blocks.get(j).max - feature.blocks.get(j).min;                    
+                    double regionLength = feature.blocks.get(j).max - feature.blocks.get(j).min;
                     double regionWidth = (regionLength / (double) annotationData.sequenceLength) * getWidth();
                     double x = ((double) feature.min / (double) annotationData.sequenceLength) * getWidth();
                     g2.setColor(feature.blocks.get(j).color);
-                    Rectangle2D rect = new Rectangle2D.Double(x + xoffset, rulerHeight + feature.row * blockHeight, regionWidth, blockHeight);
+                    RoundRectangle2D.Double rect = new RoundRectangle2D.Double(x + xoffset, rulerHeight + feature.row * blockHeight, regionWidth, blockHeight, 10, 10);
+                    featurePositions.add(new Pair(rect, feature));
                     g2.fill(rect);
                     g2.setColor(Color.black);
-                    GraphicsTools.drawStringCentred(g2, x + xoffset + regionWidth / 2, rulerHeight + feature.row * blockHeight + blockHeight / 2, feature.name);
-                }                
+                    // scale text to block size
+                    float fontSize = 13;
+                    for (; fontSize >= 6; fontSize -= 0.25) {
+                        if (g2.getFontMetrics(annotationsFont.deriveFont(Font.PLAIN, fontSize)).stringWidth(feature.name) < regionWidth * 0.95) {
+                            break;
+                        }
+                    }
+                    if (fontSize >= 7) {
+                        g2.setFont(annotationsFont.deriveFont(Font.PLAIN, fontSize));
+                        GraphicsTools.drawStringCentred(g2, x + xoffset + regionWidth / 2, rulerHeight + feature.row * blockHeight + blockHeight / 2, feature.name);
+                    } else {
+                        g2.setFont(annotationsFont.deriveFont(Font.PLAIN, 10));
+                        GraphicsTools.drawStringCentred(g2, x + xoffset + regionWidth / 2, rulerHeight + feature.row * blockHeight + blockHeight / 2, "..");
+                    }
+                }
             }
         }
 
@@ -164,47 +176,54 @@ public class AnnotationsLayer extends JPanel {
 
 
         /*
-        double rulerHeight = 0;
-        if (mouseoverStart != -1 || mouseoverEnd != -1) {
-            double mouseoverLength = mouseoverEnd - mouseoverStart;
-            double regionWidth = (mouseoverLength / (double) layerPanel.genomeLength) * getWidth();
-            double x = (mouseoverStart / (double) layerPanel.genomeLength) * getWidth();
-            g2.setColor(new Color(0, 0, 0, 125));
-            Rectangle2D rect = new Rectangle2D.Double(x + xoffset, rulerHeight + 0, regionWidth, getHeight() - rulerHeight - 1);
-            g2.draw(rect);
+         * double rulerHeight = 0; if (mouseoverStart != -1 || mouseoverEnd !=
+         * -1) { double mouseoverLength = mouseoverEnd - mouseoverStart; double
+         * regionWidth = (mouseoverLength / (double) layerPanel.genomeLength) *
+         * getWidth(); double x = (mouseoverStart / (double)
+         * layerPanel.genomeLength) * getWidth(); g2.setColor(new Color(0, 0, 0,
+         * 125)); Rectangle2D rect = new Rectangle2D.Double(x + xoffset,
+         * rulerHeight + 0, regionWidth, getHeight() - rulerHeight - 1);
+         * g2.draw(rect);
+         *
+         * // wrap around if (layerPanel.genomeLength < mouseoverEnd) {
+         * mouseoverLength = mouseoverEnd - layerPanel.genomeLength; regionWidth
+         * = (mouseoverLength / (double) layerPanel.genomeLength) * getWidth();
+         * x = 0; g2.setColor(new Color(125, 125, 125, 125)); rect = new
+         * Rectangle2D.Double(x + xoffset, rulerHeight + 0, regionWidth,
+         * getHeight() - rulerHeight - 1); g2.draw(rect); } } //rulerHeight =
+         * this.rulerHeight;
+         *
+         * if (selectedStart != -1 || selectedEnd != -1) { double
+         * mouseoverLength = selectedEnd - selectedStart; double regionWidth =
+         * (mouseoverLength / (double) layerPanel.genomeLength) * getWidth();
+         * double x = (selectedStart / (double) layerPanel.genomeLength) *
+         * getWidth(); g2.setColor(Color.RED); Rectangle2D rect = new
+         * Rectangle2D.Double(x + xoffset, rulerHeight + 0, regionWidth,
+         * getHeight() - rulerHeight - 1); g2.draw(rect);
+         *
+         * // wrap around if (layerPanel.genomeLength < selectedEnd) {
+         * mouseoverLength = selectedEnd - layerPanel.genomeLength; regionWidth
+         * = (mouseoverLength / (double) layerPanel.genomeLength) * getWidth();
+         * x = 0; g2.setColor(Color.RED); rect = new Rectangle2D.Double(x +
+         * xoffset, rulerHeight + 0, regionWidth, getHeight() - rulerHeight -
+         * 1); g2.draw(rect); } }
+         *
+         * // }
+         */
+    }
 
-            // wrap around
-            if (layerPanel.genomeLength < mouseoverEnd) {
-                mouseoverLength = mouseoverEnd - layerPanel.genomeLength;
-                regionWidth = (mouseoverLength / (double) layerPanel.genomeLength) * getWidth();
-                x = 0;
-                g2.setColor(new Color(125, 125, 125, 125));
-                rect = new Rectangle2D.Double(x + xoffset, rulerHeight + 0, regionWidth, getHeight() - rulerHeight - 1);
-                g2.draw(rect);
+    @Override
+    public String getToolTipText(MouseEvent event) {
+        Point p = new Point(event.getX(), event.getY());
+        for(int i = 0 ; i < featurePositions.size() ; i++)
+        {
+            if(featurePositions.get(i).getLeft().contains(p))
+            {
+                Feature f = featurePositions.get(i).getRight();
+                return f.name + " ("+f.min + "-" + f.max +")";
             }
         }
-        //rulerHeight = this.rulerHeight;
-
-        if (selectedStart != -1 || selectedEnd != -1) {
-            double mouseoverLength = selectedEnd - selectedStart;
-            double regionWidth = (mouseoverLength / (double) layerPanel.genomeLength) * getWidth();
-            double x = (selectedStart / (double) layerPanel.genomeLength) * getWidth();
-            g2.setColor(Color.RED);
-            Rectangle2D rect = new Rectangle2D.Double(x + xoffset, rulerHeight + 0, regionWidth, getHeight() - rulerHeight - 1);
-            g2.draw(rect);
-
-            // wrap around
-            if (layerPanel.genomeLength < selectedEnd) {
-                mouseoverLength = selectedEnd - layerPanel.genomeLength;
-                regionWidth = (mouseoverLength / (double) layerPanel.genomeLength) * getWidth();
-                x = 0;
-                g2.setColor(Color.RED);
-                rect = new Rectangle2D.Double(x + xoffset, rulerHeight + 0, regionWidth, getHeight() - rulerHeight - 1);
-                g2.draw(rect);
-            }
-        }
-
-        // }*/
+        return super.getToolTipText(event);
     }
 
     /*
@@ -324,7 +343,6 @@ public class AnnotationsLayer extends JPanel {
      *
      * public StructureAndMouseoverRegion(Structure structure, Rectangle2D
      * rectangle, int level) { this.structure = structure; this.rectangle =
-     * rectangle; this.level = level; }
-    }
+     * rectangle; this.level = level; } }
      */
 }

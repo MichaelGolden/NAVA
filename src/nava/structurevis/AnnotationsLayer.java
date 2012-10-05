@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package nava.ui.structurevis;
+package nava.structurevis;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -15,7 +15,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
 import javax.swing.*;
-import nava.ui.GraphicsTools;
+import nava.utils.GraphicsUtils;
 import nava.utils.Pair;
 
 /**
@@ -30,7 +30,7 @@ public class AnnotationsLayer extends JPanel {
     ArrayList<Pair<Shape, Feature>> featurePositions;
     
     public int rulerHeight = 20;
-    public int blockHeight = 25;
+    public int blockHeight = 22;
     int maxLevel = 0;
     int mouseoverStart = -1;
     int mouseoverEnd = -1;
@@ -111,13 +111,13 @@ public class AnnotationsLayer extends JPanel {
             g2.setFont(annotationsFont);
             for (int i = 0; i < annotationData.sequenceLength; i++) {
                 if (i % majorTickMark == 0) {
-                    double x = ((double) i / (double) annotationData.sequenceLength) * getWidth();
+                    double x = ((double) i / (double) annotationData.sequenceLength) * (getWidth() - xoffset);
                     g2.setColor(Color.black);
                     Line2D.Double tick = new Line2D.Double(x + xoffset, rulerHeight - 1, x + xoffset, rulerHeight + 1);
                     g2.draw(tick);
-                    GraphicsTools.drawStringCentred(g2, x + xoffset, rulerHeight / 2, i + "");
+                    GraphicsUtils.drawStringCentred(g2, x + xoffset, rulerHeight / 2, i + "");
                 } else if (i % minorTickMark == 0) {
-                    double x = ((double) i / (double) annotationData.sequenceLength) * getWidth();
+                    double x = ((double) i / (double) annotationData.sequenceLength) * (getWidth() - xoffset);
                     g2.setColor(Color.black);
                     Line2D.Double tick = new Line2D.Double(x + xoffset, rulerHeight - 1, x + xoffset, rulerHeight + 1);
                     g2.draw(tick);
@@ -131,8 +131,8 @@ public class AnnotationsLayer extends JPanel {
                 Feature feature = annotationData.features.get(i);
                 for (int j = 0; j < feature.blocks.size(); j++) {
                     double regionLength = feature.blocks.get(j).max - feature.blocks.get(j).min;
-                    double regionWidth = (regionLength / (double) annotationData.sequenceLength) * getWidth();
-                    double x = ((double) feature.min / (double) annotationData.sequenceLength) * getWidth();
+                    double regionWidth = (regionLength / (double) annotationData.sequenceLength) * (getWidth() - xoffset);
+                    double x = ((double) feature.min / (double) annotationData.sequenceLength) * (getWidth() - xoffset);
                     g2.setColor(feature.blocks.get(j).color);
                     RoundRectangle2D.Double rect = new RoundRectangle2D.Double(x + xoffset, rulerHeight + feature.row * blockHeight, regionWidth, blockHeight, 10, 10);
                     featurePositions.add(new Pair(rect, feature));
@@ -147,10 +147,10 @@ public class AnnotationsLayer extends JPanel {
                     }
                     if (fontSize >= 7) {
                         g2.setFont(annotationsFont.deriveFont(Font.PLAIN, fontSize));
-                        GraphicsTools.drawStringCentred(g2, x + xoffset + regionWidth / 2, rulerHeight + feature.row * blockHeight + blockHeight / 2, feature.name);
+                        GraphicsUtils.drawStringCentred(g2, x + xoffset + regionWidth / 2, rulerHeight + feature.row * blockHeight + blockHeight / 2, feature.name);
                     } else {
                         g2.setFont(annotationsFont.deriveFont(Font.PLAIN, 10));
-                        GraphicsTools.drawStringCentred(g2, x + xoffset + regionWidth / 2, rulerHeight + feature.row * blockHeight + blockHeight / 2, "..");
+                        GraphicsUtils.drawStringCentred(g2, x + xoffset + regionWidth / 2, rulerHeight + feature.row * blockHeight + blockHeight / 2, "..");
                     }
                 }
             }

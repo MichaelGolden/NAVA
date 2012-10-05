@@ -111,7 +111,7 @@ public class ApplicationPanel extends javax.swing.JPanel {
                 app.setDataSource(selectedDataSources.get(0));
                 app.start();
                 app.getOutputFiles();
-                List<OutputFile> output = app.getOutputFiles();
+                List<ApplicationOutput> output = app.getOutputFiles();
                 for (int i = 0; i < output.size(); i++) {
                     projectController.importDataSourceFromOutputFile(output.get(i));
                 }

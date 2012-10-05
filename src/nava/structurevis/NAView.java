@@ -1,4 +1,4 @@
-package nava.ui.structurevis;
+package nava.structurevis;
 
 /*
  * VARNA is a tool for the automated drawing, visualization and annotation of

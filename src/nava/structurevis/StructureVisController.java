@@ -2,12 +2,13 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package nava.ui.structurevis;
+package nava.structurevis;
 
 import java.nio.file.Paths;
 import java.util.Hashtable;
 import nava.utils.Mapping;
 import nava.data.types.Alignment;
+import nava.data.types.SecondaryStructureData;
 import nava.utils.Pair;
 
 /**
@@ -16,6 +17,9 @@ import nava.utils.Pair;
  */
 public class StructureVisController 
 {
+    SecondaryStructureData structure;
+    Alignment referenceAlignment;
+    
     Hashtable<Pair<Alignment, Alignment>, Mapping> mappings = new Hashtable<>();
     
     public Mapping createMapping(Alignment a, Alignment b)

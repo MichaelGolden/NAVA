@@ -201,7 +201,7 @@ public class RNAalifold implements Application {
     boolean started = false;
     boolean running = false;
     boolean canceled = false;
-    ArrayList<OutputFile> outputFiles = new ArrayList<>();
+    ArrayList<ApplicationOutput> outputFiles = new ArrayList<>();
     
     @Override
     public void start() {
@@ -223,7 +223,7 @@ public class RNAalifold implements Application {
                 }
 
                 result = fold(alignmentData.sequences, sequenceNames, "");
-                OutputFile outputFile1 = new OutputFile();
+                ApplicationOutput outputFile1 = new ApplicationOutput();
 
                 outputFile1.file = null;
                 SecondaryStructure structure = new SecondaryStructure();
@@ -233,7 +233,7 @@ public class RNAalifold implements Application {
                 outputFile1.object = new SecondaryStructureData(inputDataSource.title, result.firstSequence, result.pairedSites);
                 outputFiles.add(outputFile1);
                 
-                OutputFile outputFile2 = new OutputFile();
+                ApplicationOutput outputFile2 = new ApplicationOutput();
                 outputFile2.file = null;
                 Matrix matrix = new Matrix();
                 matrix.title = inputDataSource.title;
@@ -301,7 +301,7 @@ public class RNAalifold implements Application {
     }
 
     @Override
-    public List<OutputFile> getOutputFiles() {
+    public List<ApplicationOutput> getOutputFiles() {
         return outputFiles;
     }
 

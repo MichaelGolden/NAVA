@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.TreeModelListener;
-import nava.analyses.OutputFile;
+import nava.analyses.ApplicationOutput;
 import nava.analyses.RNAalifold;
 import nava.data.io.ExcelReader;
 import nava.data.io.FileImport;
@@ -129,7 +129,7 @@ public class ProjectController implements ListDataListener {
         projectModel.dataSources.addElement(dataSource);
     }
 
-    public void importDataSourceFromOutputFile(OutputFile outputFile) {
+    public void importDataSourceFromOutputFile(ApplicationOutput outputFile) {
         if (outputFile.dataSource instanceof SecondaryStructure) {
             if (outputFile.object != null) {
                 SecondaryStructure structure = (SecondaryStructure) outputFile.dataSource;

@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package nava.data.io.annotations;
+package nava.structurevis;
 
 import java.util.ArrayList;
 
@@ -12,12 +12,12 @@ import java.util.ArrayList;
  */
 public class Feature implements Comparable<Feature> {
 
-    String name;
-    int min;
-    int max;
-    int row = 0;
-    boolean visible = true;
-    ArrayList<Block> blocks = new ArrayList<>();
+    public String name;
+    public int min;
+    public int max;
+    public int row = 0;
+    public boolean visible = true;
+    public ArrayList<Block> blocks = new ArrayList<>();
 
     @Override
     public String toString() {

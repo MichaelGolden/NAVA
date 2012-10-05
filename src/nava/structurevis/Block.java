@@ -2,7 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package nava.data.io.annotations;
+package nava.structurevis;
+
+import java.awt.Color;
 
 /**
  *
@@ -10,9 +12,10 @@ package nava.data.io.annotations;
  */
 public class Block {
     
-    Feature parent;
-    int min;
-    int max;
+    public Feature parent;
+    public int min;
+    public int max;
+    public Color color = Color.lightGray;
     
     public Block(Feature parent, int min, int max)
     {

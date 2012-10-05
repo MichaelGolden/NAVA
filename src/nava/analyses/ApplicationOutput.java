@@ -11,7 +11,7 @@ import nava.data.types.DataSource;
  *
  * @author Michael
  */
-public class OutputFile {
+public class ApplicationOutput {
     
     // output can either be a file or an object
     public File file;    

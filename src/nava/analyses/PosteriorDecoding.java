@@ -16,7 +16,7 @@ import nava.utils.RNAFoldingTools;
 public class PosteriorDecoding implements Application {
 
     Matrix matrix;
-    ArrayList<OutputFile> outputFiles = new ArrayList<>();
+    ArrayList<ApplicationOutput> outputFiles = new ArrayList<>();
     boolean started = false;
     boolean running = false;
     boolean canceled = false;
@@ -32,7 +32,7 @@ public class PosteriorDecoding implements Application {
             DenseMatrixData matrixData = (DenseMatrixData) matrix.getObject();
             int[] pairedSites = new RNAFoldingTools().getPosteriorDecodingConsensusStructureMultiThreaded(matrixData.matrix);
 
-            OutputFile outputFile1 = new OutputFile();
+            ApplicationOutput outputFile1 = new ApplicationOutput();
             outputFile1.file = null;
             SecondaryStructure structure = new SecondaryStructure();
             structure.title = matrix.title;
@@ -88,7 +88,7 @@ public class PosteriorDecoding implements Application {
     }
 
     @Override
-    public List<OutputFile> getOutputFiles() {
+    public List<ApplicationOutput> getOutputFiles() {
          return outputFiles;
     }
 

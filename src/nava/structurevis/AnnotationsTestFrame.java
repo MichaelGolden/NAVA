@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package nava.ui.structurevis;
+package nava.structurevis;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,7 +24,8 @@ public class AnnotationsTestFrame extends javax.swing.JFrame {
         try {
             annotationsLayer1.annotationData =  AnnotationData.stackFeatures(AnnotationData.readAnnotations(new File("examples/annotations/refseq.gb")));
             annotationsLayer1.annotationData.assignColors();
-            annotationsLayer1.repaint();
+            System.out.println("here");
+            annotationsLayer1.revalidate();
         } catch (BioException ex) {
             Logger.getLogger(AnnotationsTestFrame.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -41,7 +42,7 @@ public class AnnotationsTestFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        annotationsLayer1 = new nava.ui.structurevis.AnnotationsLayer();
+        annotationsLayer1 = new nava.structurevis.AnnotationsLayer();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -112,6 +113,6 @@ public class AnnotationsTestFrame extends javax.swing.JFrame {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private nava.ui.structurevis.AnnotationsLayer annotationsLayer1;
+    private nava.structurevis.AnnotationsLayer annotationsLayer1;
     // End of variables declaration//GEN-END:variables
 }

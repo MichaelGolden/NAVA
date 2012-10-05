@@ -25,7 +25,7 @@ public interface Application
     public boolean isCanceled();
     public boolean isFinished();
     
-    public List<OutputFile> getOutputFiles();
+    public List<ApplicationOutput> getOutputFiles();
     
     public String getName();
     public String getDescription();

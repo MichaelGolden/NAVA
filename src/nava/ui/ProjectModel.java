@@ -9,6 +9,7 @@ import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import javax.swing.DefaultListModel;
+import nava.ui.navigator.NavigatorTreeModel;
 
 /**
  *
@@ -17,6 +18,7 @@ import javax.swing.DefaultListModel;
 public class ProjectModel implements Serializable {
 
     public DefaultListModel<DataSource> dataSources = new DefaultListModel();
+    public NavigatorTreeModel navigatorTreeModel;
     public long dataSourceCounter = 0;
 
     public void saveProject(File outFile) {

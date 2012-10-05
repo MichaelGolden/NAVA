@@ -18,6 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
+import javax.swing.event.TreeModelListener;
 import nava.analyses.OutputFile;
 import nava.analyses.RNAalifold;
 import nava.data.io.ExcelReader;
@@ -38,10 +39,10 @@ public class ProjectController implements ListDataListener {
     ArrayList<ProjectView> projectViews = new ArrayList<ProjectView>();
     public ProjectModel projectModel;
 
-    public ProjectController(ProjectModel projectModel) {
-        this.projectModel = projectModel;
+    public ProjectController() {
+        /*this.projectModel = projectModel;
 
-        this.projectModel.dataSources.addListDataListener(this);
+        this.projectModel.dataSources.addListDataListener(this);*/
     }
 
     public void importDataSourceFromFile(File dataFile, DataType dataType) {
@@ -57,8 +58,8 @@ public class ProjectController implements ListDataListener {
                         dataSource = new SecondaryStructure();
                         dataSource.setImportId(getNextImportId());
                         dataSource.originalFile = dataFile;
-                        dataSource.originalDataSourcePath = generatePath(dataSource.getImportId(), "orig." + dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1));
-                        dataSource.importedDataSourcePath = generatePath(dataSource.getImportId(), dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1));
+                        dataSource.originalDataSourcePath = generatePath(dataSource.getImportId(), "orig." + dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1)).toString();
+                        dataSource.importedDataSourcePath = generatePath(dataSource.getImportId(), dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1)).toString();
                         dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                         dataSource.dataType = dataType;
                         dataSource.persistObject(structures.get(0));
@@ -68,8 +69,8 @@ public class ProjectController implements ListDataListener {
                         dataSource = new StructureList(dataFile.getName());
                         dataSource.setImportId(getNextImportId());
                         dataSource.originalFile = dataFile;
-                        dataSource.originalDataSourcePath = generatePath(dataSource.getImportId(), "orig." + dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1));
-                        dataSource.importedDataSourcePath = generatePath(dataSource.getImportId(), dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1));
+                        dataSource.originalDataSourcePath = generatePath(dataSource.getImportId(), "orig." + dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1)).toString();
+                        dataSource.importedDataSourcePath = generatePath(dataSource.getImportId(), dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1)).toString();
                         dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                         dataSource.dataType = dataType;
                         dataSource.persistObject(structures);
@@ -100,15 +101,15 @@ public class ProjectController implements ListDataListener {
                 Alignment al = new Alignment();
                 al.setImportId(getNextImportId());
                 al.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
-                al.originalDataSourcePath = generatePath(al.getImportId(), "orig." + dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1));
-                al.importedDataSourcePath = generatePath(al.getImportId(), "fas");
+                al.originalDataSourcePath = generatePath(al.getImportId(), "orig." + dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1)).toString();
+                al.importedDataSourcePath = generatePath(al.getImportId(), "fas").toString();
                 al.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                 al.dataType = dataType;
                 al.fileSize = new FileSize(dataFile.length());
 
                 try {
-                    ReadseqTools.saveAsFASTA(dataFile, al.importedDataSourcePath.toFile());
-                    al.numSequences = IO.countFastaSequences(al.importedDataSourcePath.toFile());
+                    ReadseqTools.saveAsFASTA(dataFile, Paths.get(al.importedDataSourcePath).toFile());
+                    al.numSequences = IO.countFastaSequences(Paths.get(al.importedDataSourcePath).toFile());
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
@@ -120,7 +121,7 @@ public class ProjectController implements ListDataListener {
         try {
             System.out.println(sourcePath);
             System.out.println(dataSource.originalDataSourcePath);
-            Files.copy(sourcePath, dataSource.originalDataSourcePath);
+            Files.copy(sourcePath, Paths.get(dataSource.originalDataSourcePath));
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -133,25 +134,25 @@ public class ProjectController implements ListDataListener {
             if (outputFile.object != null) {
                 SecondaryStructure structure = (SecondaryStructure) outputFile.dataSource;
                 structure.setImportId(getNextImportId());
-                structure.originalDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "dbn");
-                structure.importedDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "dbn");
+                structure.originalDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "dbn").toString();
+                structure.importedDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "dbn").toString();
                 structure.title = outputFile.dataSource.title;
                 structure.persistObject(outputFile.object);
 
                 //dataSource.dataType = DataType.Primary.SECONDARY_STRUCTURE;
-                structure.fileSize = new FileSize(structure.originalDataSourcePath.toFile().length());
+                structure.fileSize = new FileSize(Paths.get(structure.originalDataSourcePath).toFile().length());
                 projectModel.dataSources.addElement(structure);
             }
         } else if (outputFile.dataSource instanceof Matrix) {
             if (outputFile.object != null) {
                 Matrix matrix = (Matrix) outputFile.dataSource;
                 matrix.setImportId(getNextImportId());
-                matrix.originalDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "matrix");
-                matrix.importedDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "matrix");
+                matrix.originalDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "matrix").toString();
+                matrix.importedDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "matrix").toString();
                 matrix.title = outputFile.dataSource.title;
                 matrix.persistObject(outputFile.object);
 
-                matrix.fileSize = new FileSize(matrix.originalDataSourcePath.toFile().length());
+                matrix.fileSize = new FileSize(Paths.get(matrix.originalDataSourcePath).toFile().length());
                 projectModel.dataSources.addElement(matrix);
             }
         }
@@ -198,9 +199,24 @@ public class ProjectController implements ListDataListener {
     }
 
     public void saveProject() {
-        System.out.println("Saving project " + projectModel.dataSources.size());
         projectModel.dataSourceCounter = DataSource.getCount();
+       
+        // a terrible, but necessary hack in order to save the project (tree listener classes prevent serialization)
+        ArrayList<TreeModelListener> treeListenersList  = new ArrayList<>();
+        TreeModelListener [] treeListeners = projectModel.navigatorTreeModel.getTreeModelListeners();
+        for(int i = 0 ; i < treeListeners.length ; i++)
+        {
+            treeListenersList.add(treeListeners[i]);
+            projectModel.navigatorTreeModel.removeTreeModelListener(treeListeners[i]);
+        }
+        
         projectModel.saveProject(projectModel.getProjectPath().resolve(Paths.get("project.data")).toFile());
+        
+        // re-add the listeners, this is only necessary if the application stays open
+        for(int i = 0 ; i < treeListeners.length ; i++)
+        {
+            projectModel.navigatorTreeModel.addTreeModelListener(treeListenersList.get(i));
+        }
     }
 
     @Override

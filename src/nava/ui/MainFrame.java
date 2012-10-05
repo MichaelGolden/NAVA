@@ -4,25 +4,23 @@
  */
 package nava.ui;
 
-import nava.ui.navigator.NavigatorPanel;
 import java.awt.BorderLayout;
-import java.awt.Image;
-import java.util.ArrayList;
-import javax.swing.DefaultListModel;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import nava.analyses.ApplicationController;
-import nava.analyses.Application;
-import nava.analyses.RNAalifold;
-import nava.data.types.Alignment;
-import nava.data.types.StructureList;
-import nava.data.types.TabularData;
 import nava.ui.navigator.NavigationEvent;
 import nava.ui.navigator.NavigationListener;
+import nava.ui.navigator.NavigatorPanel;
 
 /**
  *
  * @author Michael
  */
-public class MainFrame extends javax.swing.JFrame implements NavigationListener {
+public class MainFrame extends javax.swing.JFrame implements NavigationListener, WindowListener {
 
     ProjectController projectController;
     ApplicationController appController;
@@ -35,21 +33,36 @@ public class MainFrame extends javax.swing.JFrame implements NavigationListener 
     public MainFrame() {
         initComponents();
 
-        projectController = new ProjectController(new ProjectModel());
+        ProjectModel model = new ProjectModel();
+        File projectFile = new File("workspace/test_project/project.data");
+        if (projectFile.exists()) {
+            try {
+                model = ProjectModel.loadProject(projectFile);
+            } catch (IOException ex) {
+                Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        projectController = new ProjectController();
+        projectController.openProject(model);
+
         appController = new ApplicationController();
 
         navigatorPanel = new NavigatorPanel(projectController);
+        //projectController.addView(navigatorPanel.navigatorTreeModel);
         navigatorPanel.addNavigationListener(this);
         applicationPanel = new ApplicationPanel(appController, projectController);
 
         /*
          * RNAalifold rnaalifold = new RNAalifold(); ExternalApplication
-         * application = rnaalifold.getClass().newInstance();
-        application.s
+         * application = rnaalifold.getClass().newInstance(); application.s
          */
 
         this.jPanel1.add(navigatorPanel, BorderLayout.CENTER);
         this.jPanel2.add(applicationPanel, BorderLayout.CENTER);
+        this.addWindowListener(this);
     }
 
     /**
@@ -94,7 +107,7 @@ public class MainFrame extends javax.swing.JFrame implements NavigationListener 
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-       projectController.saveProject();
+        projectController.saveProject();
     }//GEN-LAST:event_formWindowClosing
 
     /**
@@ -146,5 +159,34 @@ public class MainFrame extends javax.swing.JFrame implements NavigationListener 
     @Override
     public void dataSourceSelectionChanged(NavigationEvent e) {
         applicationPanel.showUsableApplications(e.selectedDataSources);
+    }
+
+    @Override
+    public void windowOpened(WindowEvent e) {
+    }
+
+    @Override
+    public void windowClosing(WindowEvent e) {
+        projectController.saveProject();
+    }
+
+    @Override
+    public void windowClosed(WindowEvent e) {
+    }
+
+    @Override
+    public void windowIconified(WindowEvent e) {
+    }
+
+    @Override
+    public void windowDeiconified(WindowEvent e) {
+    }
+
+    @Override
+    public void windowActivated(WindowEvent e) {
+    }
+
+    @Override
+    public void windowDeactivated(WindowEvent e) {
     }
 }

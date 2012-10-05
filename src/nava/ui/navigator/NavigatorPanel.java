@@ -11,13 +11,6 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.io.File;
 import java.util.List;
 import javax.swing.event.*;
-import nava.data.types.StructureList;
-import nava.data.types.Annotations;
-import nava.data.types.TabularData;
-import nava.data.types.Matrix;
-import nava.data.types.TabularField;
-import nava.data.types.SecondaryStructure;
-import nava.data.types.Alignment;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
@@ -29,8 +22,7 @@ import nava.ui.ProjectController;
  */
 public class NavigatorPanel extends javax.swing.JPanel implements TreeSelectionListener, TreeModelListener {
 
-    ProjectController projectController;
-
+    ProjectController projectController;    
     /**
      * Creates new form NavigatorPanel
      */
@@ -41,15 +33,23 @@ public class NavigatorPanel extends javax.swing.JPanel implements TreeSelectionL
 
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode();
-        NavigatorTreeModel navigatorTreeModel = new NavigatorTreeModel(root, projectController);
-        navigatorTreeModel.addTreeModelListener(this);
+        if(projectController.projectModel.navigatorTreeModel == null)
+        {
+            projectController.projectModel.navigatorTreeModel = new NavigatorTreeModel(root, projectController.projectModel);
+        }
+        else
+        {
+            
+        }
+        projectController.projectModel.navigatorTreeModel.addTreeModelListener(this);
+        projectController.addView(projectController.projectModel.navigatorTreeModel);
+        
         NavigatorTreeRenderer navigatorRenderer = new NavigatorTreeRenderer();
         jTree1.setRootVisible(false);
-        jTree1.setModel(navigatorTreeModel);
+        jTree1.setModel(projectController.projectModel.navigatorTreeModel);
         jTree1.setCellRenderer(navigatorRenderer);
         jTree1.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         jTree1.addTreeSelectionListener(this);
-        projectController.addView(navigatorTreeModel);
 
         jTree1.setDropTarget(new DropTarget() {
 

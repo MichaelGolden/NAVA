@@ -9,6 +9,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.io.Serializable;
 import java.util.ArrayList;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -19,7 +20,7 @@ import nava.data.types.DataSource;
  *
  * @author Michael
  */
-public class NavigatorTreeNode extends DefaultMutableTreeNode {
+public class NavigatorTreeNode extends DefaultMutableTreeNode implements Serializable {
 
     public boolean isFolder = false;
     public boolean isNew = true;

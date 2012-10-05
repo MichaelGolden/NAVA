@@ -4,19 +4,21 @@
  */
 package nava.ui.navigator;
 
+import java.io.Serializable;
 import javax.swing.event.ListDataEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import nava.data.types.*;
 import nava.ui.ProjectController;
+import nava.ui.ProjectModel;
 import nava.ui.ProjectView;
 
 /**
  *
  * @author Michael
  */
-public class NavigatorTreeModel extends DefaultTreeModel implements ProjectView {
+public class NavigatorTreeModel extends DefaultTreeModel implements Serializable, ProjectView {
 
     DefaultMutableTreeNode origDataNode = null;
     DefaultMutableTreeNode dataNode = null;
@@ -26,11 +28,11 @@ public class NavigatorTreeModel extends DefaultTreeModel implements ProjectView 
     DefaultMutableTreeNode structuresNode = null;
     DefaultMutableTreeNode tabularNode = null;
     
-    ProjectController projectController;
+    ProjectModel projectModel;
 
-    public NavigatorTreeModel(DefaultMutableTreeNode root, ProjectController projectController) {
+    public NavigatorTreeModel(DefaultMutableTreeNode root, ProjectModel projectModel) {
         super(root);
-        this.projectController = projectController;
+        this.projectModel = projectModel;
 
         origDataNode = NavigatorTreeNode.createFolderNode("Original data sources");
         dataNode = NavigatorTreeNode.createFolderNode("Imported data sources");
@@ -82,8 +84,7 @@ public class NavigatorTreeModel extends DefaultTreeModel implements ProjectView 
 
     @Override
     public void dataSourcesLoaded() {
-        System.out.println("dataSourcesLoaded");
-        //throw new UnsupportedOperationException("Not supported yet.");
+        // do nothing
     }
 
     @Override
@@ -91,7 +92,7 @@ public class NavigatorTreeModel extends DefaultTreeModel implements ProjectView 
         System.out.println("NavigatorTreeModel dataSourcesIntervalAdded");
         for(int i = e.getIndex0() ; i < e.getIndex1() + 1 ; i++)
         {
-            addDataSource(projectController.projectModel.dataSources.get(i));
+            addDataSource(projectModel.dataSources.get(i));
         }
         //throw new UnsupportedOperationException("Not supported yet.");
     }

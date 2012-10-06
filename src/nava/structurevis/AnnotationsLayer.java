@@ -4,19 +4,18 @@
  */
 package nava.structurevis;
 
-import nava.structurevis.data.Feature;
-import nava.structurevis.data.AnnotationData;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
-import javax.swing.*;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.ToolTipManager;
+import nava.structurevis.data.AnnotationData;
+import nava.structurevis.data.Feature;
+import nava.ui.MainFrame;
 import nava.utils.GraphicsUtils;
 import nava.utils.Pair;
 
@@ -45,7 +44,8 @@ public class AnnotationsLayer extends JPanel {
     int minorTickMark = 500;
     int majorTickMark = 1000;
     int[] tickMarkPossibilities = {1, 5, 10, 15, 20, 25, 50, 75, 100, 200, 250, 500, 750, 1500, 2000};
-    Font annotationsFont = new Font("Sans serif", Font.PLAIN, 12);
+    
+    Font annotationsFont = MainFrame.fontLiberationSans.deriveFont(12);
 
     /*
      * Structure selected = null; ArrayList<Structure> structures = null;
@@ -106,18 +106,19 @@ public class AnnotationsLayer extends JPanel {
             g2.setColor(Color.white);
             g2.fillRect(0, 0, panelWidth, panelHeight);
 
+            
             minorTickMark = chooseBestTickMarkSize(annotationData.sequenceLength);
             majorTickMark = minorTickMark * 2;
-
+            
             // draw ruler
-            g2.setFont(annotationsFont);
-            for (int i = 0; i < annotationData.sequenceLength; i++) {
+            g2.setFont(annotationsFont.deriveFont(12.0f));
+            for (int i = 0; i < annotationData.sequenceLength ; i++) {
                 if (i % majorTickMark == 0) {
                     double x = ((double) i / (double) annotationData.sequenceLength) * (getWidth() - xoffset);
                     g2.setColor(Color.black);
                     Line2D.Double tick = new Line2D.Double(x + xoffset, rulerHeight - 1, x + xoffset, rulerHeight + 1);
                     g2.draw(tick);
-                    GraphicsUtils.drawStringCentred(g2, x + xoffset, rulerHeight / 2, i + "");
+                    GraphicsUtils.drawStringCentred(g2, x + xoffset, rulerHeight/2, i + "");
                 } else if (i % minorTickMark == 0) {
                     double x = ((double) i / (double) annotationData.sequenceLength) * (getWidth() - xoffset);
                     g2.setColor(Color.black);
@@ -126,8 +127,8 @@ public class AnnotationsLayer extends JPanel {
                 }
             }
 
-
-            // draw blocksn
+            
+            // draw blocks
             this.featurePositions = new ArrayList<>();
             for (int i = 0; i < annotationData.features.size(); i++) {
                 Feature feature = annotationData.features.get(i);
@@ -141,6 +142,7 @@ public class AnnotationsLayer extends JPanel {
                     g2.fill(rect);
                     g2.setColor(Color.black);
                     // scale text to block size
+                   
                     float fontSize = 13;
                     for (; fontSize >= 6; fontSize -= 0.25) {
                         if (g2.getFontMetrics(annotationsFont.deriveFont(Font.PLAIN, fontSize)).stringWidth(feature.name) < regionWidth * 0.95) {
@@ -153,7 +155,7 @@ public class AnnotationsLayer extends JPanel {
                     } else {
                         g2.setFont(annotationsFont.deriveFont(Font.PLAIN, 10));
                         GraphicsUtils.drawStringCentred(g2, x + xoffset + regionWidth / 2, rulerHeight + feature.row * blockHeight + blockHeight / 2, "..");
-                    }
+                    }                   
                 }
             }
         }

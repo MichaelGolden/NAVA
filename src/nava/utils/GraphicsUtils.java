@@ -18,11 +18,12 @@ public class GraphicsUtils {
         FontMetrics fm = g.getFontMetrics();
         java.awt.geom.Rectangle2D rect = fm.getStringBounds(s, g);
 
-        int textHeight = (int) (rect.getHeight());
-        int textWidth = (int) (rect.getWidth());
+        double textHeight = rect.getHeight();
+        double textWidth = rect.getWidth();
         double x1 = x + (-textWidth / 2);
         double y1 = y + (-textHeight / 2 + fm.getAscent());
 
+        //System.out.println(s+"\t"+x1 +"\t"+y1);
         g.drawString(s, (float) x1, (float) y1);  // Draw the string.
     }
 

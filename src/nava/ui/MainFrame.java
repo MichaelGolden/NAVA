@@ -5,6 +5,8 @@
 package nava.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
@@ -14,6 +16,7 @@ import java.util.logging.Logger;
 import nava.analyses.ApplicationController;
 import nava.data.types.TabularField;
 import nava.data.types.TabularFieldData;
+import nava.structurevis.StructureVisPanel;
 import nava.ui.navigator.NavigationEvent;
 import nava.ui.navigator.NavigationListener;
 import nava.ui.navigator.NavigatorPanel;
@@ -22,18 +25,32 @@ import nava.ui.navigator.NavigatorPanel;
  *
  * @author Michael
  */
-public class MainFrame extends javax.swing.JFrame implements NavigationListener, WindowListener {
+public class MainFrame extends javax.swing.JFrame implements WindowListener {
 
     ProjectController projectController;
     ApplicationController appController;
     NavigatorPanel navigatorPanel;
-    ApplicationPanel applicationPanel;
+    //ApplicationPanel applicationPanel;
+    
+    public static Font fontLiberationSans = new Font("Sans", Font.PLAIN, 12);
+    
+    public void startup()
+    {
+        try {
+            fontLiberationSans = Font.createFont(Font.PLAIN, ClassLoader.getSystemResourceAsStream("resources/fonts/LiberationSans-Regular.ttf")).deriveFont(12.0f);
+        } catch (FontFormatException ex) {
+            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
     /**
      * Creates new form MainFrame
      */
     public MainFrame() {
         initComponents();
+        startup();
 
         ProjectModel model = new ProjectModel();
         File projectFile = new File("workspace/test_project/project.data");
@@ -46,24 +63,16 @@ public class MainFrame extends javax.swing.JFrame implements NavigationListener,
                 Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-
+        
         projectController = new ProjectController();
-        projectController.openProject(model);
-
+        projectController.openProject(model);    
         appController = new ApplicationController();
-
-        navigatorPanel = new NavigatorPanel(projectController);
-        //projectController.addView(navigatorPanel.navigatorTreeModel);
-        navigatorPanel.addNavigationListener(this);
-        applicationPanel = new ApplicationPanel(appController, projectController);
-
-        /*
-         * RNAalifold rnaalifold = new RNAalifold(); ExternalApplication
-         * application = rnaalifold.getClass().newInstance(); application.s
-         */
-
-        this.jPanel1.add(navigatorPanel, BorderLayout.CENTER);
-        this.jPanel2.add(applicationPanel, BorderLayout.CENTER);
+        
+        DataPanel dataPanel = new DataPanel(projectController, appController);
+        jPanel1.add(dataPanel, BorderLayout.CENTER);
+        StructureVisPanel structureVisPanel = new StructureVisPanel();
+        jPanel2.add(structureVisPanel, BorderLayout.CENTER);
+        
         this.addWindowListener(this);
     }
 
@@ -76,6 +85,7 @@ public class MainFrame extends javax.swing.JFrame implements NavigationListener,
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
 
@@ -87,23 +97,12 @@ public class MainFrame extends javax.swing.JFrame implements NavigationListener,
         });
 
         jPanel1.setLayout(new java.awt.BorderLayout());
+        jTabbedPane1.addTab("tab1", jPanel1);
 
         jPanel2.setLayout(new java.awt.BorderLayout());
+        jTabbedPane1.addTab("tab2", jPanel2);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
+        getContentPane().add(jTabbedPane1, java.awt.BorderLayout.CENTER);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -156,19 +155,8 @@ public class MainFrame extends javax.swing.JFrame implements NavigationListener,
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JTabbedPane jTabbedPane1;
     // End of variables declaration//GEN-END:variables
-
-    @Override
-    public void dataSourceSelectionChanged(NavigationEvent e) {
-        applicationPanel.showUsableApplications(e.selectedDataSources);
-        for(int i = 0 ; i < e.selectedDataSources.size() ; i++)
-        {
-            if(e.selectedDataSources.get(i) instanceof TabularField)
-            {
-                System.out.println(((TabularField)e.selectedDataSources.get(i)).getObject().values);
-            }
-        }
-    }
 
     @Override
     public void windowOpened(WindowEvent e) {

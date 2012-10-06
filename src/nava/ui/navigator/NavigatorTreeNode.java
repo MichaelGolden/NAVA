@@ -35,11 +35,14 @@ public class NavigatorTreeNode extends DefaultMutableTreeNode implements Seriali
 
         ArrayList<DataSource> children = this.dataSource.getChildren();
         for (int i = 0; i < children.size(); i++) {
-            this.add(new NavigatorTreeNode(children.get(i)));
+           NavigatorTreeNode childNode = new NavigatorTreeNode(children.get(i));
+           childNode.isNew = false;
+           this.add(childNode);
         }
     }
 
     public static NavigatorTreeNode createFolderNode(String title) {
+        
         NavigatorTreeNode node = new NavigatorTreeNode();
         node.isFolder = true;
         node.title = title;

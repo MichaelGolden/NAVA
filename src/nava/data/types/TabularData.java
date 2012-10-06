@@ -5,35 +5,11 @@
 package nava.data.types;
 
 import java.util.ArrayList;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 
 /**
  *
- * @author Michael
+ * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class TabularData extends DataSource {
-
-    public ArrayList<TabularField> fields = new ArrayList<TabularField>();
-    
-    @Override
-    public Icon getIcon() {
-        return new ImageIcon(ClassLoader.getSystemResource("resources/icons/tabular-16x16.png"));
-    }
-
-    @Override
-    public ArrayList<TabularField> getChildren() {
-        return fields;
-    }
-
-    @Override
-    public Object getObject() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void persistObject(Object object) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-    
+public class TabularData {
+    ArrayList<TabularFieldData> fields = new ArrayList<>();
 }

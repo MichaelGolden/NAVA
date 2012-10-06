@@ -121,7 +121,7 @@ public class FileImport {
         }
         
         try {
-            if(ExcelReader.isExcelWorkbook(inFile))
+            if(ExcelIO.isExcelWorkbook(inFile))
             {
                 possibleDataTypes.add(new DataType(DataType.Primary.TABULAR_DATA, DataType.FileFormat.EXCEL));
             }
@@ -172,7 +172,7 @@ public class FileImport {
                 }
                 System.out.println(ReadseqTools.isKnownFormat(files.get(j)) + "\t" + ReadseqTools.getFormatName(files.get(j)));
                 System.out.println("isGenbank?" + isGenbankFormat(files.get(j)));
-                System.out.println("isExcel?" + ExcelReader.isExcelWorkbook(files.get(j)));
+                System.out.println("isExcel?" + ExcelIO.isExcelWorkbook(files.get(j)));
                 System.out.println("isCSV?" + CsvReader.isCsvFormat(files.get(j)));
                 System.out.println();
             } catch (Exception ex) {

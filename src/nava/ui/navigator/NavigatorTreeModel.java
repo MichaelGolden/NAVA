@@ -76,7 +76,7 @@ public class NavigatorTreeModel extends DefaultTreeModel implements Serializable
             insertNodeInto(new NavigatorTreeNode(dataSource), structuresNode, structuresNode.getChildCount());
         }
         
-        if(dataSource instanceof TabularData || dataSource instanceof TabularField)
+        if(dataSource instanceof Tabular || dataSource instanceof TabularField)
         {
             insertNodeInto(new NavigatorTreeNode(dataSource), tabularNode, tabularNode.getChildCount());
         }

@@ -4,6 +4,7 @@
  */
 package nava.structurevis;
 
+import nava.structurevis.data.AnnotationData;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;

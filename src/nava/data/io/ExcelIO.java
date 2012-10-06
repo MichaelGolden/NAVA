@@ -4,14 +4,12 @@
  */
 package nava.data.io;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import nava.data.types.Tabular;
 import nava.data.types.TabularData;
 import nava.data.types.TabularField;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -21,14 +19,14 @@ import org.apache.poi.ss.usermodel.*;
  *
  * @author Michael
  */
-public class ExcelReader {
+public class ExcelIO {
 
     File file = null;
     Workbook workbook = null;
     DataFormatter formatter = null;
     FormulaEvaluator evaluator = null;
 
-    public ExcelReader(File file) {
+    public ExcelIO(File file) {
         this.file = file;
     }
 
@@ -87,31 +85,66 @@ public class ExcelReader {
         return 0;
     }
 
-    public static TabularData getTabularRepresentatation(File inFile) throws FileNotFoundException {
-        TabularData tabularData = new TabularData();
+    public static Tabular getTabularRepresentatation(File excelFile) throws IOException, InvalidFormatException {
+        Tabular tabular = new Tabular();
 
         DecimalFormat df = new DecimalFormat("00");
-        try {
-            Workbook workbook = WorkbookFactory.create(inFile);
-            DataFormatter formatter = new DataFormatter(true);
-            FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
-            int numSheets = workbook.getNumberOfSheets();
-            Sheet sheet = null;
-            //Row row = null;
-            for (int i = 0; i < numSheets; i++) {
-                sheet = workbook.getSheetAt(i);
-                if (sheet.getPhysicalNumberOfRows() > 0) {
-                    ArrayList<String> header = rowToCSV(sheet.getRow(0), formatter, evaluator);
-                    for (int j = 0; j < header.size(); j++) {
-                        tabularData.fields.add(new TabularField((i+1)+"."+df.format(j+1)+": "+header.get(j)));
-                    }
+        Workbook workbook = WorkbookFactory.create(excelFile);
+        DataFormatter formatter = new DataFormatter(true);
+        FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+
+        int numSheets = workbook.getNumberOfSheets();
+        tabular.numSheets = numSheets;
+
+        Sheet sheet;
+
+        for (int i = 0; i < numSheets; i++) {
+            sheet = workbook.getSheetAt(i);
+            if (sheet.getPhysicalNumberOfRows() > 0) {
+                ArrayList<String> header = rowToStringList(sheet.getRow(0), formatter, evaluator);
+                for (int j = 0; j < header.size(); j++) {
+                    tabular.fields.add(new TabularField(tabular, header.get(j), i, j, i * numSheets + j));
                 }
             }
-        } catch (IOException ex) {
-        } catch (InvalidFormatException ex) {
         }
 
-        return tabularData;
+        return tabular;
+    }
+
+    public static void saveAsCSV(File excelFile, File outFile) throws IOException, InvalidFormatException {
+        Workbook workbook = WorkbookFactory.create(excelFile);
+        DataFormatter formatter = new DataFormatter(true);
+        FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+
+        int numSheets = workbook.getNumberOfSheets();
+
+        Sheet sheet;
+
+        BufferedWriter buffer = new BufferedWriter(new FileWriter(outFile));
+
+        for (int r = 0;; r++) {
+            ArrayList<String> row = new ArrayList<>();
+            boolean cont = false;
+            for (int i = 0; i < numSheets; i++) {
+                sheet = workbook.getSheetAt(i);
+                if (r < sheet.getPhysicalNumberOfRows()) {
+                    row.addAll(rowToStringList(sheet.getRow(r), formatter, evaluator));
+                    cont = true;
+                }
+            }
+
+            // if there is a row to write
+            if (cont) {
+                for (int k = 0; k < row.size() - 1; k++) {
+                    buffer.write("\"" + row.get(k) + "\",");
+                }
+                buffer.write("\"" + row.get(row.size() - 1) + "\"");
+                buffer.newLine();
+            } else {
+                break;
+            }
+        }
+        buffer.close();
     }
 
     public void printWorkbook() throws FileNotFoundException,
@@ -158,7 +191,7 @@ public class ExcelReader {
                     for (int j = 0; j <= lastRowNum; j++) {
                         row = sheet.getRow(j);
 //                        this.rowToCSV(row);
-                        System.out.println(i + "," + j + "\t" + rowToCSV(row, formatter, evaluator).toString());
+                        System.out.println(i + "," + j + "\t" + rowToStringList(row, formatter, evaluator).toString());
                     }
                 }
             }
@@ -169,7 +202,7 @@ public class ExcelReader {
         }
     }
 
-    private static ArrayList<String> rowToCSV(Row row, DataFormatter formatter, FormulaEvaluator evaluator) {
+    private static ArrayList<String> rowToStringList(Row row, DataFormatter formatter, FormulaEvaluator evaluator) {
         Cell cell = null;
         int lastCellNum = 0;
         ArrayList<String> csvLine = new ArrayList<String>();
@@ -190,9 +223,24 @@ public class ExcelReader {
                     csvLine.add("");
                 } else {
                     if (cell.getCellType() != Cell.CELL_TYPE_FORMULA) {
-                        csvLine.add(formatter.formatCellValue(cell));
+                        if(cell.getCellType() == Cell.CELL_TYPE_NUMERIC)
+                        {
+                            csvLine.add(cell.getNumericCellValue()+"");
+                        }
+                        else
+                        {
+                           csvLine.add(formatter.formatCellValue(cell, evaluator));
+                        }
                     } else {
-                        csvLine.add(formatter.formatCellValue(cell, evaluator));
+                        CellValue cellValue = evaluator.evaluate(cell);
+                        if(cellValue.getCellType() == Cell.CELL_TYPE_NUMERIC)
+                        {
+                            csvLine.add(cellValue.getNumberValue()+"");
+                        }
+                        else
+                        {
+                            csvLine.add(formatter.formatCellValue(cell, evaluator));
+                        }                        
                     }
                 }
             }
@@ -202,13 +250,13 @@ public class ExcelReader {
 
     public static void main(String[] args) {
         try {
-            new ExcelReader(new File("C:\\Users\\Michael\\Dropbox\\RNA and StatAlign\\correlation_zsexcelfix.xlsx")).printWorkbook();
+            new ExcelIO(new File("C:\\Users\\Michael\\Dropbox\\RNA and StatAlign\\correlation_zsexcelfix.xlsx")).printWorkbook();
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(ExcelReader.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ExcelIO.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(ExcelReader.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ExcelIO.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InvalidFormatException ex) {
-            Logger.getLogger(ExcelReader.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ExcelIO.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

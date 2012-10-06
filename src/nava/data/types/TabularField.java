@@ -4,7 +4,11 @@
  */
 package nava.data.types;
 
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
@@ -14,9 +18,20 @@ import javax.swing.ImageIcon;
  */
 public class TabularField extends DataSource {
     
-    public TabularField(String title)
+    Tabular parent;
+    String header;
+    int sheet;
+    int indexInSheet;
+    int index;
+    
+    public TabularField(Tabular parent, String header, int sheet, int indexInSheet, int index)
     {
-        this.title = title;
+        this.parent = parent;
+        this.header = header;
+        this.title = header;
+        this.sheet = sheet;
+        this.indexInSheet = indexInSheet;
+        this.index = index;
     }
 
     @Override
@@ -30,8 +45,13 @@ public class TabularField extends DataSource {
     }
 
     @Override
-    public Object getObject() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public TabularFieldData getObject() {
+        try {
+            return TabularFieldData.getColumn(Paths.get(parent.importedDataSourcePath).toFile(), index);
+        } catch (IOException ex) {
+            Logger.getLogger(TabularField.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 
     @Override

@@ -4,6 +4,8 @@
  */
 package nava.structurevis;
 
+import nava.structurevis.data.Feature;
+import nava.structurevis.data.AnnotationData;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

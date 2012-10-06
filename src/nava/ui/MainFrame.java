@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import nava.analyses.ApplicationController;
+import nava.data.types.TabularField;
+import nava.data.types.TabularFieldData;
 import nava.ui.navigator.NavigationEvent;
 import nava.ui.navigator.NavigationListener;
 import nava.ui.navigator.NavigatorPanel;
@@ -159,6 +161,13 @@ public class MainFrame extends javax.swing.JFrame implements NavigationListener,
     @Override
     public void dataSourceSelectionChanged(NavigationEvent e) {
         applicationPanel.showUsableApplications(e.selectedDataSources);
+        for(int i = 0 ; i < e.selectedDataSources.size() ; i++)
+        {
+            if(e.selectedDataSources.get(i) instanceof TabularField)
+            {
+                System.out.println(((TabularField)e.selectedDataSources.get(i)).getObject().values);
+            }
+        }
     }
 
     @Override

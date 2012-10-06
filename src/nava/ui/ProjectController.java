@@ -21,7 +21,7 @@ import javax.swing.event.ListDataListener;
 import javax.swing.event.TreeModelListener;
 import nava.analyses.ApplicationOutput;
 import nava.analyses.RNAalifold;
-import nava.data.io.ExcelReader;
+import nava.data.io.ExcelIO;
 import nava.data.io.FileImport;
 import nava.data.io.FileImport.ParserException;
 import nava.data.io.IO;
@@ -40,9 +40,11 @@ public class ProjectController implements ListDataListener {
     public ProjectModel projectModel;
 
     public ProjectController() {
-        /*this.projectModel = projectModel;
-
-        this.projectModel.dataSources.addListDataListener(this);*/
+        /*
+         * this.projectModel = projectModel;
+         *
+         * this.projectModel.dataSources.addListDataListener(this);
+         */
     }
 
     public void importDataSourceFromFile(File dataFile, DataType dataType) {
@@ -86,8 +88,24 @@ public class ProjectController implements ListDataListener {
                 break;
             case TABULAR_DATA:
                 try {
-                    dataSource = ExcelReader.getTabularRepresentatation(dataFile);
-                } catch (FileNotFoundException ex) {
+                    if(dataType.fileFormat.equals(DataType.FileFormat.EXCEL))
+                    {
+                        dataSource = ExcelIO.getTabularRepresentatation(dataFile);
+                        dataSource.setImportId(getNextImportId());
+                        dataSource.originalFile = dataFile;
+                        dataSource.originalDataSourcePath = generatePath(dataSource.getImportId(), "orig." + dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1)).toString();
+                        dataSource.importedDataSourcePath = generatePath(dataSource.getImportId(), "csv").toString();
+                        dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
+                        dataSource.dataType = dataType;
+                        dataSource.persistObject(dataSource);
+                        dataSource.fileSize = new FileSize(dataFile.length());                        
+                        ExcelIO.saveAsCSV(dataFile, Paths.get(dataSource.importedDataSourcePath).toFile());
+                    }
+                } catch (IOException ex) {
+                    Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                catch(Exception ex)
+                {
                     Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
@@ -200,21 +218,19 @@ public class ProjectController implements ListDataListener {
 
     public void saveProject() {
         projectModel.dataSourceCounter = DataSource.getCount();
-       
+
         // a terrible, but necessary hack in order to save the project (tree listener classes prevent serialization)
-        ArrayList<TreeModelListener> treeListenersList  = new ArrayList<>();
-        TreeModelListener [] treeListeners = projectModel.navigatorTreeModel.getTreeModelListeners();
-        for(int i = 0 ; i < treeListeners.length ; i++)
-        {
+        ArrayList<TreeModelListener> treeListenersList = new ArrayList<>();
+        TreeModelListener[] treeListeners = projectModel.navigatorTreeModel.getTreeModelListeners();
+        for (int i = 0; i < treeListeners.length; i++) {
             treeListenersList.add(treeListeners[i]);
             projectModel.navigatorTreeModel.removeTreeModelListener(treeListeners[i]);
         }
-        
+
         projectModel.saveProject(projectModel.getProjectPath().resolve(Paths.get("project.data")).toFile());
-        
+
         // re-add the listeners, this is only necessary if the application stays open
-        for(int i = 0 ; i < treeListeners.length ; i++)
-        {
+        for (int i = 0; i < treeListeners.length; i++) {
             projectModel.navigatorTreeModel.addTreeModelListener(treeListenersList.get(i));
         }
     }

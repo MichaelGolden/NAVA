@@ -1,0 +1,8 @@
+bin/*
+build/*
+data/*
+design/*
+workspace/*
+nbproject/*
+manifest.mf
+build.xml

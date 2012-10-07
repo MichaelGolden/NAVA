@@ -6,10 +6,16 @@ package nava.structurevis;
 
 import nava.structurevis.data.AnnotationData;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import nava.ui.ProjectController;
 import org.biojava.bio.BioException;
 
 /**
@@ -18,23 +24,39 @@ import org.biojava.bio.BioException;
  */
 public class StructureVisPanel extends javax.swing.JPanel {
 
+    ProjectController projectController;
+    
     /**
      * Creates new form StructureVisPanel
      */
-    public StructureVisPanel() {
+    public StructureVisPanel(ProjectController projectController) {
         initComponents();
+        this.projectController = projectController;
+
+        LayerPanel layerPanel = new LayerPanel();
 
         AnnotationsLayer annotationsLayer1 = new AnnotationsLayer();
         try {
-            annotationsLayer1.annotationData = AnnotationData.stackFeatures(AnnotationData.readAnnotations(new File("examples/annotations/refseq.gb")));
-            annotationsLayer1.annotationData.assignColors();
-            annotationsLayer1.revalidate();
+            AnnotationData annotationData = AnnotationData.stackFeatures(AnnotationData.readAnnotations(new File("examples/annotations/refseq.gb")));
+            annotationData.assignColors();
+            annotationsLayer1.setAnnotationData(annotationData);
         } catch (BioException ex) {
             Logger.getLogger(StructureVisPanel.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(StructureVisPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
-        this.annotationPanel.add(annotationsLayer1, BorderLayout.CENTER);
+
+        JPanel annotationsLayerLeft = new JPanel();
+        annotationsLayerLeft.setLayout(new BorderLayout());
+        annotationsLayerLeft.add(new JLabel("Sequence annotations"), BorderLayout.WEST);
+        annotationsLayerLeft.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.darkGray));
+        layerPanel.addLayer(new Layer(annotationsLayerLeft, annotationsLayer1));
+        
+        topScrollPane.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.darkGray));
+        topScrollPane.setViewportView(layerPanel);
+
+
+        verticalSplitPane.setDividerLocation(annotationsLayer1.getPreferredSize().height + jPanel1.getPreferredSize().height + 3);
     }
 
     /**
@@ -46,42 +68,88 @@ public class StructureVisPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        annotationPanel = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        verticalSplitPane = new javax.swing.JSplitPane();
+        topSplit = new javax.swing.JPanel();
+        topScrollPane = new javax.swing.JScrollPane();
+        jPanel1 = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
+        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(4, 0), new java.awt.Dimension(4, 0), new java.awt.Dimension(4, 32767));
+        add1DDataButton = new javax.swing.JButton();
+        bottomSplit = new javax.swing.JPanel();
 
-        annotationPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        annotationPanel.setLayout(new java.awt.BorderLayout());
+        verticalSplitPane.setDividerLocation(300);
+        verticalSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 496, Short.MAX_VALUE)
+        topSplit.setLayout(new javax.swing.BoxLayout(topSplit, javax.swing.BoxLayout.PAGE_AXIS));
+
+        topScrollPane.setBorder(null);
+        topSplit.add(topScrollPane);
+
+        jPanel1.setMaximumSize(new java.awt.Dimension(32767, 15));
+        jPanel1.setMinimumSize(new java.awt.Dimension(83, 40));
+        jPanel1.setPreferredSize(new java.awt.Dimension(461, 25));
+        jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.LINE_AXIS));
+
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/annotations-16x16.png"))); // NOI18N
+        jButton1.setText("Add annotations");
+        jPanel1.add(jButton1);
+        jPanel1.add(filler1);
+
+        add1DDataButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/tabular-field-16x16.png"))); // NOI18N
+        add1DDataButton.setText("Add 1D data");
+        add1DDataButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                add1DDataButtonActionPerformed(evt);
+            }
+        });
+        jPanel1.add(add1DDataButton);
+
+        topSplit.add(jPanel1);
+
+        verticalSplitPane.setLeftComponent(topSplit);
+
+        bottomSplit.setPreferredSize(new java.awt.Dimension(461, 500));
+
+        javax.swing.GroupLayout bottomSplitLayout = new javax.swing.GroupLayout(bottomSplit);
+        bottomSplit.setLayout(bottomSplitLayout);
+        bottomSplitLayout.setHorizontalGroup(
+            bottomSplitLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 461, Short.MAX_VALUE)
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 206, Short.MAX_VALUE)
+        bottomSplitLayout.setVerticalGroup(
+            bottomSplitLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
+
+        verticalSplitPane.setRightComponent(bottomSplit);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(annotationPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(verticalSplitPane)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(annotationPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 103, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addComponent(verticalSplitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void add1DDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_add1DDataButtonActionPerformed
+       Data1DDialog d = new Data1DDialog(null, true, projectController.projectModel);
+       d.setSize(640,480);
+       d.setVisible(true);
+    }//GEN-LAST:event_add1DDataButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel annotationPanel;
-    private javax.swing.JPanel jPanel2;
+    private javax.swing.JButton add1DDataButton;
+    private javax.swing.JPanel bottomSplit;
+    private javax.swing.Box.Filler filler1;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane topScrollPane;
+    private javax.swing.JPanel topSplit;
+    private javax.swing.JSplitPane verticalSplitPane;
     // End of variables declaration//GEN-END:variables
 }

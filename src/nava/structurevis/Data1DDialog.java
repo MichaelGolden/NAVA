@@ -4,17 +4,25 @@
  */
 package nava.structurevis;
 
+import java.awt.BorderLayout;
+import nava.ui.ProjectModel;
+
 /**
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class StructureVisTestFrame extends javax.swing.JFrame {
+public class Data1DDialog extends javax.swing.JDialog {
 
+    ProjectModel projectModel;
     /**
-     * Creates new form StructureVisTestFrame
+     * Creates new form Data1DDialog
      */
-    public StructureVisTestFrame() {
+    public Data1DDialog(java.awt.Frame parent, boolean modal, ProjectModel projectModel) {
+        super(parent, modal);
         initComponents();
+        
+        this.projectModel = projectModel;
+        this.add(new Data1DPanel(projectModel), BorderLayout.CENTER);
     }
 
     /**
@@ -26,10 +34,7 @@ public class StructureVisTestFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        structureVisPanel1 = new nava.structurevis.StructureVisPanel();
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        getContentPane().add(structureVisPanel1, java.awt.BorderLayout.CENTER);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -55,27 +60,34 @@ public class StructureVisTestFrame extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(StructureVisTestFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Data1DDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(StructureVisTestFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Data1DDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(StructureVisTestFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Data1DDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(StructureVisTestFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Data1DDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
         /*
-         * Create and display the form
+         * Create and display the dialog
          */
         java.awt.EventQueue.invokeLater(new Runnable() {
 
             public void run() {
-                new StructureVisTestFrame().setVisible(true);
+                Data1DDialog dialog = new Data1DDialog(new javax.swing.JFrame(), true, null);
+                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+
+                    @Override
+                    public void windowClosing(java.awt.event.WindowEvent e) {
+                        System.exit(0);
+                    }
+                });
+                dialog.setVisible(true);
             }
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private nava.structurevis.StructureVisPanel structureVisPanel1;
     // End of variables declaration//GEN-END:variables
 }

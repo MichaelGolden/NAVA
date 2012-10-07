@@ -70,7 +70,7 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
         
         DataPanel dataPanel = new DataPanel(projectController, appController);
         jPanel1.add(dataPanel, BorderLayout.CENTER);
-        StructureVisPanel structureVisPanel = new StructureVisPanel();
+        StructureVisPanel structureVisPanel = new StructureVisPanel(projectController);
         jPanel2.add(structureVisPanel, BorderLayout.CENTER);
         
         this.addWindowListener(this);
@@ -90,6 +90,7 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
         jPanel2 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setPreferredSize(new java.awt.Dimension(800, 600));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -101,6 +102,8 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
 
         jPanel2.setLayout(new java.awt.BorderLayout());
         jTabbedPane1.addTab("tab2", jPanel2);
+
+        jTabbedPane1.setSelectedComponent(jPanel2);
 
         getContentPane().add(jTabbedPane1, java.awt.BorderLayout.CENTER);
 

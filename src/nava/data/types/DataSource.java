@@ -77,6 +77,17 @@ public abstract class DataSource implements Serializable
         this.parentSource = parentSource;
     }
     
+    public String getTitle()
+    {
+        return title;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return getTitle();
+    }
+    
     public abstract Icon getIcon();
     public abstract<T extends DataSource> ArrayList<T> getChildren();
     public abstract Object getObject();

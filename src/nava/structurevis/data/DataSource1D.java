@@ -21,9 +21,13 @@ public class DataSource1D
     double minValue;
     double maxValue;
     
+    public double getTransformedValue(int pos)
+    {
+        return data[pos];
+    }
+    
     public static DataSource1D getDataSource1D (TabularField field)
     {
-        //field.
         return null;
     }
 }

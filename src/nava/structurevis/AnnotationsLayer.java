@@ -27,9 +27,8 @@ public class AnnotationsLayer extends JPanel {
 
     //Graphics2D g = null;
     int xoffset = 5;
-    AnnotationData annotationData;
+    private AnnotationData annotationData;
     ArrayList<Pair<Shape, Feature>> featurePositions;
-    
     public int rulerHeight = 20;
     public int blockHeight = 22;
     int maxLevel = 0;
@@ -44,7 +43,6 @@ public class AnnotationsLayer extends JPanel {
     int minorTickMark = 500;
     int majorTickMark = 1000;
     int[] tickMarkPossibilities = {1, 5, 10, 15, 20, 25, 50, 75, 100, 200, 250, 500, 750, 1500, 2000};
-    
     Font annotationsFont = MainFrame.fontLiberationSans.deriveFont(12);
 
     /*
@@ -80,6 +78,15 @@ public class AnnotationsLayer extends JPanel {
         return 1;
     }
 
+    public void setAnnotationData(AnnotationData annotationData) {
+        this.annotationData = annotationData;
+        int numRows = 0;
+        for (int i = 0; i < annotationData.features.size(); i++) {
+            numRows = Math.max(numRows, annotationData.features.get(i).row);
+        }
+        setPreferredSize(new Dimension(10000, rulerHeight + numRows * blockHeight + blockHeight+5));
+    }
+
     /*
      * @Override public void redraw() { forceRepaint = true; repaint(); }
      *
@@ -97,28 +104,29 @@ public class AnnotationsLayer extends JPanel {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-        int panelWidth = this.getWidth();
-        int panelHeight = this.getHeight();
-
-
         if (annotationData != null) {
+
+            //  System.out.println("al"+this.getPreferredSize());
+
+            int panelWidth = this.getWidth();
+            int panelHeight = this.getHeight();
 
             g2.setColor(Color.white);
             g2.fillRect(0, 0, panelWidth, panelHeight);
 
-            
+
             minorTickMark = chooseBestTickMarkSize(annotationData.sequenceLength);
             majorTickMark = minorTickMark * 2;
-            
+
             // draw ruler
             g2.setFont(annotationsFont.deriveFont(12.0f));
-            for (int i = 0; i < annotationData.sequenceLength ; i++) {
+            for (int i = 0; i < annotationData.sequenceLength; i++) {
                 if (i % majorTickMark == 0) {
                     double x = ((double) i / (double) annotationData.sequenceLength) * (getWidth() - xoffset);
                     g2.setColor(Color.black);
                     Line2D.Double tick = new Line2D.Double(x + xoffset, rulerHeight - 1, x + xoffset, rulerHeight + 1);
                     g2.draw(tick);
-                    GraphicsUtils.drawStringCentred(g2, x + xoffset, rulerHeight/2, i + "");
+                    GraphicsUtils.drawStringCentred(g2, x + xoffset, rulerHeight / 2, i + "");
                 } else if (i % minorTickMark == 0) {
                     double x = ((double) i / (double) annotationData.sequenceLength) * (getWidth() - xoffset);
                     g2.setColor(Color.black);
@@ -127,7 +135,7 @@ public class AnnotationsLayer extends JPanel {
                 }
             }
 
-            
+
             // draw blocks
             this.featurePositions = new ArrayList<>();
             for (int i = 0; i < annotationData.features.size(); i++) {
@@ -142,7 +150,7 @@ public class AnnotationsLayer extends JPanel {
                     g2.fill(rect);
                     g2.setColor(Color.black);
                     // scale text to block size
-                   
+
                     float fontSize = 13;
                     for (; fontSize >= 6; fontSize -= 0.25) {
                         if (g2.getFontMetrics(annotationsFont.deriveFont(Font.PLAIN, fontSize)).stringWidth(feature.name) < regionWidth * 0.95) {
@@ -155,7 +163,7 @@ public class AnnotationsLayer extends JPanel {
                     } else {
                         g2.setFont(annotationsFont.deriveFont(Font.PLAIN, 10));
                         GraphicsUtils.drawStringCentred(g2, x + xoffset + regionWidth / 2, rulerHeight + feature.row * blockHeight + blockHeight / 2, "..");
-                    }                   
+                    }
                 }
             }
         }
@@ -219,12 +227,10 @@ public class AnnotationsLayer extends JPanel {
     @Override
     public String getToolTipText(MouseEvent event) {
         Point p = new Point(event.getX(), event.getY());
-        for(int i = 0 ; i < featurePositions.size() ; i++)
-        {
-            if(featurePositions.get(i).getLeft().contains(p))
-            {
+        for (int i = 0; i < featurePositions.size(); i++) {
+            if (featurePositions.get(i).getLeft().contains(p)) {
                 Feature f = featurePositions.get(i).getRight();
-                return f.name + " ("+f.min + "-" + f.max +")";
+                return f.name + " (" + f.min + "-" + f.max + ")";
             }
         }
         return super.getToolTipText(event);

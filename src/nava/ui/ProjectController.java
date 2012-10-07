@@ -7,27 +7,23 @@ package nava.ui;
 //import nava.data.types.DataSource;
 import nava.data.types.DataType;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.TreeModelListener;
 import nava.analyses.ApplicationOutput;
-import nava.analyses.RNAalifold;
 import nava.data.io.ExcelIO;
 import nava.data.io.FileImport;
 import nava.data.io.FileImport.ParserException;
 import nava.data.io.IO;
 import nava.data.io.ReadseqTools;
 import nava.data.types.*;
-import nava.utils.RNAFoldingTools;
 
 /**
  *

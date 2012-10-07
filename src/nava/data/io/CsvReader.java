@@ -9,6 +9,8 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import nava.data.types.Tabular;
+import nava.data.types.TabularField;
 
 /**
  *
@@ -24,13 +26,30 @@ public class CsvReader {
         }
     }
 
+    public static Tabular getTabularRepresentation(File inFile) throws IOException  {
+       Tabular tabular = new Tabular();
+
+        CSVReader reader = new CSVReader(new FileReader(inFile));
+        String[] nextLine;
+        if ((nextLine = reader.readNext()) != null) {
+            for(int i = 0 ; i < nextLine.length ; i++)
+            {
+                tabular.fields.add(new TabularField(tabular, nextLine[i],0,i,i));
+            }
+        }
+        reader.close();
+
+        return tabular;
+
+    }
+
     public static ArrayList<String> getColumn(File inFile, int column) throws IOException {
         ArrayList<String> cells = new ArrayList<>();
 
         CSVReader reader = new CSVReader(new FileReader(inFile));
         String[] nextLine;
         while ((nextLine = reader.readNext()) != null) {
-             if (column < nextLine.length) {
+            if (column < nextLine.length) {
                 cells.add(nextLine[column]);
             } else {
                 cells.add("");

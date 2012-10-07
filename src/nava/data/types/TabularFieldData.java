@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import nava.data.io.CsvReader;
+import nava.utils.Utils;
 
 /**
  *
@@ -20,6 +21,19 @@ public class TabularFieldData {
     public TabularFieldData(ArrayList<String> values)
     {
         this.values = values;
+    }
+    
+    public ArrayList<Double> getNumericValues()
+    {
+        ArrayList<Double> ret = new  ArrayList<>();
+        for(int i = 0 ; i < values.size() ; i++)
+        {
+            if(Utils.isNumeric(values.get(i)))
+            {
+                ret.add(Double.parseDouble(values.get(i)));
+            }
+        }
+        return ret;
     }
     
     public static TabularFieldData getColumn(File csvFile, int index) throws IOException

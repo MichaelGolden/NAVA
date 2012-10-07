@@ -16,8 +16,9 @@ public class DataSource1D
     double [] data;
     boolean [] used; // is value missing or is it used?
     
-    ColorGradient colorGradient;
-    DataTransform transform;
+    public String title;
+    public ColorGradient colorGradient;
+    public DataTransform transform;
     double minValue;
     double maxValue;
     

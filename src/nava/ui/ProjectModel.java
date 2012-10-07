@@ -20,6 +20,7 @@ public class ProjectModel implements Serializable {
     public DefaultListModel<DataSource> dataSources = new DefaultListModel();
     public NavigatorTreeModel navigatorTreeModel;
     public long dataSourceCounter = 0;
+    public long importCounter = 0;
 
     public void saveProject(File outFile) {
         try {

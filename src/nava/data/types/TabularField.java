@@ -66,14 +66,12 @@ public class TabularField extends DataSource {
         double min = Double.MAX_VALUE;
         double max = Double.MIN_VALUE;
         ArrayList<String> values = this.getObject().values;
-        System.out.println(values);
         for (int i = 0; i < values.size(); i++) {
             if (Utils.isNumeric(values.get(i).trim())) {
                 double val = Double.parseDouble(values.get(i).trim());
                 min = Math.min(min, val);
                 max = Math.max(max, val);
             }
-            System.out.println(min + "\t" + max);
         }
         this.minimum = min;
         this.maximum = max;

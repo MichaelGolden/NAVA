@@ -11,7 +11,6 @@ import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import nava.analyses.*;
 import nava.data.types.DataSource;
-import nava.ui.navigator.NavigationListener;
 
 /**
  *

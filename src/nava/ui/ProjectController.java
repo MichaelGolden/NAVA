@@ -18,11 +18,8 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.TreeModelListener;
 import nava.analyses.ApplicationOutput;
-import nava.data.io.ExcelIO;
-import nava.data.io.FileImport;
+import nava.data.io.*;
 import nava.data.io.FileImport.ParserException;
-import nava.data.io.IO;
-import nava.data.io.ReadseqTools;
 import nava.data.types.*;
 
 /**
@@ -31,7 +28,6 @@ import nava.data.types.*;
  */
 public class ProjectController implements ListDataListener {
 
-    private long importCount = 0;
     ArrayList<ProjectView> projectViews = new ArrayList<ProjectView>();
     public ProjectModel projectModel;
 
@@ -86,7 +82,7 @@ public class ProjectController implements ListDataListener {
                 try {
                     if(dataType.fileFormat.equals(DataType.FileFormat.EXCEL))
                     {
-                        dataSource = ExcelIO.getTabularRepresentatation(dataFile);
+                        dataSource = ExcelIO.getTabularRepresentation(dataFile);
                         dataSource.setImportId(getNextImportId());
                         dataSource.originalFile = dataFile;
                         dataSource.originalDataSourcePath = generatePath(dataSource.getImportId(), "orig." + dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1)).toString();
@@ -96,6 +92,20 @@ public class ProjectController implements ListDataListener {
                         dataSource.persistObject(dataSource);
                         dataSource.fileSize = new FileSize(dataFile.length());                        
                         ExcelIO.saveAsCSV(dataFile, Paths.get(dataSource.importedDataSourcePath).toFile());
+                    }
+                    else
+                    if(dataType.fileFormat.equals(DataType.FileFormat.CSV))
+                    {
+                        dataSource = CsvReader.getTabularRepresentation(dataFile);
+                        dataSource.setImportId(getNextImportId());
+                        dataSource.originalFile = dataFile;
+                        dataSource.originalDataSourcePath = generatePath(dataSource.getImportId(), "orig." + dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1)).toString();
+                        dataSource.importedDataSourcePath = generatePath(dataSource.getImportId(), "csv").toString();
+                        dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
+                        dataSource.dataType = dataType;
+                        dataSource.persistObject(dataSource);
+                        dataSource.fileSize = new FileSize(dataFile.length());                        
+                        Files.copy(Paths.get(dataFile.getAbsolutePath()), Paths.get(dataSource.importedDataSourcePath));
                     }
                 } catch (IOException ex) {
                     Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
@@ -262,6 +272,6 @@ public class ProjectController implements ListDataListener {
     }
 
     public long getNextImportId() {
-        return importCount++;
+        return projectModel.importCounter++;
     }
 }

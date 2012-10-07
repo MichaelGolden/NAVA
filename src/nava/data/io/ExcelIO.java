@@ -85,7 +85,7 @@ public class ExcelIO {
         return 0;
     }
 
-    public static Tabular getTabularRepresentatation(File excelFile) throws IOException, InvalidFormatException {
+    public static Tabular getTabularRepresentation(File excelFile) throws IOException, InvalidFormatException {
         Tabular tabular = new Tabular();
 
         DecimalFormat df = new DecimalFormat("00");

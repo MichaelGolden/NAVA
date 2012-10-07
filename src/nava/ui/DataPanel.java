@@ -80,7 +80,7 @@ public class DataPanel extends javax.swing.JPanel implements NavigationListener 
         applicationPanel.showUsableApplications(e.selectedDataSources);
         for (int i = 0; i < e.selectedDataSources.size(); i++) {
             if (e.selectedDataSources.get(i) instanceof TabularField) {
-                System.out.println(((TabularField) e.selectedDataSources.get(i)).getObject().values);
+                //System.out.println(((TabularField) e.selectedDataSources.get(i)).getObject().values);
             }
         }
     }

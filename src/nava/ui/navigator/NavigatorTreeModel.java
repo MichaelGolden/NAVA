@@ -8,9 +8,7 @@ import java.io.Serializable;
 import javax.swing.event.ListDataEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
 import nava.data.types.*;
-import nava.ui.ProjectController;
 import nava.ui.ProjectModel;
 import nava.ui.ProjectView;
 

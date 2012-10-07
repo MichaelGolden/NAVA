@@ -14,11 +14,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import nava.analyses.ApplicationController;
-import nava.data.types.TabularField;
-import nava.data.types.TabularFieldData;
 import nava.structurevis.StructureVisPanel;
-import nava.ui.navigator.NavigationEvent;
-import nava.ui.navigator.NavigationListener;
 import nava.ui.navigator.NavigatorPanel;
 
 /**

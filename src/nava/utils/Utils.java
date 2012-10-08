@@ -21,6 +21,20 @@ public class Utils {
         }
         return ret;
     }
+    
+    public static boolean isInteger(String s)
+    {
+        try
+        {
+            Integer.parseInt(s);
+        }
+        catch(NumberFormatException ex)
+        {
+            return false;
+        }
+        
+        return true;       
+    }
 
     public static boolean isNumeric(String s) {
         try

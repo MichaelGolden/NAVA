@@ -25,6 +25,7 @@ import javax.swing.text.NumberFormatter;
 import nava.data.types.DataSource;
 import nava.data.types.Tabular;
 import nava.data.types.TabularField;
+import nava.structurevis.data.DataSource1D;
 import nava.structurevis.data.DataTransform;
 import nava.structurevis.data.Histogram;
 import nava.ui.ProjectModel;
@@ -47,6 +48,8 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
     TabularField selectedField = null;
     TabularField dataLoadedForField = null;
     DataTransform selectedTransform = null;
+    DataSource1D dataSource1D = null;
+    DataPreviewTable previewTable = new DataPreviewTable();
 
     public Data1DPanel(ProjectModel projectModel) {
         initComponents();
@@ -122,7 +125,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
         this.fromFieldRadioButton.addItemListener(this);
 
         populateDataSourceComboBox(Collections.list(projectModel.dataSources.elements()));
-        previewPanel.add(new DataPreviewTable(), BorderLayout.CENTER);
+        previewPanel.add(previewTable, BorderLayout.CENTER);
     }
 
     public void populateDataSourceComboBox(List<DataSource> dataSources) {
@@ -168,6 +171,10 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
     {        
         this.selectedTransform = new DataTransform((Double) dataMinField.getValue(), (Double) dataMaxField.getValue(), (DataTransform.TransformType) transformComboBoxModel.getSelectedItem());
         this.updateLegend();
+        // (TabularField field, String title, TabularField positionField, boolean naturalPositions, boolean oneOffset, boolean codonPositions, double min, double max, boolean excludeValuesOutOfRange, DataTransform transform, ColorGradient colorGradient) {
+        dataSource1D = DataSource1D.getDataSource1D(selectedField, dataTitleField.getText(), (TabularField)positionComboBox.getSelectedItem(), naturalRadioButton.isSelected(), onePositionRadioButton.isSelected(), codonRadioButton.isSelected(), (Double)dataMinField.getValue(), (Double)dataMaxField.getValue(), missingDataRadioButton.isSelected(), selectedTransform, null);
+        dataSource1D.loadData();
+        previewTable.tableDataModel.setDataSource1D(dataSource1D);
     }
 
     /**
@@ -195,7 +202,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
         dataSourceComboBox = new javax.swing.JComboBox();
         jLabel2 = new javax.swing.JLabel();
         dataFieldComboBox = new javax.swing.JComboBox();
-        dataTitle = new javax.swing.JTextField();
+        dataTitleField = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
@@ -310,7 +317,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(dataSourceComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(dataFieldComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(dataTitle))
+                    .addComponent(dataTitleField))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -326,7 +333,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(dataTitle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(dataTitleField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -549,7 +556,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
     private javax.swing.JFormattedTextField dataMaxField;
     private javax.swing.JFormattedTextField dataMinField;
     private javax.swing.JComboBox dataSourceComboBox;
-    private javax.swing.JTextField dataTitle;
+    private javax.swing.JTextField dataTitleField;
     private javax.swing.ButtonGroup firstPositionGroup;
     private javax.swing.JLabel firstPositionLabel;
     private javax.swing.JRadioButton fromFieldRadioButton;
@@ -585,7 +592,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
         } else if (e.getSource().equals(this.dataFieldComboBox)) {
             TabularField field = (TabularField) dataFieldComboBox.getSelectedItem();
             if (field != null) {
-                this.dataTitle.setText(field.getTitle());
+                this.dataTitleField.setText(field.getTitle());
                 this.dataMinField.setValue(field.getMinimum());
                 this.dataMaxField.setValue(field.getMaximum());
                 this.selectedField = field;

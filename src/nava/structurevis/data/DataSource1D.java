@@ -4,31 +4,127 @@
  */
 package nava.structurevis.data;
 
+import java.util.ArrayList;
 import nava.data.types.TabularField;
 import nava.utils.ColorGradient;
+import nava.utils.Utils;
 
 /**
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class DataSource1D 
-{    
-    double [] data;
-    boolean [] used; // is value missing or is it used?
-    
+public class DataSource1D {
+
     public String title;
+    public ColorGradient defaultColorGradient;
     public ColorGradient colorGradient;
     public DataTransform transform;
-    double minValue;
-    double maxValue;
-    
-    public double getTransformedValue(int pos)
-    {
-        return data[pos];
+    public TabularField dataField;
+    public TabularField positionField;
+    public boolean naturalPositions;
+    public boolean oneOffset;
+    public boolean codonPositions;
+    public boolean excludeValuesOutOfRange = false;
+    public double minValue;
+    public double maxValue;
+    public double[] data;
+    public boolean[] used;
+
+    public void loadData() {
+        ArrayList<String> values = dataField.getObject().values;
+
+        if (naturalPositions) {
+            if (!codonPositions) {
+                data = new double[values.size()];
+                used = new boolean[values.size()];
+                for (int i = 0; i < data.length; i++) {
+                    if (Utils.isNumeric(values.get(i))) {
+                        data[i] = Double.parseDouble(values.get(i));
+                        used[i] = true;
+                    }
+                }
+            } else {
+                data = new double[values.size() * 3];
+                used = new boolean[values.size() * 3];
+                for (int i = 0; i < values.size() ; i++) {
+                    if (Utils.isNumeric(values.get(i))) {
+                        data[i * 3] = Double.parseDouble(values.get(i));
+                        data[i * 3 + 1] = Double.parseDouble(values.get(i));
+                        data[i * 3 + 2] = Double.parseDouble(values.get(i));
+                        used[i * 3] = true;
+                        used[i * 3 + 1] = true;
+                        used[i * 3 + 2] = true;
+                    }
+                }
+            }
+        } else {
+            ArrayList<String> positionValues = positionField.getObject().values;
+            ArrayList<Integer> positions = new ArrayList<>();
+            int length = 0;
+            for (int i = 0; i < positionValues.size(); i++) {
+                System.out.println("G" + positionValues.get(i) + "G");
+                if (Utils.isNumeric(positionValues.get(i))) {
+                    double p = Double.parseDouble(positionValues.get(i));
+                    if ((double) ((int) p) == p) {
+                        int pos = (int) p;
+                        if (oneOffset) {
+                            pos = pos - 1;
+                        }
+                        length = Math.max(length, pos + 1);
+                        if (pos >= 0) {
+                            positions.add(pos);
+                        } else {
+                            positions.add(-1);
+                        }
+                    }
+                } else {
+                    positions.add(-1);
+                }
+            }
+
+            if (!codonPositions) {
+                data = new double[length];
+                used = new boolean[length];
+                for (int i = 0; i < positions.size(); i++) {
+                    if (positions.get(i) != -1 && i < values.size() && Utils.isNumeric(values.get(i))) {
+                        data[positions.get(i)] = Double.parseDouble(values.get(i));
+                        used[positions.get(i)] = true;
+                    }
+                }
+            } else {
+                data = new double[length * 3];
+                used = new boolean[length * 3];
+                for (int i = 0; i < positions.size(); i++) {
+                    if (positions.get(i) != -1 && i < values.size() && Utils.isNumeric(values.get(i))) {
+                        data[positions.get(i)*3] = Double.parseDouble(values.get(i));
+                        data[positions.get(i)*3+1] = Double.parseDouble(values.get(i));
+                        data[positions.get(i)*3+2] = Double.parseDouble(values.get(i));
+                        used[positions.get(i)*3] = true;
+                        used[positions.get(i)*3+1] = true;
+                        used[positions.get(i)*3+2] = true;
+                    }
+                }
+            }
+        }
     }
-    
-    public static DataSource1D getDataSource1D (TabularField field)
-    {
-        return null;
+
+    public static DataSource1D getDataSource1D(TabularField field, String title, TabularField positionField, boolean naturalPositions, boolean oneOffset, boolean codonPositions, double min, double max, boolean excludeValuesOutOfRange, DataTransform transform, ColorGradient colorGradient) {
+        DataSource1D dataSource = new DataSource1D();
+        dataSource.dataField = field;
+        dataSource.title = title;
+        dataSource.positionField = positionField;
+        dataSource.naturalPositions = naturalPositions;
+        dataSource.oneOffset = oneOffset;
+        dataSource.codonPositions = codonPositions;
+        dataSource.minValue = min;
+        dataSource.maxValue = max;
+        dataSource.excludeValuesOutOfRange = excludeValuesOutOfRange;
+        dataSource.transform = transform;
+        dataSource.colorGradient = colorGradient;
+        if (colorGradient != null) {
+            dataSource.defaultColorGradient = colorGradient.clone();
+        }
+
+        return dataSource;
     }
 }

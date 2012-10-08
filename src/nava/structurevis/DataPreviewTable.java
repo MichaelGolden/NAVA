@@ -15,6 +15,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import javax.swing.table.AbstractTableModel;
+import nava.structurevis.data.DataSource1D;
 
 
 /**
@@ -23,17 +24,18 @@ import javax.swing.table.AbstractTableModel;
  */
 public class DataPreviewTable extends JPanel {
 
-    TableDataModel tableDataModel;
+    public TableDataModel tableDataModel;
     final JTable table;
-    public JScrollPane scrollPane;
+    JScrollPane scrollPane;
 
     public DataPreviewTable() {
         super(new BorderLayout());
 
         tableDataModel = new TableDataModel();
-        //TableSorter sorter = new TableSorter(tableDataModel);
-        table = new JTable(tableDataModel);
-        //sorter.setTableHeader(table.getTableHeader());
+        TableSorter sorter = new TableSorter(tableDataModel);
+        table = new JTable(sorter);
+        //table.setModel(tableDataModel);
+        sorter.setTableHeader(table.getTableHeader());
        // sorter.sortOnColumn(table.getTableHeader(),table.getColumnCount()-1,-1);
         table.setFillsViewportHeight(true);
         table.addMouseListener(new MouseAdapter() {
@@ -49,14 +51,29 @@ public class DataPreviewTable extends JPanel {
 
     class TableDataModel extends AbstractTableModel {
 
-        String[] columnNames = {"Position", "Mapped position", "Sequence", "Value"};
-        Class[] columnClasses = {Integer.class, Integer.class, String.class, String.class};
-        public ArrayList<Object[]> rows = new ArrayList<Object[]>();
+        String[] columnNames = {"Position", "Sequence", "Value"};
+        Class[] columnClasses = {Integer.class, String.class, String.class};
+        public ArrayList<Object[]> rows = new ArrayList<>();
+        
+        public void setDataSource1D(DataSource1D dataSource1D)
+        {
+            ArrayList<Object[]> rows = new ArrayList<Object[]>();
+            for(int i = 0 ; i < dataSource1D.data.length ; i++)
+            {
+                Object[] row = {new Integer(i+1),"A",dataSource1D.data[i]+""};
+                //addRow(row);
+                rows.add(row);
+            }
+            clear();
+            addRows(rows);
+        }
 
+        @Override
         public int getColumnCount() {
             return columnNames.length;
         }
 
+        @Override
         public int getRowCount() {
             return rows.size();
         }
@@ -66,10 +83,10 @@ public class DataPreviewTable extends JPanel {
             return columnNames[col];
         }
 
+        @Override
         public Object getValueAt(int row, int col) {
             return rows.get(row)[col];
         }
-        boolean hasMappedData = false;
 
         public void clear() {
             rows.clear();
@@ -119,6 +136,7 @@ public class DataPreviewTable extends JPanel {
          * each cell. If we didn't implement this method, then the last column
          * would contain text ("true"/"false"), rather than a check box.
          */
+        @Override
         public Class getColumnClass(int c) {
             return columnClasses[c];
         }

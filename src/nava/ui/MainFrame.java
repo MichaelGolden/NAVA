@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import nava.analyses.ApplicationController;
+import nava.data.types.DataSourceCache;
 import nava.structurevis.StructureVisPanel;
 import nava.ui.navigator.NavigatorPanel;
 
@@ -23,6 +24,7 @@ import nava.ui.navigator.NavigatorPanel;
  */
 public class MainFrame extends javax.swing.JFrame implements WindowListener {
 
+    public static DataSourceCache dataSourceCache = new DataSourceCache();
     ProjectController projectController;
     ApplicationController appController;
     NavigatorPanel navigatorPanel;

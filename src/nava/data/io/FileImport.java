@@ -244,9 +244,9 @@ public class FileImport {
                 if (textline.startsWith(">")) {
                     s = new SecondaryStructureData();
                     s.sequence = "";
-                    s.title = textline.trim().substring(1);
-                    s.pairedSites = RNAFoldingTools.getPairedSitesFromDotBracketString(buffer.readLine());
+                    s.title = textline.trim().substring(1);                    
                     s.sequence = buffer.readLine().toUpperCase();
+                    s.pairedSites = RNAFoldingTools.getPairedSitesFromDotBracketString(buffer.readLine());
                     structures.add(s);
                 } else {
                     throw new ParserException("Dot bracket format expects header line starting with '>'.");

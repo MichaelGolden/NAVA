@@ -58,7 +58,6 @@ public class ProjectController implements ListDataListener {
                         dataSource.dataType = dataType;
                         dataSource.persistObject(structures.get(0));
                         dataSource.fileSize = new FileSize(dataFile.length());
-                        //projectModel.dataSources.addElement(dataSource);
                     } else {
                         dataSource = new StructureList(dataFile.getName());
                         dataSource.setImportId(getNextImportId());

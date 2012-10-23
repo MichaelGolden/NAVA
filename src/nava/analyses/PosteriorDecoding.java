@@ -7,6 +7,7 @@ package nava.analyses;
 import java.util.ArrayList;
 import java.util.List;
 import nava.data.types.*;
+import nava.ui.MainFrame;
 import nava.utils.RNAFoldingTools;
 
 /**
@@ -29,7 +30,7 @@ public class PosteriorDecoding implements Application {
             started = true;
             running = true;
             RNAFoldingTools rnaTools = new RNAFoldingTools();
-            DenseMatrixData matrixData = (DenseMatrixData) matrix.getObject();
+            DenseMatrixData matrixData = (DenseMatrixData) matrix.getObject(MainFrame.dataSourceCache);
             int[] pairedSites = new RNAFoldingTools().getPosteriorDecodingConsensusStructureMultiThreaded(matrixData.matrix);
 
             ApplicationOutput outputFile1 = new ApplicationOutput();

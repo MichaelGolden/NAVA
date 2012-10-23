@@ -9,6 +9,7 @@ import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import javax.swing.DefaultListModel;
+import nava.data.types.DataSourceCache;
 import nava.ui.navigator.NavigatorTreeModel;
 
 /**

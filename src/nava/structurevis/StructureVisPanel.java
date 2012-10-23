@@ -8,23 +8,39 @@ import nava.structurevis.data.AnnotationData;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.event.ListDataEvent;
+import nava.data.types.*;
+import nava.structurevis.data.StructureSource;
+import nava.ui.MainFrame;
 import nava.ui.ProjectController;
+import nava.ui.ProjectView;
 import org.biojava.bio.BioException;
 
 /**
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class StructureVisPanel extends javax.swing.JPanel {
+public class StructureVisPanel extends javax.swing.JPanel implements ItemListener, ProjectView {
 
+    
+    DefaultComboBoxModel<Alignment> mappingSourceComboBoxModel = new DefaultComboBoxModel<>();
+    
     ProjectController projectController;
+    StructureVisController structureVisController = new StructureVisController();
+    
+    StructurePanel structurePanel;
     
     /**
      * Creates new form StructureVisPanel
@@ -32,6 +48,7 @@ public class StructureVisPanel extends javax.swing.JPanel {
     public StructureVisPanel(ProjectController projectController) {
         initComponents();
         this.projectController = projectController;
+        
 
         LayerPanel layerPanel = new LayerPanel();
 
@@ -55,8 +72,15 @@ public class StructureVisPanel extends javax.swing.JPanel {
         topScrollPane.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.darkGray));
         topScrollPane.setViewportView(layerPanel);
 
-
         verticalSplitPane.setDividerLocation(annotationsLayer1.getPreferredSize().height + jPanel1.getPreferredSize().height + 3);
+        
+        
+        structurePanel = new StructurePanel(structureVisController, projectController);
+        bottomSplit.add(structurePanel, BorderLayout.CENTER);
+       // bottomScrollPane.setViewportView(structurePanel);
+        
+       // populateStructureComboBox(Collections.list(projectController.projectModel.dataSources.elements()));
+        projectController.addView(this);
     }
 
     /**
@@ -76,6 +100,7 @@ public class StructureVisPanel extends javax.swing.JPanel {
         jButton1 = new javax.swing.JButton();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(4, 0), new java.awt.Dimension(4, 0), new java.awt.Dimension(4, 32767));
         add1DDataButton = new javax.swing.JButton();
+        filler4 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
         bottomSplit = new javax.swing.JPanel();
 
         verticalSplitPane.setDividerLocation(300);
@@ -104,40 +129,30 @@ public class StructureVisPanel extends javax.swing.JPanel {
             }
         });
         jPanel1.add(add1DDataButton);
+        jPanel1.add(filler4);
 
         topSplit.add(jPanel1);
 
         verticalSplitPane.setLeftComponent(topSplit);
 
         bottomSplit.setPreferredSize(new java.awt.Dimension(461, 500));
-
-        javax.swing.GroupLayout bottomSplitLayout = new javax.swing.GroupLayout(bottomSplit);
-        bottomSplit.setLayout(bottomSplitLayout);
-        bottomSplitLayout.setHorizontalGroup(
-            bottomSplitLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 461, Short.MAX_VALUE)
-        );
-        bottomSplitLayout.setVerticalGroup(
-            bottomSplitLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-
+        bottomSplit.setLayout(new java.awt.BorderLayout());
         verticalSplitPane.setRightComponent(bottomSplit);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(verticalSplitPane)
+            .addComponent(verticalSplitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 679, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(verticalSplitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
+            .addComponent(verticalSplitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 375, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void add1DDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_add1DDataButtonActionPerformed
-       Data1DDialog d = new Data1DDialog(null, true, projectController.projectModel);
+       Data1DDialog d = new Data1DDialog(null, true, projectController.projectModel, structureVisController);
        d.setSize(640,480);
        d.setVisible(true);
     }//GEN-LAST:event_add1DDataButtonActionPerformed
@@ -145,6 +160,7 @@ public class StructureVisPanel extends javax.swing.JPanel {
     private javax.swing.JButton add1DDataButton;
     private javax.swing.JPanel bottomSplit;
     private javax.swing.Box.Filler filler1;
+    private javax.swing.Box.Filler filler4;
     private javax.swing.JButton jButton1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
@@ -152,4 +168,29 @@ public class StructureVisPanel extends javax.swing.JPanel {
     private javax.swing.JPanel topSplit;
     private javax.swing.JSplitPane verticalSplitPane;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+       
+    }
+
+    @Override
+    public void dataSourcesLoaded() {
+        structurePanel.populateStructureComboBox(Collections.list(projectController.projectModel.dataSources.elements()));
+    }
+
+    @Override
+    public void dataSourcesIntervalAdded(ListDataEvent e) {
+        structurePanel.populateStructureComboBox(Collections.list(projectController.projectModel.dataSources.elements()));
+    }
+
+    @Override
+    public void dataSourcesIntervalRemoved(ListDataEvent e) {
+        structurePanel.populateStructureComboBox(Collections.list(projectController.projectModel.dataSources.elements()));
+    }
+
+    @Override
+    public void dataSourcesContentsChanged(ListDataEvent e) {
+        structurePanel.populateStructureComboBox(Collections.list(projectController.projectModel.dataSources.elements()));
+    }
 }

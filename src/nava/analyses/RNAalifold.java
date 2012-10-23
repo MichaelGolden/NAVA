@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import nava.data.types.*;
+import nava.ui.MainFrame;
 import nava.utils.RNAFoldingTools;
 
 /**
@@ -213,7 +214,7 @@ public class RNAalifold implements Application {
         {
             started = true;
             running = true;
-            AlignmentData alignmentData = inputDataSource.getObject();
+            AlignmentData alignmentData = inputDataSource.getObject(MainFrame.dataSourceCache);
             RNAalifoldResult result = null;
             try {
                 ArrayList<String> sequenceNames = new ArrayList<String>();

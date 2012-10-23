@@ -4,19 +4,16 @@
  */
 package nava.structurevis;
 
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-
 import java.awt.BorderLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import nava.structurevis.data.DataSource1D;
-
 
 /**
  *
@@ -36,15 +33,16 @@ public class DataPreviewTable extends JPanel {
         table = new JTable(sorter);
         //table.setModel(tableDataModel);
         sorter.setTableHeader(table.getTableHeader());
-       // sorter.sortOnColumn(table.getTableHeader(),table.getColumnCount()-1,-1);
+        // sorter.sortOnColumn(table.getTableHeader(),table.getColumnCount()-1,-1);
         table.setFillsViewportHeight(true);
         table.addMouseListener(new MouseAdapter() {
+
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                 }
             }
         });
-        
+
         scrollPane = new JScrollPane(table);
         add(scrollPane);
     }
@@ -54,18 +52,22 @@ public class DataPreviewTable extends JPanel {
         String[] columnNames = {"Position", "Sequence", "Value"};
         Class[] columnClasses = {Integer.class, String.class, String.class};
         public ArrayList<Object[]> rows = new ArrayList<>();
-        
-        public void setDataSource1D(DataSource1D dataSource1D)
-        {
-            ArrayList<Object[]> rows = new ArrayList<Object[]>();
-            for(int i = 0 ; i < dataSource1D.data.length ; i++)
-            {
-                Object[] row = {new Integer(i+1),"A",dataSource1D.data[i]+""};
-                //addRow(row);
-                rows.add(row);
+
+        public void setDataSource1D(DataSource1D dataSource1D) {
+            if (dataSource1D != null) {
+                ArrayList<Object[]> rows = new ArrayList<>();
+                for (int i = 0; i < dataSource1D.data.length; i++) {
+                    Object[] row = {new Integer(i + 1), "?", dataSource1D.data2[i] == null ? "" : dataSource1D.data2[i]};
+                    if (dataSource1D.mappingSequence != null && i < dataSource1D.mappingSequence.length()) {
+                        row[1] = dataSource1D.mappingSequence.charAt(i) + "";
+                    }
+
+                    //addRow(row);
+                    rows.add(row);
+                }
+                clear();
+                addRows(rows);
             }
-            clear();
-            addRows(rows);
         }
 
         @Override

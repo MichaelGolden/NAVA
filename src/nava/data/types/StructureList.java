@@ -51,8 +51,17 @@ public class StructureList extends DataSource {
         } catch (Exception ex) {
             Logger.getLogger(StructureList.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return null;
+    }
+
+    @Override
+    public ArrayList<SecondaryStructureData> getObject(DataSourceCache cache) {
+        ArrayList<SecondaryStructureData> cachedObject = (ArrayList<SecondaryStructureData>) cache.getObject(this);
+        if (cachedObject == null) {
+            return getObject();
+        }
+        return cachedObject;
     }
 
     @Override

@@ -28,6 +28,11 @@ public class Annotations extends DataSource {
     public Object getObject() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+    
+    @Override
+    public Object getObject(DataSourceCache cache) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 
     @Override
     public void persistObject(Object object) {

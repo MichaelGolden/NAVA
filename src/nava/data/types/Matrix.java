@@ -30,6 +30,16 @@ public class Matrix extends DataSource {
     public Object getObject() {
         return new DenseMatrixData( RNAFoldingTools.loadMatrix(Paths.get(importedDataSourcePath).toFile()));
     }
+    
+    @Override
+    public DenseMatrixData getObject(DataSourceCache cache) {
+       DenseMatrixData cachedObject = (DenseMatrixData) cache.getObject(this);
+       if(cachedObject == null)
+       {
+            return (DenseMatrixData) cache.cache(this, getObject());
+       }
+       return cachedObject;
+    }
 
     @Override
     public void persistObject(Object object) {

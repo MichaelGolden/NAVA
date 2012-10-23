@@ -56,6 +56,16 @@ public class TabularField extends DataSource {
         }
         return null;
     }
+        
+    @Override
+    public TabularFieldData getObject(DataSourceCache cache) {
+       TabularFieldData cachedObject = (TabularFieldData) cache.getObject(this);
+       if(cachedObject == null)
+       {
+           return (TabularFieldData) cache.cache(this, getObject());
+       }
+       return cachedObject;
+    }
 
     @Override
     public void persistObject(Object object) {

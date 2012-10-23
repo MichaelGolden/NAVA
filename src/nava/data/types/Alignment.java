@@ -16,18 +16,18 @@ import nava.data.io.IO;
  * @author Michael
  */
 public class Alignment extends DataSource {
-    
-    public enum Type {NUCLEOTIDE, CODING, PROTEIN};
-    
+
+    public enum Type {
+
+        NUCLEOTIDE, CODING, PROTEIN
+    };
     public Type type = Type.NUCLEOTIDE;
     public boolean aligned = false;
-    
     public int numSequences = 0;
 
     @Override
     public Icon getIcon() {
-        switch(type)
-        {
+        switch (type) {
             case NUCLEOTIDE:
                 return new ImageIcon(ClassLoader.getSystemResource("resources/icons/nucleotide-alignment-16x16.png"));
             case CODING:
@@ -45,18 +45,31 @@ public class Alignment extends DataSource {
     }
 
     @Override
-    public AlignmentData getObject() {        
+    public AlignmentData getObject() {
         AlignmentData alignmentData = new AlignmentData();
         IO.loadFastaSequences(Paths.get(importedDataSourcePath).toFile(), alignmentData.sequences, alignmentData.sequenceNames);
         return alignmentData;
-    }    
-    
+    }
+
+    @Override
+    public AlignmentData getObject(DataSourceCache cache) {
+       AlignmentData cachedObject = (AlignmentData) cache.getObject(this);
+       if(cachedObject == null)
+       {
+           return (AlignmentData) cache.cache(this, getObject());
+       }
+       return cachedObject;
+    }
+
+    /*public String getSequence(int i) {
+        return getObject().sequences.get(i);
+    }*/
+
     @Override
     public void persistObject(Object object) {
-        if(object instanceof AlignmentData)
-        {
+        if (object instanceof AlignmentData) {
             AlignmentData alignmentData = (AlignmentData) object;
             IO.saveToFASTAfile(alignmentData.sequences, alignmentData.sequenceNames, Paths.get(importedDataSourcePath).toFile());
         }
-    }    
+    }
 }

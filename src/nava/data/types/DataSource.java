@@ -91,5 +91,6 @@ public abstract class DataSource implements Serializable
     public abstract Icon getIcon();
     public abstract<T extends DataSource> ArrayList<T> getChildren();
     public abstract Object getObject();
+    public abstract Object getObject(DataSourceCache cache);
     public abstract void persistObject(Object object);
 }

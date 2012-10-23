@@ -21,24 +21,23 @@ import nava.utils.RNAFoldingTools;
  * @author Michael
  */
 public class SecondaryStructure extends DataSource {
-    
+
     //public int[] pairedSites;
-   // public String sequence;
-    
+    // public String sequence;
     @Override
     public Icon getIcon() {
-        return new ImageIcon(ClassLoader.getSystemResource("resources/icons/structure-16x16.png"));        
+        return new ImageIcon(ClassLoader.getSystemResource("resources/icons/structure-16x16.png"));
     }
-    
+
     @Override
     public ArrayList<DataSource> getChildren() {
         return new ArrayList();
-    }    
+    }
 
     @Override
     public SecondaryStructureData getObject() {
         try {
-            return FileImport.readDotBracketOnlyFile(originalFile).get(0);
+            return FileImport.readDotBracketFile(Paths.get(importedDataSourcePath).toFile()).get(0);
         } catch (IOException ex) {
             Logger.getLogger(SecondaryStructure.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ParserException ex) {
@@ -50,13 +49,19 @@ public class SecondaryStructure extends DataSource {
     }
 
     @Override
+    public SecondaryStructureData getObject(DataSourceCache cache) {
+        SecondaryStructureData cachedObject = (SecondaryStructureData) cache.getObject(this);
+        if (cachedObject == null) {
+            return (SecondaryStructureData) cache.cache(this, getObject());
+        }
+        return cachedObject;
+    }
+
+    @Override
     public void persistObject(Object object) {
-        if(object instanceof SecondaryStructureData)
-        {
-            SecondaryStructureData structure = (SecondaryStructureData)object;
+        if (object instanceof SecondaryStructureData) {
+            SecondaryStructureData structure = (SecondaryStructureData) object;
             RNAFoldingTools.saveDotBracketFile(Paths.get(importedDataSourcePath).toFile(), structure.pairedSites, structure.title, structure.sequence);
         }
     }
-
-
 }

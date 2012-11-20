@@ -17,4 +17,19 @@ public class MappingSource implements Serializable {
     public Alignment alignmentSource;
     public Sequence sequenceSource;
     public String sequence;
+    
+    public MappingSource (Alignment alignmentSource)
+    {
+        this.alignmentSource = alignmentSource;
+    }
+    
+    public MappingSource(Sequence sequenceSource)
+    {
+        this.sequenceSource = sequenceSource;
+    }
+    
+    public MappingSource(String sequence)
+    {
+        this.sequence = sequence;
+    }
 }

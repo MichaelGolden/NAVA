@@ -193,10 +193,8 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
         // (TabularField field, String title, TabularField positionField, boolean naturalPositions, boolean oneOffset, boolean codonPositions, double min, double max, boolean excludeValuesOutOfRange, DataTransform transform, ColorGradient colorGradient) {
         if(selectedField != null && positionComboBox.getSelectedItem() != null)
         {
-            MappingSource mappingSource = new MappingSource();
-            mappingSource.alignmentSource = (Alignment) mappingSourceComboBox.getSelectedItem();
+            MappingSource mappingSource = new MappingSource((Alignment) mappingSourceComboBox.getSelectedItem());
        
-            
             dataSource1D = DataSource1D.getDataSource1D(selectedField, dataTitleField.getText(), (TabularField) positionComboBox.getSelectedItem(), naturalRadioButton.isSelected(), onePositionRadioButton.isSelected(), codonCheckButton.isSelected(), (Double) dataMinField.getValue(), (Double) dataMaxField.getValue(), missingDataRadioButton.isSelected(), selectedTransform, null, mappingSource);
             dataSource1D.loadData();
             previewTable.tableDataModel.setDataSource1D(dataSource1D);
@@ -223,6 +221,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
         zeroPositionRadioButton = new javax.swing.JRadioButton();
         onePositionRadioButton = new javax.swing.JRadioButton();
         firstPositionLabel = new javax.swing.JLabel();
+        headerCheckButton = new javax.swing.JCheckBox();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         dataSourceComboBox = new javax.swing.JComboBox();
@@ -276,6 +275,14 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
         firstPositionLabel.setText("First position is");
         firstPositionLabel.setEnabled(false);
 
+        headerCheckButton.setSelected(true);
+        headerCheckButton.setText("First line is header");
+        headerCheckButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                headerCheckButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -299,13 +306,16 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
                             .addComponent(naturalRadioButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(10, 10, 10))
                     .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(headerCheckButton)
+                        .addContainerGap())
+                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(codonCheckButton)
-                        .addContainerGap())))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(11, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(naturalRadioButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -316,9 +326,10 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
                     .addComponent(onePositionRadioButton)
                     .addComponent(firstPositionLabel)
                     .addComponent(zeroPositionRadioButton))
-                .addGap(11, 11, 11)
-                .addComponent(codonCheckButton)
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(headerCheckButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(codonCheckButton))
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("1. Select a data field"));
@@ -506,7 +517,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
                     .addComponent(jLabel4)
                     .addComponent(mappingSourceComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE)
+                .addComponent(jScrollPane1)
                 .addContainerGap())
         );
 
@@ -578,7 +589,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGap(26, 26, 26)
                                 .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addComponent(previewPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -609,6 +620,11 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
     private void missingDataRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_missingDataRadioButtonActionPerformed
         this.update();
     }//GEN-LAST:event_missingDataRadioButtonActionPerformed
+
+    private void headerCheckButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_headerCheckButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_headerCheckButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton clampedRadioButton;
     private javax.swing.JCheckBox codonCheckButton;
@@ -621,6 +637,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
     private javax.swing.ButtonGroup firstPositionGroup;
     private javax.swing.JLabel firstPositionLabel;
     private javax.swing.JRadioButton fromFieldRadioButton;
+    private javax.swing.JCheckBox headerCheckButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

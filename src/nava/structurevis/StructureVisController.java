@@ -29,10 +29,10 @@ public class StructureVisController {
         if (!structureSources.contains(structureSource)) {
             structureSources.add(structureSource);
             for (StructureSource s : structureSources) {
-                System.out.println("A"+s.mappingSource);
+                System.out.println("A" + s.mappingSource);
                 System.out.println(structureVisDataSources.size());
                 for (DataSource1D dataSource : structureVisDataSources) {
-                    System.out.println("B"+dataSource.mappingSource);
+                    System.out.println("B" + dataSource.mappingSource);
                     if (s.mappingSource != null && dataSource.mappingSource != null) {
                         System.out.println("Making");
                         getMapping(dataSource.mappingSource, s.mappingSource);
@@ -75,19 +75,24 @@ public class StructureVisController {
         if (b.alignmentSource != null) {
             IO.loadFastaSequences(Paths.get(b.alignmentSource.importedDataSourcePath).toFile(), sequencesB, sequencesNamesB, maxSequencesToLoad);
         }
-        
-        if(a.sequence != null)
-        {
+
+        if (a.sequence != null) {
             sequencesA.add(a.sequence);
             sequencesNamesA.add("seq1");
         }
-        
-        if(b.sequence != null)
-        {
+
+        if (b.sequence != null) {
             sequencesB.add(b.sequence);
             sequencesNamesB.add("seq2");
         }
+
         
+        System.out.println("Mapping");
+        System.out.println((a.sequenceSource == null) + "\t" + (a.sequence == null));
+        System.out.println((b.sequenceSource == null) + "\t" + (b.sequence == null));
+        System.out.println(sequencesA);
+        System.out.println(sequencesB);
+        System.out.println("----------");
 
         Mapping mapping = Mapping.createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, maxSequencesToLoad);
         mappings.put(new Pair(a, b), mapping);

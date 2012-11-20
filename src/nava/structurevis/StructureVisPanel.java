@@ -40,7 +40,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
     ProjectController projectController;
     StructureVisController structureVisController = new StructureVisController();
     
-    StructurePanel structurePanel;
+    SubstructurePanel structurePanel;
     
     /**
      * Creates new form StructureVisPanel
@@ -75,7 +75,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         verticalSplitPane.setDividerLocation(annotationsLayer1.getPreferredSize().height + jPanel1.getPreferredSize().height + 3);
         
         
-        structurePanel = new StructurePanel(structureVisController, projectController);
+        structurePanel = new SubstructurePanel(structureVisController, projectController);
         bottomSplit.add(structurePanel, BorderLayout.CENTER);
        // bottomScrollPane.setViewportView(structurePanel);
         

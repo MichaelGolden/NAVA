@@ -15,7 +15,7 @@ import nava.utils.Utils;
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class DataSource1D {
+public class DataSource2D {
 
     public String title;
     public ColorGradient defaultColorGradient;
@@ -34,6 +34,7 @@ public class DataSource1D {
     public double[] data;
     public String[] data2;
     public boolean[] used;
+    public double emptyValue;
 
     public void loadData() {
         ArrayList<String> values = dataField.getObject(MainFrame.dataSourceCache).values;
@@ -137,8 +138,8 @@ public class DataSource1D {
         }
     }
 
-    public static DataSource1D getDataSource1D(TabularField field, String title, TabularField positionField, boolean naturalPositions, boolean oneOffset, boolean codonPositions, double min, double max, boolean excludeValuesOutOfRange, DataTransform dataTransform, ColorGradient colorGradient, MappingSource mappingSource) {
-        DataSource1D dataSource = new DataSource1D();
+    public static DataSource2D getDataSource1D(TabularField field, String title, TabularField positionField, boolean naturalPositions, boolean oneOffset, boolean codonPositions, double min, double max, boolean excludeValuesOutOfRange, DataTransform dataTransform, ColorGradient colorGradient, MappingSource mappingSource) {
+        DataSource2D dataSource = new DataSource2D();
         dataSource.dataField = field;
         dataSource.title = title;
         dataSource.positionField = positionField;
@@ -156,5 +157,10 @@ public class DataSource1D {
         }
 
         return dataSource;
+    }
+    
+    public double get(int i, int j)
+    {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

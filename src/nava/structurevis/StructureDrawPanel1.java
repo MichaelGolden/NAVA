@@ -18,7 +18,7 @@ import nava.utils.RNAFoldingTools;
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class StructureDrawPanel extends javax.swing.JPanel {
+public class StructureDrawPanel1 extends javax.swing.JPanel {
 
     int[] pairedSites;
     int start;
@@ -35,7 +35,7 @@ public class StructureDrawPanel extends javax.swing.JPanel {
     /**
      * Creates new form StructurePanel
      */
-    public StructureDrawPanel(StructureVisController structureVisController) {
+    public StructureDrawPanel1(StructureVisController structureVisController) {
         initComponents();
         this.structureVisController = structureVisController;
     }

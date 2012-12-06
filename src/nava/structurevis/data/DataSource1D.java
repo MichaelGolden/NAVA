@@ -4,6 +4,7 @@
  */
 package nava.structurevis.data;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import nava.data.types.Alignment;
 import nava.data.types.TabularField;
@@ -15,7 +16,7 @@ import nava.utils.Utils;
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class DataSource1D {
+public class DataSource1D implements Serializable {
 
     public String title;
     public ColorGradient defaultColorGradient;
@@ -31,9 +32,10 @@ public class DataSource1D {
     public boolean excludeValuesOutOfRange = false;
     public double minValue;
     public double maxValue;
-    public double[] data;
-    public String[] data2;
-    public boolean[] used;
+    public transient double[] data;
+    public transient  String[] data2;
+    public transient boolean[] used;
+    public int dataOffset =  0;
 
     public void loadData() {
         ArrayList<String> values = dataField.getObject(MainFrame.dataSourceCache).values;
@@ -137,7 +139,7 @@ public class DataSource1D {
         }
     }
 
-    public static DataSource1D getDataSource1D(TabularField field, String title, TabularField positionField, boolean naturalPositions, boolean oneOffset, boolean codonPositions, double min, double max, boolean excludeValuesOutOfRange, DataTransform dataTransform, ColorGradient colorGradient, MappingSource mappingSource) {
+    public static DataSource1D getDataSource1D(TabularField field, String title, TabularField positionField, boolean naturalPositions, boolean oneOffset, int dataOffset, boolean codonPositions, double min, double max, boolean excludeValuesOutOfRange, DataTransform dataTransform, ColorGradient colorGradient, MappingSource mappingSource) {
         DataSource1D dataSource = new DataSource1D();
         dataSource.dataField = field;
         dataSource.title = title;
@@ -145,6 +147,7 @@ public class DataSource1D {
         dataSource.naturalPositions = naturalPositions;
         dataSource.mappingSource = mappingSource;
         dataSource.oneOffset = oneOffset;
+        dataSource.dataOffset = dataOffset;
         dataSource.codonPositions = codonPositions;
         dataSource.minValue = min;
         dataSource.maxValue = max;

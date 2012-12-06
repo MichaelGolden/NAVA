@@ -73,7 +73,6 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
     //File naspStructuresFile = new File("C:/project/hepacivirus/10seq_aligned_d0.fasta.out");
     //File naspAlignmentFile = new File("C:/project/hepacivirus/10seq_aligned_d0.fasta");
     boolean saveStructures = false;
-    
     Point2D.Double[] nucleotidePositions;
     int nucleotideDiameter = 40;
     double xoffset = 150;
@@ -121,14 +120,12 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
     ///JPopupMenu relayoutStructureBondPopupMenu = new JPopupMenu();
     JMenuItem redrawStructureItem = new JMenuItem("Re-draw structure");
     JMenuItem resetStructureItem = new JMenuItem("Reset structure");
-   
-
     SubstructureModel model = null;
-    public void setModel(SubstructureModel model)
-    {
+
+    public void setModel(SubstructureModel model) {
         this.model = model;
     }
-    
+
     //public boolean drawUsingSVG = false; // if true draw graphic using SVG, otherwise use native java graphics
     public SubstructureDrawPanel(SubstructureModel model) {
         addMouseListener(this);
@@ -226,8 +223,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
      * numStructures; if (mainapp.structureCollection != null &&
      * mainapp.structureCollection.structures != null) { structure =
      * mainapp.structureCollection.structures.get(currentStructure); }
-     * openStructure(structure);
-    }
+     * openStructure(structure); }
      */
     public void openSubstructure(Substructure s) {
         model.structure = s;
@@ -245,14 +241,15 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             rnaMenuItem.setSelected(true);
         }
 
+        System.out.println("Drawing");
+
         computeAndDraw();
 
         /*
          * if (saveStructures) { try { Thread.sleep(200); } catch
          * (InterruptedException ex) {
          * Logger.getLogger(StructureDrawPanel.class.getName()).log(Level.SEVERE,
-         * null, ex); } mainapp.callNext();
-        }
+         * null, ex); } mainapp.callNext(); }
          */
     }
 
@@ -269,6 +266,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
         computeStructureToBeDrawn(model.structure);
         repaint = true;
         repaint();
+        System.out.println("Repainted");
     }
 
     public void redraw() {
@@ -289,6 +287,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
 
         //np = mainapp.getStructureCoordinates(structure.getDotBracketString());
         pairedSites = RNAFoldingTools.getPairedSitesFromDotBracketString(structure.getDotBracketString());
+
         edit = new SubstructureEdit(pairedSites);
         computeStructureToBeDrawn(edit.pairedSites);
     }
@@ -314,7 +313,6 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             nucleotidePositions[i].x = xoffset + (np.get(i).x - minx) * horizontalScale;
             nucleotidePositions[i].y = 50 + (np.get(i).y - miny) * verticalScale;
         }
-
     }
     //SVGIcon icon;
     URI uri;
@@ -621,7 +619,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
          * graphics;
          *
          */
-        
+
         g = (Graphics2D) graphics;
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.scale(zoomScale, zoomScale);
@@ -1141,7 +1139,6 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
 
         int panelWidth = (int) ((maxx - minx) * horizontalScale + xoffset * 2);
         int panelHeight = (int) ((maxy - miny) * verticalScale + 100);
-
         if (repaint) {
             repaint = false;
             currentDrawType = drawComplexStructure();
@@ -1216,63 +1213,67 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
         }
 
 
-        setPreferredSize(new Dimension((int) Math.ceil(panelWidth * zoomScale), (int) Math.ceil(panelHeight * zoomScale)));
-        revalidate();
-        // g.scale(zoomScale, zoomScale);
-        if (selectedNucleotide != -1) {
-            g.setColor(Color.black);
-            g.drawOval((int) posx - (nucleotideDiameter / 2), (int) posy - (nucleotideDiameter / 2), (int) (nucleotideDiameter), (int) (nucleotideDiameter));
-            nucleotidePositions[selectedNucleotide] = new Point2D.Double(posx, posy);
-        }
-
-        if (selectedNucleotideX != -1 || selectedNucleotideY != -1) {
-            g.setColor(Color.blue);
-            g.setStroke(new BasicStroke((float) 4));
-
-            int nucX = selectedNucleotideX - model.structure.startPosition + 1;
-            if (nucX >= 0 && nucX < nucleotidePositions.length) {
-                g.drawOval((int) nucleotidePositions[nucX].x - (nucleotideDiameter / 2), (int) nucleotidePositions[nucX].y - (nucleotideDiameter / 2), (int) (nucleotideDiameter), (int) (nucleotideDiameter));
+        int preferredWidth = (int) Math.ceil(panelWidth * zoomScale);
+        int preferredHeight = (int) Math.ceil(panelHeight * zoomScale);
+        if (preferredWidth > 0 && preferredHeight > 0) {
+            setPreferredSize(new Dimension(preferredWidth, preferredHeight));
+            revalidate();
+            // g.scale(zoomScale, zoomScale);
+            if (selectedNucleotide != -1) {
+                g.setColor(Color.black);
+                g.drawOval((int) posx - (nucleotideDiameter / 2), (int) posy - (nucleotideDiameter / 2), (int) (nucleotideDiameter), (int) (nucleotideDiameter));
+                nucleotidePositions[selectedNucleotide] = new Point2D.Double(posx, posy);
             }
 
-            int nucY = selectedNucleotideY - model.structure.startPosition + 1;
-            if (nucY >= 0 && nucY < nucleotidePositions.length) {
-                g.drawOval((int) nucleotidePositions[nucY].x - (nucleotideDiameter / 2), (int) nucleotidePositions[nucY].y - (nucleotideDiameter / 2), (int) (nucleotideDiameter), (int) (nucleotideDiameter));
+            if (selectedNucleotideX != -1 || selectedNucleotideY != -1) {
+                g.setColor(Color.blue);
+                g.setStroke(new BasicStroke((float) 4));
+
+                int nucX = selectedNucleotideX - model.structure.startPosition + 1;
+                if (nucX >= 0 && nucX < nucleotidePositions.length) {
+                    g.drawOval((int) nucleotidePositions[nucX].x - (nucleotideDiameter / 2), (int) nucleotidePositions[nucX].y - (nucleotideDiameter / 2), (int) (nucleotideDiameter), (int) (nucleotideDiameter));
+                }
+
+                int nucY = selectedNucleotideY - model.structure.startPosition + 1;
+                if (nucY >= 0 && nucY < nucleotidePositions.length) {
+                    g.drawOval((int) nucleotidePositions[nucY].x - (nucleotideDiameter / 2), (int) nucleotidePositions[nucY].y - (nucleotideDiameter / 2), (int) (nucleotideDiameter), (int) (nucleotideDiameter));
+                }
+
+                g.setColor(Color.black);
+                g.setStroke(new BasicStroke());
+            }
+
+            // highlight nucleotides
+            for (int i = startHighlightPosition; i < endHighlightPosition; i++) {
+                g.setColor(Color.orange);
+                g.setStroke(new BasicStroke((float) 3));
+
+                int nucX = i - model.structure.startPosition;
+                if (nucX >= 0 && nucX < nucleotidePositions.length) {
+                    g.drawOval((int) nucleotidePositions[nucX].x - (nucleotideDiameter / 2), (int) nucleotidePositions[nucX].y - (nucleotideDiameter / 2), (int) (nucleotideDiameter), (int) (nucleotideDiameter));
+                }
+            }
+
+            g.setColor(Color.red);
+            g.setStroke(new BasicStroke((float) 4));
+            if (selectedNuc1 != -1) {
+                int nucX = selectedNuc1;
+                //System.out.println("DrawingNuc " + selectedNuc1 + "\t" + nucX);
+                if (nucX >= 0 && nucX < nucleotidePositions.length) {
+                    //System.out.println("DrawingNuc2 " + selectedNuc1);
+                    g.drawOval((int) nucleotidePositions[nucX].x - (nucleotideDiameter / 2), (int) nucleotidePositions[nucX].y - (nucleotideDiameter / 2), (int) (nucleotideDiameter), (int) (nucleotideDiameter));
+                }
+            }
+            if (selectedNuc2 != -1) {
+                int nucY = selectedNuc2;
+                if (nucY >= 0 && nucY < nucleotidePositions.length) {
+                    g.drawOval((int) nucleotidePositions[nucY].x - (nucleotideDiameter / 2), (int) nucleotidePositions[nucY].y - (nucleotideDiameter / 2), (int) (nucleotideDiameter), (int) (nucleotideDiameter));
+                }
             }
 
             g.setColor(Color.black);
             g.setStroke(new BasicStroke());
         }
-
-        // highlight nucleotides
-        for (int i = startHighlightPosition; i < endHighlightPosition; i++) {
-            g.setColor(Color.orange);
-            g.setStroke(new BasicStroke((float) 3));
-
-            int nucX = i - model.structure.startPosition;
-            if (nucX >= 0 && nucX < nucleotidePositions.length) {
-                g.drawOval((int) nucleotidePositions[nucX].x - (nucleotideDiameter / 2), (int) nucleotidePositions[nucX].y - (nucleotideDiameter / 2), (int) (nucleotideDiameter), (int) (nucleotideDiameter));
-            }
-        }
-
-        g.setColor(Color.red);
-        g.setStroke(new BasicStroke((float) 4));
-        if (selectedNuc1 != -1) {
-            int nucX = selectedNuc1;
-            //System.out.println("DrawingNuc " + selectedNuc1 + "\t" + nucX);
-            if (nucX >= 0 && nucX < nucleotidePositions.length) {
-                //System.out.println("DrawingNuc2 " + selectedNuc1);
-                g.drawOval((int) nucleotidePositions[nucX].x - (nucleotideDiameter / 2), (int) nucleotidePositions[nucX].y - (nucleotideDiameter / 2), (int) (nucleotideDiameter), (int) (nucleotideDiameter));
-            }
-        }
-        if (selectedNuc2 != -1) {
-            int nucY = selectedNuc2;
-            if (nucY >= 0 && nucY < nucleotidePositions.length) {
-                g.drawOval((int) nucleotidePositions[nucY].x - (nucleotideDiameter / 2), (int) nucleotidePositions[nucY].y - (nucleotideDiameter / 2), (int) (nucleotideDiameter), (int) (nucleotideDiameter));
-            }
-        }
-
-        g.setColor(Color.black);
-        g.setStroke(new BasicStroke());
     }
     int startHighlightPosition = -1;
     int endHighlightPosition = -1;
@@ -1373,7 +1374,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
 
         // 2D interactions
         if (model != null) {
-           //mainapp.data2DLabel.setText("");
+            //mainapp.data2DLabel.setText("");
             int interaction2D = -1;
             for (int i = 0; i < covariationInteractions.size(); i++) {
                 //  if (covariationInteractions.get(i).shape instanceof QuadCurve2) {
@@ -1424,74 +1425,76 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
 
     public void mouseClicked(MouseEvent e) {
 
-        if (selectedNuc1 != -1 && selectedNuc2 != -1) {
-            selectedNuc1 = -1;
-            selectedNuc2 = -1;
-        }
-
-        int minIndex = -1;
-        double minDistance = Double.MAX_VALUE;
-        for (int i = 0; i < nucleotidePositions.length; i++) {
-            Point2D.Double scaledPoint = new Point2D.Double(e.getPoint().x / zoomScale, e.getPoint().y / zoomScale);
-            double distance = nucleotidePositions[i].distance(scaledPoint);
-            if (distance < minDistance) {
-                minDistance = distance;
-                minIndex = i;
-            }
-        }
-
-
-
-        if (minDistance <= nucleotideDiameter / 2) {
-            if (selectedNuc1 == minIndex) {
+        if (nucleotidePositions != null) {
+            if (selectedNuc1 != -1 && selectedNuc2 != -1) {
                 selectedNuc1 = -1;
-            } else if (selectedNuc2 == minIndex) {
                 selectedNuc2 = -1;
-            } else if (selectedNuc1 == -1) {
-                selectedNuc1 = minIndex;
-            } else if (selectedNuc2 == -1) {
-                selectedNuc2 = minIndex;
+            }
+
+            int minIndex = -1;
+            double minDistance = Double.MAX_VALUE;
+            for (int i = 0; i < nucleotidePositions.length; i++) {
+                Point2D.Double scaledPoint = new Point2D.Double(e.getPoint().x / zoomScale, e.getPoint().y / zoomScale);
+                double distance = nucleotidePositions[i].distance(scaledPoint);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    minIndex = i;
+                }
             }
 
 
-        } else {
 
-            double minDistanceFromBond = Double.MAX_VALUE;
-            int nuc1 = -1;
-            int nuc2 = -1;
-            for (int i = 0; i < nucleotidePositions.length; i++) {
-                int a = i;
-                int b = edit.pairedSites[i] - 1;
-                if (i + 1 < edit.pairedSites[i]) {
-                    Line2D bond = new Line2D.Double(nucleotidePositions[a], nucleotidePositions[b]);
-                    double dist = bond.ptLineDist(e.getPoint().x / zoomScale, e.getPoint().y / zoomScale);
-                    if (dist < minDistanceFromBond) {
-                        minDistanceFromBond = dist;
-                        nuc1 = a;
-                        nuc2 = b;
+            if (minDistance <= nucleotideDiameter / 2) {
+                if (selectedNuc1 == minIndex) {
+                    selectedNuc1 = -1;
+                } else if (selectedNuc2 == minIndex) {
+                    selectedNuc2 = -1;
+                } else if (selectedNuc1 == -1) {
+                    selectedNuc1 = minIndex;
+                } else if (selectedNuc2 == -1) {
+                    selectedNuc2 = minIndex;
+                }
+
+
+            } else {
+
+                double minDistanceFromBond = Double.MAX_VALUE;
+                int nuc1 = -1;
+                int nuc2 = -1;
+                for (int i = 0; i < nucleotidePositions.length; i++) {
+                    int a = i;
+                    int b = edit.pairedSites[i] - 1;
+                    if (i + 1 < edit.pairedSites[i]) {
+                        Line2D bond = new Line2D.Double(nucleotidePositions[a], nucleotidePositions[b]);
+                        double dist = bond.ptLineDist(e.getPoint().x / zoomScale, e.getPoint().y / zoomScale);
+                        if (dist < minDistanceFromBond) {
+                            minDistanceFromBond = dist;
+                            nuc1 = a;
+                            nuc2 = b;
+                        }
+                    }
+                }
+
+                if (minDistanceFromBond != Double.MAX_VALUE && minDistanceFromBond < 3) {
+                    selectedNuc1 = nuc1;
+                    selectedNuc2 = nuc2;
+                }
+                //System.out.println("MIN" + minDistanceFromBond);
+            }
+
+            if (SwingUtilities.isLeftMouseButton(e)) {
+                //System.out.println("X" + selectedNuc1 + "\t" + selectedNuc2);
+                if (selectedNuc1 != -1 && selectedNuc2 != -1) {
+                    if (edit.isBasePaired(selectedNuc1, selectedNuc2)) {
+                        this.disruptBondPopupMenu.show(this, e.getX(), e.getY());
+                    } else {
+                        this.createBondPopupMenu.show(this, e.getX(), e.getY());
                     }
                 }
             }
 
-            if (minDistanceFromBond != Double.MAX_VALUE && minDistanceFromBond < 3) {
-                selectedNuc1 = nuc1;
-                selectedNuc2 = nuc2;
-            }
-            //System.out.println("MIN" + minDistanceFromBond);
+            repaint();
         }
-
-        if (SwingUtilities.isLeftMouseButton(e)) {
-            //System.out.println("X" + selectedNuc1 + "\t" + selectedNuc2);
-            if (selectedNuc1 != -1 && selectedNuc2 != -1) {
-                if (edit.isBasePaired(selectedNuc1, selectedNuc2)) {
-                    this.disruptBondPopupMenu.show(this, e.getX(), e.getY());
-                } else {
-                    this.createBondPopupMenu.show(this, e.getX(), e.getY());
-                }
-            }
-        }
-
-        repaint();
     }
 
     public void mousePressed(MouseEvent e) {
@@ -1529,48 +1532,47 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
     }
 
     public void actionPerformed(ActionEvent e) {
-        /*if (e.getSource().equals(saveAsPNGItem)) {
-            String name = "structure";
-            MainApp.fileChooserSave.setDialogTitle("Save as PNG");
-            MainApp.fileChooserSave.setSelectedFile(new File(MainApp.fileChooserSave.getCurrentDirectory().getPath() + "/" + name + ".png"));
-            int returnVal = MainApp.fileChooserSave.showSaveDialog(this);
-            if (returnVal == JFileChooser.APPROVE_OPTION) {
-                setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                saveAsPNG(MainApp.fileChooserSave.getSelectedFile());
-                setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-            }
-            MainApp.fileChooserSave.setDialogTitle("Open");
-        } else if (e.getSource().equals(saveAsSVGItem)) {
-            MainApp.fileChooserSave.setDialogTitle("Save as SVG");
-            String name = "structure";
-            MainApp.fileChooserSave.setSelectedFile(new File(MainApp.fileChooserSave.getCurrentDirectory().getPath() + "/" + name + ".svg"));
-            int returnVal = MainApp.fileChooserSave.showSaveDialog(this);
-            if (returnVal == JFileChooser.APPROVE_OPTION) {
-                setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                try {
-                    saveAsSVG(MainApp.fileChooserSave.getSelectedFile());
-                } catch (IOException ex) {
-                    Logger.getLogger(StructureDrawPanel.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-            }
-            MainApp.fileChooserSave.setDialogTitle("Open");
-        } else if (e.getSource().equals(saveAsEMFItem)) {
-            MainApp.fileChooserSave.setDialogTitle("Save as EMF");
-            String name = "structure";
-            MainApp.fileChooserSave.setSelectedFile(new File(MainApp.fileChooserSave.getCurrentDirectory().getPath() + "/" + name + ".emf"));
-            int returnVal = MainApp.fileChooserSave.showSaveDialog(this);
-            if (returnVal == JFileChooser.APPROVE_OPTION) {
-                setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                try {
-                    saveAsEMF(MainApp.fileChooserSave.getSelectedFile());
-                } catch (IOException ex) {
-                    Logger.getLogger(StructureDrawPanel.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-            }
-            MainApp.fileChooserSave.setDialogTitle("Open");
-        } else */if (e.getSource().equals(dnaMenuItem)) {
+        /*
+         * if (e.getSource().equals(saveAsPNGItem)) { String name = "structure";
+         * MainApp.fileChooserSave.setDialogTitle("Save as PNG");
+         * MainApp.fileChooserSave.setSelectedFile(new
+         * File(MainApp.fileChooserSave.getCurrentDirectory().getPath() + "/" +
+         * name + ".png")); int returnVal =
+         * MainApp.fileChooserSave.showSaveDialog(this); if (returnVal ==
+         * JFileChooser.APPROVE_OPTION) {
+         * setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+         * saveAsPNG(MainApp.fileChooserSave.getSelectedFile());
+         * setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)); }
+         * MainApp.fileChooserSave.setDialogTitle("Open"); } else if
+         * (e.getSource().equals(saveAsSVGItem)) {
+         * MainApp.fileChooserSave.setDialogTitle("Save as SVG"); String name =
+         * "structure"; MainApp.fileChooserSave.setSelectedFile(new
+         * File(MainApp.fileChooserSave.getCurrentDirectory().getPath() + "/" +
+         * name + ".svg")); int returnVal =
+         * MainApp.fileChooserSave.showSaveDialog(this); if (returnVal ==
+         * JFileChooser.APPROVE_OPTION) {
+         * setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR)); try {
+         * saveAsSVG(MainApp.fileChooserSave.getSelectedFile()); } catch
+         * (IOException ex) {
+         * Logger.getLogger(StructureDrawPanel.class.getName()).log(Level.SEVERE,
+         * null, ex); }
+         * setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)); }
+         * MainApp.fileChooserSave.setDialogTitle("Open"); } else if
+         * (e.getSource().equals(saveAsEMFItem)) {
+         * MainApp.fileChooserSave.setDialogTitle("Save as EMF"); String name =
+         * "structure"; MainApp.fileChooserSave.setSelectedFile(new
+         * File(MainApp.fileChooserSave.getCurrentDirectory().getPath() + "/" +
+         * name + ".emf")); int returnVal =
+         * MainApp.fileChooserSave.showSaveDialog(this); if (returnVal ==
+         * JFileChooser.APPROVE_OPTION) {
+         * setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR)); try {
+         * saveAsEMF(MainApp.fileChooserSave.getSelectedFile()); } catch
+         * (IOException ex) {
+         * Logger.getLogger(StructureDrawPanel.class.getName()).log(Level.SEVERE,
+         * null, ex); }
+         * setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)); }
+         * MainApp.fileChooserSave.setDialogTitle("Open"); } else
+         */ if (e.getSource().equals(dnaMenuItem)) {
             showDNA = true;
             redraw();
         } else if (e.getSource().equals(rnaMenuItem)) {
@@ -1633,11 +1635,10 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             repaint();
         } else if (e.getSource().equals(resetStructureItem)) {
             int n = JOptionPane.showConfirmDialog(this,
-            "This will reset your edits, are you sure you want to continue?",
-            "Warning",
-            JOptionPane.YES_NO_OPTION);
-            if(n == JOptionPane.YES_OPTION)
-            {
+                    "This will reset your edits, are you sure you want to continue?",
+                    "Warning",
+                    JOptionPane.YES_NO_OPTION);
+            if (n == JOptionPane.YES_OPTION) {
                 edit.reset();
             }
         } else {

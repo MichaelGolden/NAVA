@@ -5,13 +5,14 @@
 package nava.utils;
 
 import java.awt.Color;
+import java.io.Serializable;
 import java.util.Arrays;
 
 /**
  *
  * @author Michael Golden
  */
-public class ColorGradient {
+public class ColorGradient implements Serializable {
 
     public Color[] colours;
     public float[] positions;

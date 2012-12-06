@@ -1,12 +1,14 @@
 package nava.structurevis.data;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Michael Golden
  */
-public class DataTransform {
+public class DataTransform implements Serializable {
 
-    public enum TransformType {
+    public enum TransformType implements Serializable {
 
         LINEAR, // transform data between 0 and 1
         EXPLOG, // transform data using e^(logx), useful for p-values

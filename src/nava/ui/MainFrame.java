@@ -32,6 +32,8 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
     
     public static Font fontLiberationSans = new Font("Sans", Font.PLAIN, 12);
     
+    StructureVisPanel structureVisPanel;
+    
     public void startup()
     {
         try {
@@ -68,8 +70,9 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
         
         DataPanel dataPanel = new DataPanel(projectController, appController);
         jPanel1.add(dataPanel, BorderLayout.CENTER);
-        StructureVisPanel structureVisPanel = new StructureVisPanel(projectController);
+        structureVisPanel = new StructureVisPanel(projectController);
         jPanel2.add(structureVisPanel, BorderLayout.CENTER);
+        
         
         this.addWindowListener(this);
     }
@@ -166,6 +169,11 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
     @Override
     public void windowClosing(WindowEvent e) {
         projectController.saveProject();
+        
+        if(structureVisPanel.structureVisController.structureVisModelFile != null)
+        {
+            structureVisPanel.structureVisController.saveStructureVisModel(structureVisPanel.structureVisController.structureVisModelFile);
+        }
     }
 
     @Override

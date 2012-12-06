@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import nava.data.types.Alignment;
 import nava.data.types.DataSource;
 import nava.data.types.SecondaryStructure;
@@ -25,13 +27,12 @@ import nava.utils.ComboBoxItem;
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class SubstructurePanel extends javax.swing.JPanel implements ItemListener {
+public class SubstructurePanel extends javax.swing.JPanel implements ItemListener, ListDataListener {
 
-    DefaultComboBoxModel<SecondaryStructure> structureComboBoxModel = new DefaultComboBoxModel<>();
+    DefaultComboBoxModel<StructureSource> structureComboBoxModel = new DefaultComboBoxModel<>();
     DefaultComboBoxModel<ComboBoxItem> substructureComboBoxModel = new DefaultComboBoxModel<>();
     StructureVisController structureVisController;
     ProjectController projectController;
-    SubstructureModel substructureModel = new SubstructureModel();
     public SubstructureDrawPanel structureDrawPanel;
     
 
@@ -43,7 +44,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ItemListene
         this.structureVisController = structureVisController;
         this.projectController = projectController;
 
-        structureDrawPanel = new SubstructureDrawPanel(substructureModel);
+        structureDrawPanel = new SubstructureDrawPanel(structureVisController.substructureModel);
         topScrollPane.setViewportView(structureDrawPanel);
 
         structureComboBox.setModel(structureComboBoxModel);
@@ -52,9 +53,19 @@ public class SubstructurePanel extends javax.swing.JPanel implements ItemListene
         substructureComboBox.setModel(substructureComboBoxModel);
         substructureComboBox.addItemListener(this);
 
-        populateStructureComboBox(Collections.list(projectController.projectModel.dataSources.elements()));
+        structureVisController.structureSources.addListDataListener(this);
+        
+        //populateStructureComboBox(Collections.list(projectController.projectModel.dataSources.elements()));
+    }
+    
+    public void refresh()
+    {
+        this.populateStructureSourceComboBox();
+        this.populateSubtructureComboBox();
+        // TODO remember which structures/substructures were selected previously
     }
 
+    /*
     public void populateStructureComboBox(List<DataSource> dataSources) {
         structureComboBoxModel.removeAllElements();
         //mappingSourceComboBoxModel.removeAllElements();
@@ -67,10 +78,11 @@ public class SubstructurePanel extends javax.swing.JPanel implements ItemListene
             }
         }
     }
+    */
 
     public void populateSubtructureComboBox() {
         substructureComboBoxModel.removeAllElements();
-        ArrayList<Substructure> list = substructureModel.getSubstructures();
+        ArrayList<Substructure> list = structureVisController.substructureModel.getSubstructures();
         for (int i = 0; i < list.size(); i++) {
             ComboBoxItem<Substructure> item = new ComboBoxItem<>(list.get(i), i + "");
             substructureComboBoxModel.addElement(item);
@@ -155,24 +167,50 @@ public class SubstructurePanel extends javax.swing.JPanel implements ItemListene
     @Override
     public void itemStateChanged(ItemEvent e) {
         if (e.getSource().equals(structureComboBox)) {
-            SecondaryStructure s = (SecondaryStructure) structureComboBox.getSelectedItem();
-            if (s != null) {
-                MappingSource mappingSource = new MappingSource(s.getObject(MainFrame.dataSourceCache).sequence);
-                StructureSource structureSource = new StructureSource(s, mappingSource);
-                //
-                if (mappingSource != null) {
-                    structureVisController.addStructureSource(structureSource);
+            StructureSource structureSource = (StructureSource) structureComboBox.getSelectedItem();
+            if (structureSource != null) {
+                if (structureSource.mappingSource != null) {
+                    //structureVisController.addStructureSource(structureSource);
                     structureSource.loadData();
-                    substructureModel.setStructureSource(structureSource);
-                    structureDrawPanel.openSubstructure(structureSource.substructures.get(0));
+                    structureVisController.substructureModel.setStructureSource(structureSource);
+                    if(structureSource.substructures.size() > 0)
+                    {
+                        System.out.println("Opening 1");
+                        structureDrawPanel.openSubstructure(structureSource.substructures.get(0));
+                    }
                     populateSubtructureComboBox();
                 }
-            }
+            }           
         } else if (e.getSource().equals(substructureComboBox)) {
             ComboBoxItem<Substructure> comboBoxItem = (ComboBoxItem<Substructure>) substructureComboBoxModel.getSelectedItem();
             if (comboBoxItem != null) {
+                System.out.println("Opening 2");
                 structureDrawPanel.openSubstructure(comboBoxItem.getObject());
             }
         }
+    }
+    
+     public void populateStructureSourceComboBox() {
+        structureComboBoxModel.removeAllElements();
+        ArrayList<StructureSource> list = Collections.list(structureVisController.structureSources.elements());
+        for (int i = 0; i < list.size(); i++) {
+            //ComboBoxItem<StructureSource> item = new ComboBoxItem<>(list.get(i), list.get(i).structure.toString());
+            structureComboBoxModel.addElement(list.get(i));
+        }
+    }
+
+    @Override
+    public void intervalAdded(ListDataEvent e) {
+        populateStructureSourceComboBox();
+    }
+
+    @Override
+    public void intervalRemoved(ListDataEvent e) {
+        populateStructureSourceComboBox();
+    }
+
+    @Override
+    public void contentsChanged(ListDataEvent e) {
+        populateStructureSourceComboBox();
     }
 }

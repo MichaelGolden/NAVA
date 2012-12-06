@@ -4,37 +4,47 @@
  */
 package nava.structurevis.data;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import nava.data.types.Alignment;
 import nava.data.types.SecondaryStructure;
 import nava.data.types.SecondaryStructureData;
+import nava.ui.MainFrame;
 import nava.utils.RNAFoldingTools;
 
 /**
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class StructureSource {
+public class StructureSource implements Serializable {
     
+    public String title;
     public SecondaryStructure structure;
     public MappingSource mappingSource;
     
-    public SecondaryStructureData data;
-    public int [] pairedSites;
+    public transient SecondaryStructureData data;
+    public transient int [] pairedSites;
     public ArrayList<Substructure> substructures = new ArrayList<>();
+    public boolean circular = false;
     
     public StructureSource(SecondaryStructure structure, MappingSource mappingSource)
     {
         this.structure = structure;
         this.mappingSource = mappingSource;
+        this.title = structure.title;
     }
     
     public void loadData ()
     {
-        this.data = structure.getObject();
+        this.data = structure.getObject(MainFrame.dataSourceCache);
         this.pairedSites = this.data.pairedSites;
-        substructures = enumerateAdjacentSubstructures(this.pairedSites, 10, 300, false);
+    }
+    
+    @Override
+    public String toString()
+    {
+        return title;
     }
     
      /**
@@ -89,5 +99,68 @@ public class StructureSource {
         }
 
         return structures;
+    }
+    
+     public static ArrayList<Substructure> enumerateSubstructures(int [] pairedSites, int minLength, int maxLength, boolean circularize)
+    {
+        ArrayList<Substructure> structures = enumerateAdjacentSubstructures(pairedSites, minLength, maxLength, circularize);
+        recursivelyEnumerateSubstructures(minLength, maxLength, structures, 0, 0);
+        return structures;
+    }
+    
+    private static void recursivelyEnumerateSubstructures(int minLength, int maxLength, ArrayList<Substructure> structures, int startIndex, int level) {
+        int added = 0;
+        
+        int end = structures.size();
+        for (int k = startIndex; k < end ; k++) {
+            int kAdded = 0;
+            
+            //int[][] pairedSites = getPairedNucleotidePositions(structures.get(k).getDotBracketString(), structures.get(k).getStartPosition());
+            int [] pairedSites = Arrays.copyOf(structures.get(k).pairedSites, structures.get(k).pairedSites.length);
+            
+            int fullStructureLength = pairedSites.length;
+
+            for (int i = 0 ; i < fullStructureLength ; i++) {
+                int x = startIndex;
+                int y = pairedSites[i];
+                int length = y - x + 1;
+                
+                if (y > 0 & length > 0) {
+                    Substructure s = new Substructure(length);
+
+                    int[] pairedSitesSub = new int[length];
+                    for (int j = 0; j < pairedSitesSub.length; j++) {
+                        pairedSitesSub[j] = pairedSites[i+j];
+                    }
+                    s.pairedSites = pairedSitesSub;
+                    s.startPosition = x;
+                    
+                    if (maxLength == 0 || s.length < fullStructureLength*0.75) {
+                        i += s.length;
+                        if (s.length >= minLength && s.length < fullStructureLength) {
+                           if(!structures.contains(s))
+                           {
+                                s.name = structures.size()+"";
+                                //s.name = structures.get(k).name + "." + kAdded;
+                                structures.add(s);
+                                added++;
+                                kAdded++;
+                           }
+                           else
+                           {
+                               int index = structures.indexOf(s);
+                               //System.out.println("already contains " + s.toString() + "\t" +index+"\t"+ structures.get(index));
+                           }
+                        }
+                    }
+                }
+            }
+        }
+        
+        if(added > 0)
+        {            
+            //System.out.println("added=" + added + ", n="+structures.size());
+            recursivelyEnumerateSubstructures(minLength, maxLength, structures, end, level+1);
+        }
     }
 }

@@ -10,8 +10,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -20,35 +22,52 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.event.EventListenerList;
 import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import nava.data.types.*;
+import nava.structurevis.data.DataSource1D;
 import nava.structurevis.data.StructureSource;
+import nava.structurevis.data.Substructure;
 import nava.ui.MainFrame;
 import nava.ui.ProjectController;
 import nava.ui.ProjectView;
+import nava.ui.navigator.NavigationListener;
+import nava.utils.ComboBoxItem;
 import org.biojava.bio.BioException;
 
 /**
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class StructureVisPanel extends javax.swing.JPanel implements ItemListener, ProjectView {
+public class StructureVisPanel extends javax.swing.JPanel implements ItemListener, ProjectView, ListDataListener {
 
-    
-    DefaultComboBoxModel<Alignment> mappingSourceComboBoxModel = new DefaultComboBoxModel<>();
-    
+    //DefaultComboBoxModel<Alignment> mappingSourceComboBoxModel = new DefaultComboBoxModel<>();
+    DefaultComboBoxModel<DataSource1D> data1DComboBoxModel = new DefaultComboBoxModel<>();
     ProjectController projectController;
-    StructureVisController structureVisController = new StructureVisController();
-    
-    SubstructurePanel structurePanel;
-    
+    public StructureVisController structureVisController;
+    SubstructurePanel substructurePanel;
+
     /**
      * Creates new form StructureVisPanel
      */
     public StructureVisPanel(ProjectController projectController) {
         initComponents();
+
+        File structureVisModelFile = new File(projectController.projectModel.getProjectPath().toFile().getAbsolutePath() + File.separatorChar + "structurevis.model");
+        if (structureVisModelFile.exists()) {
+            try {
+                this.structureVisController = StructureVisController.loadProject(structureVisModelFile);
+
+            } catch (Exception ex) {
+                this.structureVisController = new StructureVisController(projectController.projectModel.getProjectPath().toFile());
+                // TODO - handle this better.
+            }
+        } else {
+            this.structureVisController = new StructureVisController(projectController.projectModel.getProjectPath().toFile());
+        }
         this.projectController = projectController;
-        
+
 
         LayerPanel layerPanel = new LayerPanel();
 
@@ -68,19 +87,34 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         annotationsLayerLeft.add(new JLabel("Sequence annotations"), BorderLayout.WEST);
         annotationsLayerLeft.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.darkGray));
         layerPanel.addLayer(new Layer(annotationsLayerLeft, annotationsLayer1));
-        
+
         topScrollPane.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.darkGray));
         topScrollPane.setViewportView(layerPanel);
 
         verticalSplitPane.setDividerLocation(annotationsLayer1.getPreferredSize().height + jPanel1.getPreferredSize().height + 3);
-        
-        
-        structurePanel = new SubstructurePanel(structureVisController, projectController);
-        bottomSplit.add(structurePanel, BorderLayout.CENTER);
-       // bottomScrollPane.setViewportView(structurePanel);
-        
-       // populateStructureComboBox(Collections.list(projectController.projectModel.dataSources.elements()));
+
+
+        substructurePanel = new SubstructurePanel(structureVisController, projectController);
+        bottomSplit.add(substructurePanel, BorderLayout.CENTER);
+        // bottomScrollPane.setViewportView(structurePanel);
+
+        // populateStructureComboBox(Collections.list(projectController.projectModel.dataSources.elements()));
         projectController.addView(this);
+
+        data1DComboBox.setModel(data1DComboBoxModel);
+        data1DComboBox.addItemListener(this);
+        structureVisController.structureVisDataSources.addListDataListener(this);
+        populateDataSource1DComboBox();
+        substructurePanel.refresh();
+    }
+
+    public void populateDataSource1DComboBox() {
+        data1DComboBoxModel.removeAllElements();
+        ArrayList<DataSource1D> list = Collections.list(structureVisController.structureVisDataSources.elements());
+        for (int i = 0; i < list.size(); i++) {
+            //ComboBoxItem<Substructure> item = new ComboBoxItem<>(list.get(i), i + "");
+            data1DComboBoxModel.addElement(list.get(i));
+        }
     }
 
     /**
@@ -97,9 +131,9 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         topSplit = new javax.swing.JPanel();
         topScrollPane = new javax.swing.JScrollPane();
         jPanel1 = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
-        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(4, 0), new java.awt.Dimension(4, 0), new java.awt.Dimension(4, 32767));
+        data1DComboBox = new javax.swing.JComboBox();
         add1DDataButton = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
         filler4 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
         bottomSplit = new javax.swing.JPanel();
 
@@ -111,15 +145,13 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         topScrollPane.setBorder(null);
         topSplit.add(topScrollPane);
 
-        jPanel1.setMaximumSize(new java.awt.Dimension(32767, 15));
-        jPanel1.setMinimumSize(new java.awt.Dimension(83, 40));
-        jPanel1.setPreferredSize(new java.awt.Dimension(461, 25));
-        jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.LINE_AXIS));
+        jPanel1.setMaximumSize(new java.awt.Dimension(32767, 100));
+        jPanel1.setMinimumSize(new java.awt.Dimension(83, 10));
+        jPanel1.setPreferredSize(new java.awt.Dimension(461, 35));
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/annotations-16x16.png"))); // NOI18N
-        jButton1.setText("Add annotations");
-        jPanel1.add(jButton1);
-        jPanel1.add(filler1);
+        data1DComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jPanel1.add(data1DComboBox);
 
         add1DDataButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/tabular-field-16x16.png"))); // NOI18N
         add1DDataButton.setText("Add 1D data");
@@ -129,6 +161,10 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
             }
         });
         jPanel1.add(add1DDataButton);
+
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/annotations-16x16.png"))); // NOI18N
+        jButton1.setText("Add annotations");
+        jPanel1.add(jButton1);
         jPanel1.add(filler4);
 
         topSplit.add(jPanel1);
@@ -152,14 +188,14 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
     }// </editor-fold>//GEN-END:initComponents
 
     private void add1DDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_add1DDataButtonActionPerformed
-       Data1DDialog d = new Data1DDialog(null, true, projectController.projectModel, structureVisController);
-       d.setSize(640,480);
-       d.setVisible(true);
+        Data1DDialog d = new Data1DDialog(null, true, projectController.projectModel, structureVisController);
+        d.setSize(640, 480);
+        d.setVisible(true);
     }//GEN-LAST:event_add1DDataButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton add1DDataButton;
     private javax.swing.JPanel bottomSplit;
-    private javax.swing.Box.Filler filler1;
+    private javax.swing.JComboBox data1DComboBox;
     private javax.swing.Box.Filler filler4;
     private javax.swing.JButton jButton1;
     private javax.swing.JPanel jPanel1;
@@ -171,26 +207,64 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
 
     @Override
     public void itemStateChanged(ItemEvent e) {
-       
+        if (e.getSource().equals(data1DComboBox)) {
+            DataSource1D dataSource1D = (DataSource1D) data1DComboBox.getSelectedItem();
+            if (dataSource1D != null) {
+                structureVisController.substructureModel.setDataSource1D(dataSource1D);
+            }
+        }
     }
 
     @Override
     public void dataSourcesLoaded() {
-        structurePanel.populateStructureComboBox(Collections.list(projectController.projectModel.dataSources.elements()));
+        //structurePanel.populateStructureComboBox(Collections.list(projectController.projectModel.dataSources.elements()));
     }
 
     @Override
     public void dataSourcesIntervalAdded(ListDataEvent e) {
-        structurePanel.populateStructureComboBox(Collections.list(projectController.projectModel.dataSources.elements()));
+        // structurePanel.populateStructureComboBox(Collections.list(projectController.projectModel.dataSources.elements()));
     }
 
     @Override
     public void dataSourcesIntervalRemoved(ListDataEvent e) {
-        structurePanel.populateStructureComboBox(Collections.list(projectController.projectModel.dataSources.elements()));
+        //structurePanel.populateStructureComboBox(Collections.list(projectController.projectModel.dataSources.elements()));
     }
 
     @Override
     public void dataSourcesContentsChanged(ListDataEvent e) {
-        structurePanel.populateStructureComboBox(Collections.list(projectController.projectModel.dataSources.elements()));
+        //structurePanel.populateStructureComboBox(Collections.list(projectController.projectModel.dataSources.elements()));
     }
+
+    @Override
+    public void intervalAdded(ListDataEvent e) {
+        populateDataSource1DComboBox();
+    }
+
+    @Override
+    public void intervalRemoved(ListDataEvent e) {
+        populateDataSource1DComboBox();
+    }
+
+    @Override
+    public void contentsChanged(ListDataEvent e) {
+        populateDataSource1DComboBox();
+    }
+
+    /*
+     * protected EventListenerList listeners = new EventListenerList();
+     *
+     * public void addStructureVisListener(StructureVisListener listener) {
+     * listeners.add(StructureVisListener.class, listener); }
+     *
+     * public void removeStructureVisListener(StructureVisListener listener) {
+     * listeners.remove(StructureVisListener.class, listener); }
+     *
+     * public void fireWindowClosingEvent(WindowEvent e) { Object[] listeners =
+     * this.listeners.getListenerList(); // Each listener occupies two elements
+     * - the first is the listener class // and the second is the listener
+     * instance for (int i = 0; i < listeners.length; i += 2) { if (listeners[i]
+     * == NavigationListener.class) { ((StructureVisListener) listeners[i +
+     * 1]).windowClosingEvent(e); } } }
+     *
+     */
 }

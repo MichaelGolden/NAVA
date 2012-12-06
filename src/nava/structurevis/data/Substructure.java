@@ -1,11 +1,13 @@
 package nava.structurevis.data;
 
+import java.io.Serializable;
+
 /**
  * Class that represents a substructure
  *
  * @author Michael Golden
  */
-public class Substructure {
+public class Substructure implements Serializable {
 
     public int[] pairedSites;
     public String name = "";

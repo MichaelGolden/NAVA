@@ -1,6 +1,7 @@
 package nava.structurevis;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -13,7 +14,7 @@ import nava.data.io.IO;
  *
  * @author Michael Golden
  */
-public class NucleotideComposition {
+public class NucleotideComposition implements Serializable {
 
     public String name;
     File fastaAlignment;
@@ -26,7 +27,7 @@ public class NucleotideComposition {
     public double[][] mappedShannonComposition;
     public String consensus;
 
-    public enum Type {
+    public enum Type implements Serializable {
 
         FREQUENCY, SHANNON_ENTROPY, CONSENSUS
     };

@@ -4,6 +4,7 @@
  */
 package nava.structurevis.data;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import nava.data.types.Alignment;
 import nava.data.types.TabularField;
@@ -15,7 +16,7 @@ import nava.utils.Utils;
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class DataSource2D {
+public class DataSource2D implements Serializable {
 
     public String title;
     public ColorGradient defaultColorGradient;
@@ -31,9 +32,9 @@ public class DataSource2D {
     public boolean excludeValuesOutOfRange = false;
     public double minValue;
     public double maxValue;
-    public double[] data;
-    public String[] data2;
-    public boolean[] used;
+    public transient double[] data;
+    public transient String[] data2;
+    public transient boolean[] used;
     public double emptyValue;
 
     public void loadData() {

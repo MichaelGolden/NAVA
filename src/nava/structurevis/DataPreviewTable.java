@@ -56,14 +56,16 @@ public class DataPreviewTable extends JPanel {
         public void setDataSource1D(DataSource1D dataSource1D) {
             if (dataSource1D != null) {
                 ArrayList<Object[]> rows = new ArrayList<>();
-                for (int i = 0; i < dataSource1D.data.length; i++) {
-                    Object[] row = {new Integer(i + 1), "?", dataSource1D.data2[i] == null ? "" : dataSource1D.data2[i]};
+                int j = 1;
+                for (int i = dataSource1D.dataOffset ; i < dataSource1D.data.length; i++) {
+                    Object[] row = {j, "?", dataSource1D.data2[i] == null ? "" : dataSource1D.data2[i]};
                     if (dataSource1D.mappingSequence != null && i < dataSource1D.mappingSequence.length()) {
                         row[1] = dataSource1D.mappingSequence.charAt(i) + "";
                     }
 
                     //addRow(row);
                     rows.add(row);
+                    j++;
                 }
                 clear();
                 addRows(rows);

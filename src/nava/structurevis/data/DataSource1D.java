@@ -7,6 +7,8 @@ package nava.structurevis.data;
 import java.io.Serializable;
 import java.util.ArrayList;
 import nava.data.types.Alignment;
+import nava.data.types.Tabular;
+import nava.data.types.TabularData;
 import nava.data.types.TabularField;
 import nava.ui.MainFrame;
 import nava.utils.ColorGradient;
@@ -22,6 +24,7 @@ public class DataSource1D implements Serializable {
     public ColorGradient defaultColorGradient;
     public ColorGradient colorGradient;
     public DataTransform dataTransform;
+    public Tabular dataTable;
     public TabularField dataField;
     public TabularField positionField;
     public MappingSource mappingSource;
@@ -33,26 +36,34 @@ public class DataSource1D implements Serializable {
     public double minValue;
     public double maxValue;
     public transient double[] data;
-    public transient  String[] data2;
+    public transient String[] stringData;
     public transient boolean[] used;
-    public int dataOffset =  0;
+    public int dataOffset = 0;
+    public int dataOffsetCorrected = 0;
 
     public void loadData() {
         ArrayList<String> values = dataField.getObject(MainFrame.dataSourceCache).values;
 
-       /*if (mappingSource != null && mappingSource.numSequences > 0) {
-            mappingSequence = mappingSource.getObject(MainFrame.dataSourceCache).sequences.get(0);
-        } else {
-            mappingSequence = null;
-        }*/
+        dataOffsetCorrected = dataOffset;
+        if (codonPositions) {
+            dataOffsetCorrected *= 3;
+        }
+
+        /*
+         * if (mappingSource != null && mappingSource.numSequences > 0) {
+         * mappingSequence =
+         * mappingSource.getObject(MainFrame.dataSourceCache).sequences.get(0);
+         * } else { mappingSequence = null;
+        }
+         */
 
         if (naturalPositions) {
             if (!codonPositions) {
                 data = new double[values.size()];
-                data2 = new String[values.size()];
+                stringData = new String[values.size()];
                 used = new boolean[values.size()];
                 for (int i = 0; i < data.length; i++) {
-                    data2[i] = values.get(i);
+                    stringData[i] = values.get(i);
                     if (Utils.isNumeric(values.get(i))) {
                         data[i] = Double.parseDouble(values.get(i));
                         used[i] = true;
@@ -60,12 +71,12 @@ public class DataSource1D implements Serializable {
                 }
             } else {
                 data = new double[values.size() * 3];
-                data2 = new String[values.size() * 3];
+                stringData = new String[values.size() * 3];
                 used = new boolean[values.size() * 3];
                 for (int i = 0; i < values.size(); i++) {
-                    data2[i * 3] = values.get(i);
-                    data2[i * 3 + 1] = values.get(i);
-                    data2[i * 3 + 2] = values.get(i);
+                    stringData[i * 3] = values.get(i);
+                    stringData[i * 3 + 1] = values.get(i);
+                    stringData[i * 3 + 2] = values.get(i);
                     if (Utils.isNumeric(values.get(i))) {
                         data[i * 3] = Double.parseDouble(values.get(i));
                         data[i * 3 + 1] = Double.parseDouble(values.get(i));
@@ -103,11 +114,11 @@ public class DataSource1D implements Serializable {
 
                 if (!codonPositions) {
                     data = new double[length];
-                    data2 = new String[length];
+                    stringData = new String[length];
                     used = new boolean[length];
                     for (int i = 0; i < positions.size(); i++) {
                         if (positions.get(i) != -1 && i < values.size()) {
-                            data2[positions.get(i)] = values.get(i);
+                            stringData[positions.get(i)] = values.get(i);
                             if (Utils.isNumeric(values.get(i))) {
                                 data[positions.get(i)] = Double.parseDouble(values.get(i));
                                 used[positions.get(i)] = true;
@@ -116,13 +127,13 @@ public class DataSource1D implements Serializable {
                     }
                 } else {
                     data = new double[length * 3];
-                    data2 = new String[length * 3];
+                    stringData = new String[length * 3];
                     used = new boolean[length * 3];
                     for (int i = 0; i < positions.size(); i++) {
                         if (positions.get(i) != -1 && i < values.size()) {
-                            data2[positions.get(i) * 3] = values.get(i);
-                            data2[positions.get(i) * 3 + 1] = values.get(i);
-                            data2[positions.get(i) * 3 + 2] = values.get(i);
+                            stringData[positions.get(i) * 3] = values.get(i);
+                            stringData[positions.get(i) * 3 + 1] = values.get(i);
+                            stringData[positions.get(i) * 3 + 2] = values.get(i);
                             if (Utils.isNumeric(values.get(i))) {
 
                                 data[positions.get(i) * 3] = Double.parseDouble(values.get(i));
@@ -137,10 +148,15 @@ public class DataSource1D implements Serializable {
                 }
             }
         }
+
+        for (int i = 0; i < dataOffsetCorrected; i++) {
+            used[i] = false;
+        }
     }
 
-    public static DataSource1D getDataSource1D(TabularField field, String title, TabularField positionField, boolean naturalPositions, boolean oneOffset, int dataOffset, boolean codonPositions, double min, double max, boolean excludeValuesOutOfRange, DataTransform dataTransform, ColorGradient colorGradient, MappingSource mappingSource) {
+    public static DataSource1D getDataSource1D(Tabular dataTable, TabularField field, String title, TabularField positionField, boolean naturalPositions, boolean oneOffset, int dataOffset, boolean codonPositions, double min, double max, boolean excludeValuesOutOfRange, DataTransform dataTransform, ColorGradient colorGradient, MappingSource mappingSource) {
         DataSource1D dataSource = new DataSource1D();
+        dataSource.dataTable = dataTable;
         dataSource.dataField = field;
         dataSource.title = title;
         dataSource.positionField = positionField;

@@ -89,6 +89,17 @@
                     </Property>
                   </Properties>
                 </Component>
+                <Component class="javax.swing.JButton" name="edit1DDataButton">
+                  <Properties>
+                    <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                      <Image iconType="3" name="/resources/icons/tabular-field-16x16.png"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Edit 1D data"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="edit1DDataButtonActionPerformed"/>
+                  </Events>
+                </Component>
                 <Component class="javax.swing.JButton" name="add1DDataButton">
                   <Properties>
                     <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">

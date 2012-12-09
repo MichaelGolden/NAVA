@@ -5,14 +5,16 @@
 package nava.structurevis;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
+import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellRenderer;
 import nava.structurevis.data.DataSource1D;
 
 /**
@@ -31,7 +33,7 @@ public class DataPreviewTable extends JPanel {
         tableDataModel = new TableDataModel();
         TableSorter sorter = new TableSorter(tableDataModel);
         table = new JTable(sorter);
-        //table.setModel(tableDataModel);
+        table.setDefaultRenderer(Object.class, new ColorRenderer(true));
         sorter.setTableHeader(table.getTableHeader());
         // sorter.sortOnColumn(table.getTableHeader(),table.getColumnCount()-1,-1);
         table.setFillsViewportHeight(true);
@@ -57,8 +59,19 @@ public class DataPreviewTable extends JPanel {
             if (dataSource1D != null) {
                 ArrayList<Object[]> rows = new ArrayList<>();
                 int j = 1;
-                for (int i = dataSource1D.dataOffset ; i < dataSource1D.data.length; i++) {
-                    Object[] row = {j, "?", dataSource1D.data2[i] == null ? "" : dataSource1D.data2[i]};
+
+                for (int i = 0; i < dataSource1D.dataOffsetCorrected; i++) {
+                    if (!dataSource1D.codonPositions || i % 3 == 0) {
+                        Object[] row = {-1, "?", dataSource1D.stringData[i] == null ? "" : dataSource1D.stringData[i]};
+                        if (dataSource1D.mappingSequence != null && i < dataSource1D.mappingSequence.length()) {
+                            row[1] = dataSource1D.mappingSequence.charAt(i) + "";
+                        }
+                        rows.add(row);
+                    }
+                }
+
+                for (int i = dataSource1D.dataOffsetCorrected; i < dataSource1D.data.length; i++) {
+                    Object[] row = {j, "?", dataSource1D.stringData[i] == null ? "" : dataSource1D.stringData[i]};
                     if (dataSource1D.mappingSequence != null && i < dataSource1D.mappingSequence.length()) {
                         row[1] = dataSource1D.mappingSequence.charAt(i) + "";
                     }
@@ -159,6 +172,49 @@ public class DataPreviewTable extends JPanel {
         public void setValueAt(Object value, int row, int col) {
             rows.get(row)[col] = value;
             fireTableCellUpdated(row, col);
+        }
+    }
+
+    public class ColorRenderer extends JLabel
+            implements TableCellRenderer {
+
+        Border unselectedBorder = null;
+        Border selectedBorder = null;
+        boolean isBordered = true;
+
+        public ColorRenderer(boolean isBordered) {
+            this.isBordered = isBordered;
+            setOpaque(true); //MUST do this for background to show up.
+        }
+
+        public Component getTableCellRendererComponent(
+                JTable table, Object object,
+                boolean isSelected, boolean hasFocus,
+                int row, int column) {
+            
+            if(column == 0)
+            {
+                System.out.println(((Integer)object).intValue());
+            }
+            
+            if(table.getValueAt(row, 0) == null || ((Integer)table.getValueAt(row, 0)).intValue() == -1)
+            {
+               // System.out.println("HERE"+((Integer)object).intValue());
+                this.setBackground(new Color(255,230,230));
+            }
+            else            
+            if(row % 2 == 0)
+            {
+                this.setBackground(Color.white);
+            }
+            else
+            {
+                this.setBackground(new Color(240,240,240));                
+            }
+            //this.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.white));
+                 
+            this.setText(object.toString());
+            return this;
         }
     }
 }

@@ -16,9 +16,7 @@ import nava.data.types.Alignment;
 import nava.data.types.DataSource;
 import nava.data.types.SecondaryStructure;
 import nava.data.types.SecondaryStructureData;
-import nava.structurevis.data.MappingSource;
-import nava.structurevis.data.StructureSource;
-import nava.structurevis.data.Substructure;
+import nava.structurevis.data.*;
 import nava.ui.MainFrame;
 import nava.ui.ProjectController;
 import nava.utils.ComboBoxItem;
@@ -27,14 +25,15 @@ import nava.utils.ComboBoxItem;
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class SubstructurePanel extends javax.swing.JPanel implements ItemListener, ListDataListener {
+public class SubstructurePanel extends javax.swing.JPanel implements ItemListener, ListDataListener, SubstructureModelListener {
 
     DefaultComboBoxModel<StructureSource> structureComboBoxModel = new DefaultComboBoxModel<>();
     DefaultComboBoxModel<ComboBoxItem> substructureComboBoxModel = new DefaultComboBoxModel<>();
     StructureVisController structureVisController;
     ProjectController projectController;
     public SubstructureDrawPanel structureDrawPanel;
-    
+    DataLegend dataLegend1D = new DataLegend();
+    DataLegend dataLegend2D = new DataLegend();
 
     /**
      * Creates new form StructurePanel
@@ -45,6 +44,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ItemListene
         this.projectController = projectController;
 
         structureDrawPanel = new SubstructureDrawPanel(structureVisController.substructureModel);
+        structureVisController.substructureModel.addSubstructureModelListener(this);
         topScrollPane.setViewportView(structureDrawPanel);
 
         structureComboBox.setModel(structureComboBoxModel);
@@ -54,32 +54,29 @@ public class SubstructurePanel extends javax.swing.JPanel implements ItemListene
         substructureComboBox.addItemListener(this);
 
         structureVisController.structureSources.addListDataListener(this);
-        
+
+        legendPanel.add(dataLegend1D);
+        legendPanel.add(dataLegend2D);
+
+
         //populateStructureComboBox(Collections.list(projectController.projectModel.dataSources.elements()));
     }
-    
-    public void refresh()
-    {
+
+    public void refresh() {
         this.populateStructureSourceComboBox();
         this.populateSubtructureComboBox();
         // TODO remember which structures/substructures were selected previously
     }
 
     /*
-    public void populateStructureComboBox(List<DataSource> dataSources) {
-        structureComboBoxModel.removeAllElements();
-        //mappingSourceComboBoxModel.removeAllElements();
-        for (DataSource dataSource : dataSources) {
-            if (dataSource instanceof SecondaryStructure) {
-                structureComboBoxModel.addElement((SecondaryStructure) dataSource);
-            }
-            if (dataSource instanceof Alignment) {
-                // mappingSourceComboBoxModel.addElement((Alignment)dataSource);
-            }
-        }
-    }
-    */
-
+     * public void populateStructureComboBox(List<DataSource> dataSources) {
+     * structureComboBoxModel.removeAllElements();
+     * //mappingSourceComboBoxModel.removeAllElements(); for (DataSource
+     * dataSource : dataSources) { if (dataSource instanceof SecondaryStructure)
+     * { structureComboBoxModel.addElement((SecondaryStructure) dataSource); }
+     * if (dataSource instanceof Alignment) { //
+     * mappingSourceComboBoxModel.addElement((Alignment)dataSource); } } }
+     */
     public void populateSubtructureComboBox() {
         substructureComboBoxModel.removeAllElements();
         ArrayList<Substructure> list = structureVisController.substructureModel.getSubstructures();
@@ -100,6 +97,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ItemListene
 
         topPanel = new javax.swing.JPanel();
         topScrollPane = new javax.swing.JScrollPane();
+        legendPanel = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         structureComboBox = new javax.swing.JComboBox();
@@ -107,8 +105,16 @@ public class SubstructurePanel extends javax.swing.JPanel implements ItemListene
         substructureComboBox = new javax.swing.JComboBox();
         jButton1 = new javax.swing.JButton();
 
-        topPanel.setLayout(new java.awt.BorderLayout());
-        topPanel.add(topScrollPane, java.awt.BorderLayout.CENTER);
+        topPanel.setLayout(new javax.swing.BoxLayout(topPanel, javax.swing.BoxLayout.LINE_AXIS));
+
+        topScrollPane.setMinimumSize(new java.awt.Dimension(40, 23));
+        topScrollPane.setPreferredSize(new java.awt.Dimension(500, 2));
+        topPanel.add(topScrollPane);
+
+        legendPanel.setMaximumSize(new java.awt.Dimension(150, 32767));
+        legendPanel.setPreferredSize(new java.awt.Dimension(80, 289));
+        legendPanel.setLayout(new javax.swing.BoxLayout(legendPanel, javax.swing.BoxLayout.PAGE_AXIS));
+        topPanel.add(legendPanel);
 
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
@@ -136,13 +142,13 @@ public class SubstructurePanel extends javax.swing.JPanel implements ItemListene
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(topPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(topPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 522, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(topPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 289, Short.MAX_VALUE)
+                .addComponent(topPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(1, 1, 1)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -158,6 +164,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ItemListene
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel legendPanel;
     private javax.swing.JComboBox structureComboBox;
     private javax.swing.JComboBox substructureComboBox;
     private javax.swing.JPanel topPanel;
@@ -173,14 +180,13 @@ public class SubstructurePanel extends javax.swing.JPanel implements ItemListene
                     //structureVisController.addStructureSource(structureSource);
                     structureSource.loadData();
                     structureVisController.substructureModel.setStructureSource(structureSource);
-                    if(structureSource.substructures.size() > 0)
-                    {
+                    if (structureSource.substructures.size() > 0) {
                         System.out.println("Opening 1");
                         structureDrawPanel.openSubstructure(structureSource.substructures.get(0));
                     }
                     populateSubtructureComboBox();
                 }
-            }           
+            }
         } else if (e.getSource().equals(substructureComboBox)) {
             ComboBoxItem<Substructure> comboBoxItem = (ComboBoxItem<Substructure>) substructureComboBoxModel.getSelectedItem();
             if (comboBoxItem != null) {
@@ -189,8 +195,8 @@ public class SubstructurePanel extends javax.swing.JPanel implements ItemListene
             }
         }
     }
-    
-     public void populateStructureSourceComboBox() {
+
+    public void populateStructureSourceComboBox() {
         structureComboBoxModel.removeAllElements();
         ArrayList<StructureSource> list = Collections.list(structureVisController.structureSources.elements());
         for (int i = 0; i < list.size(); i++) {
@@ -212,5 +218,22 @@ public class SubstructurePanel extends javax.swing.JPanel implements ItemListene
     @Override
     public void contentsChanged(ListDataEvent e) {
         populateStructureSourceComboBox();
+    }
+
+    @Override
+    public void dataSource1DChanged(DataSource1D dataSource1D) {
+        dataLegend1D.setLegend(dataSource1D.title, dataSource1D.dataTransform, dataSource1D.colorGradient, dataSource1D.defaultColorGradient);
+        System.out.println("Data source 1D changed " + dataSource1D);
+    }
+
+    @Override
+    public void dataSource2DChanged(DataSource2D dataSource2D) {
+        dataLegend2D.setLegend(dataSource2D.title, dataSource2D.dataTransform, dataSource2D.colorGradient, dataSource2D.defaultColorGradient);
+        System.out.println("Data source 2D changed " + dataSource2D);
+    }
+
+    @Override
+    public void structureSourceChanged(StructureSource structureSource) {
+        System.out.println("Structure source changed " + structureSource);
     }
 }

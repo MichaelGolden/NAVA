@@ -140,6 +140,7 @@ public class StructureVisController implements Serializable {
             ret.structureVisDataSources.addElement(s);
         }
         ret.structureVisDataSourcesPersistent = null;
+        ret.substructureModel.initialise();
         in.close();
         return ret;
     }

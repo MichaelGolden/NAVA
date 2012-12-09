@@ -4,36 +4,26 @@
  */
 package nava.structurevis;
 
-import nava.structurevis.data.AnnotationData;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.event.EventListenerList;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
-import nava.data.types.*;
+import nava.structurevis.data.AnnotationData;
 import nava.structurevis.data.DataSource1D;
-import nava.structurevis.data.StructureSource;
-import nava.structurevis.data.Substructure;
-import nava.ui.MainFrame;
 import nava.ui.ProjectController;
 import nava.ui.ProjectView;
-import nava.ui.navigator.NavigationListener;
-import nava.utils.ComboBoxItem;
 import org.biojava.bio.BioException;
 
 /**
@@ -132,6 +122,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         topScrollPane = new javax.swing.JScrollPane();
         jPanel1 = new javax.swing.JPanel();
         data1DComboBox = new javax.swing.JComboBox();
+        edit1DDataButton = new javax.swing.JButton();
         add1DDataButton = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
         filler4 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
@@ -152,6 +143,15 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
 
         data1DComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jPanel1.add(data1DComboBox);
+
+        edit1DDataButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/tabular-field-16x16.png"))); // NOI18N
+        edit1DDataButton.setText("Edit 1D data");
+        edit1DDataButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                edit1DDataButtonActionPerformed(evt);
+            }
+        });
+        jPanel1.add(edit1DDataButton);
 
         add1DDataButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/tabular-field-16x16.png"))); // NOI18N
         add1DDataButton.setText("Add 1D data");
@@ -190,12 +190,25 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
     private void add1DDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_add1DDataButtonActionPerformed
         Data1DDialog d = new Data1DDialog(null, true, projectController.projectModel, structureVisController);
         d.setSize(640, 480);
+        d.editMode = false;
         d.setVisible(true);
     }//GEN-LAST:event_add1DDataButtonActionPerformed
+
+    private void edit1DDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edit1DDataButtonActionPerformed
+        Data1DDialog d = new Data1DDialog(null, true, projectController.projectModel, structureVisController);
+        DataSource1D dataSource1D = (DataSource1D) data1DComboBoxModel.getSelectedItem();
+        if (dataSource1D != null) {
+            d.data1DPanel.setDataSource1D(dataSource1D);
+            d.editMode = true;
+            d.setSize(640, 480);
+            d.setVisible(true);
+        }
+    }//GEN-LAST:event_edit1DDataButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton add1DDataButton;
     private javax.swing.JPanel bottomSplit;
     private javax.swing.JComboBox data1DComboBox;
+    private javax.swing.JButton edit1DDataButton;
     private javax.swing.Box.Filler filler4;
     private javax.swing.JButton jButton1;
     private javax.swing.JPanel jPanel1;

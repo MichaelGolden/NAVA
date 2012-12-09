@@ -22,10 +22,7 @@ import javax.swing.JTextField;
 import javax.swing.text.DefaultFormatter;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
-import nava.data.types.Alignment;
-import nava.data.types.DataSource;
-import nava.data.types.Tabular;
-import nava.data.types.TabularField;
+import nava.data.types.*;
 import nava.structurevis.data.DataSource1D;
 import nava.structurevis.data.DataTransform;
 import nava.structurevis.data.Histogram;
@@ -54,6 +51,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
     DataTransform selectedTransform = null;
     DataSource1D dataSource1D = null;
     DataPreviewTable previewTable = new DataPreviewTable();
+    
 
     public Data1DPanel(ProjectModel projectModel) {
         initComponents();
@@ -196,10 +194,30 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
         {
             MappingSource mappingSource = new MappingSource((Alignment) mappingSourceComboBox.getSelectedItem());
        
-            dataSource1D = DataSource1D.getDataSource1D(selectedField, dataTitleField.getText(), (TabularField) positionComboBox.getSelectedItem(), naturalRadioButton.isSelected(), onePositionRadioButton.isSelected(), headerCheckButton.isSelected() ? 1 : 0, codonCheckButton.isSelected(), (Double) dataMinField.getValue(), (Double) dataMaxField.getValue(), missingDataRadioButton.isSelected(), selectedTransform, dataLegend.colorGradient, mappingSource);
+            dataSource1D = DataSource1D.getDataSource1D((Tabular) dataSourceComboBox.getSelectedItem(), selectedField, dataTitleField.getText(), (TabularField) positionComboBox.getSelectedItem(), naturalRadioButton.isSelected(), onePositionRadioButton.isSelected(), headerCheckButton.isSelected() ? 1 : 0, codonCheckButton.isSelected(), (Double) dataMinField.getValue(), (Double) dataMaxField.getValue(), missingDataRadioButton.isSelected(), selectedTransform, dataLegend.colorGradient, mappingSource);
             dataSource1D.loadData();
             previewTable.tableDataModel.setDataSource1D(dataSource1D);
         }
+    }
+    
+    public void setDataSource1D(DataSource1D dataSource1D)
+    {
+        this.dataSourceComboBoxModel.setSelectedItem(dataSource1D.dataTable);
+        this.dataFieldComboBoxModel.setSelectedItem(dataSource1D.dataField);
+        this.dataTitleField.setText(dataSource1D.title);
+        this.positionComboBoxModel.setSelectedItem(dataSource1D.positionField);
+        this.naturalRadioButton.setSelected(dataSource1D.naturalPositions);        
+        this.onePositionRadioButton.setSelected(dataSource1D.oneOffset);
+        this.headerCheckButton.setSelected(dataSource1D.dataOffset == 1);
+        this.codonCheckButton.setSelected(dataSource1D.codonPositions);
+        this.dataMinField.setValue(dataSource1D.minValue);
+        this.dataMaxField.setValue(dataSource1D.maxValue);
+        this.fromFieldRadioButton.setSelected(dataSource1D.positionField != null);
+        this.missingDataRadioButton.setSelected(dataSource1D.excludeValuesOutOfRange);
+        this.clampedRadioButton.setSelected(!dataSource1D.excludeValuesOutOfRange);
+        this.transformComboBoxModel.setSelectedItem(dataSource1D.dataTransform.type);
+        this.dataLegend.setLegend(dataSource1D.title, dataSource1D.dataTransform, dataSource1D.colorGradient, dataSource1D.defaultColorGradient);
+        this.mappingSourceComboBoxModel.setSelectedItem(dataSource1D.mappingSequence == null ? null : dataSource1D.mappingSource.alignmentSource);        
     }
 
     /**

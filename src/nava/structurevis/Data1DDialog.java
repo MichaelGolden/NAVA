@@ -16,6 +16,7 @@ public class Data1DDialog extends javax.swing.JDialog {
     StructureVisController structureVisController;
     ProjectModel projectModel;
     Data1DPanel data1DPanel;
+    boolean editMode = false;
     
     /**
      * Creates new form Data1DDialog
@@ -24,10 +25,20 @@ public class Data1DDialog extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         
+        this.editMode = false;
         this.projectModel = projectModel;
         this.structureVisController = structureVisController;
         data1DPanel = new Data1DPanel(projectModel);
         this.jPanel1.add(data1DPanel, BorderLayout.CENTER);
+        
+        if(this.editMode)
+        {
+            this.addButton.setText("Save");
+        }
+        else
+        {
+            this.addButton.setText("Add");
+        }
     }
 
     /**

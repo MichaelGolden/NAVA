@@ -79,8 +79,7 @@ public class ProjectController implements ListDataListener {
                 break;
             case TABULAR_DATA:
                 try {
-                    if(dataType.fileFormat.equals(DataType.FileFormat.EXCEL))
-                    {
+                    if (dataType.fileFormat.equals(DataType.FileFormat.EXCEL)) {
                         dataSource = ExcelIO.getTabularRepresentation(dataFile);
                         dataSource.setImportId(getNextImportId());
                         dataSource.originalFile = dataFile;
@@ -89,12 +88,9 @@ public class ProjectController implements ListDataListener {
                         dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                         dataSource.dataType = dataType;
                         dataSource.persistObject(dataSource);
-                        dataSource.fileSize = new FileSize(dataFile.length());                        
+                        dataSource.fileSize = new FileSize(dataFile.length());
                         ExcelIO.saveAsCSV(dataFile, Paths.get(dataSource.importedDataSourcePath).toFile());
-                    }
-                    else
-                    if(dataType.fileFormat.equals(DataType.FileFormat.CSV))
-                    {
+                    } else if (dataType.fileFormat.equals(DataType.FileFormat.CSV)) {
                         dataSource = CsvReader.getTabularRepresentation(dataFile);
                         dataSource.setImportId(getNextImportId());
                         dataSource.originalFile = dataFile;
@@ -103,19 +99,32 @@ public class ProjectController implements ListDataListener {
                         dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                         dataSource.dataType = dataType;
                         dataSource.persistObject(dataSource);
-                        dataSource.fileSize = new FileSize(dataFile.length());                        
+                        dataSource.fileSize = new FileSize(dataFile.length());
                         Files.copy(Paths.get(dataFile.getAbsolutePath()), Paths.get(dataSource.importedDataSourcePath));
                     }
                 } catch (IOException ex) {
                     Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                catch(Exception ex)
-                {
+                } catch (Exception ex) {
                     Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
             case ANNOTATION_DATA:
-                dataSource = new Annotations();
+                try {
+                    dataSource = new Annotations();
+                    dataSource.setImportId(getNextImportId());
+                    dataSource.originalFile = dataFile;
+                    dataSource.originalDataSourcePath = generatePath(dataSource.getImportId(), "orig." + dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1)).toString();
+                    dataSource.importedDataSourcePath = generatePath(dataSource.getImportId(), "gb").toString();
+                    dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
+                    dataSource.dataType = dataType;
+                    //dataSource.persistObject(dataSource);
+                    dataSource.fileSize = new FileSize(dataFile.length());
+                    Files.copy(Paths.get(dataFile.getAbsolutePath()), Paths.get(dataSource.importedDataSourcePath));
+                } catch (IOException ex) {
+                    Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (Exception ex) {
+                    Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 break;
             case MATRIX:
                 dataSource = new Matrix();

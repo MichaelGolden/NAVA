@@ -4,17 +4,68 @@
  */
 package nava.structurevis;
 
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.io.File;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.DefaultComboBoxModel;
+import nava.data.types.Annotations;
+import nava.data.types.DataSource;
+import nava.data.types.Tabular;
+import nava.structurevis.data.AnnotationSource;
+import nava.ui.ProjectModel;
+import org.biojava.bio.BioException;
+
 /**
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class AnnotationsPanel extends javax.swing.JPanel {
+public class AnnotationsPanel extends javax.swing.JPanel implements ItemListener {
 
+    DefaultComboBoxModel<Annotations> annotationsComboBoxModel = new DefaultComboBoxModel<>();
+    ProjectModel projectModel;
+
+    Annotations annotations = null;
+    
     /**
      * Creates new form AnnotationsPanel
      */
-    public AnnotationsPanel() {
+    public AnnotationsPanel(ProjectModel projectModel) {
         initComponents();
+        this.projectModel = projectModel;
+
+        this.annotationsSourceComboBox.setModel(annotationsComboBoxModel);
+        this.annotationsSourceComboBox.addItemListener(this);
+
+        populateAnnotationsSourceComboBox(Collections.list(projectModel.dataSources.elements()));
+    }
+
+    public void populateAnnotationsSourceComboBox(List<DataSource> dataSources) {
+        annotationsComboBoxModel.removeAllElements();
+        for (int i = 0; i < dataSources.size(); i++) {
+            if (dataSources.get(i) instanceof Annotations) {
+                annotationsComboBoxModel.addElement((Annotations) dataSources.get(i));
+            }
+        }
+    }
+    
+    public AnnotationSource getAnnotationsSource()
+    {
+        if(annotations != null)
+        {
+            try {
+                return AnnotationSource.readAnnotations(new File(annotations.importedDataSourcePath));
+            } catch (BioException ex) {
+                Logger.getLogger(AnnotationsPanel.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(AnnotationsPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return null;
     }
 
     /**
@@ -26,12 +77,12 @@ public class AnnotationsPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jComboBox1 = new javax.swing.JComboBox();
+        annotationsSourceComboBox = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        annotationsSourceComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         jLabel1.setText("Select data source");
 
@@ -47,7 +98,7 @@ public class AnnotationsPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(annotationsSourceComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -59,7 +110,7 @@ public class AnnotationsPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(annotationsSourceComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1)
                     .addComponent(jButton1)
                     .addComponent(jLabel2))
@@ -67,9 +118,17 @@ public class AnnotationsPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox annotationsSourceComboBox;
     private javax.swing.JButton jButton1;
-    private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if(e.getSource().equals(annotationsSourceComboBox))
+        {
+            annotations = (Annotations) annotationsSourceComboBox.getSelectedItem();
+        }
+    }
 }

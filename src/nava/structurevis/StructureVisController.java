@@ -72,7 +72,7 @@ public class StructureVisController implements Serializable {
         refreshMappings();
     }
 
-    public void addStructureVisAnnotationsSource(AnnotationSource annotationSource) {
+    public void addAnnotationsSource(AnnotationSource annotationSource) {
         annotationSources.addElement(annotationSource);
         refreshMappings();
     }

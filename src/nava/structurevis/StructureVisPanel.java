@@ -61,7 +61,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
 
         LayerPanel layerPanel = new LayerPanel();
 
-        AnnotationsLayer annotationsLayer1 = new AnnotationsLayer(layerPanel);
+        AnnotationsLayer annotationsLayer1 = new AnnotationsLayer(layerPanel, structureVisController, projectController);
 
         JPanel annotationsLayerLeft = new JPanel();
         annotationsLayerLeft.setLayout(new BorderLayout());

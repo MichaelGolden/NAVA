@@ -16,6 +16,8 @@ import javax.swing.ToolTipManager;
 import nava.structurevis.data.AnnotationSource;
 import nava.structurevis.data.Feature;
 import nava.ui.MainFrame;
+import nava.ui.ProjectController;
+import nava.ui.ProjectModel;
 import nava.utils.GraphicsUtils;
 import nava.utils.Pair;
 
@@ -48,16 +50,21 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
     int majorTickMark = 1000;
     int[] tickMarkPossibilities = {1, 5, 10, 15, 20, 25, 50, 75, 100, 200, 250, 500, 750, 1500, 2000};
     Font annotationsFont = MainFrame.fontLiberationSans.deriveFont(12);
-
+    
+    StructureVisController structureVisController;
+    ProjectController projectController;
     /*
      * Structure selected = null; ArrayList<Structure> structures = null;
      * ArrayList<StructureAndMouseoverRegion> structurePositions = null;
      */
     LayerPanel parent;
 
-    public AnnotationsLayer(LayerPanel parent) {
+    public AnnotationsLayer(LayerPanel parent, StructureVisController structureVisController, ProjectController projectController) {
 
         this.parent = parent;
+        this.structureVisController = structureVisController;
+        this.projectController = projectController;
+        
         addMouseListener(this);
         addMouseMotionListener(this);
 
@@ -436,6 +443,11 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
             if (parent != null) {
                 parent.updatePanel();
             }
+        } else if (e.getSource().equals(this.addAnnotationFromSourceItem)) {
+            AnnotationsDialog d = new AnnotationsDialog(null, true, projectController.projectModel, structureVisController);
+            //d.setSize(640, 480);
+            // d.editMode = false;
+            d.setVisible(true);
         }
     }
 }

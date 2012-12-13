@@ -15,6 +15,7 @@ import javax.swing.JPanel;
  */
 public class Layer 
 {
+    public LayerPanel parent;
     private JPanel left;
     private JPanel right;
     
@@ -22,16 +23,15 @@ public class Layer
     {
         this.left = left;
         this.right = right;
+    }
+    
+    public Layer(LayerPanel parent, JPanel left, JPanel right)
+    {
+        this.parent = parent;
+        this.left = left;
+        this.right = right;
         
-        int layerHeight = Math.max(left.getPreferredSize().height, right.getPreferredSize().height);
-        
-        left.setMinimumSize(new Dimension(0, layerHeight));
-        left.setPreferredSize(new Dimension(100, layerHeight));
-        left.setMaximumSize(new Dimension(Integer.MAX_VALUE, layerHeight));
-        
-        right.setMinimumSize(new Dimension(0, layerHeight));
-        right.setPreferredSize(new Dimension(100, layerHeight));
-        right.setMaximumSize(new Dimension(Integer.MAX_VALUE, layerHeight));
+        refresh();
     }
     
     public JPanel getLeft()
@@ -42,5 +42,18 @@ public class Layer
     public JPanel getRight()
     {
         return this.right;
+    }
+    
+    public void refresh()
+    {
+        int layerHeight = Math.max(left.getPreferredSize().height, right.getPreferredSize().height);
+        
+        left.setMinimumSize(new Dimension(0, layerHeight));
+        left.setPreferredSize(new Dimension(100, layerHeight));
+        left.setMaximumSize(new Dimension(Integer.MAX_VALUE, layerHeight));
+        
+        right.setMinimumSize(new Dimension(0, layerHeight));
+        right.setPreferredSize(new Dimension(100, layerHeight));
+        right.setMaximumSize(new Dimension(Integer.MAX_VALUE, layerHeight));
     }
 }

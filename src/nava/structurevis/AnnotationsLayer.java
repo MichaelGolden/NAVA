@@ -5,7 +5,7 @@
 package nava.structurevis;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.ToolTipManager;
-import nava.structurevis.data.AnnotationData;
+import nava.structurevis.data.AnnotationSource;
 import nava.structurevis.data.Feature;
 import nava.ui.MainFrame;
 import nava.utils.GraphicsUtils;
@@ -23,11 +23,11 @@ import nava.utils.Pair;
  *
  * @author Michael Golden
  */
-public class AnnotationsLayer extends JPanel {
+public class AnnotationsLayer extends JPanel implements ActionListener, MouseListener, MouseMotionListener {
 
     //Graphics2D g = null;
     int xoffset = 5;
-    private AnnotationData annotationData;
+    private AnnotationSource annotationData;
     ArrayList<Pair<Shape, Feature>> featurePositions;
     public int rulerHeight = 20;
     public int blockHeight = 22;
@@ -37,6 +37,10 @@ public class AnnotationsLayer extends JPanel {
     int selectedStart = -1;
     int selectedEnd = -1;
     JPopupMenu popupMenu = new JPopupMenu();
+    JMenuItem removeAnnotationItem = new JMenuItem("Remove annotation");
+    JMenuItem addAnnotationItem = new JMenuItem("Add annotation...");
+    JMenuItem addAnnotationFromSourceItem = new JMenuItem("Add from source...");
+    JMenuItem stackAnnotationsItem = new JMenuItem("Stack annotations");
     JMenuItem autofitItem = new JMenuItem("Autofit width");
     JMenuItem zoomInItem = new JMenuItem("Zoom in");
     JMenuItem zoomOutItem = new JMenuItem("Zoom out");
@@ -49,17 +53,37 @@ public class AnnotationsLayer extends JPanel {
      * Structure selected = null; ArrayList<Structure> structures = null;
      * ArrayList<StructureAndMouseoverRegion> structurePositions = null;
      */
-    public AnnotationsLayer() {
-        /*
-         * super(layerPanel, name); setGenomeOrganization(genomeStructure);
-         * addMouseListener(this); addMouseMotionListener(this);
-         *
-         * autofitItem.addActionListener(this);
-         * zoomInItem.addActionListener(this);
-         * popupMenu.add(zoomOutItem).addActionListener(this);
-         * popupMenu.add(autofitItem); popupMenu.add(zoomInItem);
-         * popupMenu.add(zoomOutItem);
-         */
+    LayerPanel parent;
+
+    public AnnotationsLayer(LayerPanel parent) {
+
+        this.parent = parent;
+        addMouseListener(this);
+        addMouseMotionListener(this);
+
+        removeAnnotationItem.addActionListener(this);
+        popupMenu.add(removeAnnotationItem);
+
+        addAnnotationItem.addActionListener(this);
+        popupMenu.add(addAnnotationItem);
+
+        addAnnotationFromSourceItem.addActionListener(this);
+        popupMenu.add(addAnnotationFromSourceItem);
+
+        stackAnnotationsItem.addActionListener(this);
+        popupMenu.add(stackAnnotationsItem);
+
+        popupMenu.add(new JPopupMenu.Separator());
+
+        autofitItem.addActionListener(this);
+        popupMenu.add(autofitItem);
+
+        zoomInItem.addActionListener(this);
+        popupMenu.add(zoomInItem);
+
+        popupMenu.add(zoomOutItem).addActionListener(this);
+        popupMenu.add(zoomOutItem);
+
         ToolTipManager.sharedInstance().registerComponent(this);
     }
     boolean forceRepaint = true;
@@ -78,13 +102,19 @@ public class AnnotationsLayer extends JPanel {
         return 1;
     }
 
-    public void setAnnotationData(AnnotationData annotationData) {
+    public void setAnnotationData(AnnotationSource annotationData) {
         this.annotationData = annotationData;
+        updatePreferredHeight();
+        revalidate();
+        repaint();
+    }
+
+    public void updatePreferredHeight() {
         int numRows = 0;
         for (int i = 0; i < annotationData.features.size(); i++) {
             numRows = Math.max(numRows, annotationData.features.get(i).row);
         }
-        setPreferredSize(new Dimension(10000, rulerHeight + numRows * blockHeight + blockHeight+5));
+        setPreferredSize(new Dimension(10000, rulerHeight + numRows * blockHeight + blockHeight + 5));
     }
 
     /*
@@ -355,4 +385,57 @@ public class AnnotationsLayer extends JPanel {
      * rectangle, int level) { this.structure = structure; this.rectangle =
      * rectangle; this.level = level; } }
      */
+    int popupMenuX = 0;
+    int popupMenuY = 0;
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        popupMenu.show(this, e.getX(), e.getY());
+        popupMenuX = e.getX();
+        popupMenuY = e.getY();
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource().equals(removeAnnotationItem)) {
+            for (Pair<Shape, Feature> featurePosition : featurePositions) {
+                if (featurePosition.getLeft().contains(popupMenuX, popupMenuY)) {
+                    annotationData.features.remove(featurePosition.getRight());
+                    repaint();
+                    break;
+                }
+            }
+        } else if (e.getSource().equals(stackAnnotationsItem)) {
+            AnnotationSource.stackFeatures(annotationData);
+            updatePreferredHeight();
+            repaint();
+            if (parent != null) {
+                parent.updatePanel();
+            }
+        }
+    }
 }

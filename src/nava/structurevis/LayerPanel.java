@@ -7,6 +7,7 @@ package nava.structurevis;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JLabel;
@@ -46,14 +47,38 @@ public class LayerPanel extends javax.swing.JPanel implements Scrollable {
                 }
             }
         }*/
+        
+        refresh();
         revalidate();
         repaint();
         /*for (int i = 0; i < layers.size(); i++) {
             layers.get(i).redraw();
         }*/
     }
-
-    public void addLayer(Layer layer) {
+    
+    public void refresh()
+    {        
+        //leftPanel.removeAll();
+        //rightPanel.removeAll();
+        height = 0;
+        for(Layer layer : layers)
+        {
+            layer.refresh();
+            //addLayer(layer,false);
+             height += layer.getLeft().getPreferredSize().height;
+             layer.getRight().setPreferredSize(layer.getLeft().getPreferredSize());
+        }
+    }
+    
+    ArrayList<Layer> layers = new ArrayList<>();
+    
+    public void addLayer(Layer layer, boolean add) {
+        layer.parent = this;
+        layer.refresh();
+        if(add)
+        {
+            layers.add(layer);
+        }
         layer.getLeft().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
         leftPanel.add(layer.getLeft());
 
@@ -61,8 +86,6 @@ public class LayerPanel extends javax.swing.JPanel implements Scrollable {
         rightPanel.add(layer.getRight());
 
         height += layer.getLeft().getPreferredSize().height;
-        //setPreferredSize(new Dimension(getPreferredSize().width, height));
-        //updatePanel();
         
     }
 

@@ -9,9 +9,7 @@ import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
 import javax.swing.event.EventListenerList;
-import nava.structurevis.data.DataSource1D;
-import nava.structurevis.data.DataSource2D;
-import nava.structurevis.data.StructureSource;
+import nava.structurevis.data.*;
 import nava.ui.navigator.NavigationEvent;
 import nava.ui.navigator.NavigationListener;
 import nava.utils.Mapping;
@@ -25,6 +23,7 @@ public class SubstructureModel implements Serializable {
     public static Color missingDataColor = Color.gray;
     public static Color filteredDataColor = Color.darkGray;
     int sequenceLength;
+    AnnotationSource annotationSource = null;
     DataSource1D data1D = null;
     Mapping mapping1D = null;
     DataSource2D data2D = null;

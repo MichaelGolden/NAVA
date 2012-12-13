@@ -4,13 +4,14 @@
  */
 package nava.structurevis.data;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  *
  * @author Michael
  */
-public class Feature implements Comparable<Feature> {
+public class Feature implements Comparable<Feature>, Serializable {
 
     public String name;
     public int min;
@@ -18,6 +19,7 @@ public class Feature implements Comparable<Feature> {
     public int row = 0;
     public boolean visible = true;
     public ArrayList<Block> blocks = new ArrayList<>();
+    public MappingSource mappingSource = null;
 
     @Override
     public String toString() {

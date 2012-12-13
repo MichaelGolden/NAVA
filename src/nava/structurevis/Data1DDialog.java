@@ -94,7 +94,7 @@ public class Data1DDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
-        structureVisController.addStructureVisDataSource(data1DPanel.getDataSource1D());
+        structureVisController.addStructureVisDataSource1D(data1DPanel.getDataSource1D());
         this.dispose();
     }//GEN-LAST:event_addButtonActionPerformed
 

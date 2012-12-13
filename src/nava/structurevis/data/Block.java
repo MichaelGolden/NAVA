@@ -5,12 +5,13 @@
 package nava.structurevis.data;
 
 import java.awt.Color;
+import java.io.Serializable;
 
 /**
  *
  * @author Michael
  */
-public class Block {
+public class Block implements Serializable {
     
     public Feature parent;
     public int min;

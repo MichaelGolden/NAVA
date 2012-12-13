@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import nava.data.types.Annotations;
 import org.biojava.bio.BioException;
 import org.biojava.bio.symbol.Location;
 import org.biojavax.Namespace;
@@ -22,7 +23,7 @@ import org.biojavax.bio.seq.RichSequenceIterator;
  *
  * @author Michael
  */
-public class AnnotationData {
+public class AnnotationSource implements Serializable {
     
    public static Color[] featureColours = {
         new Color(255, 190, 190),
@@ -63,8 +64,8 @@ public class AnnotationData {
      * @param annotationData
      * @return
      */
-    public static AnnotationData stackFeatures(AnnotationData annotationData) {
-        AnnotationData ret = new AnnotationData();
+    public static AnnotationSource stackFeatures(AnnotationSource annotationData) {
+        AnnotationSource ret = new AnnotationSource();
         ret.sequenceLength = annotationData.sequenceLength;
         ret.features.addAll(annotationData.features);
         Collections.sort(ret.features);
@@ -114,8 +115,8 @@ public class AnnotationData {
      * @param annotationData
      * @return
      */
-    public static AnnotationData getVisible(AnnotationData annotationData) {
-        AnnotationData ret = new AnnotationData();
+    public static AnnotationSource getVisible(AnnotationSource annotationData) {
+        AnnotationSource ret = new AnnotationSource();
         ret.sequenceLength = annotationData.sequenceLength;
         for (int i = 0; i < annotationData.features.size(); i++) {
             if (annotationData.features.get(i).visible) {
@@ -133,8 +134,8 @@ public class AnnotationData {
      * @return
      * @throws BioException
      */
-    public static AnnotationData readAnnotations(File genBankFile) throws BioException, IOException {
-        AnnotationData annotationData = new AnnotationData();
+    public static AnnotationSource readAnnotations(File genBankFile) throws BioException, IOException {
+        AnnotationSource annotationData = new AnnotationSource();
         annotationData.sequenceLength = 0;
 
         BufferedReader br = new BufferedReader(new FileReader(genBankFile));
@@ -144,10 +145,12 @@ public class AnnotationData {
         while (seqs.hasNext()) {
             RichSequence rs = seqs.nextRichSequence();
             Iterator<org.biojava.bio.seq.Feature> it = rs.features();
+            MappingSource mappingSequence = new MappingSource(rs.seqString());
             while (it.hasNext()) {
                 org.biojava.bio.seq.Feature ft = it.next();
 
                 Feature feature = new Feature();
+                feature.mappingSource = mappingSequence;
                 feature.min = ft.getLocation().getMin();
                 feature.max = ft.getLocation().getMax();
                 if (ft.getType().equalsIgnoreCase("source")) {
@@ -183,7 +186,7 @@ public class AnnotationData {
             System.out.println(readAnnotations(new File("examples/annotations/refseq.gb")));
             System.out.println(stackFeatures(readAnnotations(new File("examples/annotations/refseq.gb"))));
         } catch (BioException ex) {
-            Logger.getLogger(AnnotationData.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(AnnotationSource.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

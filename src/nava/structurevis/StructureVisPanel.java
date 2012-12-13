@@ -20,7 +20,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
-import nava.structurevis.data.AnnotationData;
+import nava.structurevis.data.AnnotationSource;
 import nava.structurevis.data.DataSource1D;
 import nava.ui.ProjectController;
 import nava.ui.ProjectView;
@@ -61,22 +61,13 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
 
         LayerPanel layerPanel = new LayerPanel();
 
-        AnnotationsLayer annotationsLayer1 = new AnnotationsLayer();
-        try {
-            AnnotationData annotationData = AnnotationData.stackFeatures(AnnotationData.readAnnotations(new File("examples/annotations/refseq.gb")));
-            annotationData.assignColors();
-            annotationsLayer1.setAnnotationData(annotationData);
-        } catch (BioException ex) {
-            Logger.getLogger(StructureVisPanel.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(StructureVisPanel.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        AnnotationsLayer annotationsLayer1 = new AnnotationsLayer(layerPanel);
 
         JPanel annotationsLayerLeft = new JPanel();
         annotationsLayerLeft.setLayout(new BorderLayout());
         annotationsLayerLeft.add(new JLabel("Sequence annotations"), BorderLayout.WEST);
         annotationsLayerLeft.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.darkGray));
-        layerPanel.addLayer(new Layer(annotationsLayerLeft, annotationsLayer1));
+        layerPanel.addLayer(new Layer(annotationsLayerLeft, annotationsLayer1), true);
 
         topScrollPane.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.darkGray));
         topScrollPane.setViewportView(layerPanel);
@@ -96,6 +87,27 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         structureVisController.structureVisDataSources.addListDataListener(this);
         populateDataSource1DComboBox();
         substructurePanel.refresh();
+
+
+        if (structureVisController.substructureModel.annotationSource == null) {
+            try {
+                System.out.println("HERE");
+                AnnotationSource annotationData = AnnotationSource.stackFeatures(AnnotationSource.readAnnotations(new File("examples/annotations/refseq.gb")));
+                annotationData.assignColors();
+                structureVisController.substructureModel.annotationSource = annotationData;
+                annotationsLayer1.setAnnotationData(structureVisController.substructureModel.annotationSource);
+                layerPanel.updatePanel();
+            } catch (BioException ex) {
+                Logger.getLogger(StructureVisPanel.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(StructureVisPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        else
+        {
+             annotationsLayer1.setAnnotationData(structureVisController.substructureModel.annotationSource);
+             layerPanel.updatePanel();
+        }
     }
 
     public void populateDataSource1DComboBox() {

@@ -11,7 +11,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import nava.data.types.Annotations;
+import nava.structurevis.StructureVisController;
+import nava.utils.Mapping;
 import org.biojava.bio.BioException;
 import org.biojava.bio.symbol.Location;
 import org.biojavax.Namespace;
@@ -24,33 +25,34 @@ import org.biojavax.bio.seq.RichSequenceIterator;
  * @author Michael
  */
 public class AnnotationSource implements Serializable {
-    
-   public static Color[] featureColours = {
+
+    public static Color[] featureColours = {
         new Color(255, 190, 190),
         new Color(190, 255, 255),
         new Color(190, 190, 255),
         new Color(255, 190, 255),
         new Color(200, 255, 190),
-        new Color(255, 255, 190)};
-
+        new Color(255, 255, 190),
+        new Color(255, 200, 100),
+        new Color(220, 180, 210)
+    };
     public int sequenceLength;
     public ArrayList<Feature> features = new ArrayList<>();
+    public int mappedSequenceLength;
+    public ArrayList<Feature> mappedFeatures = new ArrayList<>();
 
     @Override
     public String toString() {
         return features.toString();
     }
-    
+
     /**
      * Automatically assign a different colour to each feature.
      */
-    public void assignColors()
-    {
-        for(int i = 0 ; i < features.size() ; i++)
-        {
+    public void assignColors() {
+        for (int i = 0; i < features.size(); i++) {
             Feature f = features.get(i);
-            for(int j = 0 ; j < f.blocks.size() ; j++)
-            {
+            for (int j = 0; j < f.blocks.size(); j++) {
                 f.blocks.get(j).color = featureColours[i % featureColours.length];
             }
         }
@@ -71,7 +73,6 @@ public class AnnotationSource implements Serializable {
         Collections.sort(ret.features);
         Collections.reverse(ret.features);
 
-
         ArrayList<Feature> addedFeatures = new ArrayList<>();
         int maxRow = 0;
         for (int row = 0; row < ret.features.size(); row++) {
@@ -89,6 +90,29 @@ public class AnnotationSource implements Serializable {
             addedFeatures.add(currentFeature);
         }
         ret.features = addedFeatures;
+
+        ret.mappedFeatures.addAll(annotationData.mappedFeatures);
+        Collections.sort(ret.mappedFeatures);
+        Collections.reverse(ret.mappedFeatures);
+        ArrayList<Feature> addedMappedFeatures = new ArrayList<>();
+        maxRow = 0;
+        for (int row = 0; row < ret.mappedFeatures.size(); row++) {
+            Feature currentFeature = ret.mappedFeatures.get(row);
+            int currentRow = 0;
+            for (currentRow = 0; currentRow <= maxRow + 1; currentRow++) {
+                currentFeature.row = currentRow;
+                if (isOverlap(currentFeature, addedMappedFeatures)) {
+                } else {
+                    break;
+                }
+            }
+            maxRow = Math.max(maxRow, currentRow);
+            currentFeature.row = currentRow;
+            addedMappedFeatures.add(currentFeature);
+        }
+        ret.mappedFeatures = addedMappedFeatures;
+
+
         return ret;
     }
 
@@ -110,7 +134,8 @@ public class AnnotationSource implements Serializable {
     }
 
     /**
-     * Given a list of features, return a list of those features which are visible.
+     * Given a list of features, return a list of those features which are
+     * visible.
      *
      * @param annotationData
      * @return
@@ -174,11 +199,83 @@ public class AnnotationSource implements Serializable {
                 }
 
                 annotationData.features.add(feature);
+                getMappedAnnotations(annotationData, null, null);
             }
         }
         br.close();
 
+        annotationData.assignColors();
         return annotationData;
+    }
+
+    public static AnnotationSource getMappedAnnotations(AnnotationSource annotationSource, StructureSource structureSource, StructureVisController structureVisController) {
+        annotationSource.mappedFeatures = new ArrayList<>();
+        ArrayList<Feature> features = annotationSource.features;
+        annotationSource.mappedSequenceLength = 0;
+        for (Feature feature : features) {
+            Feature mappedFeature = feature.clone();
+            if (structureSource != null && structureVisController != null) {
+                Mapping mapping = structureVisController.getMapping(mappedFeature.mappingSource, structureSource.mappingSource);
+                System.out.println("MAPPING1" + structureSource.mappingSource);
+                System.out.println("MAPPING1" + mappedFeature.mappingSource);
+                if (mapping != null) {
+                    System.out.println("MAPPING2");
+                    // annotationSource.mappedSequenceLength = Math.max(annotationSource.mappedSequenceLength, mapping.aToBNearest(annotationSource.sequenceLength));
+                    annotationSource.mappedSequenceLength = Math.max(annotationSource.mappedSequenceLength, mapping.getBLength());
+                    mappedFeature.min = mapping.aToBNearest(feature.min - 1);
+                    mappedFeature.max = mapping.aToBNearest(feature.max - 1);
+                    if (mappedFeature.min == -1) {
+                        mappedFeature.min = 0;
+                    }
+                    if (mappedFeature.max == -1) {
+                        mappedFeature.max = mappedFeature.min + 1;
+                    }
+                    for (Block block : mappedFeature.blocks) {
+                        block.min = mapping.aToBNearest(block.min - 1);
+                        block.max = mapping.aToBNearest(block.max - 1);
+                        if (block.min == -1) {
+                            block.min = 0;
+                        }
+                        if (block.max == -1) {
+                            block.max = block.min + 1;
+                        }
+                    }
+                }
+            }
+            if (annotationSource.mappedSequenceLength == 0) {
+                annotationSource.mappedSequenceLength = annotationSource.sequenceLength;
+            }
+
+            annotationSource.mappedFeatures.add(mappedFeature);
+        }
+
+        annotationSource.assignColors();
+        return annotationSource;
+    }
+
+    /**
+     * Add annotations from a2 to this, adjusting the first row of a2 to start
+     * after the last row of this.
+     *
+     * @param a1
+     * @param a2
+     */
+    public void addAnnotations(AnnotationSource a2) {
+        int maxRow = -1;
+        for (Feature feature : this.features) {
+            maxRow = Math.max(feature.row, maxRow);
+        }
+        maxRow++;
+        for (Feature feature : a2.features) {
+            Feature clone = feature.clone();
+            clone.row += maxRow;
+            this.features.add(clone);
+        }
+        for (Feature feature : a2.mappedFeatures) {
+            Feature clone = feature.clone();
+            clone.row += maxRow;
+            this.mappedFeatures.add(clone);
+        }
     }
 
     public static void main(String[] args) throws IOException {

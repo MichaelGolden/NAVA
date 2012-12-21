@@ -467,6 +467,12 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
         pw.println("<g>");
         for (int i = 0; i < nucleotidePositions.length; i++) {
             int pos = (model.structure.startPosition + i - 1) % model.sequenceLength;
+            if (model.mapping1D != null) {
+                int pos2 = model.mapping1D.aToB(pos);
+                if (pos2 != -1) {
+                    pos = pos2;
+                }
+            }
             Color nucleotideBackgroundColor = model.missingDataColor;
             if (oneDimensionalData == SHOW && model.data1D != null && model.data1D.used[pos]) {
                 double p = model.data1D.data[pos];
@@ -741,6 +747,12 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
         // draw the nucleotides
         for (int i = 0; i < nucleotidePositions.length; i++) {
             int pos = (model.structure.startPosition + i - 1) % model.sequenceLength;
+            if (model.mapping1D != null) {
+                int pos2 = model.mapping1D.aToB(pos);
+                if (pos2 != -1) {
+                    pos = pos2;
+                }
+            }
             Ellipse2D stemNucleotide = getCircleCenteredAt(nucleotidePositions[i].getX(), nucleotidePositions[i].getY(), nucleotideDiameter);
             g.setColor(Color.white);
             Color nucleotideBackgroundColor = model.missingDataColor;

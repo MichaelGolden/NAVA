@@ -25,6 +25,14 @@ public class Block implements Serializable {
         this.max = max;
     }
     
+     public Block(Feature parent, int min, int max, Color color)
+    {
+        this.parent = parent;
+        this.min = min;
+        this.max = max;
+        this.color = color;
+    }
+    
     public String getName()
     {
         return parent.name;
@@ -35,4 +43,10 @@ public class Block implements Serializable {
     {
         return "["+getName()+", "+min+"-"+max+"]";
     }
+    
+    public Block clone(Feature parent)
+    {
+        return new Block(parent, min, max, color);
+    }
+    
 }

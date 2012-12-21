@@ -66,6 +66,6 @@ public class StructureList extends DataSource {
 
     @Override
     public void persistObject(Object object) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        //throw new UnsupportedOperationException("Not supported yet.");
     }
 }

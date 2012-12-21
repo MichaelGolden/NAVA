@@ -31,7 +31,7 @@ public class StructureVisController implements Serializable {
     public File structureVisModelFile = null;
 
     public StructureVisController(File workingDirectory) {
-        substructureModel = new SubstructureModel();
+        substructureModel = new SubstructureModel(this);
         structureVisModelFile = new File(workingDirectory.getAbsolutePath() + File.separatorChar + "structurevis.model");
 
         substructureModel.loadData();
@@ -78,6 +78,11 @@ public class StructureVisController implements Serializable {
     }
 
     public Mapping getMapping(MappingSource a, MappingSource b) {
+        if(a == null || b == null)
+        {
+            return null;
+        }
+        
         Pair p = new Pair(a, b);
         Mapping m = mappings.get(p);
         if (m == null) {
@@ -88,8 +93,6 @@ public class StructureVisController implements Serializable {
     }
 
     public Mapping createMapping(MappingSource a, MappingSource b) {
-
-
         ArrayList<String> sequencesA = new ArrayList<>();
         ArrayList<String> sequencesNamesA = new ArrayList<>();
         ArrayList<String> sequencesB = new ArrayList<>();

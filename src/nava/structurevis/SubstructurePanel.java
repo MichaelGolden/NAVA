@@ -236,4 +236,9 @@ public class SubstructurePanel extends javax.swing.JPanel implements ItemListene
     public void structureSourceChanged(StructureSource structureSource) {
         System.out.println("Structure source changed " + structureSource);
     }
+
+    @Override
+    public void annotationSourceChanged(AnnotationSource annotationSource) {
+          System.out.println("Mapping source changed " + annotationSource);
+    }
 }

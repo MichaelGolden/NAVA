@@ -68,6 +68,7 @@ public class LayerPanel extends javax.swing.JPanel implements Scrollable {
              height += layer.getLeft().getPreferredSize().height;
              layer.getRight().setPreferredSize(layer.getLeft().getPreferredSize());
         }
+        this.setPreferredSize(new Dimension(this.getPreferredSize().width, height));
     }
     
     ArrayList<Layer> layers = new ArrayList<>();

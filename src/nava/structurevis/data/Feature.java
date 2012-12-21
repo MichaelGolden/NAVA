@@ -25,6 +25,11 @@ public class Feature implements Comparable<Feature>, Serializable {
     public String toString() {
         return row + ":" + blocks.toString();
     }
+    
+    public String getName()
+    {
+        return name + " [" + min + ".." + max + ", " + (row + 1) + "]";
+    }
 
     public int getLength() {
         return max - min;
@@ -57,17 +62,18 @@ public class Feature implements Comparable<Feature>, Serializable {
 
     @Override
     public Feature clone() {
-        Feature clone = new Feature();
-        clone.name = name;
-        clone.min = min;
-        clone.max = max;
-        clone.row = row;
-        clone.visible = visible;
-        clone.blocks = new ArrayList<>();
+        Feature feature = new Feature();
+        feature.name = name;
+        feature.min = min;
+        feature.max = max;
+        feature.row = row;
+        feature.visible = visible;
+        feature.blocks = new ArrayList<>();
+        feature.mappingSource = mappingSource;
         for (int i = 0; i < this.blocks.size(); i++) {
-            clone.blocks.add(this.blocks.get(i));
+            feature.blocks.add(blocks.get(i).clone(feature));
         }
-        return clone;
+        return feature;
     }
 
     public static boolean isOverlap(Feature f1, Feature f2) {

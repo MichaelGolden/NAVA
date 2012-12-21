@@ -22,6 +22,8 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import nava.structurevis.data.AnnotationSource;
 import nava.structurevis.data.DataSource1D;
+import nava.structurevis.data.DataSource2D;
+import nava.structurevis.data.StructureSource;
 import nava.ui.ProjectController;
 import nava.ui.ProjectView;
 import org.biojava.bio.BioException;
@@ -30,13 +32,15 @@ import org.biojava.bio.BioException;
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class StructureVisPanel extends javax.swing.JPanel implements ItemListener, ProjectView, ListDataListener {
+public class StructureVisPanel extends javax.swing.JPanel implements ItemListener, ProjectView, ListDataListener, SubstructureModelListener {
 
     //DefaultComboBoxModel<Alignment> mappingSourceComboBoxModel = new DefaultComboBoxModel<>();
     DefaultComboBoxModel<DataSource1D> data1DComboBoxModel = new DefaultComboBoxModel<>();
     ProjectController projectController;
     public StructureVisController structureVisController;
     SubstructurePanel substructurePanel;
+    LayerPanel layerPanel;
+    AnnotationsLayer annotationsLayerRight;
 
     /**
      * Creates new form StructureVisPanel
@@ -59,20 +63,23 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         this.projectController = projectController;
 
 
-        LayerPanel layerPanel = new LayerPanel();
+        layerPanel = new LayerPanel();
 
-        AnnotationsLayer annotationsLayer1 = new AnnotationsLayer(layerPanel, structureVisController, projectController);
+        
+        annotationsLayerRight = new AnnotationsLayer(null, structureVisController, projectController);
 
         JPanel annotationsLayerLeft = new JPanel();
         annotationsLayerLeft.setLayout(new BorderLayout());
         annotationsLayerLeft.add(new JLabel("Sequence annotations"), BorderLayout.WEST);
         annotationsLayerLeft.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.darkGray));
-        layerPanel.addLayer(new Layer(annotationsLayerLeft, annotationsLayer1), true);
+        Layer layer = new Layer(annotationsLayerLeft, annotationsLayerRight);
+        annotationsLayerRight.parent = layer;
+        layerPanel.addLayer(layer, true);
 
         topScrollPane.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.darkGray));
         topScrollPane.setViewportView(layerPanel);
 
-        verticalSplitPane.setDividerLocation(annotationsLayer1.getPreferredSize().height + jPanel1.getPreferredSize().height + 3);
+        verticalSplitPane.setDividerLocation(annotationsLayerRight.getPreferredSize().height + jPanel1.getPreferredSize().height + 3);
 
 
         substructurePanel = new SubstructurePanel(structureVisController, projectController);
@@ -89,25 +96,24 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         substructurePanel.refresh();
 
 
-        if (structureVisController.substructureModel.annotationSource == null) {
+        if (structureVisController.substructureModel.getAnnotationSource() == null) {
             try {
                 System.out.println("HERE");
                 AnnotationSource annotationData = AnnotationSource.stackFeatures(AnnotationSource.readAnnotations(new File("examples/annotations/refseq.gb")));
-                annotationData.assignColors();
-                structureVisController.substructureModel.annotationSource = annotationData;
-                annotationsLayer1.setAnnotationData(structureVisController.substructureModel.annotationSource);
+                
+                structureVisController.substructureModel.setAnnotationSource(annotationData);
+                annotationsLayerRight.setAnnotationData(structureVisController.substructureModel.getAnnotationSource());
                 layerPanel.updatePanel();
             } catch (BioException ex) {
                 Logger.getLogger(StructureVisPanel.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 Logger.getLogger(StructureVisPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
+        } else {
+            annotationsLayerRight.setAnnotationData(structureVisController.substructureModel.getAnnotationSource());
+            layerPanel.updatePanel();
         }
-        else
-        {
-             annotationsLayer1.setAnnotationData(structureVisController.substructureModel.annotationSource);
-             layerPanel.updatePanel();
-        }
+        structureVisController.substructureModel.addSubstructureModelListener(this);
     }
 
     public void populateDataSource1DComboBox() {
@@ -292,4 +298,23 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
      * 1]).windowClosingEvent(e); } } }
      *
      */
+    @Override
+    public void dataSource1DChanged(DataSource1D dataSource1D) {
+    }
+
+    @Override
+    public void dataSource2DChanged(DataSource2D dataSource2D) {
+    }
+
+    @Override
+    public void structureSourceChanged(StructureSource structureSource) {
+        if (structureVisController.substructureModel != null && structureVisController.substructureModel.getAnnotationSource() != null) {
+            annotationsLayerRight.setAnnotationData(structureVisController.substructureModel.getAnnotationSource());
+        }
+    }
+
+    @Override
+    public void annotationSourceChanged(AnnotationSource annotationSource) {
+        annotationsLayerRight.setAnnotationData(annotationSource);
+    }
 }

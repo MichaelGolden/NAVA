@@ -5,6 +5,7 @@
 package nava.structurevis;
 
 import java.awt.BorderLayout;
+import nava.structurevis.data.AnnotationSource;
 import nava.ui.ProjectModel;
 
 /**
@@ -80,7 +81,18 @@ public class AnnotationsDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
-        structureVisController.addAnnotationsSource(annotationsPanel.getAnnotationsSource());
+        AnnotationSource annotationSource = annotationsPanel.getAnnotationsSource();
+        //structureVisController.addAnnotationsSource(annotationSource);
+        if (structureVisController.substructureModel.getAnnotationSource() == null) {
+            structureVisController.addAnnotationsSource(annotationSource);
+            structureVisController.substructureModel.setAnnotationSource(annotationSource);
+        } else {
+            //structureVisController.addAnnotationsSource(annotationSource);
+            //structureVisController.substructureModel.setAnnotationSource(annotationSource);
+            structureVisController.substructureModel.getAnnotationSource().addAnnotations(annotationSource);
+            structureVisController.substructureModel.setAnnotationSource( structureVisController.substructureModel.getAnnotationSource());
+        }
+
         this.dispose();
     }//GEN-LAST:event_addButtonActionPerformed
 

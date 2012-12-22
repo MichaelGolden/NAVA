@@ -102,7 +102,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
                 AnnotationSource annotationData = AnnotationSource.stackFeatures(AnnotationSource.readAnnotations(new File("examples/annotations/refseq.gb")));
                 
                 structureVisController.substructureModel.setAnnotationSource(annotationData);
-                annotationsLayerRight.setAnnotationData(structureVisController.substructureModel.getAnnotationSource());
+                annotationsLayerRight.setAnnotationData(structureVisController.substructureModel.getAnnotationSource(), true);
                 layerPanel.updatePanel();
             } catch (BioException ex) {
                 Logger.getLogger(StructureVisPanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -110,7 +110,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
                 Logger.getLogger(StructureVisPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else {
-            annotationsLayerRight.setAnnotationData(structureVisController.substructureModel.getAnnotationSource());
+            annotationsLayerRight.setAnnotationData(structureVisController.substructureModel.getAnnotationSource(), true);
             layerPanel.updatePanel();
         }
         structureVisController.substructureModel.addSubstructureModelListener(this);
@@ -142,7 +142,6 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         data1DComboBox = new javax.swing.JComboBox();
         edit1DDataButton = new javax.swing.JButton();
         add1DDataButton = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
         filler4 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
         bottomSplit = new javax.swing.JPanel();
 
@@ -179,10 +178,6 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
             }
         });
         jPanel1.add(add1DDataButton);
-
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/annotations-16x16.png"))); // NOI18N
-        jButton1.setText("Add annotations");
-        jPanel1.add(jButton1);
         jPanel1.add(filler4);
 
         topSplit.add(jPanel1);
@@ -228,7 +223,6 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
     private javax.swing.JComboBox data1DComboBox;
     private javax.swing.JButton edit1DDataButton;
     private javax.swing.Box.Filler filler4;
-    private javax.swing.JButton jButton1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane topScrollPane;
@@ -309,12 +303,12 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
     @Override
     public void structureSourceChanged(StructureSource structureSource) {
         if (structureVisController.substructureModel != null && structureVisController.substructureModel.getAnnotationSource() != null) {
-            annotationsLayerRight.setAnnotationData(structureVisController.substructureModel.getAnnotationSource());
+            annotationsLayerRight.setAnnotationData(structureVisController.substructureModel.getAnnotationSource(), true);
         }
     }
 
     @Override
     public void annotationSourceChanged(AnnotationSource annotationSource) {
-        annotationsLayerRight.setAnnotationData(annotationSource);
+        annotationsLayerRight.setAnnotationData(annotationSource, true);
     }
 }

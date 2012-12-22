@@ -5,7 +5,6 @@
 package nava.ui;
 
 //import nava.data.types.DataSource;
-import nava.data.types.DataType;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,9 +17,10 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.TreeModelListener;
 import nava.analyses.ApplicationOutput;
-import nava.data.io.*;
 import nava.data.io.FileImport.ParserException;
+import nava.data.io.*;
 import nava.data.types.*;
+import nava.tasks.TaskManager;
 
 /**
  *

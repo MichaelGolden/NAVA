@@ -23,7 +23,9 @@ public abstract class Task<T> {
     
     int slotUsage = 1;
     
+    public abstract void before();
     public abstract void task();
+    public abstract void after();
     
     public abstract T get();
 

@@ -11,9 +11,9 @@ import java.util.Collections;
 import java.util.Hashtable;
 import javax.swing.DefaultListModel;
 import nava.data.io.IO;
-import nava.data.types.Alignment;
 import nava.structurevis.data.*;
-import nava.ui.ProjectModel;
+import nava.tasks.MappingTask;
+import nava.ui.MainFrame;
 import nava.utils.Mapping;
 import nava.utils.Pair;
 
@@ -44,7 +44,7 @@ public class StructureVisController implements Serializable {
             for (int j = 0; j < structureVisDataSources.size(); j++) {
                 DataSource1D dataSource = structureVisDataSources.get(j);
                 if (s.mappingSource != null && dataSource.mappingSource != null) {
-                    getMapping(dataSource.mappingSource, s.mappingSource);
+                    MainFrame.taskManager.queueUITask(new MappingTask(this,dataSource.mappingSource,s.mappingSource));
                 }
             }
 
@@ -53,7 +53,8 @@ public class StructureVisController implements Serializable {
                 for (Feature f : annotationSource.features) // probably all have the same source, so this is not too slow
                 {
                     if (s.mappingSource != null && f.mappingSource != null) {
-                        getMapping(f.mappingSource, s.mappingSource);
+                        //getMapping(f.mappingSource, s.mappingSource);
+                        MainFrame.taskManager.queueUITask(new MappingTask(this,f.mappingSource,s.mappingSource));
                     }
                 }
             }

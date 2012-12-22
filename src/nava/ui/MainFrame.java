@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import nava.analyses.ApplicationController;
 import nava.data.types.DataSourceCache;
 import nava.structurevis.StructureVisPanel;
+import nava.tasks.TaskManager;
 import nava.ui.navigator.NavigatorPanel;
 
 /**
@@ -24,7 +25,9 @@ import nava.ui.navigator.NavigatorPanel;
  */
 public class MainFrame extends javax.swing.JFrame implements WindowListener {
 
+    public static TaskManager taskManager = new TaskManager();
     public static DataSourceCache dataSourceCache = new DataSourceCache();
+    
     ProjectController projectController;
     ApplicationController appController;
     NavigatorPanel navigatorPanel;

@@ -15,6 +15,7 @@ import javax.swing.*;
 import nava.structurevis.data.AnnotationSource;
 import nava.structurevis.data.Block;
 import nava.structurevis.data.Feature;
+import nava.tasks.AnnotationMappingTask;
 import nava.ui.MainFrame;
 import nava.ui.ProjectController;
 import nava.ui.ProjectModel;
@@ -139,8 +140,27 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
         }
     };
 
+    public void setAnnotationData(AnnotationSource annotationData, boolean map) {
+
+        if (map) {
+            MainFrame.taskManager.queueUITask(new AnnotationMappingTask(annotationData, structureVisController.substructureModel.structureSource, structureVisController, this));
+        } else {
+            setAnnotationData(annotationData);
+        }
+    }
+    boolean showLoading = true;
+
+    public void showLoading() {
+        this.showLoading = true;
+        repaint();
+    }
+
+    public void showAnnotations() {
+        this.showLoading = false;
+        repaint();
+    }
+
     public void setAnnotationData(AnnotationSource annotationData) {
-        System.out.println("Updating annotation data: " + annotationData.mappedSequenceLength);
         this.annotationData = annotationData;
         ArrayList<Feature> features = annotationData.mappedFeatures;
         removeItem.removeAll();
@@ -193,15 +213,21 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-        if (annotationData != null) {
+        int panelWidth = this.getWidth();
+        int panelHeight = this.getHeight();
 
-            //  System.out.println("al"+this.getPreferredSize());
+        g2.setColor(Color.white);
+        g2.fillRect(0, 0, panelWidth, panelHeight);
 
-            int panelWidth = this.getWidth();
-            int panelHeight = this.getHeight();
-
-            g2.setColor(Color.white);
-            g2.fillRect(0, 0, panelWidth, panelHeight);
+        if (annotationData == null || annotationData.features.isEmpty()) {
+            g2.setColor(Color.black);
+            GraphicsUtils.drawStringCentred(g2, panelWidth / 2, panelHeight / 2, "Right click to add annotations.");
+        } else {
+            if (showLoading) {
+                g2.setColor(Color.black);
+                GraphicsUtils.drawStringCentred(g2, panelWidth / 2, panelHeight / 2, "Mapping annotations...");
+                return;
+            }
 
 
             minorTickMark = chooseBestTickMarkSize(annotationData.mappedSequenceLength);
@@ -317,10 +343,12 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
     @Override
     public String getToolTipText(MouseEvent event) {
         Point p = new Point(event.getX(), event.getY());
-        for (int i = 0; i < featurePositions.size(); i++) {
-            if (featurePositions.get(i).getLeft().contains(p)) {
-                Feature f = featurePositions.get(i).getRight();
-                return f.name + " (" + f.min + "-" + f.max + ")";
+        if (featurePositions != null) {
+            for (int i = 0; i < featurePositions.size(); i++) {
+                if (featurePositions.get(i).getLeft().contains(p)) {
+                    Feature f = featurePositions.get(i).getRight();
+                    return f.name + " (" + f.min + "-" + f.max + ")";
+                }
             }
         }
         return super.getToolTipText(event);
@@ -450,27 +478,31 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        popupMenuX = e.getX();
-        popupMenuY = e.getY();
+        if (SwingUtilities.isRightMouseButton(e)) {
+            popupMenuX = e.getX();
+            popupMenuY = e.getY();
 
-        boolean mouseoverFeature = false;
-        for (Pair<Shape, Feature> featurePosition : featurePositions) {
-            if (featurePosition.getLeft().contains(popupMenuX, popupMenuY)) {
-                mouseoverFeature = true;
-                removeAnnotationItem.setText("Remove annotation: " + featurePosition.getRight().getName());
-                setColorItem.setText("Set color: " + featurePosition.getRight().getName());
-                break;
+            boolean mouseoverFeature = false;
+            if (featurePositions != null) {
+                for (Pair<Shape, Feature> featurePosition : featurePositions) {
+                    if (featurePosition.getLeft().contains(popupMenuX, popupMenuY)) {
+                        mouseoverFeature = true;
+                        removeAnnotationItem.setText("Remove annotation: " + featurePosition.getRight().getName());
+                        setColorItem.setText("Set color: " + featurePosition.getRight().getName());
+                        break;
+                    }
+                }
             }
-        }
-        removeAnnotationItem.setEnabled(mouseoverFeature);
-        setColorItem.setEnabled(mouseoverFeature);
-        if (!mouseoverFeature) {
-            removeAnnotationItem.setText("Remove annotation");
-            setColorItem.setText("Set color");
-        }
+            removeAnnotationItem.setEnabled(mouseoverFeature);
+            setColorItem.setEnabled(mouseoverFeature);
+            if (!mouseoverFeature) {
+                removeAnnotationItem.setText("Remove annotation");
+                setColorItem.setText("Set color");
+            }
 
 
-        popupMenu.show(this, popupMenuX, popupMenuY);
+            popupMenu.show(this, popupMenuX, popupMenuY);
+        }
     }
 
     @Override
@@ -508,7 +540,7 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
                         annotationData.features.remove(index);
                         annotationData.mappedFeatures.remove(index);
                     }
-                    setAnnotationData(annotationData);
+                    setAnnotationData(annotationData, false);
                     break;
                 }
             }
@@ -525,18 +557,18 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
                         for (Block block : annotationData.mappedFeatures.get(index).blocks) {
                             block.color = retColor;
                         }
-                        break;                        
+                        break;
                     }
                 }
             }
-            setAnnotationData(annotationData);
+            setAnnotationData(annotationData, false);
         } else if (e.getSource().equals(removeAllItem)) {
             annotationData.features.clear();
             annotationData.mappedFeatures.clear();
-            setAnnotationData(annotationData);
+            setAnnotationData(annotationData, false);
         } else if (e.getSource().equals(stackAnnotationsItem)) {
             AnnotationSource.stackFeatures(annotationData);
-            setAnnotationData(annotationData);
+            setAnnotationData(annotationData, false);
             /*
              * updatePreferredHeight(); repaint(); if (parent != null) {
              * parent.updatePanel(); }
@@ -553,7 +585,7 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
                 annotationData.features.remove(index);
                 annotationData.mappedFeatures.remove(index);
             }
-            setAnnotationData(annotationData);
+            setAnnotationData(annotationData, false);
         } else if (e.getSource().equals(this.autofitItem)) {
             this.parent.parent.autofitWidth();
         } else if (e.getSource().equals(this.zoomInItem)) {

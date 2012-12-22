@@ -71,7 +71,7 @@ public class SubstructureModel implements Serializable {
         dataSource1D.loadData();
         this.data1D = dataSource1D;
         if (data1D != null && data1D.mappingSource != null && structureSource != null && structureSource.mappingSource != null) {
-            mapping1D = structureVisController.getMapping(data1D.mappingSource, structureSource.mappingSource);
+            //mapping1D = structureVisController.getMapping(data1D.mappingSource, structureSource.mappingSource);
         }
         fireDataSource1DChanged(dataSource1D);
     }
@@ -80,7 +80,7 @@ public class SubstructureModel implements Serializable {
         dataSource2D.loadData();
         this.data2D = dataSource2D;
         if (data2D != null && data2D.mappingSource != null && structureSource != null && structureSource.mappingSource != null) {
-            mapping2D = structureVisController.getMapping(data1D.mappingSource, structureSource.mappingSource);
+            //mapping2D = structureVisController.getMapping(data1D.mappingSource, structureSource.mappingSource);
         }
         fireDataSource2DChanged(dataSource2D);
     }
@@ -90,12 +90,12 @@ public class SubstructureModel implements Serializable {
         this.structureSource = structureSource;
         this.sequenceLength = structureSource.pairedSites.length;
         if (data1D != null && data1D.mappingSource != null && structureSource != null && structureSource.mappingSource != null) {
-            mapping1D = structureVisController.getMapping(data1D.mappingSource, structureSource.mappingSource);
+           // mapping1D = structureVisController.getMapping(data1D.mappingSource, structureSource.mappingSource);
         }
         if (data2D != null && data2D.mappingSource != null && structureSource != null && structureSource.mappingSource != null) {
-            mapping2D = structureVisController.getMapping(data1D.mappingSource, structureSource.mappingSource);
+            //mapping2D = structureVisController.getMapping(data1D.mappingSource, structureSource.mappingSource);
         }
-        this.annotationSource = AnnotationSource.getMappedAnnotations(annotationSource, structureSource, structureVisController);
+        //this.annotationSource = AnnotationSource.getMappedAnnotations(annotationSource, structureSource, structureVisController);
         fireStructureSourceChanged(structureSource);
     }
 
@@ -104,7 +104,7 @@ public class SubstructureModel implements Serializable {
     }
 
     public void setAnnotationSource(AnnotationSource annotationSource) {
-        this.annotationSource = AnnotationSource.getMappedAnnotations(annotationSource, structureSource, structureVisController);
+        //this.annotationSource = AnnotationSource.getMappedAnnotations(annotationSource, structureSource, structureVisController);
         fireAnnotationSourceChanged(annotationSource);
     }
 

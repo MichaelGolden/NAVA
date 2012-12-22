@@ -4,9 +4,9 @@
  */
 package nava.tasks;
 
+import java.util.Objects;
 import nava.structurevis.StructureVisController;
 import nava.structurevis.data.MappingSource;
-import nava.utils.Mapping;
 
 /**
  *
@@ -34,6 +34,46 @@ public class MappingTask<Mapping> extends UITask {
     @Override
     public nava.utils.Mapping get() {
         return mapping;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final MappingTask<Mapping> other = (MappingTask<Mapping>) obj;
+        if (!Objects.equals(this.structureVisController, other.structureVisController)) {
+            return false;
+        }
+        if (!Objects.equals(this.a, other.a)) {
+            return false;
+        }
+        if (!Objects.equals(this.b, other.b)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + Objects.hashCode(this.structureVisController);
+        hash = 97 * hash + Objects.hashCode(this.a);
+        hash = 97 * hash + Objects.hashCode(this.b);
+        return hash;
+    }
+
+    @Override
+    public void before() {
+        
+    }
+
+    @Override
+    public void after() {
+        
     }
     
     

@@ -20,6 +20,7 @@ import nava.ui.navigator.NavigationListener;
 public class TaskManager extends Thread {
 
     LinkedList<Task> runQueue = new LinkedList<>();
+    LinkedList<Task> generalTaskQueue = new LinkedList<>();
     LinkedList<UITask> uiTaskQueue = new LinkedList<>();
     int totalSlots = Runtime.getRuntime().availableProcessors();
     int usedSlots = 0;
@@ -59,12 +60,23 @@ public class TaskManager extends Thread {
         if (task instanceof UITask) {
             uiTaskQueue.remove((UITask) task);
         }
+        generalTaskQueue.remove(task);
     }
 
     public void queueTask(Task task) {
         task.taskManager = this;
-        task.setStatus(Status.QUEUED);
-        task.queueTime = System.currentTimeMillis();
+        
+        if (runQueue.contains(task) ||  generalTaskQueue.contains(task))
+        {
+            System.err.println("Task is already queued.");
+        }
+        else
+        {
+            task.before();
+            generalTaskQueue.add(task);            
+            task.setStatus(Status.QUEUED);
+            task.queueTime = System.currentTimeMillis();
+        }
     }
 
     public void queueUITask(UITask task) {
@@ -85,6 +97,12 @@ public class TaskManager extends Thread {
         while (true) {
             if (availableSlots > 0 && uiTaskQueue.size() > 0) {
                 UITask task = uiTaskQueue.removeFirst();
+                runTask(task);
+            }
+            
+            
+            if (availableSlots > 0 && generalTaskQueue.size() > 0) {
+                Task task = generalTaskQueue.removeFirst();
                 runTask(task);
             }
 

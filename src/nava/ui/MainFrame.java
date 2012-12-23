@@ -69,7 +69,7 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
         
         projectController = new ProjectController();
         projectController.openProject(model);    
-        appController = new ApplicationController();
+        appController = new ApplicationController(MainFrame.taskManager);
         
         DataPanel dataPanel = new DataPanel(projectController, appController);
         jPanel1.add(dataPanel, BorderLayout.CENTER);

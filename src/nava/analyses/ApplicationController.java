@@ -5,12 +5,24 @@
 package nava.analyses;
 
 import java.util.ArrayList;
+import nava.tasks.Task;
+import nava.tasks.Task.Status;
+import nava.tasks.TaskListener;
+import nava.tasks.TaskManager;
 
 /**
  *
  * @author Michael
  */
-public class ApplicationController {
+public class ApplicationController implements TaskListener {
+    
+    TaskManager taskManager;
+    
+    public ApplicationController(TaskManager taskManager)
+    {
+        this.taskManager = taskManager;
+        taskManager.addTaskListener(this);
+    }
 
     private ArrayList<Application> applications = new ArrayList<Application>();
 
@@ -24,4 +36,22 @@ public class ApplicationController {
     {
         return applications;
     }
+
+    @Override
+    public void taskProgressChanged(Task task, double progress) {
+    }
+
+    @Override
+    public void taskStatusChanged(Task task, Status oldStatus, Status newStatus) {
+        if(newStatus == Status.FINISHED)
+        {
+            if(task instanceof ApplicationTask)
+            {
+                ApplicationTask appTask = (ApplicationTask)task;
+                System.out.println(appTask.getApplication().getName()+"Finished");
+            }
+        }
+    }
+    
+    
 }

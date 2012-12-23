@@ -8,8 +8,11 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -33,8 +36,9 @@ public class TaskTable extends JPanel implements TaskListener {
 
         TableSorter sorter = new TableSorter(tableDataModel);
         table = new JTable(sorter);
+        table.setRowHeight(20);
         sorter.setTableHeader(table.getTableHeader());
-        sorter.sortOnColumn(table.getTableHeader(), table.getColumnCount() - 1, -1);
+        sorter.sortOnColumn(table.getTableHeader(), 0, -1);
         table.setFillsViewportHeight(true);
         table.addMouseListener(new MouseAdapter() {
 
@@ -51,16 +55,16 @@ public class TaskTable extends JPanel implements TaskListener {
                 }
             }
         });
-        
+
         table.getColumnModel().getColumn(4).setCellRenderer(new ProgressBarTableCellRenderer());
 
         scrollPane = new JScrollPane(table);
         add(scrollPane);
-        
-        taskManager.addTaskListener(this);  
-        
-        TestTask t = new TestTask();
-        taskManager.queueTask(t);
+
+        taskManager.addTaskListener(this);
+
+        taskManager.queueTask(new TestTask());
+        taskManager.queueTask(new TestTask());
     }
 
     @Override
@@ -70,7 +74,6 @@ public class TaskTable extends JPanel implements TaskListener {
 
     @Override
     public void taskStatusChanged(Task task, Status oldStatus, Status newStatus) {
-        System.out.println("taskStatusChanged " + task);
         this.tableDataModel.updateTask(task);
     }
 
@@ -80,6 +83,58 @@ public class TaskTable extends JPanel implements TaskListener {
         String[] columnNames = {"#", "Task name", "Description", "Time elapsed", "Progress"};
         Class[] columnClasses = {String.class, String.class, String.class, String.class, Task.class};
         public ArrayList<Object[]> rows = new ArrayList<Object[]>();
+
+        public TableDataModel() {
+            new TimerThread().start();
+        }
+
+        class TimerThread extends Thread {
+
+            DecimalFormat df = new DecimalFormat("00");
+            
+            @Override
+            public void run() {
+                while (true) {
+                    try {
+                        for (int i = 0; i < tasks.size(); i++) {
+                            
+                            long time = tasks.get(i).getTimeRunning() / 1000;
+                            
+                            String append = "";
+                            switch(tasks.get(i).getStatus())
+                            {
+                                case QUEUED:
+                                    append = " in queue";
+                                    time = tasks.get(i).getTimeQueued() / 1000;
+                                    break;
+                                case RUNNING:
+                                    append = " running";
+                                    break;
+                                case FINISHED:
+                                    append = "";
+                                    break;                                    
+                            }
+                            
+                            int seconds = (int)(time % 60);
+                            int minutes = (int)((time/60)%60);
+                            int hours = (int)((time/60/60));
+                            if(hours > 0)
+                            {
+                                setValueAt(df.format(minutes)+":"+df.format(seconds)+append, i, 3);
+                            }
+                            else
+                            {
+                                setValueAt(hours+":"+df.format(minutes)+":"+df.format(seconds)+append, i, 3);
+                            }
+                        }
+
+                        Thread.sleep(10000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(TaskTable.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
 
         public int getColumnCount() {
             return columnNames.length;
@@ -97,28 +152,32 @@ public class TaskTable extends JPanel implements TaskListener {
         public Object getValueAt(int row, int col) {
             return rows.get(row)[col];
         }
-        boolean hasMappedData = false;
+
+        public void setValueAt(Object value, int row, int col) {
+            rows.get(row)[col] = value;
+            this.fireTableCellUpdated(row, col);
+        }
 
         public void clear() {
             rows.clear();
             fireTableRowsDeleted(0, rows.size());
         }
 
-        public void addTask(Task task, int index) {            
+        public void addTask(Task task, int index) {
             tasks.add(task);
-            Object[] row = {index, task.getName(), task.getDescription(), 0, task};
+            Object[] row = {index, task.getName(), task.getDescription(), "-", task};
             tableDataModel.addRow(row);
         }
 
         public void updateTask(Task task) {
             int index = tasks.indexOf(task);
             if (index != -1) {
-                Object[] row = {index+1,task.getName(), task.getDescription(), 0, task};
+                Object[] row = {index + 1, task.getName(), task.getDescription(), "-", task};
                 rows.set(index, row);
                 this.fireTableRowsUpdated(index, index);
             } else {
                 System.out.println("Adding task " + task);
-                addTask(task, tasks.size()+1);
+                addTask(task, tasks.size() + 1);
             }
         }
 
@@ -174,15 +233,6 @@ public class TaskTable extends JPanel implements TaskListener {
          */
         public boolean isCellEditable(int row, int col) {
             return false;
-        }
-
-        /*
-         * Don't need to implement this method unless your table's data can
-         * change.
-         */
-        public void setValueAt(Object value, int row, int col) {
-            rows.get(row)[col] = value;
-            fireTableCellUpdated(row, col);
         }
     }
 

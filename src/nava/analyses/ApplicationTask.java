@@ -4,43 +4,57 @@
  */
 package nava.analyses;
 
+import java.util.List;
 import nava.tasks.Task;
+import nava.ui.ProjectController;
 
 /**
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class ApplicationTask extends Task
-{
+public class ApplicationTask extends Task {
+
+    Application application;
+    ProjectController projectController;
+
+    public ApplicationTask(Application application, ProjectController projectController) {
+        this.application = application;
+        this.projectController = projectController;
+    }
 
     @Override
     public void before() {
-        
     }
 
     @Override
     public void task() {
-        
+        application.start();
     }
 
     @Override
     public void after() {
-        
+        List<ApplicationOutput> output = application.getOutputFiles();
+        for (int i = 0; i < output.size(); i++) {
+            projectController.importDataSourceFromOutputFile(output.get(i));
+        }
     }
 
     @Override
-    public Object get() {
-        return null;
+    public List<ApplicationOutput> get() {
+        return application.getOutputFiles();
+    }
+
+    public Application getApplication() {
+        return application;
     }
 
     @Override
     public String getName() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return application.getName();
     }
 
     @Override
     public String getDescription() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return application.getDescription();
     }
-    
 }

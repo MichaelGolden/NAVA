@@ -84,7 +84,11 @@ public abstract class Task<T> {
         }
     }
     
-    public long timeRunning()
+    /**
+     * Returns the time since the task started running in milliseconds.
+     * @return  the time since the task started running in milliseconds.
+     */
+    public long getTimeRunning()
     {
         if(startTime == -1)
         {
@@ -96,16 +100,27 @@ public abstract class Task<T> {
             return finishTime - startTime;
         }
         
+        System.out.println(this.getName()+"getTimeRunning()"+System.currentTimeMillis()+"\t"+startTime);
         return System.currentTimeMillis() - startTime;
     }
     
-    public long timeQueued()
+    /**
+     * Returns the length of time the task has been in the queue in milliseconds.
+     * @return  the length of time the task has been in the queue in milliseconds.
+     */
+    public long getTimeQueued()
     {
+        if(queueTime == -1)
+        {
+            return 0;
+        }
+        
         if(startTime != -1)
         {
             return startTime - queueTime;
         }
         
-        return System.currentTimeMillis() - startTime;
+        System.out.println(this.getName()+"getTimeQueued()"+System.currentTimeMillis()+"\t"+queueTime);
+        return System.currentTimeMillis() - queueTime;
     }
 }

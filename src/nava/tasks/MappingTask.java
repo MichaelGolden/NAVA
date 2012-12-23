@@ -28,7 +28,10 @@ public class MappingTask<Mapping> extends UITask {
 
     @Override
     public void task() {
-        mapping = structureVisController.createMapping(a, b);
+        if(structureVisController != null)
+        {
+            mapping = structureVisController.createMapping(a, b);
+        }
     }
     
     @Override
@@ -74,6 +77,16 @@ public class MappingTask<Mapping> extends UITask {
     @Override
     public void after() {
         
+    }
+
+    @Override
+    public String getName() {
+        return "Mapping data sources";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Performing mapping using MUSCLE.";
     }
     
     

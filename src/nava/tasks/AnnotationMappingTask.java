@@ -82,5 +82,15 @@ public class AnnotationMappingTask extends UITask {
     public void after() {
         
     }
+
+    @Override
+    public String getName() {
+        return "Mapping annotations";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Mapping annotations to structure using MUSCLE.";
+    }
     
 }

@@ -21,6 +21,7 @@ public class DataPanel extends javax.swing.JPanel implements NavigationListener 
     ApplicationController appController;
     NavigatorPanel navigatorPanel;
     ApplicationPanel applicationPanel;
+    TaskPanel taskPanel;
 
     /**
      * Creates new form DataPanel
@@ -34,9 +35,11 @@ public class DataPanel extends javax.swing.JPanel implements NavigationListener 
         navigatorPanel = new NavigatorPanel(projectController);
         navigatorPanel.addNavigationListener(this);
         applicationPanel = new ApplicationPanel(appController, projectController);
+        taskPanel = new TaskPanel();
 
         this.jPanel1.add(navigatorPanel, BorderLayout.CENTER);
         this.jPanel2.add(applicationPanel, BorderLayout.CENTER);
+        this.jPanel4.add(taskPanel, BorderLayout.CENTER);
     }
 
     /**
@@ -72,18 +75,8 @@ public class DataPanel extends javax.swing.JPanel implements NavigationListener 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Actions"));
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Processes"));
-
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 93, Short.MAX_VALUE)
-        );
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Tasks"));
+        jPanel4.setLayout(new java.awt.BorderLayout());
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -105,7 +98,7 @@ public class DataPanel extends javax.swing.JPanel implements NavigationListener 
                     .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables

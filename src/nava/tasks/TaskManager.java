@@ -8,7 +8,10 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.event.EventListenerList;
 import nava.tasks.Task.Status;
+import nava.ui.navigator.NavigationEvent;
+import nava.ui.navigator.NavigationListener;
 
 /**
  *
@@ -18,13 +21,11 @@ public class TaskManager extends Thread {
 
     LinkedList<Task> runQueue = new LinkedList<>();
     LinkedList<UITask> uiTaskQueue = new LinkedList<>();
-    
     int totalSlots = Runtime.getRuntime().availableProcessors();
     int usedSlots = 0;
     int availableSlots = totalSlots - usedSlots;
-    
-    public TaskManager()
-    {
+
+    public TaskManager() {
         start();
     }
 
@@ -37,38 +38,45 @@ public class TaskManager extends Thread {
 
     private void execute(final Task task) {
         task.setStatus(Status.STARTED);
+        task.startTime = System.currentTimeMillis();
         Thread taskThread = new Thread() {
+
             @Override
             public void run() {
                 task.setStatus(Status.RUNNING);
-                task.task();                
+                task.task();
                 task.setStatus(Status.FINISHED);
+                task.finishTime = System.currentTimeMillis();
+                task.setProgress(1.0);
                 task.after();
             }
         };
         taskThread.start();
     }
-    
-    private void dequeTask(Task task)
-    {        
+
+    private void dequeTask(Task task) {
         runQueue.remove(task);
-        if(task instanceof UITask)
-        {
-            uiTaskQueue.remove((UITask)task);
+        if (task instanceof UITask) {
+            uiTaskQueue.remove((UITask) task);
         }
     }
 
     public void queueTask(Task task) {
         task.taskManager = this;
+        task.setStatus(Status.QUEUED);
+        task.queueTime = System.currentTimeMillis();
     }
 
     public void queueUITask(UITask task) {
         task.taskManager = this;
+
         if (runQueue.contains(task) || uiTaskQueue.contains(task)) {
             System.err.println("Task is already queued.");
         } else {
             task.before();
-            uiTaskQueue.add(task);
+            uiTaskQueue.add(task);            
+            task.setStatus(Status.QUEUED);
+            task.queueTime = System.currentTimeMillis();
         }
     }
 
@@ -87,12 +95,40 @@ public class TaskManager extends Thread {
             }
         }
     }
+    protected EventListenerList listeners = new EventListenerList();
 
-    public void fireStatusChanged(Task task, Status oldStatus, Status newStatus) {
-        System.out.println("TASK STATUS\t" + task+"\t"+oldStatus+"\t"+newStatus);
-        if(newStatus == Status.FINISHED)
-        {
+    public void addTaskListener(TaskListener listener) {
+        listeners.add(TaskListener.class, listener);
+    }
+
+    public void removeTaskListenerListener(TaskListener listener) {
+        listeners.remove(TaskListener.class, listener);
+    }
+
+    public void fireTaskStatusChanged(Task task, Status oldStatus, Status newStatus) {
+        if (newStatus == Status.FINISHED) {
             dequeTask(task);
+        }
+
+        Object[] listeners = this.listeners.getListenerList();
+        // Each listener occupies two elements - the first is the listener class
+        // and the second is the listener instance
+        for (int i = 0; i < listeners.length; i += 2) {
+            if (listeners[i] == TaskListener.class) {
+                ((TaskListener) listeners[i + 1]).taskStatusChanged(task, oldStatus, newStatus);
+            }
+        }
+    }
+
+    public void fireTaskProgressChanged(Task task, double progress) {
+
+        Object[] listeners = this.listeners.getListenerList();
+        // Each listener occupies two elements - the first is the listener class
+        // and the second is the listener instance
+        for (int i = 0; i < listeners.length; i += 2) {
+            if (listeners[i] == TaskListener.class) {
+                ((TaskListener) listeners[i + 1]).taskProgressChanged(task, progress);
+            }
         }
     }
 }

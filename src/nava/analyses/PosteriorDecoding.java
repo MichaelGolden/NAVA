@@ -14,7 +14,7 @@ import nava.utils.RNAFoldingTools;
  *
  * @author Michael
  */
-public class PosteriorDecoding implements Application {
+public class PosteriorDecoding  extends Application {
 
     Matrix matrix;
     ArrayList<ApplicationOutput> outputFiles = new ArrayList<>();

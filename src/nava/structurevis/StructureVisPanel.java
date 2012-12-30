@@ -202,7 +202,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
 
     private void add1DDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_add1DDataButtonActionPerformed
         Data1DDialog d = new Data1DDialog(null, true, projectController.projectModel, structureVisController);
-        d.setSize(640, 480);
+        d.setSize(920, 690);
         d.editMode = false;
         d.setVisible(true);
     }//GEN-LAST:event_add1DDataButtonActionPerformed
@@ -213,7 +213,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         if (dataSource1D != null) {
             d.data1DPanel.setDataSource1D(dataSource1D);
             d.editMode = true;
-            d.setSize(640, 480);
+            d.setSize(920, 690);
             d.setVisible(true);
         }
     }//GEN-LAST:event_edit1DDataButtonActionPerformed

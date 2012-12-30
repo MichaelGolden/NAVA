@@ -5,6 +5,7 @@
 package nava.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -91,18 +92,17 @@ public class TaskTable extends JPanel implements TaskListener {
         class TimerThread extends Thread {
 
             DecimalFormat df = new DecimalFormat("00");
-            
+
             @Override
             public void run() {
                 while (true) {
                     try {
                         for (int i = 0; i < tasks.size(); i++) {
-                            
+
                             long time = tasks.get(i).getTimeRunning() / 1000;
-                            
+
                             String append = "";
-                            switch(tasks.get(i).getStatus())
-                            {
+                            switch (tasks.get(i).getStatus()) {
                                 case QUEUED:
                                     append = " in queue";
                                     time = tasks.get(i).getTimeQueued() / 1000;
@@ -112,19 +112,16 @@ public class TaskTable extends JPanel implements TaskListener {
                                     break;
                                 case FINISHED:
                                     append = "";
-                                    break;                                    
+                                    break;
                             }
-                            
-                            int seconds = (int)(time % 60);
-                            int minutes = (int)((time/60)%60);
-                            int hours = (int)((time/60/60));
-                            if(hours > 0)
-                            {
-                                setValueAt(df.format(minutes)+":"+df.format(seconds)+append, i, 3);
-                            }
-                            else
-                            {
-                                setValueAt(hours+":"+df.format(minutes)+":"+df.format(seconds)+append, i, 3);
+
+                            int seconds = (int) (time % 60);
+                            int minutes = (int) ((time / 60) % 60);
+                            int hours = (int) ((time / 60 / 60));
+                            if (hours > 0) {
+                                setValueAt(df.format(minutes) + ":" + df.format(seconds) + append, i, 3);
+                            } else {
+                                setValueAt(hours + ":" + df.format(minutes) + ":" + df.format(seconds) + append, i, 3);
                             }
                         }
 
@@ -258,15 +255,13 @@ public class TaskTable extends JPanel implements TaskListener {
 
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
 
-            /*
-             * Component c = super.getTableCellRendererComponent(table, value,
-             * isSelected, hasFocus, row, col); String s =
-             * table.getModel().getValueAt(row, col).toString();
-             *
-             * if (s.equalsIgnoreCase("yellow")) {
-             * c.setForeground(Color.YELLOW); } else {
-             * c.setForeground(Color.WHITE); }
-             */
+            // TODO try get bar to display blue background when selected, code below is not working.            
+            if (isSelected) {
+                bar.setBackground(table.getSelectionBackground());
+            } else {
+                bar.setBackground(table.getBackground());
+            }
+            
             Task task = (Task) value;
             bar.setString(task.getStatus().toString());
             bar.setStringPainted(true);

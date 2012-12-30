@@ -14,7 +14,7 @@ import nava.utils.RNAFoldingTools;
  * appropriately and returns a RNAalifold secondary structure prediction.
  *
  */
-public class RNAalifold implements Application {
+public class RNAalifold extends Application {
 
     private static String executable = "bin/RNAalifold.exe";
     private static boolean useOldParams = false;

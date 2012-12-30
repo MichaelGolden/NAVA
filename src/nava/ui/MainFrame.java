@@ -34,6 +34,7 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
     //ApplicationPanel applicationPanel;
     
     public static Font fontLiberationSans = new Font("Sans", Font.PLAIN, 12);
+    public static Font fontDroidSansMono = new Font("Sans", Font.PLAIN, 12);
     
     StructureVisPanel structureVisPanel;
     
@@ -41,6 +42,7 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
     {
         try {
             fontLiberationSans = Font.createFont(Font.PLAIN, ClassLoader.getSystemResourceAsStream("resources/fonts/LiberationSans-Regular.ttf")).deriveFont(12.0f);
+            fontDroidSansMono = Font.createFont(Font.PLAIN, ClassLoader.getSystemResourceAsStream("resources/fonts/DroidSansMono.ttf")).deriveFont(12.0f);
         } catch (FontFormatException ex) {
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {

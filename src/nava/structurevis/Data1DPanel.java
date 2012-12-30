@@ -296,7 +296,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
         onePositionRadioButton.setText("One");
         onePositionRadioButton.setEnabled(false);
 
-        firstPositionLabel.setText("First position is");
+        firstPositionLabel.setText("Numbering starts at");
         firstPositionLabel.setEnabled(false);
 
         headerCheckButton.setSelected(true);
@@ -317,11 +317,13 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
                     .addComponent(naturalRadioButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(fromFieldRadioButton)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(fromFieldRadioButton)
+                                .addGap(0, 56, Short.MAX_VALUE))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(21, 21, 21)
-                                .addComponent(firstPositionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(firstPositionLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(zeroPositionRadioButton)

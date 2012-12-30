@@ -119,7 +119,7 @@ public class TaskManager extends Thread {
         listeners.add(TaskListener.class, listener);
     }
 
-    public void removeTaskListenerListener(TaskListener listener) {
+    public void removeTaskListener(TaskListener listener) {
         listeners.remove(TaskListener.class, listener);
     }
 

@@ -26,7 +26,7 @@ import nava.tasks.Task.Status;
  */
 public class TaskTable extends JPanel implements TaskListener {
 
-    TableDataModel tableDataModel = new TableDataModel();
+    public TableDataModel tableDataModel = new TableDataModel();
     final JTable table;
     public JScrollPane scrollPane;
     TaskManager taskManager;
@@ -49,7 +49,6 @@ public class TaskTable extends JPanel implements TaskListener {
                     int row = target.getSelectedRow();
                     int column = target.getSelectedColumn();
 
-                    int s = ((Integer) table.getModel().getValueAt(row, 3)).intValue();
 
                     //System.out.println(row+"\tID"+);
                     // do some action
@@ -148,6 +147,15 @@ public class TaskTable extends JPanel implements TaskListener {
 
         public Object getValueAt(int row, int col) {
             return rows.get(row)[col];
+        }
+        
+        public Task getTask(int row)
+        {
+            if(row >= 0 && row < rows.size())
+            {
+                return (Task) rows.get(row)[4];
+            }
+            return null;
         }
 
         public void setValueAt(Object value, int row, int col) {

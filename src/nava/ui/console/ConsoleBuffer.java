@@ -28,8 +28,7 @@ public class ConsoleBuffer extends Thread {
     int lower = 0;
     int upper = 0;
     int bufferSize = 1000;
-    //int bufferSizeUpper = bufferSize + 1000;
-    double ratio = 0.25; // ratio above and below to load
+    double ratio = 0.5; // ratio above and below to load
     int upperBufferSize = (int) ((double) bufferSize * 0.25);
     int lowerBufferSize = bufferSize - upper;
     int n = 0;
@@ -51,8 +50,7 @@ public class ConsoleBuffer extends Thread {
                 n++;
             }
         }
-
-        System.out.println("Buffer size=" + rows.size());
+        fireLineAdded(n);
         db.insertRecords(records);
     }
 
@@ -123,19 +121,23 @@ public class ConsoleBuffer extends Thread {
         }
     }
 
+    boolean running = true;
     @Override
     public void run() {
-        for (int i = 1;; i++) {
-            if ((i % mod == 0 && !writeBuffer.isEmpty()) || writeBuffer.size() >= bufferMaxLines) {
-                synchronized (lock) {
-                    try {
-                        addRecords(writeBuffer);
-                        writeBuffer.clear();
-                    } catch (Exception ex) {
-                        Logger.getLogger(ConsoleBuffer.class.getName()).log(Level.SEVERE, null, ex);
+        for (int i = 1; running ; i++) {
+            if (i % mod == 0 || writeBuffer.size() >= bufferMaxLines) {
+                if (!writeBuffer.isEmpty()) {
+                    synchronized (lock) {
+                        try {
+                            addRecords(writeBuffer);
+                            writeBuffer.clear();
+                        } catch (Exception ex) {
+                            Logger.getLogger(ConsoleBuffer.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        i = 1;
                     }
-                    i = 1;
                 }
+                this.n = (int)db.getRowCount(this.className, this.typeName);
             }
 
             try {
@@ -151,6 +153,8 @@ public class ConsoleBuffer extends Thread {
             try {
                 addRecords(writeBuffer);
                 writeBuffer.clear();
+                this.n = (int)db.getRowCount(this.className, this.typeName);
+                running = false;
             } catch (Exception ex) {
                 Logger.getLogger(ConsoleBuffer.class.getName()).log(Level.SEVERE, null, ex);
             }

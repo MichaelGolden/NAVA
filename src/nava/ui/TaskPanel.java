@@ -4,34 +4,44 @@
  */
 package nava.ui;
 
-import javax.swing.DefaultListModel;
-import nava.tasks.AnnotationMappingTask;
-import nava.tasks.MappingTask;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import nava.analyses.ApplicationTask;
 import nava.tasks.Task;
 
 /**
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class TaskPanel extends javax.swing.JPanel {
+public class TaskPanel extends javax.swing.JPanel implements ListSelectionListener {
 
-    
-    
+    TaskTable taskTable;
+    TaskConsolePanel taskConsolePanel;
+
     /**
      * Creates new form TaskPanel
      */
     public TaskPanel() {
         initComponents();
-       /* TaskListCellRenderer taskListCellRenderer = new TaskListCellRenderer();
-        DefaultListModel<Task> taskListModel = new DefaultListModel<Task>();
-        
-        jList1.setCellRenderer(taskListCellRenderer);
-        jList1.setModel(taskListModel);
-        
-        taskListModel.addElement(new AnnotationMappingTask(null,null,null, null));
-        taskListModel.addElement(new MappingTask(null,null,null));*/
-        
-        add(new TaskTable(MainFrame.taskManager));
+        /*
+         * TaskListCellRenderer taskListCellRenderer = new
+         * TaskListCellRenderer(); DefaultListModel<Task> taskListModel = new
+         * DefaultListModel<Task>();
+         *
+         * jList1.setCellRenderer(taskListCellRenderer);
+         * jList1.setModel(taskListModel);
+         *
+         * taskListModel.addElement(new AnnotationMappingTask(null,null,null,
+         * null)); taskListModel.addElement(new MappingTask(null,null,null));
+         */
+        taskTable = new TaskTable(MainFrame.taskManager);
+        taskTable.table.getSelectionModel().addListSelectionListener(this);
+        jSplitPane1.setDividerLocation(0.6);
+        jSplitPane1.setResizeWeight(0.3);
+        jSplitPane1.setLeftComponent(taskTable);
+
+        taskConsolePanel = new TaskConsolePanel();
+        jSplitPane1.setRightComponent(taskConsolePanel);
     }
 
     /**
@@ -43,8 +53,32 @@ public class TaskPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jSplitPane1 = new javax.swing.JSplitPane();
+
         setLayout(new java.awt.BorderLayout());
+
+        jSplitPane1.setDividerLocation(500);
+        add(jSplitPane1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JSplitPane jSplitPane1;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        int selectedRow = taskTable.table.getSelectedRow();
+        //Task selectedTask = (Task) taskTable.tableDataModel.getValueAt(selectedRow, 4);
+        if (selectedRow > -1) {
+            Task selectedTask = (Task) taskTable.table.getValueAt(selectedRow, 4);
+            if (selectedTask instanceof ApplicationTask) {
+                taskConsolePanel.setApplicationTask((ApplicationTask) selectedTask);
+            } else {
+                taskConsolePanel.errorConsolePanel.clearScreen();
+                taskConsolePanel.standardConsolePanel.clearScreen();
+            }
+        } else {
+            taskConsolePanel.errorConsolePanel.clearScreen();
+            taskConsolePanel.standardConsolePanel.clearScreen();
+        }
+    }
 }

@@ -15,7 +15,7 @@ import nava.ui.MainFrame;
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class ConsolePanel extends JPanel {
+public class ConsolePanel extends JPanel implements ConsoleListener {
 
     int numLines = 10;
     int charsPerLine = 120;
@@ -27,50 +27,34 @@ public class ConsolePanel extends JPanel {
     int fontWidth = 0;
     int lineSpacing = 3;
     // ArrayList<String> lines = new ArrayList<String>();
-    ConsoleBuffer standardConsole;
+    ConsoleBuffer console;
+    
+    public void setConsoleBuffer(ConsoleBuffer consoleBuffer)
+    {
+        if(this.console != null)
+        {
+            console.removeConsoleListener(this);
+        }
+        this.console = consoleBuffer;        
+        console.addConsoleListener(this);
+        repaint();
+    }
 
     public ConsolePanel() {
-        standardConsole = new ConsoleBuffer(new ConsoleDatabase(), "app_123", "standard_out");
-        /*
-         * lines.add("With just days left in the year, lawmakers in two states
-         * are making last-minute bids to pass marriage equality bills.");
-         * lines.add("thumb up﻿ if damienwalters took u here, because he liked
-         * this video."); lines.add("Congratulations to the lucky winners who
-         * won one of 10 cheques worth R20,000 by entering the Kellogg’s®
-         * All-Bran® Shopping Spree Competition. Thank you all for
-         * participating!"); lines.add("Interwebs drama of the day: Randi
-         * Zuckerberg, sister of Mark Zuckerberg, threw a fit when someone
-         * tweeted a copy of a Zuckerberg family photo (see above) that Randi
-         * herself had posted to Facebook."); lines.add("A company that once
-         * claimed it wasn't tracking users when they were logged off, only to
-         * turn around and admit that it was, just before someone reported that
-         * Facebook in fact had applied for and received a patent on technology
-         * that would do exactly that;"); lines.add("People will wonder what
-         * gifts these people bought each other and why the boy with the very
-         * pale face and the hoodie is leaning smugly against the kitchen
-         * cabinets."); lines.add("An anonymous reader writes with news of a
-         * study out of the Netherlands (abstract) about the link between
-         * psychosis and marijuana use.");
-         */
-
-        new Thread() {
-
-            public void run() {
-                for (int i = 0;; i++) {
-                    standardConsole.bufferedWrite("inserting line "+i, "app_123", "standard_out");
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(ConsolePanel.class.getName()).log(Level.SEVERE, null, ex);
-
-                    }
-                }
-            }
-        }.start();
     }
 
     @Override
-    public void paintComponent(Graphics graphics) {
+    public void paintComponent(Graphics graphics) {        
+          
+        if(console == null)
+        {
+            numLines = 0;
+        }
+        else
+        {
+             numLines = console.n;
+        }
+        
         Graphics2D g = (Graphics2D) graphics;
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -79,17 +63,21 @@ public class ConsolePanel extends JPanel {
         fontHeight = g.getFontMetrics().getHeight();
         fontWidth = g.getFontMetrics().stringWidth("W");
 
-        numLines = standardConsole.n;
+       
         int width = leftPadding + rightPadding + (fontWidth * charsPerLine) + fontHeight;
         int height = topPadding + bottomPadding + (fontHeight + lineSpacing) * numLines;
         Rectangle visibleRect = this.getVisibleRect();
 
         this.setPreferredSize(new Dimension(width, height));
-
-
-
+        
         g.setColor(Color.white);
         g.fill(visibleRect);
+        
+        if(console == null)
+        {
+            return;
+        }
+        
 
         g.setFont(MainFrame.fontDroidSansMono);
         g.setColor(Color.black);
@@ -100,7 +88,7 @@ public class ConsolePanel extends JPanel {
         int startLine = (int) ((double) (visibleRect.y-fontHeight) / (double) (fontHeight + lineSpacing));
         int endLine = startLine + linesPerScreen;
 
-        ArrayList<ConsoleRecord> records = standardConsole.getRecords(startLine, linesPerScreen);
+        ArrayList<ConsoleRecord> records = console.getRecords(startLine, linesPerScreen);
         //ArrayList<ConsoleRecord> records = standardConsole.getRecords(0, standardConsole.n);
         /*
          * for (int i = 0; i < lines.size(); i++) { g.drawString(i+".
@@ -110,7 +98,20 @@ public class ConsolePanel extends JPanel {
          */
         
         for (int i = 0; i < records.size(); i++) {
-            g.drawString(records.get(i).lineNumber + ". " + records.get(i).text, leftPadding, records.get(i).lineNumber * (fontHeight + lineSpacing) + fontHeight);
+           // g.drawString(records.get(i).lineNumber + ". " + records.get(i).text, leftPadding, records.get(i).lineNumber * (fontHeight + lineSpacing) + fontHeight);
+             g.drawString(records.get(i).text, leftPadding, records.get(i).lineNumber * (fontHeight + lineSpacing) + fontHeight);
         }
+    }
+
+    @Override
+    public void lineAddedEvent(int totalLines) {
+        repaint();
+    }
+    
+    
+    public void clearScreen()
+    {
+        console = null;
+        repaint();
     }
 }

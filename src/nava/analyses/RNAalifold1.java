@@ -7,7 +7,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import nava.data.types.*;
 import nava.ui.MainFrame;
-import nava.ui.console.ConsoleInputHandler;
 import nava.utils.RNAFoldingTools;
 
 /**
@@ -15,7 +14,7 @@ import nava.utils.RNAFoldingTools;
  * appropriately and returns a RNAalifold secondary structure prediction.
  *
  */
-public class RNAalifold extends Application {
+public class RNAalifold1 extends Application {
 
     private static String executable = "bin/RNAalifold.exe";
     private static boolean useOldParams = false;
@@ -94,13 +93,29 @@ public class RNAalifold extends Application {
             processBuilder.command(commands);
 
             process = processBuilder.start();
-            startConsoleInputBuffer(process);
-            startConsoleErrorBuffer(process);
-            
+
+            InputStream is = process.getErrorStream();
+            BufferedReader buffer = new BufferedReader(new InputStreamReader(is));
+            String textline = null;
+            String errorString = "";
+            boolean first = true;
+            while ((textline = buffer.readLine()) != null) {
+                if (first) {
+                    first = false;
+                } else {
+                    errorString += "\n";
+                }
+                errorString += textline;
+            }
+            buffer.close();
             int exitCode = process.waitFor();
 
-            
+            System.out.println(exitCode);
             if (exitCode != 0) {
+                if (!noErrorMessages) {
+                    System.err.println("RNAalifold generated the following error during execution:"
+                            + "\n\"" + errorString + "\"");
+                }
                 return null;
             }
 
@@ -221,7 +236,7 @@ public class RNAalifold extends Application {
                 outputFile2.object = new DenseMatrixData(result.matrix);
                 outputFiles.add(outputFile2);
             } catch (Exception ex) {
-                Logger.getLogger(RNAalifold.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(RNAalifold1.class.getName()).log(Level.SEVERE, null, ex);
             }
             running = false;
         }

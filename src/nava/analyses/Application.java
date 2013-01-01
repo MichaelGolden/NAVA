@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import nava.data.types.DataSource;
+import nava.ui.console.ConsoleBuffer;
+import nava.ui.console.ConsoleDatabase;
+import nava.ui.console.ConsoleInputHandler;
 
 /**
  *
@@ -18,26 +21,42 @@ import nava.data.types.DataSource;
  */
 public abstract class Application {
 
-    public static int instanceCount = 0;
-    int appInstanceId;
+    public static long runtimeId = System.currentTimeMillis();
+    public static long instanceCount = 0;
+    public static ConsoleDatabase consoleDatabase = new ConsoleDatabase();
+    String appInstanceId;
+    
+    public ConsoleBuffer consoleInputBuffer;
+    public ConsoleBuffer consoleErrorBuffer;
+    private ConsoleInputHandler consoleInputHandler;
+    private ConsoleInputHandler consoleErrorHandler;
     //BufferedWriter standardBuffer;
-    BufferedWriter errorBuffer;
+    //BufferedWriter errorBuffer;
 
     public Application() {
         instanceCount++;
-        appInstanceId = instanceCount;
-
-        /*
-        try {
-            standardBuffer = new BufferedWriter(new FileWriter(appInstanceId + ".app.out"));
-            errorBuffer = new BufferedWriter(new FileWriter(appInstanceId + ".app.err"));
-        } catch (IOException ex) {
-            Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        * 
-        */
-
+        appInstanceId = runtimeId+"_"+instanceCount + "";
+        
+        consoleInputBuffer = new ConsoleBuffer(consoleDatabase, appInstanceId, "standard_out");
+        consoleErrorBuffer = new ConsoleBuffer(consoleDatabase, appInstanceId, "standard_err");
     }
+    
+    public void startConsoleInputBuffer(Process process)
+    {
+        consoleInputHandler = new ConsoleInputHandler(consoleInputBuffer, process.getInputStream());
+    }
+    
+    public void startConsoleErrorBuffer(Process process)
+    {
+        consoleErrorHandler = new ConsoleInputHandler(consoleErrorBuffer, process.getErrorStream());
+    }
+    
+    /*
+    public void closeBuffers ()
+    {
+        consoleInputBuffer.close();
+        consoleErrorBuffer.close();
+    }*/
 
     public abstract void start();
 

@@ -26,6 +26,7 @@ public abstract class Application {
     public static ConsoleDatabase consoleDatabase = new ConsoleDatabase();
     String appInstanceId;
     
+    public ConsoleBuffer combinedBuffer;    
     public ConsoleBuffer consoleInputBuffer;
     public ConsoleBuffer consoleErrorBuffer;
     private ConsoleInputHandler consoleInputHandler;
@@ -37,18 +38,22 @@ public abstract class Application {
         instanceCount++;
         appInstanceId = runtimeId+"_"+instanceCount + "";
         
-        consoleInputBuffer = new ConsoleBuffer(consoleDatabase, appInstanceId, "standard_out");
-        consoleErrorBuffer = new ConsoleBuffer(consoleDatabase, appInstanceId, "standard_err");
+        
+        combinedBuffer = new ConsoleBuffer(consoleDatabase, appInstanceId, null);
+        //consoleInputBuffer = new ConsoleBuffer(consoleDatabase, appInstanceId, "standard_out");
+        //consoleErrorBuffer = new ConsoleBuffer(consoleDatabase, appInstanceId, "standard_err");
     }
     
     public void startConsoleInputBuffer(Process process)
     {
-        consoleInputHandler = new ConsoleInputHandler(consoleInputBuffer, process.getInputStream());
+        consoleInputHandler = new ConsoleInputHandler(combinedBuffer, appInstanceId, "standard_out", process.getInputStream());
+        //consoleInputHandler = new ConsoleInputHandler(consoleInputBuffer, process.getInputStream());
     }
     
     public void startConsoleErrorBuffer(Process process)
     {
-        consoleErrorHandler = new ConsoleInputHandler(consoleErrorBuffer, process.getErrorStream());
+        consoleErrorHandler = new ConsoleInputHandler(combinedBuffer, appInstanceId, "standard_err", process.getErrorStream());
+        //consoleErrorHandler = new ConsoleInputHandler(consoleInputBuffer, process.getErrorStream());        
     }
     
     /*

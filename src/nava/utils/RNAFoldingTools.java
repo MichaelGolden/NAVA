@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import nava.analyses.RunInfo;
 
 /**
  *
@@ -153,7 +154,7 @@ public class RNAFoldingTools {
      * access to various useful variables (e.g. paired nucleotides of the MEA
      * structure).
      */
-    public MultiThreadedPosteriorDecoding performPosteriorDecodingMultiThreaded(double[][] basePairProb) {
+    public static MultiThreadedPosteriorDecoding performPosteriorDecodingMultiThreaded(double[][] basePairProb) {
         double[] singleBaseProb = new double[basePairProb.length];
         for (int i = 0; i < basePairProb.length; i++) {
             singleBaseProb[i] = 1;
@@ -164,8 +165,7 @@ public class RNAFoldingTools {
 
         /*
          * for(int i = 0 ; i < singleBaseProb.length ; i++) {
-         * System.out.println((i+1)+"\t"+singleBaseProb[i]);
-    	}
+         * System.out.println((i+1)+"\t"+singleBaseProb[i]); }
          */
 
         return new MultiThreadedPosteriorDecoding(basePairProb, singleBaseProb);
@@ -298,8 +298,142 @@ public class RNAFoldingTools {
          * double max = 0; if(p1 > u1 && p1 > p2 && p1 > u2) { max = p1; S[i][j]
          * = -3; } else if(u1 > p2 && u1 > u2) { max = u1; S[i][j] = -1; } else
          * if(p2 > u2) { max = p2; S[i][j] = max_k; } else { max = u2; S[i][j] =
-         * -2;
+         * -2; }
+         */
+
+
+        double max = 0;
+        if (u1 > p1 && u1 > p2 && u1 > u2) {
+            max = u1;
+            S[i][j] = -1;
+        } else if (u2 > p1 && u2 > p2) {
+            max = u2;
+            S[i][j] = -2;
+        } else if (p1 > p2) {
+            max = p1;
+            S[i][j] = -3; // paired
+        } else {
+            max = p2;
+            S[i][j] = max_k;
         }
+
+        eMatrix[i][j] = max;
+
+        return eMatrix[i][j];
+    }
+
+    /**
+     * A recursive method that fills the dynamic programming matrix for
+     * generating the posterior decoding structure.
+     *
+     * @param basePairProb a NxN matrix of base-pairing probabilities.
+     * @param singleBaseProb a vector of length N representing the probability
+     * that a base at a position is unpaired.
+     * @param eMatrix the dynamic programming matrix for the posterior-decoding.
+     * @param i the start position of the window.
+     * @param j the end position of the window.
+     * @param pairedWith an array of paired positions. Where (i, array[i])
+     * represents a pairing between nucleotides (i+1, array[i]), if array[i] =
+     * 0, then (i+1) is unpaired.
+     * @return the value of the eMatrix at position (i, j).
+     */
+    private static double recursePosteriorDecodingCancelable(double[][] basePairProb, double[] singleBaseProb, double[][] eMatrix, int i, int j, int[] pairedWith, RunInfo runInfo) {
+
+        System.out.println("cancel1=" + runInfo.cancel);
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(RNAFoldingTools.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        if (runInfo.cancel) {
+            return -1;
+        }
+
+        if (i > j) {
+            return 0;
+        }
+
+        if (eMatrix[i][j] != RNAFoldingTools.emptyValue) {
+            return eMatrix[i][j];
+        }
+
+        if (i == j) {
+            eMatrix[i][j] = singleBaseProb[i];
+            return eMatrix[i][j];
+        }
+
+
+        double u1 = recursePosteriorDecodingCancelable(basePairProb, singleBaseProb, eMatrix, i + 1, j, pairedWith, runInfo) + singleBaseProb[i];
+        double p1 = recursePosteriorDecodingCancelable(basePairProb, singleBaseProb, eMatrix, i + 1, j - 1, pairedWith, runInfo) + basePairProb[i][j]; // * 2
+        double u2 = recursePosteriorDecodingCancelable(basePairProb, singleBaseProb, eMatrix, i, j - 1, pairedWith, runInfo) + singleBaseProb[j];
+        double p2 = 0;
+        for (int k = i; k < j; k++) {
+            // remember K
+            p2 = Math.max(p2, recursePosteriorDecodingCancelable(basePairProb, singleBaseProb, eMatrix, i, k, pairedWith, runInfo) + recursePosteriorDecodingCancelable(basePairProb, singleBaseProb, eMatrix, k + 1, j, pairedWith, runInfo));
+        }
+
+        eMatrix[i][j] = Math.max(u1, Math.max(p1, Math.max(u2, p2)));
+
+        if (p1 > u1 && p1 > u2 && p1 > p2 && pairedWith != null) {
+
+            // if(pairedWith[i] == 0 && pairedWith[j] == 0)
+            //{
+            pairedWith[i] = j + 1;
+            pairedWith[j] = i + 1;
+            //}
+            System.out.println("B" + i + "\t" + j);
+        }
+
+        return eMatrix[i][j];
+    }
+
+    private static double recursePosteriorDecodingCancelable(double[][] basePairProb, double[] singleBaseProb, double[][] eMatrix, int[][] S, int i, int j, RunInfo runInfo) {
+
+        System.out.println("cancel2=" + runInfo.cancel);
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(RNAFoldingTools.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        if (runInfo.cancel) {
+            return -1;
+        }
+
+        if (i > j) {
+            return 0;
+        }
+
+        if (eMatrix[i][j] != RNAFoldingTools.emptyValue) {
+            return eMatrix[i][j];
+        }
+
+        if (i == j) {
+            eMatrix[i][j] = singleBaseProb[i];
+            return eMatrix[i][j];
+        }
+
+
+        double u1 = recursePosteriorDecodingCancelable(basePairProb, singleBaseProb, eMatrix, S, i + 1, j, runInfo) + singleBaseProb[i];
+        double p1 = recursePosteriorDecodingCancelable(basePairProb, singleBaseProb, eMatrix, S, i + 1, j - 1, runInfo) + 2 * basePairProb[i][j]; // * 2
+        double u2 = recursePosteriorDecodingCancelable(basePairProb, singleBaseProb, eMatrix, S, i, j - 1, runInfo) + singleBaseProb[j];
+        double p2 = 0;
+        int max_k = i;
+        for (int k = i; k < j; k++) {
+            double p2k = recursePosteriorDecodingCancelable(basePairProb, singleBaseProb, eMatrix, S, i, k, runInfo) + recursePosteriorDecodingCancelable(basePairProb, singleBaseProb, eMatrix, S, k + 1, j, runInfo);
+            // remember K
+            if (p2k > p2) {
+                p2 = p2k;
+                max_k = k;
+            }
+        }
+
+        /*
+         * double max = 0; if(p1 > u1 && p1 > p2 && p1 > u2) { max = p1; S[i][j]
+         * = -3; } else if(u1 > p2 && u1 > u2) { max = u1; S[i][j] = -1; } else
+         * if(p2 > u2) { max = p2; S[i][j] = max_k; } else { max = u2; S[i][j] =
+         * -2; }
          */
 
 
@@ -333,6 +467,23 @@ public class RNAFoldingTools {
         } else {
             traceBack(S, i, S[i][j], pairedWith);
             traceBack(S, S[i][j] + 1, j, pairedWith);
+        }
+    }
+
+    public static void traceBack(int[][] S, int i, int j, int[] pairedWith, RunInfo runInfo) {
+        if (runInfo.cancel) {
+            return;
+        }
+
+        if (i >= j) {
+            // do nothing
+        } else if (S[i][j] == -3) {
+            pairedWith[i] = j + 1;
+            pairedWith[j] = i + 1;
+            traceBack(S, i + 1, j - 1, pairedWith, runInfo);
+        } else {
+            traceBack(S, i, S[i][j], pairedWith, runInfo);
+            traceBack(S, S[i][j] + 1, j, pairedWith, runInfo);
         }
     }
 
@@ -515,7 +666,7 @@ public class RNAFoldingTools {
      * performs a multi-threaded posterior-decoding and returns the MPD
      * consensus structure.
      */
-    public class MultiThreadedPosteriorDecoding {
+    public static class MultiThreadedPosteriorDecoding {
 
         double[][] basePairProb;
         double[] singleBaseProb;
@@ -533,6 +684,7 @@ public class RNAFoldingTools {
         int blockIncrement;
         double[][] eMatrix;
         int[][] S;
+        RunInfo runInfo = new RunInfo();
 
         public MultiThreadedPosteriorDecoding(double[][] basePairCount, double[] singleBaseCount) {
             this.length = singleBaseCount.length;
@@ -553,6 +705,9 @@ public class RNAFoldingTools {
                 }
             }
             this.S = new int[length][length];
+        }
+
+        public void start() {
             compute();
         }
 
@@ -577,10 +732,18 @@ public class RNAFoldingTools {
             }
 
             // recurse one last time *just* in case missed the 0,N case,
-            RNAFoldingTools.recursePosteriorDecoding(basePairProb, singleBaseProb, eMatrix, 0, eMatrix.length - 1, pairedWith);
+            //RNAFoldingTools.recursePosteriorDecoding(basePairProb, singleBaseProb, eMatrix, 0, eMatrix.length - 1, pairedWith);
+            RNAFoldingTools.recursePosteriorDecodingCancelable(basePairProb, singleBaseProb, eMatrix, 0, eMatrix.length - 1, pairedWith, runInfo);
 
-            RNAFoldingTools.traceBack(S, 0, eMatrix.length - 1, pairedWith);
+            if (!runInfo.cancel) {
+                RNAFoldingTools.traceBack(S, 0, eMatrix.length - 1, pairedWith, runInfo);
+            }
             return eMatrix[0][eMatrix.length - 1];
+        }
+
+        public void cancel() {
+            System.out.println("CANCELLING");
+            runInfo.cancel = true;
         }
 
         /**
@@ -684,7 +847,7 @@ public class RNAFoldingTools {
             }
 
             public void run() {
-                RNAFoldingTools.recursePosteriorDecoding(basePairProb, singleBaseProb, eMatrix, S, this.x, this.y);
+                RNAFoldingTools.recursePosteriorDecodingCancelable(basePairProb, singleBaseProb, eMatrix, S, this.x, this.y, runInfo);
                 computeNextSection();
 
                 if (this.x == 0 && this.y == MultiThreadedPosteriorDecoding.this.length - 1) {
@@ -694,6 +857,10 @@ public class RNAFoldingTools {
                     }
                 }
             }
+        }
+
+        public int[] getPairedSites() {
+            return pairedWith;
         }
     }
 

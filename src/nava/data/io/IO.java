@@ -65,7 +65,7 @@ public class IO {
             }
             buffer.close();
             if (!sequence.equals("")) {
-                sequences.add(sequence);
+                sequences.add(sequence.toUpperCase());
             }
         } catch (IOException ex) {
             ex.printStackTrace();

@@ -21,6 +21,8 @@ public class PosteriorDecoding  extends Application {
     boolean started = false;
     boolean running = false;
     boolean canceled = false;
+    
+    RNAFoldingTools.MultiThreadedPosteriorDecoding posteriorDecoding;
 
     @Override
     public void start() {
@@ -31,16 +33,21 @@ public class PosteriorDecoding  extends Application {
             running = true;
             RNAFoldingTools rnaTools = new RNAFoldingTools();
             DenseMatrixData matrixData = (DenseMatrixData) matrix.getObject(MainFrame.dataSourceCache);
-            int[] pairedSites = new RNAFoldingTools().getPosteriorDecodingConsensusStructureMultiThreaded(matrixData.matrix);
-
-            ApplicationOutput outputFile1 = new ApplicationOutput();
-            outputFile1.file = null;
-            SecondaryStructure structure = new SecondaryStructure();
-            structure.title = matrix.title;
-            structure.parentSource = matrix;
-            outputFile1.dataSource = structure;
-            outputFile1.object = new SecondaryStructureData(matrix.title, "", pairedSites);
-            outputFiles.add(outputFile1);
+            posteriorDecoding = RNAFoldingTools.performPosteriorDecodingMultiThreaded(matrixData.matrix);
+            posteriorDecoding.start();
+            //int[] pairedSites = new RNAFoldingTools().getPosteriorDecodingConsensusStructureMultiThreaded(matrixData.matrix);
+            int [] pairedSites = posteriorDecoding.getPairedSites();
+            if(canceled) {
+            } else {
+                ApplicationOutput outputFile1 = new ApplicationOutput();
+                outputFile1.file = null;
+                SecondaryStructure structure = new SecondaryStructure();
+                structure.title = matrix.title;
+                structure.parentSource = matrix;
+                outputFile1.dataSource = structure;
+                outputFile1.object = new SecondaryStructureData(matrix.title, "", pairedSites);
+                outputFiles.add(outputFile1);
+            }
             running = false;
         }
     }
@@ -52,7 +59,13 @@ public class PosteriorDecoding  extends Application {
 
     @Override
     public void cancel() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        System.out.println("CALL CANCEL");
+        if(posteriorDecoding != null)
+        {
+            canceled = true;
+            posteriorDecoding.cancel();
+            System.out.println("CANCELLED");
+        }
     }
 
     @Override

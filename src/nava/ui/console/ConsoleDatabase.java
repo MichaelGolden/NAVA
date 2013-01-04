@@ -27,26 +27,15 @@ public class ConsoleDatabase {
     private static final String TYPE_FIELD = "type";
     private static final String TEXT_FIELD = "text";
     private static final String TIMESTAMP_FIELD = "timestamp";
+    private static final String CLASS_INDEX = "classindex";
     private static final String CLASS_TYPE_INDEX = "classtypeindex";
 
     public static void main(String[] args) {
         try {
             ConsoleDatabase db = new ConsoleDatabase();
-            ArrayList<ConsoleRecord> records = new ArrayList<>();
-            records.add(new ConsoleRecord("app_123", "standard_out", "1", System.currentTimeMillis()));
-            records.add(new ConsoleRecord("app_123", "standard_out", "2", System.currentTimeMillis()));
-            records.add(new ConsoleRecord("app_123", "standard_out", "3", System.currentTimeMillis()));
-            records.add(new ConsoleRecord("app_123", "standard_out", "4", System.currentTimeMillis()));
-            records.add(new ConsoleRecord("app_123", "standard_err", "1", System.currentTimeMillis()));
-            records.add(new ConsoleRecord("app_123", "standard_err", "2", System.currentTimeMillis()));
-            records.add(new ConsoleRecord("app_123", "standard_err", "3", System.currentTimeMillis()));
-            records.add(new ConsoleRecord("app_123", "standard_err", "4", System.currentTimeMillis()));
-            records.add(new ConsoleRecord("app_123", "standard_err", "4", System.currentTimeMillis()));
-
-            db.insertRecords(records);
-
-            System.out.println(db.getConsoleRecordsFromDB("app_123", "standard_err", 2, 3));
-        } catch (SqlJetException ex) {
+            System.out.println(db.getRowCount("app_123", "standard_err"));
+            System.out.println(db.getRowCount("app_123", null));
+        } catch (Exception ex) {
             Logger.getLogger(ConsoleDatabase.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -83,6 +72,7 @@ public class ConsoleDatabase {
                             + TIMESTAMP_FIELD + " INTEGER"
                             //+ "PRIMARY KEY (" + CLASS_FIELD + "," + TYPE_FIELD + "," + LINE_FIELD + ")" 
                             + ")";
+                    String classIndex = "CREATE INDEX " + CLASS_INDEX + " ON " + CONSOLE_TABLE_NAME + "(" + CLASS_FIELD + ")";
                     String classTypeIndex = "CREATE INDEX " + CLASS_TYPE_INDEX + " ON " + CONSOLE_TABLE_NAME + "(" + CLASS_FIELD + "," + TYPE_FIELD + ")";
 
                     System.out.println(createTableQuery);
@@ -91,8 +81,9 @@ public class ConsoleDatabase {
                     //System.out.println(createDateIndexQuery);
 
                     db.createTable(createTableQuery);
+                    db.createIndex(classIndex);
                     //System.out.println("CREATE INDEX " + "LINE_INDEX" + " ON " + TABLE_NAME + "(" + CLASS_FIELD + "," + TYPE_FIELD +","+LINE_FIELD+")");
-                    db.createIndex("CREATE INDEX " + CLASS_TYPE_INDEX + " ON " + CONSOLE_TABLE_NAME + "(" + CLASS_FIELD + "," + TYPE_FIELD + ")");
+                    db.createIndex(classTypeIndex);
                     //db.createIndex("CREATE INDEX " + "LINE_INDEX" + " ON " + CONSOLE_TABLE_NAME + "(" + CLASS_FIELD + "," + TYPE_FIELD + "," + LINE_FIELD + ")");
                     //db.createIndex(createDateIndexQuery);
                 } finally {
@@ -117,8 +108,16 @@ public class ConsoleDatabase {
             SqlJetDb db = SqlJetDb.open(dbFile, true);
             ISqlJetTable table = db.getTable(CONSOLE_TABLE_NAME);
             db.beginTransaction(SqlJetTransactionMode.READ_ONLY);
-            
-            ISqlJetCursor cursor = table.lookup(CLASS_TYPE_INDEX, className, typeName);
+
+            ISqlJetCursor cursor = null;
+             if(typeName == null)
+            {
+                cursor = table.lookup(CLASS_INDEX, className);
+            }
+            else
+            {
+                cursor = table.lookup(CLASS_TYPE_INDEX, className, typeName);
+            }
             //System.out.println
             cursor.goToRow(index + 1);
             if (!cursor.eof()) {
@@ -147,7 +146,15 @@ public class ConsoleDatabase {
             SqlJetDb db = SqlJetDb.open(dbFile, true);
             ISqlJetTable table = db.getTable(CONSOLE_TABLE_NAME);
             db.beginTransaction(SqlJetTransactionMode.READ_ONLY);
-            ISqlJetCursor cursor = table.lookup(CLASS_TYPE_INDEX, className, typeName);
+            ISqlJetCursor cursor = null;
+            if(typeName == null)
+            {
+                cursor = table.lookup(CLASS_INDEX, className);
+            }
+            else
+            {
+                cursor = table.lookup(CLASS_TYPE_INDEX, className, typeName);
+            }
             rowCount = cursor.getRowCount();
             cursor.close();
             db.close();
@@ -158,7 +165,7 @@ public class ConsoleDatabase {
         return rowCount;
     }
 
-    public void insertRecords(ArrayList<ConsoleRecord> records) throws SqlJetException {        
+    public void insertRecords(ArrayList<ConsoleRecord> records) throws SqlJetException {
         File dbFile = new File(DB_NAME);
 
         SqlJetDb db = SqlJetDb.open(dbFile, true);
@@ -174,16 +181,15 @@ public class ConsoleDatabase {
         }
         db.close();
     }
-    
-    
+
     private static void printRecords(ISqlJetCursor cursor) throws SqlJetException {
         try {
             if (!cursor.eof()) {
                 do {
-                    System.out.println(cursor.getRowId() + " : " + 
-                            cursor.getString(0) + " " + 
-                            cursor.getString(1)+ " " + cursor.getString(2));
-                } while(cursor.next());
+                    System.out.println(cursor.getRowId() + " : "
+                            + cursor.getString(0) + " "
+                            + cursor.getString(1) + " " + cursor.getString(2));
+                } while (cursor.next());
             }
         } finally {
             cursor.close();

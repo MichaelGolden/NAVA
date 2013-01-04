@@ -160,7 +160,12 @@ public class TaskTable extends JPanel implements TaskListener {
 
         public void setValueAt(Object value, int row, int col) {
             rows.get(row)[col] = value;
+            int selected = TaskTable.this.table.getSelectedRow();
             this.fireTableCellUpdated(row, col);
+            if(selected != -1)
+            {
+                TaskTable.this.table.setRowSelectionInterval(selected, selected);
+            }
         }
 
         public void clear() {

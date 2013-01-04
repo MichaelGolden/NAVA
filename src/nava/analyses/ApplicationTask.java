@@ -24,6 +24,9 @@ public class ApplicationTask extends Task {
 
     @Override
     public void before() {
+        if (application.combinedBuffer != null) {
+            application.combinedBuffer.bufferedWrite("Started.", application.appInstanceId, "console");
+        }
     }
 
     @Override
@@ -36,6 +39,11 @@ public class ApplicationTask extends Task {
         List<ApplicationOutput> output = application.getOutputFiles();
         for (int i = 0; i < output.size(); i++) {
             projectController.importDataSourceFromOutputFile(output.get(i));
+        }
+
+        if (application.combinedBuffer != null) {
+            application.combinedBuffer.bufferedWrite("Finished.", application.appInstanceId, "console");
+            application.combinedBuffer.close();
         }
     }
 

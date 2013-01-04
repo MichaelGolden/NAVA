@@ -32,6 +32,7 @@ public class ConsoleBuffer extends Thread {
     int upperBufferSize = (int) ((double) bufferSize * 0.25);
     int lowerBufferSize = bufferSize - upper;
     int n = 0;
+    int maxLineChars = 0;
 
     public ConsoleBuffer(ConsoleDatabase db, String className, String typeName) {
         this.db = db;
@@ -93,6 +94,11 @@ public class ConsoleBuffer extends Thread {
             }
         }
 
+        ConsoleRecord record = rows.get(key);
+        if (record != null) {
+            maxLineChars = Math.max(record.text.length(), maxLineChars);
+        }
+
         return rows.get(key);
     }
 
@@ -103,7 +109,7 @@ public class ConsoleBuffer extends Thread {
             if (record != null) {
                 records.add(record);
             } else {
-                System.err.println("Record is null");
+                System.err.println("Record is null "+i);
             }
         }
         return records;
@@ -120,12 +126,14 @@ public class ConsoleBuffer extends Thread {
             writeBuffer.add(new ConsoleRecord(className, typeName, line, System.currentTimeMillis()));
         }
     }
-
     boolean running = true;
+
     @Override
     public void run() {
-        for (int i = 1; running ; i++) {
+        for (int i = 1; running; i++) {
             if (i % mod == 0 || writeBuffer.size() >= bufferMaxLines) {
+
+                System.out.println("ADDING RECORDS");
                 if (!writeBuffer.isEmpty()) {
                     synchronized (lock) {
                         try {
@@ -137,7 +145,7 @@ public class ConsoleBuffer extends Thread {
                         i = 1;
                     }
                 }
-                this.n = (int)db.getRowCount(this.className, this.typeName);
+                this.n = (int) db.getRowCount(this.className, this.typeName);
             }
 
             try {
@@ -153,7 +161,7 @@ public class ConsoleBuffer extends Thread {
             try {
                 addRecords(writeBuffer);
                 writeBuffer.clear();
-                this.n = (int)db.getRowCount(this.className, this.typeName);
+                this.n = (int) db.getRowCount(this.className, this.typeName);
                 running = false;
             } catch (Exception ex) {
                 Logger.getLogger(ConsoleBuffer.class.getName()).log(Level.SEVERE, null, ex);

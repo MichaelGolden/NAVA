@@ -129,6 +129,11 @@ public class FileImport {
             
         }
         
+        if(ReadseqTools.isInFastaFormat(inFile))
+        {
+            possibleDataTypes.add(new DataType(DataType.Primary.ALIGNMENT, DataType.FileFormat.UNKNOWN));
+        }
+        
         if(CsvReader.isCsvFormat(inFile))
         {
             possibleDataTypes.add(new DataType(DataType.Primary.TABULAR_DATA, DataType.FileFormat.CSV));
@@ -138,6 +143,8 @@ public class FileImport {
         {
             possibleDataTypes.add(new DataType(DataType.Primary.ALIGNMENT, DataType.FileFormat.UNKNOWN));
         }
+        
+        System.out.println("Possible datatypes " + possibleDataTypes);
         
         return possibleDataTypes;
     }

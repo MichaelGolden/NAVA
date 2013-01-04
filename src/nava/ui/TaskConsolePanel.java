@@ -4,6 +4,7 @@
  */
 package nava.ui;
 
+import java.awt.Color;
 import nava.analyses.ApplicationTask;
 import nava.ui.console.ConsolePanel;
 
@@ -16,32 +17,45 @@ public class TaskConsolePanel extends javax.swing.JPanel {
     ApplicationTask task;
     ConsolePanel standardConsolePanel;
     ConsolePanel errorConsolePanel;
-    
+
     /**
      * Creates new form ConsolePanel
      */
     public TaskConsolePanel() {
         initComponents();
-        
+
         standardConsolePanel = new ConsolePanel();
         errorConsolePanel = new ConsolePanel();
-        
+
         standardScrollPane.setViewportView(standardConsolePanel);
-        errorScrollPane.setViewportView(errorConsolePanel);
+        //errorScrollPane.setViewportView(errorConsolePanel);
     }
-    
-    public void setApplicationTask(ApplicationTask task)
-    {
+
+    public void setApplicationTask(ApplicationTask task) {
         this.task = task;
-        
-        standardConsolePanel  = new ConsolePanel();
-        errorConsolePanel  = new ConsolePanel();
-        
-        standardConsolePanel.setConsoleBuffer(task.getApplication().consoleInputBuffer);
-        errorConsolePanel.setConsoleBuffer(task.getApplication().consoleErrorBuffer);
-        
-        standardScrollPane.setViewportView(standardConsolePanel);
-        errorScrollPane.setViewportView(errorConsolePanel);
+
+        standardConsolePanel = new ConsolePanel();
+        standardConsolePanel.setTypeColor("standard_out", Color.black);
+        standardConsolePanel.setTypeColor("standard_err", Color.red);
+        standardConsolePanel.setTypeColor("console", Color.green);
+
+       // errorConsolePanel = new ConsolePanel();
+       // errorConsolePanel.setTypeColor("standard_err", Color.red);
+        //errorConsolePanel.setTypeColor("standard_out", Color.black);
+
+        if (task.getApplication().combinedBuffer == null) {
+            standardConsolePanel.setConsoleBuffer(task.getApplication().consoleInputBuffer);
+            errorConsolePanel.setConsoleBuffer(task.getApplication().consoleErrorBuffer);
+
+            standardScrollPane.setViewportView(standardConsolePanel);
+            //errorScrollPane.setViewportView(errorConsolePanel);
+        } else {
+            standardConsolePanel.setConsoleBuffer(task.getApplication().combinedBuffer);
+            //errorConsolePanel.setConsoleBuffer(task.getApplication().consoleErrorBuffer);
+
+            standardScrollPane.setViewportView(standardConsolePanel);
+            //errorScrollPane.setViewportView(errorConsolePanel);
+        }
     }
 
     /**
@@ -53,31 +67,17 @@ public class TaskConsolePanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jTabbedPane1 = new javax.swing.JTabbedPane();
-        jPanel1 = new javax.swing.JPanel();
+        jTabbedPane2 = new javax.swing.JTabbedPane();
         standardScrollPane = new javax.swing.JScrollPane();
-        jPanel2 = new javax.swing.JPanel();
-        errorScrollPane = new javax.swing.JScrollPane();
 
         setLayout(new java.awt.BorderLayout());
 
-        jPanel1.setLayout(new java.awt.BorderLayout());
-        jPanel1.add(standardScrollPane, java.awt.BorderLayout.CENTER);
+        jTabbedPane2.addTab("Output", standardScrollPane);
 
-        jTabbedPane1.addTab("Standard output", jPanel1);
-
-        jPanel2.setLayout(new java.awt.BorderLayout());
-        jPanel2.add(errorScrollPane, java.awt.BorderLayout.CENTER);
-
-        jTabbedPane1.addTab("Standard error", jPanel2);
-
-        add(jTabbedPane1, java.awt.BorderLayout.CENTER);
+        add(jTabbedPane2, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JScrollPane errorScrollPane;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JTabbedPane jTabbedPane2;
     private javax.swing.JScrollPane standardScrollPane;
     // End of variables declaration//GEN-END:variables
 }

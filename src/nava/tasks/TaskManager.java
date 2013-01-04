@@ -9,6 +9,8 @@ import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.event.EventListenerList;
+import nava.analyses.Application;
+import nava.analyses.ApplicationTask;
 import nava.tasks.Task.Status;
 import nava.ui.navigator.NavigationEvent;
 import nava.ui.navigator.NavigationListener;
@@ -46,7 +48,24 @@ public class TaskManager extends Thread {
             public void run() {
                 task.setStatus(Status.RUNNING);
                 task.task();
-                task.setStatus(Status.FINISHED);
+                if(task instanceof ApplicationTask)
+                {
+                    ApplicationTask appTask = (ApplicationTask)task;
+                    Application app = appTask.getApplication();
+                    if(app.isCanceled())
+                    {
+                        task.setStatus(Status.STOPPED);
+                    }
+                    else
+                    if(app.isFinished())
+                    {
+                        task.setStatus(Status.FINISHED);
+                    }
+                }
+                else
+                {
+                    task.setStatus(Status.FINISHED);
+                }
                 task.finishTime = System.currentTimeMillis();
                 task.setProgress(1.0);
                 task.after();

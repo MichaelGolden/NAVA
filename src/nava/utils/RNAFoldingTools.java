@@ -339,7 +339,14 @@ public class RNAFoldingTools {
      */
     private static double recursePosteriorDecodingCancelable(double[][] basePairProb, double[] singleBaseProb, double[][] eMatrix, int i, int j, int[] pairedWith, RunInfo runInfo) {
 
-        System.out.println("cancel1=" + runInfo.cancel);
+        while (runInfo.pause) {
+            try {
+                Thread.sleep(250);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(RNAFoldingTools.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
         try {
             Thread.sleep(100);
         } catch (InterruptedException ex) {
@@ -390,7 +397,14 @@ public class RNAFoldingTools {
 
     private static double recursePosteriorDecodingCancelable(double[][] basePairProb, double[] singleBaseProb, double[][] eMatrix, int[][] S, int i, int j, RunInfo runInfo) {
 
-        System.out.println("cancel2=" + runInfo.cancel);
+        while (runInfo.pause) {
+            try {
+                Thread.sleep(250);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(RNAFoldingTools.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
         try {
             Thread.sleep(100);
         } catch (InterruptedException ex) {
@@ -740,9 +754,17 @@ public class RNAFoldingTools {
             }
             return eMatrix[0][eMatrix.length - 1];
         }
+        
+        public void resume()
+        {
+            runInfo.pause = true;
+        }
+        
+        public void pause() {
+            runInfo.pause = true;
+        }
 
         public void cancel() {
-            System.out.println("CANCELLING");
             runInfo.cancel = true;
         }
 

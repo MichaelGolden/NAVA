@@ -14,14 +14,13 @@ import nava.utils.RNAFoldingTools;
  *
  * @author Michael
  */
-public class PosteriorDecoding  extends Application {
+public class PosteriorDecoding extends Application {
 
     Matrix matrix;
     ArrayList<ApplicationOutput> outputFiles = new ArrayList<>();
     boolean started = false;
     boolean running = false;
     boolean canceled = false;
-    
     RNAFoldingTools.MultiThreadedPosteriorDecoding posteriorDecoding;
 
     @Override
@@ -36,8 +35,8 @@ public class PosteriorDecoding  extends Application {
             posteriorDecoding = RNAFoldingTools.performPosteriorDecodingMultiThreaded(matrixData.matrix);
             posteriorDecoding.start();
             //int[] pairedSites = new RNAFoldingTools().getPosteriorDecodingConsensusStructureMultiThreaded(matrixData.matrix);
-            int [] pairedSites = posteriorDecoding.getPairedSites();
-            if(canceled) {
+            int[] pairedSites = posteriorDecoding.getPairedSites();
+            if (canceled) {
             } else {
                 ApplicationOutput outputFile1 = new ApplicationOutput();
                 outputFile1.file = null;
@@ -54,17 +53,23 @@ public class PosteriorDecoding  extends Application {
 
     @Override
     public void pause() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (posteriorDecoding != null) {
+            posteriorDecoding.pause();
+        }
+    }
+
+    @Override
+    public void resume() {
+        if (posteriorDecoding != null) {
+            posteriorDecoding.resume();
+        }
     }
 
     @Override
     public void cancel() {
-        System.out.println("CALL CANCEL");
-        if(posteriorDecoding != null)
-        {
+        if (posteriorDecoding != null) {
             canceled = true;
             posteriorDecoding.cancel();
-            System.out.println("CANCELLED");
         }
     }
 
@@ -78,32 +83,12 @@ public class PosteriorDecoding  extends Application {
 
     @Override
     public void setDataSource(DataSource dataSource) {
-         this.matrix = (Matrix) dataSource;
-    }
-
-    @Override
-    public boolean isStarted() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public boolean isRunning() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public boolean isCanceled() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public boolean isFinished() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.matrix = (Matrix) dataSource;
     }
 
     @Override
     public List<ApplicationOutput> getOutputFiles() {
-         return outputFiles;
+        return outputFiles;
     }
 
     @Override

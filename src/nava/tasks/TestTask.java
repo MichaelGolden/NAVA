@@ -39,5 +39,20 @@ public class TestTask extends Task{
     public Object get() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
+    @Override
+    protected void pause() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    protected void cancel() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    protected void resume() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
     
 }

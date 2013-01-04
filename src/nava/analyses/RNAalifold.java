@@ -96,10 +96,10 @@ public class RNAalifold extends Application {
             process = processBuilder.start();
             startConsoleInputBuffer(process);
             startConsoleErrorBuffer(process);
-            
+
             int exitCode = process.waitFor();
 
-            
+
             if (exitCode != 0) {
                 return null;
             }
@@ -175,61 +175,63 @@ public class RNAalifold extends Application {
 
         return matrix;
     }
-    
     private Alignment inputDataSource;
     boolean started = false;
     boolean running = false;
     boolean canceled = false;
     ArrayList<ApplicationOutput> outputFiles = new ArrayList<>();
-    
+
     @Override
     public void start() {
-        if(started)
-        {
+        if (started) {
             System.err.println("Cannot start this process more than once.");
-        }
-        else
-        {
+        } else {
             started = true;
             running = true;
             AlignmentData alignmentData = inputDataSource.getObject(MainFrame.dataSourceCache);
             RNAalifoldResult result = null;
             try {
                 ArrayList<String> sequenceNames = new ArrayList<String>();
-                for(int i = 0 ; i < alignmentData.sequences.size() ; i++)
-                {
-                    sequenceNames.add("S"+i);
+                for (int i = 0; i < alignmentData.sequences.size(); i++) {
+                    sequenceNames.add("S" + i);
                 }
 
                 result = fold(alignmentData.sequences, sequenceNames, "");
-                ApplicationOutput outputFile1 = new ApplicationOutput();
 
-                outputFile1.file = null;
-                SecondaryStructure structure = new SecondaryStructure();
-                structure.title = inputDataSource.title;
-                structure.parentSource = inputDataSource;
-                outputFile1.dataSource = structure;
-                outputFile1.object = new SecondaryStructureData(inputDataSource.title, result.firstSequence, result.pairedSites);
-                outputFiles.add(outputFile1);
-                
-                ApplicationOutput outputFile2 = new ApplicationOutput();
-                outputFile2.file = null;
-                Matrix matrix = new Matrix();
-                matrix.title = inputDataSource.title;
-                matrix.parentSource = inputDataSource;
-                outputFile2.dataSource = matrix;
-                outputFile2.object = new DenseMatrixData(result.matrix);
-                outputFiles.add(outputFile2);
+                if (result != null) {
+                    ApplicationOutput outputFile1 = new ApplicationOutput();
+
+                    outputFile1.file = null;
+                    SecondaryStructure structure = new SecondaryStructure();
+                    structure.title = inputDataSource.title;
+                    structure.parentSource = inputDataSource;
+                    outputFile1.dataSource = structure;
+                    outputFile1.object = new SecondaryStructureData(inputDataSource.title, result.firstSequence, result.pairedSites);
+                    outputFiles.add(outputFile1);
+
+                    ApplicationOutput outputFile2 = new ApplicationOutput();
+                    outputFile2.file = null;
+                    Matrix matrix = new Matrix();
+                    matrix.title = inputDataSource.title;
+                    matrix.parentSource = inputDataSource;
+                    outputFile2.dataSource = matrix;
+                    outputFile2.object = new DenseMatrixData(result.matrix);
+                    outputFiles.add(outputFile2);
+                }
             } catch (Exception ex) {
                 Logger.getLogger(RNAalifold.class.getName()).log(Level.SEVERE, null, ex);
             }
             running = false;
         }
     }
-    
 
     @Override
     public void pause() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void resume() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -242,41 +244,18 @@ public class RNAalifold extends Application {
 
     @Override
     public boolean canProcessDataSource(DataSource dataSource) {
-        if(dataSource instanceof Alignment)
-        {
+        if (dataSource instanceof Alignment) {
             Alignment alignment = (Alignment) dataSource;
-            if(alignment.type.equals(Alignment.Type.NUCLEOTIDE) || alignment.type.equals(Alignment.Type.CODING))
-            {
+            if (alignment.type.equals(Alignment.Type.NUCLEOTIDE) || alignment.type.equals(Alignment.Type.CODING)) {
                 return true;
             }
         }
         return false;
     }
-    
+
     @Override
-    public void setDataSource(DataSource dataSource)
-    {
+    public void setDataSource(DataSource dataSource) {
         this.inputDataSource = (Alignment) dataSource;
-    }
-
-    @Override
-    public boolean isStarted() {
-        return started;
-    }
-
-    @Override
-    public boolean isRunning() {
-        return running;
-    }
-
-    @Override
-    public boolean isCanceled() {
-        return canceled;
-    }
-
-    @Override
-    public boolean isFinished() {
-        return started && !running;
     }
 
     @Override

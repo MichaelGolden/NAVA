@@ -5,7 +5,7 @@
 package nava.ui;
 
 import java.awt.Color;
-import nava.analyses.ApplicationTask;
+import nava.analyses.Application;
 import nava.ui.console.ConsolePanel;
 
 /**
@@ -14,7 +14,7 @@ import nava.ui.console.ConsolePanel;
  */
 public class TaskConsolePanel extends javax.swing.JPanel {
 
-    ApplicationTask task;
+    Application task;
     ConsolePanel standardConsolePanel;
     ConsolePanel errorConsolePanel;
 
@@ -31,7 +31,7 @@ public class TaskConsolePanel extends javax.swing.JPanel {
         //errorScrollPane.setViewportView(errorConsolePanel);
     }
 
-    public void setApplicationTask(ApplicationTask task) {
+    public void setApplicationTask(Application task) {
         this.task = task;
 
         standardConsolePanel = new ConsolePanel();
@@ -43,14 +43,15 @@ public class TaskConsolePanel extends javax.swing.JPanel {
        // errorConsolePanel.setTypeColor("standard_err", Color.red);
         //errorConsolePanel.setTypeColor("standard_out", Color.black);
 
-        if (task.getApplication().combinedBuffer == null) {
-            standardConsolePanel.setConsoleBuffer(task.getApplication().consoleInputBuffer);
-            errorConsolePanel.setConsoleBuffer(task.getApplication().consoleErrorBuffer);
+        
+        if (task.combinedBuffer == null) {
+            standardConsolePanel.setConsoleBuffer(task.consoleInputBuffer);
+            errorConsolePanel.setConsoleBuffer(task.consoleErrorBuffer);
 
             standardScrollPane.setViewportView(standardConsolePanel);
             //errorScrollPane.setViewportView(errorConsolePanel);
         } else {
-            standardConsolePanel.setConsoleBuffer(task.getApplication().combinedBuffer);
+            standardConsolePanel.setConsoleBuffer(task.combinedBuffer);
             //errorConsolePanel.setConsoleBuffer(task.getApplication().consoleErrorBuffer);
 
             standardScrollPane.setViewportView(standardConsolePanel);

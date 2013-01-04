@@ -88,6 +88,21 @@ public class MappingTask<Mapping> extends UITask {
     public String getDescription() {
         return "Performing mapping using MUSCLE.";
     }
+
+    @Override
+    protected void pause() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    protected void cancel() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    protected void resume() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
     
     
 }

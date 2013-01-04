@@ -45,10 +45,9 @@ public class ApplicationController implements TaskListener {
     public void taskStatusChanged(Task task, Status oldStatus, Status newStatus) {
         if(newStatus == Status.FINISHED)
         {
-            if(task instanceof ApplicationTask)
+            if(task instanceof Application)
             {
-                ApplicationTask appTask = (ApplicationTask)task;
-                System.out.println(appTask.getApplication().getName()+"Finished");
+                System.out.println(task.getName()+"Finished");
             }
         }
     }

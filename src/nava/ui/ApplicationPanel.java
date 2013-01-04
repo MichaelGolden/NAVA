@@ -108,7 +108,7 @@ public class ApplicationPanel extends javax.swing.JPanel {
             try {
                 Application app = applicationObject.application.getClass().newInstance();
                 app.setDataSource(selectedDataSources.get(0));
-                MainFrame.taskManager.queueTask(new ApplicationTask(app, projectController));
+                MainFrame.taskManager.queueTask(app);
             } catch (InstantiationException ex) {
                 Logger.getLogger(ApplicationPanel.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IllegalAccessException ex) {

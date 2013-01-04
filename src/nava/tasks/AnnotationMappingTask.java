@@ -92,5 +92,20 @@ public class AnnotationMappingTask extends UITask {
     public String getDescription() {
         return "Mapping annotations to structure using MUSCLE.";
     }
+
+    @Override
+    protected void pause() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    protected void cancel() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    protected void resume() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
     
 }

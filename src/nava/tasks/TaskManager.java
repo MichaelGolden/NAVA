@@ -10,7 +10,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.event.EventListenerList;
 import nava.analyses.Application;
-import nava.analyses.ApplicationTask;
 import nava.tasks.Task.Status;
 import nava.ui.navigator.NavigationEvent;
 import nava.ui.navigator.NavigationListener;
@@ -48,10 +47,9 @@ public class TaskManager extends Thread {
             public void run() {
                 task.setStatus(Status.RUNNING);
                 task.task();
-                if(task instanceof ApplicationTask)
-                {
-                    ApplicationTask appTask = (ApplicationTask)task;
-                    Application app = appTask.getApplication();
+                if(task instanceof Application)
+                {                    
+                    Application app = (Application) task;
                     if(app.isCanceled())
                     {
                         task.setStatus(Status.STOPPED);

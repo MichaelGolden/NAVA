@@ -8,7 +8,7 @@ import java.util.Objects;
 import javax.swing.ImageIcon;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import nava.analyses.ApplicationTask;
+import nava.analyses.Application;
 import nava.tasks.Task;
 
 /**
@@ -126,15 +126,26 @@ public class TaskPanel extends javax.swing.JPanel implements ListSelectionListen
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         if(currentlySelectedTask != null)
         {
+            Application task = (Application) currentlySelectedTask;
+            if(task.isPaused())
+            {
+                task.resumeTask();
+            }
+            else
+            {
+                task.pauseTask();
+            }   
             
+            setIcons(task);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        if(currentlySelectedTask != null && currentlySelectedTask instanceof ApplicationTask)
+        if(currentlySelectedTask != null && currentlySelectedTask instanceof Application)
         {
-            ApplicationTask task = (ApplicationTask) currentlySelectedTask;
-            task.getApplication().cancel();
+            Application task = (Application) currentlySelectedTask;
+            task.cancelTask();
+            setIcons(task);
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
@@ -159,8 +170,8 @@ public class TaskPanel extends javax.swing.JPanel implements ListSelectionListen
             if (selectedRow > -1) {
                 Task selectedTask = (Task) taskTable.table.getValueAt(selectedRow, 4);
                 if (!Objects.equals(selectedTask, currentlySelectedTask)) {
-                    if (selectedTask instanceof ApplicationTask) {
-                        taskConsolePanel.setApplicationTask((ApplicationTask) selectedTask);
+                    if (selectedTask instanceof Application) {
+                        taskConsolePanel.setApplicationTask((Application) selectedTask);
                     } else {
                         taskConsolePanel.errorConsolePanel.clearScreen();
                         taskConsolePanel.standardConsolePanel.clearScreen();

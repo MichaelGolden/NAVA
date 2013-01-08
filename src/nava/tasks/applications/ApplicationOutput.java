@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package nava.analyses;
+package nava.tasks.applications;
 
 import java.io.File;
 import nava.data.types.DataSource;

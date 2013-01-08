@@ -5,7 +5,7 @@
 package nava.ui;
 
 import java.awt.Color;
-import nava.analyses.Application;
+import nava.tasks.applications.Application;
 import nava.ui.console.ConsolePanel;
 
 /**

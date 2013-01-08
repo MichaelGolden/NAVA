@@ -132,8 +132,6 @@ public class ConsoleBuffer extends Thread {
     public void run() {
         for (int i = 1; running; i++) {
             if (i % mod == 0 || writeBuffer.size() >= bufferMaxLines) {
-
-                System.out.println("ADDING RECORDS");
                 if (!writeBuffer.isEmpty()) {
                     synchronized (lock) {
                         try {

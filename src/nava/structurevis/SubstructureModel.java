@@ -4,6 +4,7 @@
  */
 package nava.structurevis;
 
+import nava.structurevis.data.NucleotideComposition;
 import nava.structurevis.data.Substructure;
 import java.awt.Color;
 import java.io.Serializable;
@@ -28,7 +29,8 @@ public class SubstructureModel implements Serializable {
     Mapping mapping1D = null;
     DataSource2D data2D = null;
     Mapping mapping2D = null;
-    NucleotideComposition nucleotideComposition = null;
+    NucleotideComposition nucleotideSource = null;
+    Mapping nucleotideMapping = null;
     NucleotideComposition.Type nucleotideCompositionType = NucleotideComposition.Type.FREQUENCY;
     StructureSource structureSource = null;
     int numbering = 0;
@@ -71,7 +73,7 @@ public class SubstructureModel implements Serializable {
         dataSource1D.loadData();
         this.data1D = dataSource1D;
         if (data1D != null && data1D.mappingSource != null && structureSource != null && structureSource.mappingSource != null) {
-            //mapping1D = structureVisController.getMapping(data1D.mappingSource, structureSource.mappingSource);
+            mapping1D = structureVisController.getMapping(data1D.mappingSource, structureSource.mappingSource);
         }
         fireDataSource1DChanged(dataSource1D);
     }
@@ -80,7 +82,7 @@ public class SubstructureModel implements Serializable {
         dataSource2D.loadData();
         this.data2D = dataSource2D;
         if (data2D != null && data2D.mappingSource != null && structureSource != null && structureSource.mappingSource != null) {
-            //mapping2D = structureVisController.getMapping(data1D.mappingSource, structureSource.mappingSource);
+            mapping2D = structureVisController.getMapping(data1D.mappingSource, structureSource.mappingSource);
         }
         fireDataSource2DChanged(dataSource2D);
     }
@@ -90,13 +92,32 @@ public class SubstructureModel implements Serializable {
         this.structureSource = structureSource;
         this.sequenceLength = structureSource.pairedSites.length;
         if (data1D != null && data1D.mappingSource != null && structureSource != null && structureSource.mappingSource != null) {
-           // mapping1D = structureVisController.getMapping(data1D.mappingSource, structureSource.mappingSource);
+            mapping1D = structureVisController.getMapping(data1D.mappingSource, structureSource.mappingSource);
         }
         if (data2D != null && data2D.mappingSource != null && structureSource != null && structureSource.mappingSource != null) {
-            //mapping2D = structureVisController.getMapping(data1D.mappingSource, structureSource.mappingSource);
+            mapping2D = structureVisController.getMapping(data1D.mappingSource, structureSource.mappingSource);
+        }
+        if (nucleotideSource != null && nucleotideSource.mappingSource != null) {
+            nucleotideMapping = structureVisController.getMapping(nucleotideSource.mappingSource, structureSource.mappingSource);
         }
         //this.annotationSource = AnnotationSource.getMappedAnnotations(annotationSource, structureSource, structureVisController);
         fireStructureSourceChanged(structureSource);
+    }
+
+    public void setNucleotideSource(NucleotideComposition nucleotideSource) {
+        this.nucleotideSource = nucleotideSource;
+        if (nucleotideSource != null && nucleotideSource.mappingSource != null) {
+            nucleotideMapping = structureVisController.getMapping(nucleotideSource.mappingSource, structureSource.mappingSource);
+            /*
+            for(int i = 0 ; i < nucleotideMapping.getALength() ; i++)
+            {
+                System.out.println(i+" -> "+nucleotideMapping.aToB(i)+" -> "+nucleotideSource.consensus.charAt(nucleotideMapping.aToB(i)));
+            }
+            System.out.println(nucleotideSource.consensus);
+            *
+            */
+        }
+        fireNucleotideSourceChanged(nucleotideSource);
     }
 
     public AnnotationSource getAnnotationSource() {
@@ -164,6 +185,17 @@ public class SubstructureModel implements Serializable {
         for (int i = 0; i < listeners.length; i += 2) {
             if (listeners[i] == SubstructureModelListener.class) {
                 ((SubstructureModelListener) listeners[i + 1]).annotationSourceChanged(annotationSource);
+            }
+        }
+    }
+
+    public void fireNucleotideSourceChanged(NucleotideComposition nucleotideSource) {
+        Object[] listeners = this.listeners.getListenerList();
+        // Each listener occupies two elements - the first is the listener class
+        // and the second is the listener instance
+        for (int i = 0; i < listeners.length; i += 2) {
+            if (listeners[i] == SubstructureModelListener.class) {
+                ((SubstructureModelListener) listeners[i + 1]).nucleotideSourceChanged(nucleotideSource);
             }
         }
     }

@@ -1,4 +1,4 @@
-package nava.analyses;
+package nava.tasks.applications;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import nava.utils.RNAFoldingTools;
  * appropriately and returns a RNAalifold secondary structure prediction.
  *
  */
-public class RNAalifold extends Application {
+public class RNAalifoldApplication extends Application {
 
     private static String executable = "bin/RNAalifold.exe";
     private static boolean useOldParams = false;
@@ -219,7 +219,7 @@ public class RNAalifold extends Application {
                     outputFiles.add(outputFile2);
                 }
             } catch (Exception ex) {
-                Logger.getLogger(RNAalifold.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(RNAalifoldApplication.class.getName()).log(Level.SEVERE, null, ex);
             }
             running = false;
         }

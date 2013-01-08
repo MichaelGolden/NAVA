@@ -26,6 +26,7 @@ public class StructureVisController implements Serializable {
     public transient DefaultListModel<StructureSource> structureSources = new DefaultListModel<>();
     public transient DefaultListModel<DataSource1D> structureVisDataSources = new DefaultListModel<>();
     public transient DefaultListModel<AnnotationSource> annotationSources = new DefaultListModel<>();
+    public transient DefaultListModel<NucleotideComposition> nucleotideSources = new DefaultListModel<>();
     public SubstructureModel substructureModel = null;
     Hashtable<Pair<MappingSource, MappingSource>, Mapping> mappings = new Hashtable<>();
     public File structureVisModelFile = null;
@@ -44,7 +45,7 @@ public class StructureVisController implements Serializable {
             for (int j = 0; j < structureVisDataSources.size(); j++) {
                 DataSource1D dataSource = structureVisDataSources.get(j);
                 if (s.mappingSource != null && dataSource.mappingSource != null) {
-                    MainFrame.taskManager.queueUITask(new MappingTask(this,dataSource.mappingSource,s.mappingSource));
+                    MainFrame.taskManager.queueUITask(new MappingTask(this, dataSource.mappingSource, s.mappingSource));
                 }
             }
 
@@ -54,8 +55,16 @@ public class StructureVisController implements Serializable {
                 {
                     if (s.mappingSource != null && f.mappingSource != null) {
                         //getMapping(f.mappingSource, s.mappingSource);
-                        MainFrame.taskManager.queueUITask(new MappingTask(this,f.mappingSource,s.mappingSource));
+                        MainFrame.taskManager.queueUITask(new MappingTask(this, f.mappingSource, s.mappingSource));
                     }
+                }
+            }
+
+            for (int j = 0; j < nucleotideSources.size(); j++) {
+                NucleotideComposition nucleotideComposition = nucleotideSources.get(j);
+                if (s.mappingSource != null && nucleotideComposition.mappingSource != null) {
+                    //getMapping(f.mappingSource, s.mappingSource);
+                    MainFrame.taskManager.queueUITask(new MappingTask(this, nucleotideComposition.mappingSource, s.mappingSource));
                 }
             }
         }
@@ -78,12 +87,16 @@ public class StructureVisController implements Serializable {
         refreshMappings();
     }
 
+    public void addNucleotideCompositionSource(NucleotideComposition nucleotideComposition) {
+        nucleotideSources.addElement(nucleotideComposition);
+        refreshMappings();
+    }
+
     public Mapping getMapping(MappingSource a, MappingSource b) {
-        if(a == null || b == null)
-        {
+        if (a == null || b == null) {
             return null;
         }
-        
+
         Pair p = new Pair(a, b);
         Mapping m = mappings.get(p);
         if (m == null) {
@@ -134,11 +147,13 @@ public class StructureVisController implements Serializable {
     public ArrayList<StructureSource> structureSourcesPersistent = new ArrayList<>();
     public ArrayList<DataSource1D> structureVisDataSourcesPersistent = new ArrayList<>();
     public ArrayList<AnnotationSource> annotationSourcesPersistent = new ArrayList<>();
+    public ArrayList<NucleotideComposition> nucleotideSourcesPersistent = new ArrayList<>();
 
     public void saveStructureVisModel(File outFile) {
         structureSourcesPersistent = Collections.list(structureSources.elements());
         structureVisDataSourcesPersistent = Collections.list(structureVisDataSources.elements());
         annotationSourcesPersistent = Collections.list(annotationSources.elements());
+        nucleotideSourcesPersistent = Collections.list(nucleotideSources.elements());
         try {
             ObjectOutput out = new ObjectOutputStream(new FileOutputStream(outFile));
             out.writeObject(this);
@@ -170,6 +185,12 @@ public class StructureVisController implements Serializable {
             ret.annotationSources.addElement(annotationSource);
         }
         ret.annotationSourcesPersistent = null;
+
+        ret.nucleotideSources = new DefaultListModel<>();
+         for (NucleotideComposition nucleotideSource : ret.nucleotideSourcesPersistent) {
+            ret.nucleotideSources.addElement(nucleotideSource);
+        }
+        ret.nucleotideSourcesPersistent = null;
 
         ret.substructureModel.initialise();
         in.close();

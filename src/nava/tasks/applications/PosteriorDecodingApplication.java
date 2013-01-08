@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package nava.analyses;
+package nava.tasks.applications;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ import nava.utils.RNAFoldingTools;
  *
  * @author Michael
  */
-public class PosteriorDecoding extends Application {
+public class PosteriorDecodingApplication extends Application {
 
     Matrix matrix;
     ArrayList<ApplicationOutput> outputFiles = new ArrayList<>();

@@ -1,14 +1,14 @@
-package nava.structurevis;
+package nava.structurevis.data;
 
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
+import java.util.Random;
 import nava.data.io.IO;
+import nava.data.types.Alignment;
+import nava.data.types.AlignmentData;
+import nava.utils.Mapping;
 
 /**
  *
@@ -17,15 +17,12 @@ import nava.data.io.IO;
 public class NucleotideComposition implements Serializable {
 
     public String name;
-    File fastaAlignment;
-    //Mapping mapping;
-    ArrayList<String> sequences = new ArrayList<String>();
-    ArrayList<String> sequenceNames = new ArrayList<String>();
     double[] weights;
-    public int[] mappedNonGapCount;
-    public double[][] mappedFrequencyComposition;
-    public double[][] mappedShannonComposition;
+    public int[] nonGapCount;
+    public double[][] frequencyComposition = null;
+    public double[][] shannonComposition = null;
     public String consensus;
+    public MappingSource mappingSource;
 
     public enum Type implements Serializable {
 
@@ -36,66 +33,70 @@ public class NucleotideComposition implements Serializable {
     public NucleotideComposition() {
     }
 
-    
-    /*
-    public NucleotideComposition(File alignmentB, Mapping mapping) {
-        this.fastaAlignment = alignmentB;
-        this.mapping = mapping;
+    public NucleotideComposition(Alignment alignmentSource) {
+        AlignmentData data = alignmentSource.getObject();
+        mappingSource = new MappingSource(alignmentSource);
+        calculateFrequencies(data.sequences, data.sequenceNames);
+    }
 
-        IO.loadFastaSequences(alignmentB, sequences, sequenceNames);
+    public double[] getMappedFrequencyAtNucleotide(Mapping mapping, int structurePos) {
+        if (mapping != null) {
+            int mappedPos = mapping.bToA(structurePos);
+            if (mappedPos != -1) {
+                return frequencyComposition[mappedPos];
+            }
+        }
+        return null;
+    }
 
-        // getWeights() is very slow for large number of sequences!!!! problem is distance matrix calculation
-        if (sequences.size() > 200) {
-            System.out.println("::" + alignmentB);
+    public double[] getMappedShannonEntropyAtNucleotide(Mapping mapping, int structurePos) {
+        if (mapping != null) {
+            int mappedPos = mapping.bToA(structurePos);
+            if (mappedPos != -1) {
+                return shannonComposition[mappedPos];
+            }
+        }
+        return null;
+    }
+
+    public int getMappedNonGapCountAtNucleotide(Mapping mapping, int structurePos) {
+        if (mapping != null) {
+            int mappedPos = mapping.bToA(structurePos);
+            if (mappedPos != -1) {
+                return nonGapCount[mappedPos];
+            }
+        }
+        return 0;
+    }
+
+    public void calculateFrequencies(ArrayList<String> sequences, ArrayList<String> sequenceNames) {
+        if (sequences.size() > 1500) {
             weights = new double[sequences.size()];
             Arrays.fill(weights, 1.0);
             System.out.println(weights.length);
+        } else if (sequences.size() > 750) {
+            weights = getWeightsFast(sequences, 100);
+        } else if (sequences.size() > 250) {
+            weights = getWeightsFast(sequences, 200);
         } else {
             weights = getWeights(sequences);
         }
 
-        double[][] unbiasedFrequencyB = getFrequencyComposition(sequences, weights, false);
-        mappedFrequencyComposition = new double[mapping.getALength()][4];
-        for (int i = 0; i < mappedFrequencyComposition.length; i++) {
-            int x = mapping.aToB(i);
-            for (int n = 0; n < mappedFrequencyComposition[0].length; n++) {
-                if (x != -1) {
-                    mappedFrequencyComposition[i][n] = unbiasedFrequencyB[x][n];
-                }
-            }
-        }
-
-        double[][] shannnonEntropyB = getShannonEntropyComposition(sequences, weights);
-        mappedShannonComposition = new double[mapping.getALength()][4];
-        for (int i = 0; i < mappedShannonComposition.length; i++) {
-            int x = mapping.aToB(i);
-            for (int n = 0; n < mappedShannonComposition[0].length; n++) {
-                if (x != -1) {
-                    mappedShannonComposition[i][n] = shannnonEntropyB[x][n];
-                }
-            }
-        }
-
-        int[] unmappedNongapCharCount = getNumNonGappedCharacters(sequences);
-        mappedNonGapCount = new int[mapping.getALength()];
-        for (int i = 0; i < mappedNonGapCount.length; i++) {
-            int x = mapping.aToB(i);
-            if (x != -1) {
-                mappedNonGapCount[i] = unmappedNongapCharCount[x];
-            }
-        }
+        frequencyComposition = getFrequencyComposition(sequences, weights, false);
+        shannonComposition = getShannonEntropyComposition(sequences, weights);
+        nonGapCount = getNumNonGappedCharacters(sequences);
 
         consensus = "";
         // determine consensus sequence
-        for (int i = 0; i < mappedFrequencyComposition.length; i++) {
+        for (int i = 0; i < frequencyComposition.length; i++) {
             int maxFrequencyIndex = 0;
             for (int n = 1; n < 4; n++) {
-                if (mappedFrequencyComposition[i][n] > mappedFrequencyComposition[i][maxFrequencyIndex]) {
+                if (frequencyComposition[i][n] > frequencyComposition[i][maxFrequencyIndex]) {
                     maxFrequencyIndex = n;
                 }
             }
 
-            if (mappedFrequencyComposition[i][maxFrequencyIndex] == 0) {
+            if (frequencyComposition[i][maxFrequencyIndex] == 0) {
                 consensus += "-";
             } else {
                 switch (maxFrequencyIndex) {
@@ -114,8 +115,51 @@ public class NucleotideComposition implements Serializable {
                 }
             }
         }
-    }*/
+    }
 
+    /*
+     * public NucleotideComposition(File alignmentB, Mapping mapping) {
+     * this.fastaAlignment = alignmentB; this.mapping = mapping;
+     *
+     * IO.loadFastaSequences(alignmentB, sequences, sequenceNames);
+     *
+     * // getWeights() is very slow for large number of sequences!!!! problem
+     * is distance matrix calculation if (sequences.size() > 200) {
+     * System.out.println("::" + alignmentB); weights = new
+     * double[sequences.size()]; Arrays.fill(weights, 1.0);
+     * System.out.println(weights.length); } else { weights =
+     * getWeights(sequences); }
+     *
+     * double[][] unbiasedFrequencyB = getFrequencyComposition(sequences,
+     * weights, false); mappedFrequencyComposition = new
+     * double[mapping.getALength()][4]; for (int i = 0; i <
+     * mappedFrequencyComposition.length; i++) { int x = mapping.aToB(i); for
+     * (int n = 0; n < mappedFrequencyComposition[0].length; n++) { if (x != -1)
+     * { mappedFrequencyComposition[i][n] = unbiasedFrequencyB[x][n]; } } }
+     *
+     * double[][] shannnonEntropyB = getShannonEntropyComposition(sequences,
+     * weights); mappedShannonComposition = new double[mapping.getALength()][4];
+     * for (int i = 0; i < mappedShannonComposition.length; i++) { int x =
+     * mapping.aToB(i); for (int n = 0; n < mappedShannonComposition[0].length;
+     * n++) { if (x != -1) { mappedShannonComposition[i][n] =
+     * shannnonEntropyB[x][n]; } } }
+     *
+     * int[] unmappedNongapCharCount = getNumNonGappedCharacters(sequences);
+     * mappedNonGapCount = new int[mapping.getALength()]; for (int i = 0; i <
+     * mappedNonGapCount.length; i++) { int x = mapping.aToB(i); if (x != -1) {
+     * mappedNonGapCount[i] = unmappedNongapCharCount[x]; } }
+     *
+     * consensus = ""; // determine consensus sequence for (int i = 0; i <
+     * mappedFrequencyComposition.length; i++) { int maxFrequencyIndex = 0; for
+     * (int n = 1; n < 4; n++) { if (mappedFrequencyComposition[i][n] >
+     * mappedFrequencyComposition[i][maxFrequencyIndex]) { maxFrequencyIndex =
+     * n; } }
+     *
+     * if (mappedFrequencyComposition[i][maxFrequencyIndex] == 0) { consensus +=
+     * "-"; } else { switch (maxFrequencyIndex) { case 0: consensus += "A";
+     * break; case 1: consensus += "C"; break; case 2: consensus += "G"; break;
+     * case 3: consensus += "T"; break; } } } }
+     */
     public static double[][] getFrequencyComposition(ArrayList<String> sequences, double[] weights, boolean includeGaps) {
         int seqLength = sequences.get(0).length();
         double[][] nucleotideComposition = new double[seqLength][5];
@@ -137,6 +181,9 @@ public class NucleotideComposition implements Serializable {
                     case 'T':
                         nucleotideComposition[i][3] += weights[j];
                         break;
+                    case 'U':
+                        nucleotideComposition[i][3] += weights[j];
+                        break;
                     default:
                         nucleotideComposition[i][4] += weights[j];
                         sumUngapped -= weights[j];
@@ -147,16 +194,14 @@ public class NucleotideComposition implements Serializable {
             }
 
             if (includeGaps) {
-                if(sum == 0)
-                {
+                if (sum == 0) {
                     sum = 1;
                 }
                 for (int j = 0; j < 5; j++) {
                     nucleotideComposition[i][j] /= sum;
                 }
             } else {
-                if(sumUngapped == 0)
-                {
+                if (sumUngapped == 0) {
                     sumUngapped = 1;
                 }
                 for (int j = 0; j < 5; j++) {
@@ -193,6 +238,8 @@ public class NucleotideComposition implements Serializable {
                     fa[2] += weights[j];
                     break;
                 case 'T':
+                    fa[3] += weights[j];
+                case 'U':
                     fa[3] += weights[j];
                     break;
             }
@@ -277,6 +324,25 @@ public class NucleotideComposition implements Serializable {
 
         return distanceMatrix;
     }
+    static Random random = new Random();
+
+    public static double[][] getDistanceMatrixFast(ArrayList<String> sequences, int sampleSize) {
+        int len = sequences.size();
+        double[][] distanceMatrix = new double[len][len];
+        int count = 0;
+        for (int i = 0; i < len; i++) {
+            Arrays.fill(distanceMatrix[i], -1);
+            while (count < sampleSize) {
+                int j = random.nextInt(len);
+                if (distanceMatrix[i][j] == -1) {
+                    distanceMatrix[i][j] = distanceIgnoringGaps(sequences.get(i), sequences.get(j));
+                    count++;
+                }
+            }
+        }
+
+        return distanceMatrix;
+    }
 
     public static double[] getWeights(ArrayList<String> sequences) {
         if (sequences.size() == 1) {
@@ -297,9 +363,36 @@ public class NucleotideComposition implements Serializable {
         }
     }
 
+    public static double[] getWeightsFast(ArrayList<String> sequences, int sampleSize) {
+        if (sequences.size() == 1) {
+            double[] weights = new double[sequences.size()];
+            Arrays.fill(weights, 1);
+            return weights;
+        } else {
+            double[][] distanceMatrix = getDistanceMatrixFast(sequences, sampleSize);
+            double[] weights = new double[sequences.size()];
+            double n = 0;
+            for (int i = 0; i < weights.length; i++) {
+                for (int j = 0; j < weights.length; j++) {
+                    if (distanceMatrix[i][j] != -1) {
+                        weights[i] += distanceMatrix[i][j];
+                        n++;
+                    }
+                }
+                weights[i] /= n;
+            }
+            return weights;
+        }
+    }
+
     public static void main(String[] args) {
         //Mapping m = Mapping.createMapping(new File("d:/Nasp/PCV/PCV_10seq.fasta"), new File("d:/Nasp/PCV/PCV29sequencedatasetCP.fasta"), 2, true);
         //NucleotideComposition c = new NucleotideComposition(new File("d:/Nasp/PCV/PCV29sequencedatasetCP.fasta"), m);
+        NucleotideComposition c = new NucleotideComposition();
+        ArrayList<String> sequences = new ArrayList<>();
+        ArrayList<String> sequenceNames = new ArrayList<>();
+        IO.loadFastaSequences(new File("C:/hcv/HCV.fasta"), sequences, sequenceNames);
+        c.calculateFrequencies(sequences, sequenceNames);
     }
 
     public String getType() {

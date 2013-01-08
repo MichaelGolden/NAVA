@@ -4,13 +4,17 @@
  */
 package nava.ui;
 
+import nava.tasks.applications.Application;
+import nava.tasks.applications.PosteriorDecodingApplication;
+import nava.tasks.applications.ApplicationController;
+import nava.tasks.applications.RNAalifoldApplication;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
-import nava.analyses.*;
 import nava.data.types.DataSource;
+import nava.tasks.applications.*;
 
 /**
  *
@@ -32,8 +36,11 @@ public class ApplicationPanel extends javax.swing.JPanel {
         this.appController = appController;
         this.projectController = projectController;
 
-        appController.registerApplication(new RNAalifold());
-        appController.registerApplication(new PosteriorDecoding());
+        appController.registerApplication(new RNAalifoldApplication());
+        appController.registerApplication(new PosteriorDecodingApplication());
+        appController.registerApplication(new MAFFTApplication());
+        appController.registerApplication(new MuscleApplication());
+        appController.registerApplication(new ClustalWApplication());
         applications = appController.getApplications();
 
         applicationListModel = new DefaultListModel<>();
@@ -80,7 +87,7 @@ public class ApplicationPanel extends javax.swing.JPanel {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList();
-        jButton1 = new javax.swing.JButton();
+        runButton = new javax.swing.JButton();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -93,16 +100,16 @@ public class ApplicationPanel extends javax.swing.JPanel {
 
         add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
-        jButton1.setText("Run");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        runButton.setText("Run");
+        runButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                runButtonActionPerformed(evt);
             }
         });
-        add(jButton1, java.awt.BorderLayout.SOUTH);
+        add(runButton, java.awt.BorderLayout.SOUTH);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runButtonActionPerformed
         ApplicationListObject applicationObject = (ApplicationListObject) jList1.getSelectedValue();
         if (applicationObject != null) {
             try {
@@ -115,10 +122,10 @@ public class ApplicationPanel extends javax.swing.JPanel {
                 Logger.getLogger(ApplicationPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_runButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
     private javax.swing.JList jList1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JButton runButton;
     // End of variables declaration//GEN-END:variables
 }

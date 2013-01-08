@@ -1,4 +1,4 @@
-package nava.analyses;
+package nava.tasks.applications;
 
 import java.io.Serializable;
 import nava.utils.RNAFoldingTools;

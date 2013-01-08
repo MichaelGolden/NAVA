@@ -13,7 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import nava.analyses.ApplicationController;
+import nava.tasks.applications.ApplicationController;
 import nava.data.types.DataSourceCache;
 import nava.structurevis.StructureVisPanel;
 import nava.tasks.TaskManager;
@@ -25,7 +25,7 @@ import nava.ui.navigator.NavigatorPanel;
  */
 public class MainFrame extends javax.swing.JFrame implements WindowListener {
 
-    public static TaskManager taskManager = new TaskManager();
+    public static TaskManager taskManager;
     public static DataSourceCache dataSourceCache = new DataSourceCache();
     
     ProjectController projectController;
@@ -71,6 +71,7 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
         
         projectController = new ProjectController();
         projectController.openProject(model);    
+        taskManager =  new TaskManager(projectController);
         appController = new ApplicationController(MainFrame.taskManager);
         
         DataPanel dataPanel = new DataPanel(projectController, appController);

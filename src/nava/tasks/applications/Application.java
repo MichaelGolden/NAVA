@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package nava.analyses;
+package nava.tasks.applications;
 
+import java.io.File;
 import java.util.List;
 import nava.data.types.DataSource;
 import nava.tasks.Task;
@@ -37,7 +38,7 @@ public abstract class Application extends Task {
         appInstanceId = appRuntimeID+"_"+appInstanceCount + "";
         
         
-        combinedBuffer = new ConsoleBuffer(consoleDatabase, appInstanceId, null);
+        combinedBuffer = new ConsoleBuffer(consoleDatabase, taskInstanceId, null);
         //consoleInputBuffer = new ConsoleBuffer(consoleDatabase, appInstanceId, "standard_out");
         //consoleErrorBuffer = new ConsoleBuffer(consoleDatabase, appInstanceId, "standard_err");
     }
@@ -75,7 +76,7 @@ public abstract class Application extends Task {
     @Override
     public void before() {
         if (combinedBuffer != null) {
-            combinedBuffer.bufferedWrite("Started.", appInstanceId, "console");
+            combinedBuffer.bufferedWrite("Started.", taskInstanceId, "console");
         }
     }
 
@@ -86,13 +87,8 @@ public abstract class Application extends Task {
 
     @Override
     public void after() {
-        List<ApplicationOutput> output = getOutputFiles();
-        for (int i = 0; i < output.size(); i++) {
-           // projectController.importDataSourceFromOutputFile(output.get(i));
-        }
-
         if (combinedBuffer != null) {
-            combinedBuffer.bufferedWrite("Finished.", appInstanceId, "console");
+            combinedBuffer.bufferedWrite("Finished.", taskInstanceId, "console");
             combinedBuffer.close();
         }
     }
@@ -101,5 +97,12 @@ public abstract class Application extends Task {
     public List<ApplicationOutput> get ()
     {
         return getOutputFiles();
+    }
+    
+    public File createTemporaryDirectory()
+    {
+        File tempDir = new File(System.getProperty("java.io.tmpdir") + "/" + taskInstanceId+"/");
+        tempDir.mkdirs();
+        return tempDir;
     }
 }

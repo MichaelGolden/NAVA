@@ -241,4 +241,9 @@ public class SubstructurePanel extends javax.swing.JPanel implements ItemListene
     public void annotationSourceChanged(AnnotationSource annotationSource) {
           System.out.println("Mapping source changed " + annotationSource);
     }
+
+    @Override
+    public void nucleotideSourceChanged(NucleotideComposition nucleotideSource) {
+        System.out.println("Nucleotide source changed " + nucleotideSource);
+    }
 }

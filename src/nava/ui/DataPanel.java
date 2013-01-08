@@ -5,7 +5,7 @@
 package nava.ui;
 
 import java.awt.BorderLayout;
-import nava.analyses.ApplicationController;
+import nava.tasks.applications.ApplicationController;
 import nava.data.types.TabularField;
 import nava.ui.navigator.NavigationEvent;
 import nava.ui.navigator.NavigationListener;

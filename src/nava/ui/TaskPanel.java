@@ -8,7 +8,7 @@ import java.util.Objects;
 import javax.swing.ImageIcon;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import nava.analyses.Application;
+import nava.tasks.applications.Application;
 import nava.tasks.Task;
 
 /**

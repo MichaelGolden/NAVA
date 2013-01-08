@@ -4,6 +4,7 @@
  */
 package nava.structurevis;
 
+import nava.structurevis.data.NucleotideComposition;
 import nava.structurevis.data.Substructure;
 import com.kitfox.svg.SVGCache;
 import com.kitfox.svg.SVGDiagram;
@@ -488,19 +489,50 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             //pw.println("</g>");
 
             // draw the information
+            /*
+             * if (drawSequenceLogo) { Color bestColor =
+             * ColorUtils.selectBestForegroundColor(nucleotideBackgroundColor,
+             * Color.white, Color.black); if (model.nucleotideComposition !=
+             * null) { if (model.nucleotideCompositionType ==
+             * NucleotideComposition.Type.SHANNON_ENTROPY) { // fa =
+             * structure.shannonFrequencies[i]; double[] fa =
+             * Arrays.copyOf(model.nucleotideComposition.mappedShannonComposition[(model.structure.startPosition
+             * + i - 1) % model.sequenceLength], 5); for (int k = 0; k < 4; k++)
+             * { fa[k] = fa[k] / 2; } pw.print(drawSequenceLogoSVG("logo_" +
+             * (model.structure.startPosition + i),
+             * nucleotidePositions[i].getX(), nucleotidePositions[i].getY() -
+             * (nucleotideDiameter / 2) + 4, nucleotideDiameter,
+             * nucleotideDiameter - 8, fa, bestColor)); } else if
+             * (model.nucleotideCompositionType ==
+             * NucleotideComposition.Type.FREQUENCY) { double[] fa =
+             * model.nucleotideComposition.mappedFrequencyComposition[(model.structure.startPosition
+             * + i - 1) % model.sequenceLength];
+             * pw.print(drawSequenceLogoSVG("logo_" +
+             * (model.structure.startPosition + i),
+             * nucleotidePositions[i].getX(), nucleotidePositions[i].getY() -
+             * (nucleotideDiameter / 2) + 4, nucleotideDiameter,
+             * nucleotideDiameter - 8, fa, bestColor)); } } }
+             */
+
             if (drawSequenceLogo) {
                 Color bestColor = ColorUtils.selectBestForegroundColor(nucleotideBackgroundColor, Color.white, Color.black);
-                if (model.nucleotideComposition != null) {
+                int nucPos = i;
+                if (model.nucleotideSource != null) {
                     if (model.nucleotideCompositionType == NucleotideComposition.Type.SHANNON_ENTROPY) {
                         // fa = structure.shannonFrequencies[i];
-                        double[] fa = Arrays.copyOf(model.nucleotideComposition.mappedShannonComposition[(model.structure.startPosition + i - 1) % model.sequenceLength], 5);
-                        for (int k = 0; k < 4; k++) {
-                            fa[k] = fa[k] / 2;
+                        double[] nucfa = model.nucleotideSource.getMappedShannonEntropyAtNucleotide(model.nucleotideMapping, nucPos);
+                        if (nucfa != null) {
+                            double[] fa = Arrays.copyOf(nucfa, 5);
+                            for (int k = 0; k < 4; k++) {
+                                fa[k] = fa[k] / 2;
+                            }
+                            pw.print(drawSequenceLogoSVG("logo_" + (model.structure.startPosition + i), nucleotidePositions[i].getX(), nucleotidePositions[i].getY() - (nucleotideDiameter / 2) + 4, nucleotideDiameter, nucleotideDiameter - 8, fa, bestColor));
                         }
-                        pw.print(drawSequenceLogoSVG("logo_" + (model.structure.startPosition + i), nucleotidePositions[i].getX(), nucleotidePositions[i].getY() - (nucleotideDiameter / 2) + 4, nucleotideDiameter, nucleotideDiameter - 8, fa, bestColor));
                     } else if (model.nucleotideCompositionType == NucleotideComposition.Type.FREQUENCY) {
-                        double[] fa = model.nucleotideComposition.mappedFrequencyComposition[(model.structure.startPosition + i - 1) % model.sequenceLength];
-                        pw.print(drawSequenceLogoSVG("logo_" + (model.structure.startPosition + i), nucleotidePositions[i].getX(), nucleotidePositions[i].getY() - (nucleotideDiameter / 2) + 4, nucleotideDiameter, nucleotideDiameter - 8, fa, bestColor));
+                        double[] nucfa = model.nucleotideSource.getMappedFrequencyAtNucleotide(model.nucleotideMapping, nucPos);
+                        if (nucfa != null) {
+                            pw.print(drawSequenceLogoSVG("logo_" + (model.structure.startPosition + i), nucleotidePositions[i].getX(), nucleotidePositions[i].getY() - (nucleotideDiameter / 2) + 4, nucleotideDiameter, nucleotideDiameter - 8, nucfa, bestColor));
+                        }
                     }
                 }
             }
@@ -787,13 +819,14 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
 
             // draw the information
             g.setColor(ColorUtils.selectBestForegroundColor(nucleotideBackgroundColor, Color.white, Color.black));
-            if (model.nucleotideComposition != null) {
+            if (model.nucleotideSource != null) {
+                int nucPos = i;
                 if (model.nucleotideCompositionType == NucleotideComposition.Type.SHANNON_ENTROPY) {
-                    if (pos < model.nucleotideComposition.mappedShannonComposition.length) {
-                        double[] fa = new double[4];
+                    double[] nucfa = model.nucleotideSource.getMappedShannonEntropyAtNucleotide(model.nucleotideMapping, nucPos);
+                    if (nucfa != null) {
+                        double[] fa = Arrays.copyOf(nucfa, 5);
                         for (int k = 0; k < fa.length; k++) // java Arrays.copy causes fatal error
                         {
-                            fa[k] = model.nucleotideComposition.mappedShannonComposition[pos][k];
                             if (Double.isNaN(fa[k])) {
                                 fa[k] = 0; // java crashes fatally if this is not done
                             }
@@ -805,9 +838,10 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                         g.setFont(f2);
                     }
                 } else if (model.nucleotideCompositionType == NucleotideComposition.Type.FREQUENCY) {
-                    int index = (model.structure.startPosition + i - 1) % model.sequenceLength;
-                    if (index < model.nucleotideComposition.mappedFrequencyComposition.length) {
-                        double[] fa = model.nucleotideComposition.mappedFrequencyComposition[index];
+                    System.out.println("*"+nucPos);
+                    double[] nucfa = model.nucleotideSource.getMappedFrequencyAtNucleotide(model.nucleotideMapping, nucPos);
+                    if (nucfa != null) {
+                        double[] fa = nucfa;
                         drawSequenceLogo(g, nucleotidePositions[i].getX(), nucleotidePositions[i].getY() - (nucleotideDiameter / 2) + 0, nucleotideDiameter, nucleotideDiameter - 5, fa);
                         g.setFont(f2);
                     }
@@ -1344,7 +1378,9 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             }
 
             int pos = (model.structure.getStartPosition() + nucleotide - 1) % model.sequenceLength;
-            if (model.nucleotideComposition != null && nucleotide != -1) {
+
+            if (model.nucleotideSource != null && nucleotide != -1) {
+                double[] nucfa = model.nucleotideSource.getMappedFrequencyAtNucleotide(model.nucleotideMapping, pos);                
                 interactionText += "Composition (";
                 for (int i = 0; i < 4; i++) {
                     String a = "";
@@ -1366,10 +1402,16 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                             }
                             break;
                     }
-                    double perc = model.nucleotideComposition.mappedFrequencyComposition[pos][i];
+
+                    double perc = 0;
+                    if (nucfa != null) {
+                        perc = nucfa[i];
+                    }
                     interactionText += a + " " + decimalFormat.format(perc * 100) + "%,  ";
                 }
-                interactionText += "[" + model.nucleotideComposition.mappedNonGapCount[pos] + "])     ";
+                int nonGapCount = model.nucleotideSource.getMappedNonGapCountAtNucleotide(model.nucleotideMapping, pos);
+                
+                interactionText += "[" +nonGapCount+ "])     ";
             } else {
                 interactionText += "Composition (none)     ";
             }

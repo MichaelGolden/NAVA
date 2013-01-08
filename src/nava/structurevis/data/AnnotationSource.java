@@ -209,6 +209,10 @@ public class AnnotationSource implements Serializable {
     }
 
     public static AnnotationSource getMappedAnnotations(AnnotationSource annotationSource, StructureSource structureSource, StructureVisController structureVisController) {
+        if(annotationSource == null)
+        {
+            annotationSource = new AnnotationSource();
+        }
         annotationSource.mappedFeatures = new ArrayList<>();
         ArrayList<Feature> features = annotationSource.features;
         annotationSource.mappedSequenceLength = 0;

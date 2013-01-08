@@ -6,10 +6,7 @@ package nava.structurevis;
 
 import java.awt.event.WindowEvent;
 import java.util.EventListener;
-import nava.structurevis.data.AnnotationSource;
-import nava.structurevis.data.DataSource1D;
-import nava.structurevis.data.DataSource2D;
-import nava.structurevis.data.StructureSource;
+import nava.structurevis.data.*;
 
 /**
  *
@@ -24,4 +21,6 @@ public interface SubstructureModelListener extends EventListener {
     public void structureSourceChanged(StructureSource structureSource);
     
     public void annotationSourceChanged(AnnotationSource annotationSource);
+            
+   public void nucleotideSourceChanged(NucleotideComposition nucleotideSource);
 }

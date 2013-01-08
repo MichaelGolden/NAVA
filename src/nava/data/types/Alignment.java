@@ -5,6 +5,7 @@
 package nava.data.types;
 
 import java.io.File;
+import java.io.Serializable;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import javax.swing.Icon;
@@ -17,7 +18,7 @@ import nava.data.io.IO;
  */
 public class Alignment extends DataSource {
 
-    public enum Type {
+    public enum Type implements Serializable {
 
         NUCLEOTIDE, CODING, PROTEIN
     };

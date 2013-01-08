@@ -6,11 +6,14 @@ package nava.tasks;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.event.EventListenerList;
-import nava.analyses.Application;
+import nava.tasks.applications.Application;
 import nava.tasks.Task.Status;
+import nava.tasks.applications.ApplicationOutput;
+import nava.ui.ProjectController;
 import nava.ui.navigator.NavigationEvent;
 import nava.ui.navigator.NavigationListener;
 
@@ -26,8 +29,11 @@ public class TaskManager extends Thread {
     int totalSlots = Runtime.getRuntime().availableProcessors();
     int usedSlots = 0;
     int availableSlots = totalSlots - usedSlots;
+    
+    ProjectController projectController;
 
-    public TaskManager() {
+    public TaskManager(ProjectController projectController) {
+        this.projectController = projectController;
         start();
     }
 
@@ -55,9 +61,14 @@ public class TaskManager extends Thread {
                         task.setStatus(Status.STOPPED);
                     }
                     else
-                    if(app.isFinished())
                     {
-                        task.setStatus(Status.FINISHED);
+                        task.setStatus(Status.FINISHED);            
+                        List<ApplicationOutput> outputFiles = app.getOutputFiles();
+                        for(ApplicationOutput outputFile : outputFiles)
+                        {
+                            System.out.println("importing");
+                            projectController.importDataSourceFromOutputFile(outputFile);
+                        }
                     }
                 }
                 else

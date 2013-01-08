@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.TreeModelListener;
-import nava.analyses.ApplicationOutput;
+import nava.tasks.applications.ApplicationOutput;
 import nava.data.io.FileImport.ParserException;
 import nava.data.io.*;
 import nava.data.types.*;
@@ -187,6 +187,23 @@ public class ProjectController implements ListDataListener {
                 matrix.fileSize = new FileSize(Paths.get(matrix.originalDataSourcePath).toFile().length());
                 projectModel.dataSources.addElement(matrix);
             }
+        }
+        else if (outputFile.dataSource instanceof Alignment) {
+                System.out.println("Importing alignment");
+                Alignment alignment = (Alignment) outputFile.dataSource;
+                alignment.setImportId(getNextImportId());
+                alignment.originalDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "fas").toString();
+                alignment.importedDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "fas").toString();
+                alignment.title = outputFile.dataSource.title;
+                
+                ArrayList<String> sequences = new ArrayList<>();
+                ArrayList<String> sequenceNames = new ArrayList<>();
+                IO.loadFastaSequences(alignment.originalFile, sequences, sequenceNames);
+                IO.saveToFASTAfile(sequences, sequenceNames, new File(alignment.originalDataSourcePath));
+                IO.saveToFASTAfile(sequences, sequenceNames, new File(alignment.importedDataSourcePath));
+                alignment.fileSize = new FileSize(Paths.get(alignment.originalDataSourcePath).toFile().length());
+                
+                projectModel.dataSources.addElement(alignment);
         }
 
     }

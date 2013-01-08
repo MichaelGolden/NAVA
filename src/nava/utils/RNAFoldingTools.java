@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import nava.analyses.RunInfo;
+import nava.tasks.applications.RunInfo;
 
 /**
  *

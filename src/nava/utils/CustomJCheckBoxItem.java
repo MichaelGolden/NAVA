@@ -4,27 +4,27 @@
  */
 package nava.utils;
 
+import javax.swing.JCheckBox;
+
 /**
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class ComboBoxItem<T> {
+public class CustomJCheckBoxItem<T> extends JCheckBox {
     private T object;
-    private String title;
     
-    public ComboBoxItem(T object, String title)
+    public CustomJCheckBoxItem(String label)
+    {
+        super(label);
+    }
+    
+    public void setObject(T object)
     {
         this.object = object;
-        this.title = title;
     }
     
     public T getObject()
     {
         return object;
-    }
-    
-    public String toString()
-    {
-        return title;
     }
 }

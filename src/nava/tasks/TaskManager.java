@@ -66,7 +66,6 @@ public class TaskManager extends Thread {
                         List<ApplicationOutput> outputFiles = app.getOutputFiles();
                         for(ApplicationOutput outputFile : outputFiles)
                         {
-                            System.out.println("importing");
                             projectController.importDataSourceFromOutputFile(outputFile);
                         }
                     }

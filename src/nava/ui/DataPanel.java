@@ -7,6 +7,7 @@ package nava.ui;
 import java.awt.BorderLayout;
 import nava.tasks.applications.ApplicationController;
 import nava.data.types.TabularField;
+import nava.structurevis.DataInspectorPanel;
 import nava.ui.navigator.NavigationEvent;
 import nava.ui.navigator.NavigationListener;
 import nava.ui.navigator.NavigatorPanel;
@@ -20,6 +21,7 @@ public class DataPanel extends javax.swing.JPanel implements NavigationListener 
     ProjectController projectController;
     ApplicationController appController;
     NavigatorPanel navigatorPanel;
+    DataInspectorPanel dataInspectorPanel;
     ApplicationPanel applicationPanel;
     TaskPanel taskPanel;
 
@@ -34,11 +36,13 @@ public class DataPanel extends javax.swing.JPanel implements NavigationListener 
 
         navigatorPanel = new NavigatorPanel(projectController);
         navigatorPanel.addNavigationListener(this);
+        dataInspectorPanel = new DataInspectorPanel();
         applicationPanel = new ApplicationPanel(appController, projectController);
         taskPanel = new TaskPanel();
 
         this.jPanel1.add(navigatorPanel, BorderLayout.CENTER);
         this.jPanel2.add(applicationPanel, BorderLayout.CENTER);
+        this.jPanel3.add(dataInspectorPanel, BorderLayout.CENTER);
         this.jPanel4.add(taskPanel, BorderLayout.CENTER);
     }
 
@@ -62,17 +66,7 @@ public class DataPanel extends javax.swing.JPanel implements NavigationListener 
         jPanel1.setLayout(new java.awt.BorderLayout());
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Data inspector"));
-
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 203, Short.MAX_VALUE)
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
+        jPanel3.setLayout(new java.awt.BorderLayout());
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Actions"));
         jPanel2.setLayout(new java.awt.BorderLayout());
@@ -87,7 +81,7 @@ public class DataPanel extends javax.swing.JPanel implements NavigationListener 
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 244, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 215, Short.MAX_VALUE)
                 .addGap(10, 10, 10)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -113,6 +107,11 @@ public class DataPanel extends javax.swing.JPanel implements NavigationListener 
     @Override
     public void dataSourceSelectionChanged(NavigationEvent e) {
         applicationPanel.showUsableApplications(e.selectedDataSources);
+        if(e.selectedDataSources.size() == 1)
+        {
+            dataInspectorPanel.updatePanel(e.selectedDataSources.get(0));
+        }
+        
         for (int i = 0; i < e.selectedDataSources.size(); i++) {
             if (e.selectedDataSources.get(i) instanceof TabularField) {
                 //System.out.println(((TabularField) e.selectedDataSources.get(i)).getObject().values);

@@ -16,11 +16,11 @@ import java.util.logging.Logger;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.TreeModelListener;
-import nava.tasks.applications.ApplicationOutput;
 import nava.data.io.FileImport.ParserException;
 import nava.data.io.*;
 import nava.data.types.*;
-import nava.tasks.TaskManager;
+import nava.structurevis.data.PersistentSparseMatrix;
+import nava.tasks.applications.ApplicationOutput;
 
 /**
  *
@@ -50,20 +50,16 @@ public class ProjectController implements ListDataListener {
 
                     if (structures.size() == 1) {
                         dataSource = new SecondaryStructure();
-                        dataSource.setImportId(getNextImportId());
+                        createPath(dataSource,dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1),dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1));          
                         dataSource.originalFile = dataFile;
-                        dataSource.originalDataSourcePath = generatePath(dataSource.getImportId(), "orig." + dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1)).toString();
-                        dataSource.importedDataSourcePath = generatePath(dataSource.getImportId(), dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1)).toString();
                         dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                         dataSource.dataType = dataType;
                         dataSource.persistObject(structures.get(0));
                         dataSource.fileSize = new FileSize(dataFile.length());
                     } else {
                         dataSource = new StructureList(dataFile.getName());
-                        dataSource.setImportId(getNextImportId());
+                        createPath(dataSource,dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1),dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1));          
                         dataSource.originalFile = dataFile;
-                        dataSource.originalDataSourcePath = generatePath(dataSource.getImportId(), "orig." + dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1)).toString();
-                        dataSource.importedDataSourcePath = generatePath(dataSource.getImportId(), dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1)).toString();
                         dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                         dataSource.dataType = dataType;
                         dataSource.persistObject(structures);
@@ -81,10 +77,8 @@ public class ProjectController implements ListDataListener {
                 try {
                     if (dataType.fileFormat.equals(DataType.FileFormat.EXCEL)) {
                         dataSource = ExcelIO.getTabularRepresentation(dataFile);
-                        dataSource.setImportId(getNextImportId());
-                        dataSource.originalFile = dataFile;
-                        dataSource.originalDataSourcePath = generatePath(dataSource.getImportId(), "orig." + dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1)).toString();
-                        dataSource.importedDataSourcePath = generatePath(dataSource.getImportId(), "csv").toString();
+                        createPath(dataSource,dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1),"csv");                
+                        dataSource.originalFile = dataFile;                        
                         dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                         dataSource.dataType = dataType;
                         dataSource.persistObject(dataSource);
@@ -92,10 +86,8 @@ public class ProjectController implements ListDataListener {
                         ExcelIO.saveAsCSV(dataFile, Paths.get(dataSource.importedDataSourcePath).toFile());
                     } else if (dataType.fileFormat.equals(DataType.FileFormat.CSV)) {
                         dataSource = CsvReader.getTabularRepresentation(dataFile);
-                        dataSource.setImportId(getNextImportId());
-                        dataSource.originalFile = dataFile;
-                        dataSource.originalDataSourcePath = generatePath(dataSource.getImportId(), "orig." + dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1)).toString();
-                        dataSource.importedDataSourcePath = generatePath(dataSource.getImportId(), "csv").toString();
+                        createPath(dataSource,dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1),"csv");                
+                        dataSource.originalFile = dataFile;                        
                         dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                         dataSource.dataType = dataType;
                         dataSource.persistObject(dataSource);
@@ -111,10 +103,8 @@ public class ProjectController implements ListDataListener {
             case ANNOTATION_DATA:
                 try {
                     dataSource = new Annotations();
-                    dataSource.setImportId(getNextImportId());
-                    dataSource.originalFile = dataFile;
-                    dataSource.originalDataSourcePath = generatePath(dataSource.getImportId(), "orig." + dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1)).toString();
-                    dataSource.importedDataSourcePath = generatePath(dataSource.getImportId(), "gb").toString();
+                    createPath(dataSource,dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1),"gb");                
+                    dataSource.originalFile = dataFile;                   
                     dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                     dataSource.dataType = dataType;
                     //dataSource.persistObject(dataSource);
@@ -128,14 +118,30 @@ public class ProjectController implements ListDataListener {
                 break;
             case MATRIX:
                 dataSource = new Matrix();
+                createPath(dataSource,dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1),"matrix");                
+                dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");                
+                dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
+                dataSource.dataType = dataType;
+                dataSource.fileSize = new FileSize(dataFile.length());
+
+                if (dataType.fileFormat == DataType.FileFormat.DENSE_MATRIX) {
+                    try {
+                        PersistentSparseMatrix.createMatrixFromDenseMatrix(dataFile, "[\\s,;]+", new File(dataSource.importedDataSourcePath));
+                    } catch (IOException ex) {
+                        Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } else if (dataType.fileFormat == DataType.FileFormat.COORDINATE_LIST_MATRIX) {
+                    try {
+                        PersistentSparseMatrix.createMatrixFromCoordinateListMatrix(dataFile, "[\\s,;]+", new File(dataSource.importedDataSourcePath));
+                    } catch (IOException ex) {
+                        Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
                 break;
             case ALIGNMENT:
                 Alignment al = new Alignment();
-                al.setImportId(getNextImportId());
-                al.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
-                al.originalDataSourcePath = generatePath(al.getImportId(), "orig." + dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1)).toString();
-                al.importedDataSourcePath = generatePath(al.getImportId(), "fas").toString();
-                al.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
+                createPath(al,dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1), "fas");          
+                al.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");   
                 al.dataType = dataType;
                 al.fileSize = new FileSize(dataFile.length());
 
@@ -187,25 +193,33 @@ public class ProjectController implements ListDataListener {
                 matrix.fileSize = new FileSize(Paths.get(matrix.originalDataSourcePath).toFile().length());
                 projectModel.dataSources.addElement(matrix);
             }
-        }
-        else if (outputFile.dataSource instanceof Alignment) {
-                System.out.println("Importing alignment");
-                Alignment alignment = (Alignment) outputFile.dataSource;
-                alignment.setImportId(getNextImportId());
-                alignment.originalDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "fas").toString();
-                alignment.importedDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "fas").toString();
-                alignment.title = outputFile.dataSource.title;
-                
-                ArrayList<String> sequences = new ArrayList<>();
-                ArrayList<String> sequenceNames = new ArrayList<>();
-                IO.loadFastaSequences(alignment.originalFile, sequences, sequenceNames);
-                IO.saveToFASTAfile(sequences, sequenceNames, new File(alignment.originalDataSourcePath));
-                IO.saveToFASTAfile(sequences, sequenceNames, new File(alignment.importedDataSourcePath));
-                alignment.fileSize = new FileSize(Paths.get(alignment.originalDataSourcePath).toFile().length());
-                
-                projectModel.dataSources.addElement(alignment);
+        } else if (outputFile.dataSource instanceof Alignment) {
+            Alignment alignment = (Alignment) outputFile.dataSource;
+            alignment.setImportId(getNextImportId());
+            alignment.originalDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "fas").toString();
+            alignment.importedDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "fas").toString();
+            alignment.title = outputFile.dataSource.title;
+
+            ArrayList<String> sequences = new ArrayList<>();
+            ArrayList<String> sequenceNames = new ArrayList<>();
+            IO.loadFastaSequences(alignment.originalFile, sequences, sequenceNames);
+            IO.saveToFASTAfile(sequences, sequenceNames, new File(alignment.originalDataSourcePath));
+            IO.saveToFASTAfile(sequences, sequenceNames, new File(alignment.importedDataSourcePath));
+            alignment.fileSize = new FileSize(Paths.get(alignment.originalDataSourcePath).toFile().length());
+
+            projectModel.dataSources.addElement(alignment);
         }
 
+    }
+
+    public void createPath(DataSource dataSource, String origExtension, String newExtension) {
+        dataSource.setImportId(getNextImportId());
+        Path p = projectModel.getProjectPath().resolve(Paths.get(dataSource.getId() + "." + newExtension));
+        while (Files.exists(p)) {
+            dataSource.setImportId(getNextImportId());
+        }
+        dataSource.originalDataSourcePath = generatePath(dataSource.getImportId(), "orig." + origExtension).toString();
+        dataSource.importedDataSourcePath = generatePath(dataSource.getImportId(), newExtension).toString();
     }
 
     public Path generatePath(long id, String extension) {

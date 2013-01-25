@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import nava.data.types.Alignment;
@@ -19,16 +21,16 @@ import nava.data.types.SecondaryStructureData;
 import nava.structurevis.data.*;
 import nava.ui.MainFrame;
 import nava.ui.ProjectController;
-import nava.utils.ComboBoxItem;
+import nava.utils.CustomItem;
 
 /**
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class SubstructurePanel extends javax.swing.JPanel implements ItemListener, ListDataListener, SubstructureModelListener {
+public class SubstructurePanel extends javax.swing.JPanel implements ChangeListener, ItemListener, ListDataListener, SubstructureModelListener {
 
     DefaultComboBoxModel<StructureSource> structureComboBoxModel = new DefaultComboBoxModel<>();
-    DefaultComboBoxModel<ComboBoxItem> substructureComboBoxModel = new DefaultComboBoxModel<>();
+    DefaultComboBoxModel<CustomItem> substructureComboBoxModel = new DefaultComboBoxModel<>();
     StructureVisController structureVisController;
     ProjectController projectController;
     public SubstructureDrawPanel structureDrawPanel;
@@ -55,6 +57,8 @@ public class SubstructurePanel extends javax.swing.JPanel implements ItemListene
 
         structureVisController.structureSources.addListDataListener(this);
 
+        dataLegend1D.addChangeListener(this);
+        dataLegend2D.addChangeListener(this);
         legendPanel.add(dataLegend1D);
         legendPanel.add(dataLegend2D);
 
@@ -81,7 +85,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ItemListene
         substructureComboBoxModel.removeAllElements();
         ArrayList<Substructure> list = structureVisController.substructureModel.getSubstructures();
         for (int i = 0; i < list.size(); i++) {
-            ComboBoxItem<Substructure> item = new ComboBoxItem<>(list.get(i), i + "");
+            CustomItem<Substructure> item = new CustomItem<>(list.get(i), i + "");
             substructureComboBoxModel.addElement(item);
         }
     }
@@ -181,16 +185,14 @@ public class SubstructurePanel extends javax.swing.JPanel implements ItemListene
                     structureSource.loadData();
                     structureVisController.substructureModel.setStructureSource(structureSource);
                     if (structureSource.substructures.size() > 0) {
-                        System.out.println("Opening 1");
                         structureDrawPanel.openSubstructure(structureSource.substructures.get(0));
                     }
                     populateSubtructureComboBox();
                 }
             }
         } else if (e.getSource().equals(substructureComboBox)) {
-            ComboBoxItem<Substructure> comboBoxItem = (ComboBoxItem<Substructure>) substructureComboBoxModel.getSelectedItem();
+            CustomItem<Substructure> comboBoxItem = (CustomItem<Substructure>) substructureComboBoxModel.getSelectedItem();
             if (comboBoxItem != null) {
-                System.out.println("Opening 2");
                 structureDrawPanel.openSubstructure(comboBoxItem.getObject());
             }
         }
@@ -223,27 +225,43 @@ public class SubstructurePanel extends javax.swing.JPanel implements ItemListene
     @Override
     public void dataSource1DChanged(DataSource1D dataSource1D) {
         dataLegend1D.setLegend(dataSource1D.title, dataSource1D.dataTransform, dataSource1D.colorGradient, dataSource1D.defaultColorGradient);
-        System.out.println("Data source 1D changed " + dataSource1D);
+        structureDrawPanel.redraw();
     }
 
     @Override
     public void dataSource2DChanged(DataSource2D dataSource2D) {
         dataLegend2D.setLegend(dataSource2D.title, dataSource2D.dataTransform, dataSource2D.colorGradient, dataSource2D.defaultColorGradient);
-        System.out.println("Data source 2D changed " + dataSource2D);
+        structureDrawPanel.redraw();
     }
 
     @Override
     public void structureSourceChanged(StructureSource structureSource) {
-        System.out.println("Structure source changed " + structureSource);
+        structureDrawPanel.redraw();
     }
 
     @Override
     public void annotationSourceChanged(AnnotationSource annotationSource) {
-          System.out.println("Mapping source changed " + annotationSource);
+        structureDrawPanel.redraw();
     }
 
     @Override
     public void nucleotideSourceChanged(NucleotideComposition nucleotideSource) {
         System.out.println("Nucleotide source changed " + nucleotideSource);
+    }
+
+    @Override
+    public void stateChanged(ChangeEvent e) {
+        if (e.getSource().equals(dataLegend1D) || e.getSource().equals(dataLegend2D)) {
+            System.out.println(dataLegend1D.getMinValue() + "\t" + dataLegend1D.getMaxValue() + "\t" + dataLegend2D.getMinValue() + "\t" + dataLegend2D.getMaxValue());
+            structureDrawPanel.model.thresholdMin1D = dataLegend1D.getMinValue();
+            structureDrawPanel.model.thresholdMax1D = dataLegend1D.getMaxValue();
+            structureDrawPanel.model.thresholdMin2D = dataLegend2D.getMinValue();
+            structureDrawPanel.model.thresholdMax2D = dataLegend2D.getMaxValue();
+            structureDrawPanel.model.useLowerThreshold1D = !dataLegend1D.downSliderOpen;
+            structureDrawPanel.model.useUpperThreshold1D = !dataLegend1D.upSliderOpen;
+            structureDrawPanel.model.useLowerThreshold2D = !dataLegend2D.downSliderOpen;
+            structureDrawPanel.model.useUpperThreshold2D = !dataLegend2D.upSliderOpen;
+            structureDrawPanel.redraw();
+        }
     }
 }

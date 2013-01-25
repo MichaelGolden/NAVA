@@ -19,7 +19,7 @@ import nava.tasks.AnnotationMappingTask;
 import nava.ui.MainFrame;
 import nava.ui.ProjectController;
 import nava.ui.ProjectModel;
-import nava.utils.ComboBoxItem;
+import nava.utils.CustomItem;
 import nava.utils.CustomJMenuItem;
 import nava.utils.GraphicsUtils;
 import nava.utils.Pair;

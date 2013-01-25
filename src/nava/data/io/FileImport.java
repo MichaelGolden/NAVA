@@ -20,8 +20,6 @@ import org.biojavax.bio.seq.io.GenbankFormat;
  */
 public class FileImport {
 
-    
-
     public static ArrayList<StructureFormat> parsableStructureFormats(File inFile) {
         ArrayList<StructureFormat> parsableFormats = new ArrayList<StructureFormat>();
 
@@ -62,12 +60,10 @@ public class FileImport {
 
         return parsableFormats;
     }
-    
-    public static ArrayList<SecondaryStructureData> loadStructures(File inFile, FileFormat format) throws ParserException, IOException, Exception
-    {
+
+    public static ArrayList<SecondaryStructureData> loadStructures(File inFile, FileFormat format) throws ParserException, IOException, Exception {
         ArrayList<SecondaryStructureData> structures = new ArrayList<SecondaryStructureData>();
-        switch(format)
-        {
+        switch (format) {
             case CONNECT_FILE:
                 return readConnectFile(inFile);
             case VIENNA_DOT_BRACKET:
@@ -79,25 +75,27 @@ public class FileImport {
             case BPSEQ:
                 return readBpseqFile(inFile);
         }
-        
-        
+
+
         return structures;
     }
-    
-     public static ArrayList<MatrixFormat> parsableMatrixFormats(File inFile) {
-         
-         ArrayList<MatrixFormat> parsableMatrixFormats = new ArrayList<MatrixFormat>();
-         try
-         {
-            MatrixReader.readDenseFloatMatrix(inFile);
-            parsableMatrixFormats.add(MatrixFormat.DENSE_MATRIX);
-         }
-         catch(Exception ex)
-         {
-             
-         }
-         return parsableMatrixFormats;
-     }
+
+    public static ArrayList<MatrixFormat> parsableMatrixFormats(File inFile) {
+
+        ArrayList<MatrixFormat> parsableMatrixFormats = new ArrayList<>();
+        try {
+            MatrixReader.parseDenseFloatMatrix(inFile);
+            parsableMatrixFormats.add(DataType.MatrixFormat.DENSE_MATRIX);
+        } catch (Exception ex) {
+        }
+
+        try {
+            MatrixReader.parseCoordinateListMatrix(inFile, ",");
+            parsableMatrixFormats.add(DataType.MatrixFormat.COORDINATE_LIST_MATRIX);
+        } catch (Exception ex) {
+        }
+        return parsableMatrixFormats;
+    }
 
     public static boolean isGenbankFormat(File inFile) throws IOException {
         GenbankFormat gbFormat = new GenbankFormat();
@@ -106,46 +104,53 @@ public class FileImport {
 
     public static ArrayList<DataType> getPossibleDataTypes(File inFile) {
         ArrayList<DataType> possibleDataTypes = new ArrayList<DataType>();
-        ArrayList<StructureFormat> parsableFormats = parsableStructureFormats(inFile);
+        ArrayList<StructureFormat> parsableStructureFormats = parsableStructureFormats(inFile);
 
-        for (int i = 0; i < parsableFormats.size(); i++) {
-            possibleDataTypes.add(new DataType(DataType.Primary.SECONDARY_STRUCTURE, DataType.FileFormat.valueOf(parsableFormats.get(i).name())));
+        for (int i = 0; i < parsableStructureFormats.size(); i++) {
+            possibleDataTypes.add(new DataType(DataType.Primary.SECONDARY_STRUCTURE, DataType.FileFormat.valueOf(parsableStructureFormats.get(i).name())));
         }
         try {
-            if(FileImport.isGenbankFormat(inFile))
-            {
+            if (FileImport.isGenbankFormat(inFile)) {
                 possibleDataTypes.add(new DataType(DataType.Primary.ANNOTATION_DATA, DataType.FileFormat.GENBANK));
             }
         } catch (IOException ex) {
-            
         }
-        
+
         try {
-            if(ExcelIO.isExcelWorkbook(inFile))
-            {
+            if (ExcelIO.isExcelWorkbook(inFile)) {
                 possibleDataTypes.add(new DataType(DataType.Primary.TABULAR_DATA, DataType.FileFormat.EXCEL));
             }
         } catch (FileNotFoundException ex) {
-            
         }
-        
-        if(ReadseqTools.isInFastaFormat(inFile))
-        {
+
+        if (ReadseqTools.isInFastaFormat(inFile)) {
             possibleDataTypes.add(new DataType(DataType.Primary.ALIGNMENT, DataType.FileFormat.UNKNOWN));
         }
-        
-        if(CsvReader.isCsvFormat(inFile))
-        {
+
+        if (CsvReader.isCsvFormat(inFile)) {
             possibleDataTypes.add(new DataType(DataType.Primary.TABULAR_DATA, DataType.FileFormat.CSV));
         }
-                
-        if(ReadseqTools.isKnownFormat(inFile))
+        
+        ArrayList<MatrixFormat> matrixFormats = FileImport.parsableMatrixFormats(inFile);
+        for(MatrixFormat matrixFormat : matrixFormats)
         {
-            possibleDataTypes.add(new DataType(DataType.Primary.ALIGNMENT, DataType.FileFormat.UNKNOWN));
+            if(matrixFormat == MatrixFormat.COORDINATE_LIST_MATRIX)
+            {
+                possibleDataTypes.add(new DataType(DataType.Primary.MATRIX, DataType.FileFormat.COORDINATE_LIST_MATRIX));
+            }
+            
+            if(matrixFormat == MatrixFormat.DENSE_MATRIX)
+            {
+                possibleDataTypes.add(new DataType(DataType.Primary.MATRIX, DataType.FileFormat.DENSE_MATRIX));
+            }
         }
         
+        if (ReadseqTools.isKnownFormat(inFile)) {
+            possibleDataTypes.add(new DataType(DataType.Primary.ALIGNMENT, DataType.FileFormat.UNKNOWN));
+        }
+
         System.out.println("Possible datatypes " + possibleDataTypes);
-        
+
         return possibleDataTypes;
     }
 
@@ -169,7 +174,7 @@ public class FileImport {
         files.add(new File("examples\\tabular\\hard_parse.csv"));
 
         System.out.println(getPossibleDataTypes(new File("examples\\tabular\\hard_parse.csv")));
-        
+
         for (int j = 0; j < files.size(); j++) {
             try {
                 ArrayList<StructureFormat> parsableFormats = parsableStructureFormats(files.get(j));
@@ -203,15 +208,12 @@ public class FileImport {
                 s = new SecondaryStructureData();
                 s.sequence = "";
                 s.title = textline.trim();
-                try
-                {
+                try {
                     s.pairedSites = new int[Integer.parseInt(textline.trim().split("(\\s)+")[0])];
-                }
-                catch(NumberFormatException ex)
-                {
+                } catch (NumberFormatException ex) {
                     throw new ParserException("Connect format expects the first line of a new structure to begin with an integer specifying the length of that structure.");
                 }
-                
+
                 for (int i = 0; i < s.pairedSites.length; i++) {
                     textline = buffer.readLine();
                     String[] split = textline.trim().split("(\\s)+");
@@ -251,7 +253,7 @@ public class FileImport {
                 if (textline.startsWith(">")) {
                     s = new SecondaryStructureData();
                     s.sequence = "";
-                    s.title = textline.trim().substring(1);                    
+                    s.title = textline.trim().substring(1);
                     s.sequence = buffer.readLine().toUpperCase();
                     s.pairedSites = RNAFoldingTools.getPairedSitesFromDotBracketString(buffer.readLine());
                     structures.add(s);
@@ -401,7 +403,7 @@ public class FileImport {
                         throw new ParserException("Bpseq format expects integer positions in columns 1 and 3.");
                     }
                 } else {
-                    throw new ParserException("Bpseq format expects exactly 3 columns, "+split2.length + " were found.");
+                    throw new ParserException("Bpseq format expects exactly 3 columns, " + split2.length + " were found.");
                 }
 
             }

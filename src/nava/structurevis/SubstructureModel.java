@@ -82,7 +82,7 @@ public class SubstructureModel implements Serializable {
         dataSource2D.loadData();
         this.data2D = dataSource2D;
         if (data2D != null && data2D.mappingSource != null && structureSource != null && structureSource.mappingSource != null) {
-            mapping2D = structureVisController.getMapping(data1D.mappingSource, structureSource.mappingSource);
+            mapping2D = structureVisController.getMapping(data2D.mappingSource, structureSource.mappingSource);
         }
         fireDataSource2DChanged(dataSource2D);
     }
@@ -95,7 +95,7 @@ public class SubstructureModel implements Serializable {
             mapping1D = structureVisController.getMapping(data1D.mappingSource, structureSource.mappingSource);
         }
         if (data2D != null && data2D.mappingSource != null && structureSource != null && structureSource.mappingSource != null) {
-            mapping2D = structureVisController.getMapping(data1D.mappingSource, structureSource.mappingSource);
+            mapping2D = structureVisController.getMapping(data2D.mappingSource, structureSource.mappingSource);
         }
         if (nucleotideSource != null && nucleotideSource.mappingSource != null) {
             nucleotideMapping = structureVisController.getMapping(nucleotideSource.mappingSource, structureSource.mappingSource);

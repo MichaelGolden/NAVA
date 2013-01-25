@@ -7,9 +7,11 @@ package nava.structurevis.data;
 import java.io.Serializable;
 import java.util.ArrayList;
 import nava.data.types.Alignment;
+import nava.data.types.Matrix;
 import nava.data.types.TabularField;
 import nava.ui.MainFrame;
 import nava.utils.ColorGradient;
+import nava.utils.Mapping;
 import nava.utils.Utils;
 
 /**
@@ -22,8 +24,9 @@ public class DataSource2D implements Serializable {
     public ColorGradient defaultColorGradient;
     public ColorGradient colorGradient;
     public DataTransform dataTransform;
-    public TabularField dataField;
-    public TabularField positionField;
+    //public Matrix dataMatrix;
+    public Matrix matrix;
+    public PersistentSparseMatrix dataMatrix;
     public MappingSource mappingSource;
     public String mappingSequence;
     public boolean naturalPositions;
@@ -36,114 +39,23 @@ public class DataSource2D implements Serializable {
     public transient String[] data2;
     public transient boolean[] used;
     public double emptyValue;
-
+    
+    
+    public static enum MatrixRegion{FULL, UPPER_TRIANGLE, LOWER_TRIANGLE};
+    MatrixRegion matrixRegion = MatrixRegion.FULL;
+    
     public void loadData() {
-        ArrayList<String> values = dataField.getObject(MainFrame.dataSourceCache).values;
-
-       /*if (mappingSource != null && mappingSource.numSequences > 0) {
-            mappingSequence = mappingSource.getObject(MainFrame.dataSourceCache).sequences.get(0);
-        } else {
-            mappingSequence = null;
-        }*/
-
-        if (naturalPositions) {
-            if (!codonPositions) {
-                data = new double[values.size()];
-                data2 = new String[values.size()];
-                used = new boolean[values.size()];
-                for (int i = 0; i < data.length; i++) {
-                    data2[i] = values.get(i);
-                    if (Utils.isNumeric(values.get(i))) {
-                        data[i] = Double.parseDouble(values.get(i));
-                        used[i] = true;
-                    }
-                }
-            } else {
-                data = new double[values.size() * 3];
-                data2 = new String[values.size() * 3];
-                used = new boolean[values.size() * 3];
-                for (int i = 0; i < values.size(); i++) {
-                    data2[i * 3] = values.get(i);
-                    data2[i * 3 + 1] = values.get(i);
-                    data2[i * 3 + 2] = values.get(i);
-                    if (Utils.isNumeric(values.get(i))) {
-                        data[i * 3] = Double.parseDouble(values.get(i));
-                        data[i * 3 + 1] = Double.parseDouble(values.get(i));
-                        data[i * 3 + 2] = Double.parseDouble(values.get(i));
-                        used[i * 3] = true;
-                        used[i * 3 + 1] = true;
-                        used[i * 3 + 2] = true;
-                    }
-                }
-            }
-        } else {
-            if (positionField != null) {
-                ArrayList<String> positionValues = positionField.getObject(MainFrame.dataSourceCache).values;
-                ArrayList<Integer> positions = new ArrayList<>();
-                int length = 0;
-                for (int i = 0; i < positionValues.size(); i++) {
-                    if (Utils.isNumeric(positionValues.get(i))) {
-                        double p = Double.parseDouble(positionValues.get(i));
-                        if ((double) ((int) p) == p) {
-                            int pos = (int) p;
-                            if (oneOffset) {
-                                pos = pos - 1;
-                            }
-                            length = Math.max(length, pos + 1);
-                            if (pos >= 0) {
-                                positions.add(pos);
-                            } else {
-                                positions.add(-1);
-                            }
-                        }
-                    } else {
-                        positions.add(-1);
-                    }
-                }
-
-                if (!codonPositions) {
-                    data = new double[length];
-                    data2 = new String[length];
-                    used = new boolean[length];
-                    for (int i = 0; i < positions.size(); i++) {
-                        if (positions.get(i) != -1 && i < values.size()) {
-                            data2[positions.get(i)] = values.get(i);
-                            if (Utils.isNumeric(values.get(i))) {
-                                data[positions.get(i)] = Double.parseDouble(values.get(i));
-                                used[positions.get(i)] = true;
-                            }
-                        }
-                    }
-                } else {
-                    data = new double[length * 3];
-                    data2 = new String[length * 3];
-                    used = new boolean[length * 3];
-                    for (int i = 0; i < positions.size(); i++) {
-                        if (positions.get(i) != -1 && i < values.size()) {
-                            data2[positions.get(i) * 3] = values.get(i);
-                            data2[positions.get(i) * 3 + 1] = values.get(i);
-                            data2[positions.get(i) * 3 + 2] = values.get(i);
-                            if (Utils.isNumeric(values.get(i))) {
-
-                                data[positions.get(i) * 3] = Double.parseDouble(values.get(i));
-                                data[positions.get(i) * 3 + 1] = Double.parseDouble(values.get(i));
-                                data[positions.get(i) * 3 + 2] = Double.parseDouble(values.get(i));
-                                used[positions.get(i) * 3] = true;
-                                used[positions.get(i) * 3 + 1] = true;
-                                used[positions.get(i) * 3 + 2] = true;
-                            }
-                        }
-                    }
-                }
-            }
+        dataMatrix = matrix.getObject(MainFrame.dataSourceCache);
+        if(dataMatrix != null)
+        {
+            emptyValue = dataMatrix.getEmptyValue();
         }
     }
 
-    public static DataSource2D getDataSource1D(TabularField field, String title, TabularField positionField, boolean naturalPositions, boolean oneOffset, boolean codonPositions, double min, double max, boolean excludeValuesOutOfRange, DataTransform dataTransform, ColorGradient colorGradient, MappingSource mappingSource) {
+    public static DataSource2D getDataSource2D(Matrix matrix, String title,boolean naturalPositions, boolean oneOffset, boolean codonPositions, double min, double max, boolean excludeValuesOutOfRange, DataTransform dataTransform, ColorGradient colorGradient, MappingSource mappingSource, MatrixRegion matrixRegion) {
         DataSource2D dataSource = new DataSource2D();
-        dataSource.dataField = field;
+        dataSource.matrix = matrix;
         dataSource.title = title;
-        dataSource.positionField = positionField;
         dataSource.naturalPositions = naturalPositions;
         dataSource.mappingSource = mappingSource;
         dataSource.oneOffset = oneOffset;
@@ -156,12 +68,47 @@ public class DataSource2D implements Serializable {
         if (colorGradient != null) {
             dataSource.defaultColorGradient = colorGradient.clone();
         }
+        dataSource.matrixRegion = matrixRegion;
 
         return dataSource;
     }
     
-    public double get(int i, int j)
+    public double get(int i, int j, Mapping mapping)
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        int x = mapping.aToB(i);
+        int y = mapping.aToB(j);
+        try
+        {
+            switch(matrixRegion)
+            {
+                case FULL:
+                    return dataMatrix.getValue(x, y);
+                case UPPER_TRIANGLE:
+                    if(x <= y)
+                    {
+                        return dataMatrix.getValue(x, y);
+                    }
+                    else
+                    {
+                        return emptyValue;
+                    }
+                case LOWER_TRIANGLE:
+                    if(x >= y)
+                    {
+                        return dataMatrix.getValue(x, y);
+                    }
+                    else
+                    {
+                        return emptyValue;
+                    }
+                default:
+                    return emptyValue;
+            }
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+            return emptyValue;
+        }
     }
 }

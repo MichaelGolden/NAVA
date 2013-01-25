@@ -1,0 +1,667 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package nava.structurevis;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.InputVerifier;
+import javax.swing.JComponent;
+import javax.swing.JTextField;
+import javax.swing.text.DefaultFormatter;
+import javax.swing.text.DefaultFormatterFactory;
+import nava.data.types.Alignment;
+import nava.data.types.DataSource;
+import nava.data.types.Matrix;
+import nava.data.types.TabularField;
+import nava.structurevis.data.*;
+import nava.structurevis.data.DataSource2D.MatrixRegion;
+import nava.ui.MainFrame;
+import nava.ui.ProjectModel;
+import nava.utils.ColorGradient;
+import nava.utils.Utils;
+
+/**
+ *
+ * @author Michael Golden <michaelgolden0@gmail.com>
+ */
+public class Data2DPanel extends javax.swing.JPanel implements KeyListener, ItemListener {
+
+    DefaultComboBoxModel<Matrix> dataMatrixComboBoxModel = new DefaultComboBoxModel<>();
+    DefaultComboBoxModel<TabularField> positionComboBoxModel = new DefaultComboBoxModel<>();
+    DefaultComboBoxModel<Alignment> mappingSourceComboBoxModel = new DefaultComboBoxModel<>();
+    DefaultComboBoxModel<DataTransform.TransformType> transformComboBoxModel;
+    DataLegend dataLegend = new DataLegend();
+    ProjectModel projectModel;
+    DefaultFormatter numberFormatter;
+    TabularField selectedField = null;
+    TabularField dataLoadedForField = null;
+    DataTransform selectedTransform = null;
+    //DataSource1D dataSource1D = null;
+    DataSource2D dataSource2D = null;
+    DataPreviewTable previewTable = new DataPreviewTable();
+
+    public Data2DPanel(ProjectModel projectModel) {
+        initComponents();
+
+        this.projectModel = projectModel;
+
+        this.dataMatrixComboBox.setModel(dataMatrixComboBoxModel);
+        this.dataMatrixComboBox.addItemListener(this);
+
+        this.transformComboBoxModel = new DefaultComboBoxModel<>(DataTransform.TransformType.values());
+        this.transformComboBox.setModel(transformComboBoxModel);
+        this.transformComboBox.addItemListener(this);
+
+        this.mappingSourceComboBox.setModel(mappingSourceComboBoxModel);
+        this.mappingSourceComboBox.addItemListener(this);
+
+        InputVerifier verifier = new InputVerifier() {
+
+            public boolean verify(JComponent comp) {
+                JTextField textField = (JTextField) comp;
+                return Utils.isNumeric(textField.getText());
+            }
+        };
+        this.dataMinField.setInputVerifier(verifier);
+        this.dataMaxField.setInputVerifier(verifier);
+
+        numberFormatter = new DefaultFormatter() {
+
+            DecimalFormat df = new DecimalFormat("0.0####");
+            DecimalFormat df2 = new DecimalFormat("0.00E0#");
+
+            @Override
+            public String valueToString(Object o) throws ParseException {
+                if (o != null) {
+                    double value = ((Double) o).doubleValue();
+                    if (value == 0) {
+                        return df.format(value);
+                    } else if (value < 10000 && value > 0.0001) {
+                        return df.format(value);
+                    } else {
+                        return df2.format(value);
+                    }
+                }
+                return "";
+            }
+
+            @Override
+            public Double stringToValue(String s)
+                    throws ParseException {
+                if (Utils.isNumeric(s)) {
+                    return Double.parseDouble(s);
+                } else {
+                    return new Double(0);
+                }
+            }
+        };
+
+        DefaultFormatterFactory f1 = new DefaultFormatterFactory(numberFormatter, numberFormatter, numberFormatter, numberFormatter);;
+        this.dataMinField.setFormatterFactory(f1);
+        DefaultFormatterFactory f2 = new DefaultFormatterFactory(numberFormatter, numberFormatter, numberFormatter, numberFormatter);;
+        this.dataMaxField.setFormatterFactory(f2);
+
+        this.dataMinField.addKeyListener(this);
+        this.dataMaxField.addKeyListener(this);
+
+        this.dataLegendPanel.add(dataLegend, BorderLayout.CENTER);
+        dataLegend.setLegend("Example", new DataTransform(0, 1, DataTransform.TransformType.LINEAR), new ColorGradient(Color.white, Color.red), new ColorGradient(Color.white, Color.red));
+
+        this.naturalRadioButton.addItemListener(this);
+        this.codonCheckButton.addItemListener(this);
+
+        populateDataMatrixComboBox(Collections.list(projectModel.dataSources.elements()));
+        populateMappingSourceComboBox(Collections.list(projectModel.dataSources.elements()));
+    }
+
+    public void populateDataMatrixComboBox(List<DataSource> dataSources) {
+        dataMatrixComboBoxModel.removeAllElements();
+        for (int i = 0; i < dataSources.size(); i++) {
+            if (dataSources.get(i) instanceof Matrix) {
+                dataMatrixComboBoxModel.addElement((Matrix) dataSources.get(i));
+            }
+        }
+    }
+
+    public void populateMappingSourceComboBox(List<DataSource> dataSources) {
+        mappingSourceComboBoxModel.removeAllElements();
+        for (int i = 0; i < dataSources.size(); i++) {
+            if (dataSources.get(i) instanceof Alignment) {
+                mappingSourceComboBoxModel.addElement((Alignment) dataSources.get(i));
+            }
+        }
+    }
+    ArrayList<Double> values = new ArrayList<>();
+
+    public void updateLegend() {
+        if (selectedField != null) {
+            if (!selectedField.equals(dataLoadedForField)) {
+                values = (ArrayList<Double>) selectedField.getObject(MainFrame.dataSourceCache).getNumericValues();
+                dataLoadedForField = selectedField;
+            }
+
+            ArrayList<Double> transformedValues = new ArrayList<>(values.size());
+            if (selectedTransform != null) {
+                transformedValues = Histogram.getTransformedValues((Double) dataMinField.getValue(), (Double) dataMaxField.getValue(), missingDataRadioButton.isSelected(), selectedTransform, values);
+                dataLegend.setDataTransform(selectedTransform);
+            }
+
+            dataLegend.setHistogram(Histogram.getHistogram(0, 1, transformedValues, 8, 30));
+        }
+    }
+
+    public void update() {
+        this.selectedTransform = new DataTransform(dataMinField.getValue() == null ? 0 : (Double) dataMinField.getValue(), dataMaxField.getValue() == null ? 0 : (Double) dataMaxField.getValue(), (DataTransform.TransformType) transformComboBoxModel.getSelectedItem());
+        this.updateLegend();
+
+        MappingSource mappingSource = new MappingSource((Alignment) mappingSourceComboBox.getSelectedItem());
+        MatrixRegion matrixRegion = MatrixRegion.FULL;
+        if(useUpperMatrixRadioButton.isSelected())
+        {
+            matrixRegion = MatrixRegion.UPPER_TRIANGLE;
+        }
+        else
+        if(useLowerMatrixRadioButton.isSelected())
+        {
+             matrixRegion = MatrixRegion.LOWER_TRIANGLE;
+        }
+        dataSource2D = DataSource2D.getDataSource2D((Matrix) dataMatrixComboBox.getSelectedItem(), dataTitleField.getText(), naturalRadioButton.isSelected(), true, codonCheckButton.isSelected(), (Double) dataMinField.getValue(), (Double) dataMaxField.getValue(), missingDataRadioButton.isSelected(), selectedTransform, dataLegend.colorGradient, mappingSource, matrixRegion);
+        dataSource2D.loadData();
+    }
+
+    public void setDataSource2D(DataSource2D dataSource2D) {
+        this.dataMatrixComboBoxModel.setSelectedItem(dataSource2D.dataMatrix);
+        this.dataTitleField.setText(dataSource2D.title);
+        this.naturalRadioButton.setSelected(dataSource2D.naturalPositions);
+        this.codonCheckButton.setSelected(dataSource2D.codonPositions);
+        this.dataMinField.setValue(dataSource2D.minValue);
+        this.dataMaxField.setValue(dataSource2D.maxValue);
+        this.missingDataRadioButton.setSelected(dataSource2D.excludeValuesOutOfRange);
+        this.clampedRadioButton.setSelected(!dataSource2D.excludeValuesOutOfRange);
+        this.transformComboBoxModel.setSelectedItem(dataSource2D.dataTransform.type);
+        this.dataLegend.setLegend(dataSource2D.title, dataSource2D.dataTransform, dataSource2D.colorGradient, dataSource2D.defaultColorGradient);
+        this.mappingSourceComboBoxModel.setSelectedItem(dataSource2D.mappingSequence == null ? null : dataSource2D.mappingSource.alignmentSource);
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        positionGroup = new javax.swing.ButtonGroup();
+        valueGroup = new javax.swing.ButtonGroup();
+        firstPositionGroup = new javax.swing.ButtonGroup();
+        matrixGroup = new javax.swing.ButtonGroup();
+        jPanel1 = new javax.swing.JPanel();
+        naturalRadioButton = new javax.swing.JRadioButton();
+        codonCheckButton = new javax.swing.JCheckBox();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        dataMatrixComboBox = new javax.swing.JComboBox();
+        dataTitleField = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        jPanel3 = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        missingDataRadioButton = new javax.swing.JRadioButton();
+        clampedRadioButton = new javax.swing.JRadioButton();
+        jLabel9 = new javax.swing.JLabel();
+        dataMaxField = new javax.swing.JFormattedTextField();
+        dataMinField = new javax.swing.JFormattedTextField();
+        restMinMaxButton = new javax.swing.JButton();
+        jPanel4 = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        mappingSourceComboBox = new javax.swing.JComboBox();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTextArea1 = new javax.swing.JTextArea();
+        jPanel5 = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
+        transformComboBox = new javax.swing.JComboBox();
+        dataLegendPanel = new javax.swing.JPanel();
+        jPanel6 = new javax.swing.JPanel();
+        useEntireMatrixRadioButton = new javax.swing.JRadioButton();
+        useUpperMatrixRadioButton = new javax.swing.JRadioButton();
+        useLowerMatrixRadioButton = new javax.swing.JRadioButton();
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("2. Specify how the values are positioned"));
+
+        positionGroup.add(naturalRadioButton);
+        naturalRadioButton.setSelected(true);
+        naturalRadioButton.setText("Natural (1, 2, 3, ...)");
+
+        codonCheckButton.setText("Positions are codon positions");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(naturalRadioButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(codonCheckButton)
+                        .addGap(0, 123, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(naturalRadioButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(codonCheckButton)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("1. Select a data field"));
+
+        jLabel1.setText("Data matrix");
+
+        dataMatrixComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        jLabel3.setText("Title");
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(18, 18, 18)
+                        .addComponent(dataMatrixComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addGap(54, 54, 54)
+                        .addComponent(dataTitleField)))
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(dataMatrixComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(dataTitleField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("5. Specify the numeric range"));
+
+        jLabel6.setText("Minimum value");
+
+        jLabel7.setText("Maximum value");
+
+        jLabel8.setText("How should values out of this range be treated? ");
+
+        valueGroup.add(missingDataRadioButton);
+        missingDataRadioButton.setSelected(true);
+        missingDataRadioButton.setText("As missing data");
+        missingDataRadioButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                missingDataRadioButtonActionPerformed(evt);
+            }
+        });
+
+        valueGroup.add(clampedRadioButton);
+        clampedRadioButton.setText("Clamped");
+        clampedRadioButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clampedRadioButtonActionPerformed(evt);
+            }
+        });
+
+        jLabel9.setText("e.g. 0.01 or 1e-2");
+
+        dataMaxField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dataMaxFieldActionPerformed(evt);
+            }
+        });
+
+        dataMinField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dataMinFieldActionPerformed(evt);
+            }
+        });
+
+        restMinMaxButton.setText("Reset");
+        restMinMaxButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                restMinMaxButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel6)
+                                    .addComponent(jLabel7))
+                                .addGap(18, 18, 18)
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(dataMinField, javax.swing.GroupLayout.DEFAULT_SIZE, 75, Short.MAX_VALUE)
+                                    .addComponent(dataMaxField))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel9)
+                                    .addComponent(restMinMaxButton)))
+                            .addComponent(jLabel8)))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(missingDataRadioButton)
+                        .addGap(18, 18, 18)
+                        .addComponent(clampedRadioButton)))
+                .addContainerGap())
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel6)
+                    .addComponent(dataMinField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel9))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel7)
+                    .addComponent(dataMaxField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(restMinMaxButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel8)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(missingDataRadioButton)
+                    .addComponent(clampedRadioButton)))
+        );
+
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("4. Map the data values to the structure"));
+
+        jLabel4.setText("Mapping source");
+
+        mappingSourceComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        jScrollPane1.setBorder(null);
+        jScrollPane1.setOpaque(false);
+
+        jTextArea1.setColumns(20);
+        jTextArea1.setEditable(false);
+        jTextArea1.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jTextArea1.setLineWrap(true);
+        jTextArea1.setRows(5);
+        jTextArea1.setText("You should choose a mapping source (a sequence or an alignment) where the nucleotide positions (column positions) correspond exactly to the data values. This allows the data values to be automatically mapped against the structure.");
+        jTextArea1.setWrapStyleWord(true);
+        jTextArea1.setBorder(null);
+        jTextArea1.setOpaque(false);
+        jScrollPane1.setViewportView(jTextArea1);
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(mappingSourceComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(mappingSourceComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("6. Choose how the data values are displayed"));
+
+        jLabel5.setText("Select a transform");
+
+        transformComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        dataLegendPanel.setLayout(new java.awt.BorderLayout());
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(dataLegendPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addComponent(jLabel5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(transformComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(transformComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(dataLegendPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("3. Select which parts of the matrix to use."));
+
+        matrixGroup.add(useEntireMatrixRadioButton);
+        useEntireMatrixRadioButton.setSelected(true);
+        useEntireMatrixRadioButton.setText("Use entire matrix");
+
+        matrixGroup.add(useUpperMatrixRadioButton);
+        useUpperMatrixRadioButton.setText("Use only upper triangle");
+        useUpperMatrixRadioButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                useUpperMatrixRadioButtonActionPerformed(evt);
+            }
+        });
+
+        matrixGroup.add(useLowerMatrixRadioButton);
+        useLowerMatrixRadioButton.setText("Use only lower triangle");
+
+        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(useEntireMatrixRadioButton)
+                    .addComponent(useUpperMatrixRadioButton)
+                    .addComponent(useLowerMatrixRadioButton))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(useEntireMatrixRadioButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(useUpperMatrixRadioButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(useLowerMatrixRadioButton))
+        );
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel6.getAccessibleContext().setAccessibleName("3. Select which parts of the matrix to use");
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void dataMinFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataMinFieldActionPerformed
+        this.update();
+    }//GEN-LAST:event_dataMinFieldActionPerformed
+
+    private void dataMaxFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataMaxFieldActionPerformed
+        this.update();
+    }//GEN-LAST:event_dataMaxFieldActionPerformed
+
+    private void restMinMaxButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_restMinMaxButtonActionPerformed
+        if (selectedField != null) {
+            this.dataMinField.setValue(selectedField.getMinimum());
+            this.dataMaxField.setValue(selectedField.getMaximum());
+            this.update();
+        }
+    }//GEN-LAST:event_restMinMaxButtonActionPerformed
+
+    private void clampedRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clampedRadioButtonActionPerformed
+        this.update();
+    }//GEN-LAST:event_clampedRadioButtonActionPerformed
+
+    private void missingDataRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_missingDataRadioButtonActionPerformed
+        this.update();
+    }//GEN-LAST:event_missingDataRadioButtonActionPerformed
+
+    private void useUpperMatrixRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_useUpperMatrixRadioButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_useUpperMatrixRadioButtonActionPerformed
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JRadioButton clampedRadioButton;
+    private javax.swing.JCheckBox codonCheckButton;
+    private javax.swing.JPanel dataLegendPanel;
+    private javax.swing.JComboBox dataMatrixComboBox;
+    private javax.swing.JFormattedTextField dataMaxField;
+    private javax.swing.JFormattedTextField dataMinField;
+    private javax.swing.JTextField dataTitleField;
+    private javax.swing.ButtonGroup firstPositionGroup;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JComboBox mappingSourceComboBox;
+    private javax.swing.ButtonGroup matrixGroup;
+    private javax.swing.JRadioButton missingDataRadioButton;
+    private javax.swing.JRadioButton naturalRadioButton;
+    private javax.swing.ButtonGroup positionGroup;
+    private javax.swing.JButton restMinMaxButton;
+    private javax.swing.JComboBox transformComboBox;
+    private javax.swing.JRadioButton useEntireMatrixRadioButton;
+    private javax.swing.JRadioButton useLowerMatrixRadioButton;
+    private javax.swing.JRadioButton useUpperMatrixRadioButton;
+    private javax.swing.ButtonGroup valueGroup;
+    // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getSource().equals(this.dataMatrixComboBox)) {
+            Matrix matrix = (Matrix) this.dataMatrixComboBox.getSelectedItem();
+            PersistentSparseMatrix p = matrix.getObject(MainFrame.dataSourceCache);
+            this.dataMinField.setValue(p.getMinValue());
+            this.dataMaxField.setValue(p.getMaxValue());
+        } else if (e.getSource().equals(this.naturalRadioButton)) {
+            boolean enable = false;
+        }
+        update();
+    }
+
+    public DataSource2D getDataSource2D() {
+        return dataSource2D;
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        update();
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        update();
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        update();
+    }
+}

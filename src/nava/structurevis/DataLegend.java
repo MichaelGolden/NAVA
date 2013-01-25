@@ -330,10 +330,10 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
             int width = getWidth();
             //int height = getHeight();
             int height = getHeight();
-            
+
             g.setColor(Color.white);
             g.fillRect(0, 0, width, height);
-            
+
             barHeight = height - 2 * barOffsetX;
 
             if (this.showMissingAndFilteredData) {
@@ -439,36 +439,33 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
                 g.drawString("Missing data", (int) (barOffsetX + barWidth / 2) - missingAndFilteredDataBlockSize / 2 + missingAndFilteredDataBlockSize + 5, (int) barOffsetY + (int) barHeight + 32 + missingAndFilteredDataBlockSize - 3);
             }
 
-            if (histogram != null) {                
-                double xpos = Math.max(barOffsetX + barWidth+20, greatestLabelX+10);
-                for (int i = 0; i < histogram.nbins ; i++) {
-                    double ypos = barOffsetY + (((double) i/(histogram.nbins))  * (barHeight+1));  
-                    double w  = histogram.getProportionOfMax(i)*(getWidth()-xpos-10);
-                    double h = barHeight / ((double)histogram.nbins) - 1;
-                    
-                    
-                    Rectangle2D.Double bar = new Rectangle2D.Double(xpos,ypos+1,w, h);
-                    g.setColor(new Color(175,221,233));
+            if (histogram != null) {
+                double xpos = Math.max(barOffsetX + barWidth + 20, greatestLabelX + 10);
+                for (int i = 0; i < histogram.nbins; i++) {
+                    double ypos = barOffsetY + (((double) i / (histogram.nbins)) * (barHeight + 1));
+                    double w = histogram.getProportionOfMax(i) * (getWidth() - xpos - 10);
+                    double h = barHeight / ((double) histogram.nbins) - 1;
+
+
+                    Rectangle2D.Double bar = new Rectangle2D.Double(xpos, ypos + 1, w, h);
+                    g.setColor(new Color(175, 221, 233));
                     g.fill(bar);
-                    
+
                     //new Line2D.Double
                     //Rectangle2D.Double line = new Rectangle2D.Double(0,0,100,100);
-                    Line2D.Double line = new Line2D.Double(xpos+w,ypos+1,xpos+w,ypos+h+1);
+                    Line2D.Double line = new Line2D.Double(xpos + w, ypos + 1, xpos + w, ypos + h + 1);
                     g.setStroke(new BasicStroke(0.75f));
-                    g.setColor(new Color(110,126,233));
+                    g.setColor(new Color(110, 126, 233));
                     g.draw(line);
-                    /*double x = transform.inverseTransform(min + h * (max - min));
-                    if (i % pixelsBetweenTickMarks == 0) {
-                        int xpos = (int) (barOffsetX + barWidth);
-                        if (edit) {
-                            xpos += arrowWidth;
-                        }
-                        int ypos = (int) (barOffsetY + h * barHeight);
-                        if (!edit) {
-                            g.drawLine(xpos - 2, ypos, xpos + 1, ypos);
-                        }
-                        g.drawString(formatValue(x, transform, 2), xpos + 5, ypos + fm.getAscent() / 2);
-                    }*/
+                    /*
+                     * double x = transform.inverseTransform(min + h * (max -
+                     * min)); if (i % pixelsBetweenTickMarks == 0) { int xpos =
+                     * (int) (barOffsetX + barWidth); if (edit) { xpos +=
+                     * arrowWidth; } int ypos = (int) (barOffsetY + h *
+                     * barHeight); if (!edit) { g.drawLine(xpos - 2, ypos, xpos
+                     * + 1, ypos); } g.drawString(formatValue(x, transform, 2),
+                     * xpos + 5, ypos + fm.getAscent() / 2); }
+                     */
                 }
             }
         }
@@ -700,6 +697,7 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
     }
 
     void fireChangeEvent(ChangeEvent evt) {
+        calculateThresholds();
         Object[] listeners = listenerList.getListenerList();
         for (int i = 0; i < listeners.length; i += 2) {
             if (listeners[i] == ChangeListener.class) {
@@ -774,9 +772,26 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
          * Logger.getLogger(StructureDrawPanel.class.getName()).log(Level.SEVERE,
          * null, ex); }
          * setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)); }
-         * MainApp.fileChooserSave.setDialogTitle("Open");
-        }
+         * MainApp.fileChooserSave.setDialogTitle("Open"); }
          */
         fireChangeEvent(new ChangeEvent(this));
+    }
+    
+    double thresholdMin = 0;
+    double thresholdMax = 0;
+
+    public void calculateThresholds() {
+        double min = transform.transform(transform.min);
+        double max = transform.transform(transform.max);
+        thresholdMax = transform.inverseTransform(min + upSliderPercentY * (max - min));
+        thresholdMin = transform.inverseTransform(min + downSliderPercentY * (max - min));
+    }
+
+    public double getMinValue() {
+        return thresholdMin;
+    }
+
+    public double getMaxValue() {
+        return thresholdMax;
     }
 }

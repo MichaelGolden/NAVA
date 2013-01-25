@@ -346,13 +346,7 @@ public class RNAFoldingTools {
                 Logger.getLogger(RNAFoldingTools.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(RNAFoldingTools.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
+        
         if (runInfo.cancel) {
             return -1;
         }
@@ -403,12 +397,6 @@ public class RNAFoldingTools {
             } catch (InterruptedException ex) {
                 Logger.getLogger(RNAFoldingTools.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
-
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(RNAFoldingTools.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         if (runInfo.cancel) {
@@ -754,12 +742,11 @@ public class RNAFoldingTools {
             }
             return eMatrix[0][eMatrix.length - 1];
         }
-        
-        public void resume()
-        {
+
+        public void resume() {
             runInfo.pause = true;
         }
-        
+
         public void pause() {
             runInfo.pause = true;
         }
@@ -1070,29 +1057,23 @@ public class RNAFoldingTools {
         return null;
     }
 
-    public static double[][] loadMatrix(File bpFile) {
+    public static double[][] loadMatrix(File bpFile) throws Exception {
         //File bpFile = new File("C:/Users/Michael/Dropbox/RNA and StatAlign/TestRNAData/TestRNAData1.dat.bp");		
         double[][] bpMatrix = null;
-        try {
-            BufferedReader buffer = new BufferedReader(new FileReader(bpFile));
-            String textline = buffer.readLine();
-            int length = textline.split("(\\s)+").length;
-            bpMatrix = new double[length][length];
+        BufferedReader buffer = new BufferedReader(new FileReader(bpFile));
+        String textline = buffer.readLine();
+        int length = textline.split("(\\s)+").length;
+        bpMatrix = new double[length][length];
 
-            for (int i = 0; i < length; i++) {
-                String[] split = textline.split("(\\s)+");
-                for (int j = 0; j < length; j++) {
-                    bpMatrix[i][j] = Double.parseDouble(split[j]);
-                }
-                textline = buffer.readLine();
+        for (int i = 0; i < length; i++) {
+            String[] split = textline.split("(\\s)+");
+            for (int j = 0; j < length; j++) {
+                bpMatrix[i][j] = Double.parseDouble(split[j]);
             }
-
-            buffer.close();
-
-        } catch (IOException ex) {
-            ex.printStackTrace();
+            textline = buffer.readLine();
         }
 
+        buffer.close();
         return bpMatrix;
 
     }

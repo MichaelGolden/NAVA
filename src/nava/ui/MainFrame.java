@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFileChooser;
 import nava.tasks.applications.ApplicationController;
 import nava.data.types.DataSourceCache;
 import nava.structurevis.StructureVisPanel;
@@ -37,6 +38,8 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
     public static Font fontDroidSansMono = new Font("Sans", Font.PLAIN, 12);
     
     StructureVisPanel structureVisPanel;
+    
+    public static JFileChooser browseDialog = new JFileChooser();
     
     public void startup()
     {

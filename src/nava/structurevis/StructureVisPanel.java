@@ -33,6 +33,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
 
     //DefaultComboBoxModel<Alignment> mappingSourceComboBoxModel = new DefaultComboBoxModel<>();
     DefaultComboBoxModel<DataSource1D> data1DComboBoxModel = new DefaultComboBoxModel<>();
+    DefaultComboBoxModel<DataSource2D> data2DComboBoxModel = new DefaultComboBoxModel<>();
     ProjectController projectController;
     public StructureVisController structureVisController;
     SubstructurePanel substructurePanel;
@@ -90,12 +91,16 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         data1DComboBox.setModel(data1DComboBoxModel);
         data1DComboBox.addItemListener(this);
         populateDataSource1DComboBox();
-        substructurePanel.refresh();
-        
-        nucleotideAlignmentComboBox.setModel(nucleotideComboBoxModel);        
+
+        data2DComboBox.setModel(data2DComboBoxModel);
+        data2DComboBox.addItemListener(this);
+        populateDataSource2DComboBox();
+
+        nucleotideAlignmentComboBox.setModel(nucleotideComboBoxModel);
         nucleotideAlignmentComboBox.addItemListener(this);
         populateNucleotideComboBox();
 
+        substructurePanel.refresh();
 
         if (structureVisController.substructureModel.getAnnotationSource() == null) {
             try {
@@ -118,16 +123,25 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
 
     public void populateDataSource1DComboBox() {
         data1DComboBoxModel.removeAllElements();
-        ArrayList<DataSource1D> list = Collections.list(structureVisController.structureVisDataSources.elements());
+        ArrayList<DataSource1D> list = Collections.list(structureVisController.structureVisDataSources1D.elements());
         for (int i = 0; i < list.size(); i++) {
             //ComboBoxItem<Substructure> item = new ComboBoxItem<>(list.get(i), i + "");
             data1DComboBoxModel.addElement(list.get(i));
         }
     }
 
+    public void populateDataSource2DComboBox() {
+        data1DComboBoxModel.removeAllElements();
+        ArrayList<DataSource2D> list = Collections.list(structureVisController.structureVisDataSources2D.elements());
+        for (int i = 0; i < list.size(); i++) {
+            //ComboBoxItem<Substructure> item = new ComboBoxItem<>(list.get(i), i + "");
+            data2DComboBoxModel.addElement(list.get(i));
+        }
+    }
+
     public void populateNucleotideComboBox() {
-        nucleotideComboBoxModel.removeAllElements();       
-        ArrayList<NucleotideComposition> list = Collections.list(structureVisController.nucleotideSources.elements());       
+        nucleotideComboBoxModel.removeAllElements();
+        ArrayList<NucleotideComposition> list = Collections.list(structureVisController.nucleotideSources.elements());
         for (int i = 0; i < list.size(); i++) {
             nucleotideComboBoxModel.addElement(list.get(i));
         }
@@ -151,8 +165,11 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         edit1DDataButton = new javax.swing.JButton();
         add1DDataButton = new javax.swing.JButton();
         filler4 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
+        data2DComboBox = new javax.swing.JComboBox();
+        edit2DDataButton = new javax.swing.JButton();
+        add2DDataButton = new javax.swing.JButton();
         nucleotideAlignmentComboBox = new javax.swing.JComboBox();
-        jButton1 = new javax.swing.JButton();
+        addNucleotideOverlayButton = new javax.swing.JButton();
         bottomSplit = new javax.swing.JPanel();
 
         verticalSplitPane.setDividerLocation(300);
@@ -190,16 +207,37 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         jPanel1.add(add1DDataButton);
         jPanel1.add(filler4);
 
+        data2DComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jPanel1.add(data2DComboBox);
+
+        edit2DDataButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/tabular-field-16x16.png"))); // NOI18N
+        edit2DDataButton.setText("Edit 2D data");
+        edit2DDataButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                edit2DDataButtonActionPerformed(evt);
+            }
+        });
+        jPanel1.add(edit2DDataButton);
+
+        add2DDataButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/tabular-field-16x16.png"))); // NOI18N
+        add2DDataButton.setText("Add 2D data");
+        add2DDataButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                add2DDataButtonActionPerformed(evt);
+            }
+        });
+        jPanel1.add(add2DDataButton);
+
         nucleotideAlignmentComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jPanel1.add(nucleotideAlignmentComboBox);
 
-        jButton1.setText("Add nucleotide overlay");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        addNucleotideOverlayButton.setText("Add nucleotide overlay");
+        addNucleotideOverlayButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                addNucleotideOverlayButtonActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton1);
+        jPanel1.add(addNucleotideOverlayButton);
 
         topSplit.add(jPanel1);
 
@@ -213,7 +251,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(verticalSplitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 679, Short.MAX_VALUE)
+            .addComponent(verticalSplitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 846, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -239,20 +277,41 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         }
     }//GEN-LAST:event_edit1DDataButtonActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void addNucleotideOverlayButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addNucleotideOverlayButtonActionPerformed
         NucleotideCompositionDialog d = new NucleotideCompositionDialog(null, true, projectController.projectModel, structureVisController);
         d.setSize(920, 690);
         //d.editMode = false;
         d.setVisible(true);
         populateNucleotideComboBox();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_addNucleotideOverlayButtonActionPerformed
+
+    private void edit2DDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edit2DDataButtonActionPerformed
+        Data2DDialog d = new Data2DDialog(null, true, projectController.projectModel, structureVisController);
+        DataSource2D dataSource2D = (DataSource2D) data2DComboBoxModel.getSelectedItem();
+        if (dataSource2D != null) {
+            d.data2DPanel.setDataSource2D(dataSource2D);
+            d.editMode = true;
+            d.setSize(920, 690);
+            d.setVisible(true);
+        }
+    }//GEN-LAST:event_edit2DDataButtonActionPerformed
+
+    private void add2DDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_add2DDataButtonActionPerformed
+        Data2DDialog d = new Data2DDialog(null, true, projectController.projectModel, structureVisController);
+        d.setSize(920, 690);
+        d.editMode = false;
+        d.setVisible(true);
+    }//GEN-LAST:event_add2DDataButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton add1DDataButton;
+    private javax.swing.JButton add2DDataButton;
+    private javax.swing.JButton addNucleotideOverlayButton;
     private javax.swing.JPanel bottomSplit;
     private javax.swing.JComboBox data1DComboBox;
+    private javax.swing.JComboBox data2DComboBox;
     private javax.swing.JButton edit1DDataButton;
+    private javax.swing.JButton edit2DDataButton;
     private javax.swing.Box.Filler filler4;
-    private javax.swing.JButton jButton1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JComboBox nucleotideAlignmentComboBox;
@@ -268,17 +327,18 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
             if (dataSource1D != null) {
                 structureVisController.substructureModel.setDataSource1D(dataSource1D);
             }
-        }
-        else
-        if(e.getSource().equals(nucleotideAlignmentComboBox))
-        {
+        } else if (e.getSource().equals(data2DComboBox)) {
+            DataSource2D dataSource2D = (DataSource2D) data2DComboBox.getSelectedItem();
+            if (dataSource2D != null) {
+                structureVisController.substructureModel.setDataSource2D(dataSource2D);
+            }
+        } else if (e.getSource().equals(nucleotideAlignmentComboBox)) {
             NucleotideComposition nucleotideComposition = (NucleotideComposition) nucleotideAlignmentComboBox.getSelectedItem();
-            if(nucleotideComposition != null)
-            {
+            if (nucleotideComposition != null) {
                 structureVisController.substructureModel.setNucleotideSource(nucleotideComposition);
             }
         }
-            
+        substructurePanel.structureDrawPanel.redraw();
     }
 
     @Override
@@ -302,20 +362,16 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
     }
 
     /*
-    @Override
-    public void intervalAdded(ListDataEvent e) {
-        populateDataSource1DComboBox();
+     * @Override public void intervalAdded(ListDataEvent e) {
+     * populateDataSource1DComboBox(); }
+     *
+     * @Override public void intervalRemoved(ListDataEvent e) {
+     * populateDataSource1DComboBox(); }
+     *
+     * @Override public void contentsChanged(ListDataEvent e) {
+     * populateDataSource1DComboBox();
     }
-
-    @Override
-    public void intervalRemoved(ListDataEvent e) {
-        populateDataSource1DComboBox();
-    }
-
-    @Override
-    public void contentsChanged(ListDataEvent e) {
-        populateDataSource1DComboBox();
-    }*/
+     */
 
     /*
      * protected EventListenerList listeners = new EventListenerList();
@@ -356,6 +412,5 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
 
     @Override
     public void nucleotideSourceChanged(NucleotideComposition nucleotideSource) {
-        
     }
 }

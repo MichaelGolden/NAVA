@@ -24,7 +24,7 @@ public class DataType implements Serializable {
 
     public enum MatrixFormat {
 
-        DENSE_MATRIX
+        DENSE_MATRIX, COORDINATE_LIST_MATRIX
     };
 
     public enum Primary {
@@ -61,15 +61,52 @@ public class DataType implements Serializable {
     public enum FileFormat {
 
         UNKNOWN(Primary.UNKNOWN),
+        FASTA(Primary.ALIGNMENT), PHYLIP4(Primary.ALIGNMENT), NEXUS(Primary.ALIGNMENT), CLUSTAL(Primary.ALIGNMENT),
         CONNECT_FILE(Primary.SECONDARY_STRUCTURE), VIENNA_DOT_BRACKET(Primary.SECONDARY_STRUCTURE), DOT_BRACKET_ONLY(Primary.SECONDARY_STRUCTURE), BPSEQ(Primary.SECONDARY_STRUCTURE), TAB_DELIMITTED_HELIX(Primary.SECONDARY_STRUCTURE),
         GENBANK(Primary.ANNOTATION_DATA),
-        EXCEL(Primary.TABULAR_DATA), CSV(Primary.TABULAR_DATA);
-        
+        EXCEL(Primary.TABULAR_DATA), CSV(Primary.TABULAR_DATA),
+        COORDINATE_LIST_MATRIX(Primary.MATRIX), DENSE_MATRIX(Primary.MATRIX);
         public Primary primaryType = Primary.UNKNOWN;
-        
-        FileFormat(Primary primaryType)
-        {
+
+        FileFormat(Primary primaryType) {
             this.primaryType = primaryType;
+        }
+
+        public String getExtension() {
+            switch (this) {
+                case UNKNOWN:
+                    return "dat";
+                case FASTA:
+                    return "fas";
+                case PHYLIP4:
+                    return "phy";
+                case NEXUS:
+                    return "nex";
+                case CLUSTAL:
+                    return "aln";
+                case CONNECT_FILE:
+                    return "ct";
+                case VIENNA_DOT_BRACKET:
+                    return "dbn";
+                case DOT_BRACKET_ONLY:
+                    return "dbs";
+                case BPSEQ:
+                    return "bp";
+                case TAB_DELIMITTED_HELIX:
+                    return "helix";
+                case GENBANK:
+                    return "gb";
+                case EXCEL:
+                    return "xlsx";
+                case CSV:
+                    return "csv";
+                case COORDINATE_LIST_MATRIX:
+                    return "cmt";
+                case DENSE_MATRIX:
+                    return "mt";
+                default:
+                    return "dat";
+            }
         }
 
         @Override
@@ -77,22 +114,34 @@ public class DataType implements Serializable {
             switch (this) {
                 case UNKNOWN:
                     return "Unknown";
+                case FASTA:
+                    return "Fasta";
+                case PHYLIP4:
+                    return "Phylip4";
+                case NEXUS:
+                    return "Nexus";
+                case CLUSTAL:
+                    return "Clustal";
                 case CONNECT_FILE:
-                    return "Connect format";
+                    return "Connect";
                 case VIENNA_DOT_BRACKET:
-                    return "Vienna dot bracket format";
+                    return "Vienna dot bracket";
                 case DOT_BRACKET_ONLY:
                     return "Dot bracket string only";
                 case BPSEQ:
-                    return "Bpseq format";
+                    return "Bpseq";
                 case TAB_DELIMITTED_HELIX:
-                    return "Tab-delimitted helix format";
+                    return "Tab-delimitted helix";
                 case GENBANK:
                     return "Genbank";
                 case EXCEL:
                     return "Excel workbook";
                 case CSV:
                     return "Comma-seperated values";
+                case COORDINATE_LIST_MATRIX:
+                    return "Co-ordinate list matrix";
+                case DENSE_MATRIX:
+                    return "Dense matrix";
                 default:
                     return "Unknown";
             }

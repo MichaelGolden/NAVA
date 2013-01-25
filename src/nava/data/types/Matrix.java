@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import nava.structurevis.data.PersistentSparseMatrix;
 import nava.utils.RNAFoldingTools;
 
 /**
@@ -18,7 +19,7 @@ public class Matrix extends DataSource {
 
     @Override
     public Icon getIcon() {
-        return new ImageIcon(ClassLoader.getSystemResource("resources/icons/matrix-16x16.png"));  
+        return new ImageIcon(ClassLoader.getSystemResource("resources/icons/matrix-16x16.png"));
     }
 
     @Override
@@ -27,27 +28,32 @@ public class Matrix extends DataSource {
     }
 
     @Override
-    public Object getObject() {
-        return new DenseMatrixData( RNAFoldingTools.loadMatrix(Paths.get(importedDataSourcePath).toFile()));
+    public PersistentSparseMatrix getObject() {
+        try {
+            return new PersistentSparseMatrix(Paths.get(importedDataSourcePath).toFile());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
-    
+
     @Override
-    public DenseMatrixData getObject(DataSourceCache cache) {
-       DenseMatrixData cachedObject = (DenseMatrixData) cache.getObject(this);
-       if(cachedObject == null)
-       {
-            return (DenseMatrixData) cache.cache(this, getObject());
-       }
-       return cachedObject;
+    public PersistentSparseMatrix getObject(DataSourceCache cache) {
+        PersistentSparseMatrix cachedObject = (PersistentSparseMatrix) cache.getObject(this);
+        if (cachedObject == null) {
+            try {
+                return (PersistentSparseMatrix) cache.cache(this, new PersistentSparseMatrix(Paths.get(importedDataSourcePath).toFile()));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                return null;
+            }
+
+        }
+        return cachedObject;
     }
 
     @Override
     public void persistObject(Object object) {
-        if(object instanceof DenseMatrixData)
-        {
-            DenseMatrixData denseMatrixData = (DenseMatrixData)object;
-            RNAFoldingTools.writeMatrix(denseMatrixData.matrix, Paths.get(importedDataSourcePath).toFile());
-        }
+        
     }
-    
 }

@@ -4,6 +4,9 @@
  */
 package nava.tasks.applications;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import nava.data.types.*;
@@ -30,8 +33,37 @@ public class PosteriorDecodingApplication extends Application {
         } else {
             started = true;
             running = true;
-            RNAFoldingTools rnaTools = new RNAFoldingTools();
-            DenseMatrixData matrixData = (DenseMatrixData) matrix.getObject(MainFrame.dataSourceCache);
+            DenseMatrixData matrixData = null;
+            try
+            {    
+                matrixData =  matrix.getObject(MainFrame.dataSourceCache).getDenseMatrixData(0);
+               /*
+                try
+                {
+                    BufferedWriter buffer = new BufferedWriter(new FileWriter("temptest.txt"));
+                    for(int i = 0 ; i < matrixData.matrix.length ; i++)
+                    {
+                        for(int j = 0 ; j < matrixData.matrix[0].length ; j++)
+                        {
+                            buffer.write(matrixData.matrix[i][j]+"\t");
+                        }
+                        buffer.newLine();
+                    }
+                    buffer.close();
+                }
+                catch(IOException ex)
+                {
+                    ex.printStackTrace();
+                }
+                */
+            }
+            catch(Exception ex)
+            {
+                this.consoleErrorBuffer.bufferedWrite("An error occured:\n"+ex.getMessage(), taskInstanceId, "standard_err");
+            }
+            System.out.println("Started decoding");
+            RNAFoldingTools.getPosteriorDecodingConsensusStructure(matrixData.matrix);
+            System.out.println("Finished decoding");
             posteriorDecoding = RNAFoldingTools.performPosteriorDecodingMultiThreaded(matrixData.matrix);
             posteriorDecoding.start();
             //int[] pairedSites = new RNAFoldingTools().getPosteriorDecodingConsensusStructureMultiThreaded(matrixData.matrix);

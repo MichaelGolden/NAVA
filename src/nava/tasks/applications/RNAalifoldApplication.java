@@ -243,10 +243,9 @@ public class RNAalifoldApplication extends Application {
     }
 
     @Override
-    public boolean canProcessDataSource(DataSource dataSource) {
-        if (dataSource instanceof Alignment) {
-            Alignment alignment = (Alignment) dataSource;
-            if (alignment.type.equals(Alignment.Type.NUCLEOTIDE) || alignment.type.equals(Alignment.Type.CODING)) {
+    public boolean canProcessDataSources(List<DataSource> dataSources) {
+        if (dataSources.size() == 1) {
+            if (dataSources.get(0) instanceof Alignment) {
                 return true;
             }
         }

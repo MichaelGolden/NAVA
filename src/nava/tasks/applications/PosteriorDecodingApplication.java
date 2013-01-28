@@ -104,11 +104,13 @@ public class PosteriorDecodingApplication extends Application {
             posteriorDecoding.cancel();
         }
     }
-
+    
     @Override
-    public boolean canProcessDataSource(DataSource dataSource) {
-        if (dataSource instanceof Matrix) {
-            return true;
+    public boolean canProcessDataSources(List<DataSource> dataSources) {
+        if (dataSources.size() == 1) {
+            if (dataSources.get(0) instanceof Matrix) {
+                return true;
+            }
         }
         return false;
     }

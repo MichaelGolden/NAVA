@@ -35,20 +35,20 @@ public class MuscleApplication extends Application {
         File outFastaFile = new File(tempDir.getAbsolutePath() + File.separator + "temp.fas");
 
         try {
-            String cmd = new File(MUSCLE_EXECUTABLE).getAbsolutePath()  + " -in "+ inFastaFile.getAbsolutePath() + " -out " + outFastaFile.getAbsolutePath();
+            String cmd = new File(MUSCLE_EXECUTABLE).getAbsolutePath() + " -in " + inFastaFile.getAbsolutePath() + " -out " + outFastaFile.getAbsolutePath();
             process = Runtime.getRuntime().exec(cmd, null, tempDir);
 
             startConsoleInputBuffer(process);
             startConsoleErrorBuffer(process);
 
             int exitCode = process.waitFor();
-            if (exitCode == 0) {                
+            if (exitCode == 0) {
                 ApplicationOutput outputFile1 = new ApplicationOutput();
 
                 outputFile1.file = null;
                 Alignment alignment = new Alignment();
                 alignment.title = inputDataSource.title + "_muscle_aligned";
-                alignment.originalFile = outFastaFile;      
+                alignment.originalFile = outFastaFile;
                 outputFile1.dataSource = alignment;
                 outputFiles.add(outputFile1);
             } else {
@@ -62,9 +62,11 @@ public class MuscleApplication extends Application {
     }
 
     @Override
-    public boolean canProcessDataSource(DataSource dataSource) {
-        if (dataSource instanceof Alignment) {
-            return true;
+    public boolean canProcessDataSources(List<DataSource> dataSources) {
+        if (dataSources.size() == 1) {
+            if (dataSources.get(0) instanceof Alignment) {
+                return true;
+            }
         }
         return false;
     }

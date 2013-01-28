@@ -5,6 +5,7 @@
 package nava.tasks.applications;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import nava.data.types.DataSource;
 import nava.tasks.Task;
@@ -57,7 +58,16 @@ public abstract class Application extends Task {
       
     protected abstract void start();
 
-    public abstract boolean canProcessDataSource(DataSource dataSource);
+    //public abstract boolean canProcessDataSource(DataSource dataSource);
+    
+    public boolean canProcessDataSource(DataSource dataSource)
+    {
+        ArrayList<DataSource> dataSources = new ArrayList<>();
+        dataSources.add(dataSource);
+        return canProcessDataSources(dataSources);
+    }
+    
+    public abstract boolean canProcessDataSources(List<DataSource> dataSources);
 
     public abstract void setDataSource(DataSource dataSource);
 

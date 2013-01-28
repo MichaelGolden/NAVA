@@ -42,13 +42,13 @@ public class MAFFTApplication extends Application {
             startConsoleErrorBuffer(process);
 
             int exitCode = process.waitFor();
-            if (exitCode == 0) {                
+            if (exitCode == 0) {
                 ApplicationOutput outputFile1 = new ApplicationOutput();
 
                 outputFile1.file = null;
                 Alignment alignment = new Alignment();
                 alignment.title = inputDataSource.title + "_mafft_aligned";
-                alignment.originalFile = outFastaFile;      
+                alignment.originalFile = outFastaFile;
                 outputFile1.dataSource = alignment;
                 System.out.println("Finalising");
                 outputFiles.add(outputFile1);
@@ -63,9 +63,11 @@ public class MAFFTApplication extends Application {
     }
 
     @Override
-    public boolean canProcessDataSource(DataSource dataSource) {
-        if (dataSource instanceof Alignment) {
-            return true;
+    public boolean canProcessDataSources(List<DataSource> dataSources) {
+        if (dataSources.size() == 1) {
+            if (dataSources.get(0) instanceof Alignment) {
+                return true;
+            }
         }
         return false;
     }

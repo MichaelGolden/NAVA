@@ -28,6 +28,11 @@ public class SecondaryStructure extends DataSource {
     public Icon getIcon() {
         return new ImageIcon(ClassLoader.getSystemResource("resources/icons/structure-16x16.png"));
     }
+    
+    @Override
+    public String getTypeName() {
+        return "Secondary structure";
+    }
 
     @Override
     public ArrayList<DataSource> getChildren() {

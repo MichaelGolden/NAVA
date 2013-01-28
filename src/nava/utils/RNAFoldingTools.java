@@ -1,11 +1,6 @@
 package nava.utils;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Stack;
@@ -1205,7 +1200,7 @@ public class RNAFoldingTools {
             BufferedWriter buffer = new BufferedWriter(new FileWriter(outFile));
             buffer.write(header + "\n");
             for (int i = 0; i < pairedSites.length; i++) {
-                buffer.write((i + 1) + sequence.charAt(i) + "\t" + i + "\t" + (i + 2) + "\t" + pairedSites[i] + "\t" + (i + 1) + "\n");
+                buffer.write((i + 1) + "\t" + (i < sequence.length() ? sequence.charAt(i) : "-") + "\t" + i + "\t" + (i + 2) + "\t" + pairedSites[i] + "\t" + (i + 1) + "\n");
             }
             buffer.close();
         } catch (IOException ex) {

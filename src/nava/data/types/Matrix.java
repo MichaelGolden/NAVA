@@ -23,6 +23,11 @@ public class Matrix extends DataSource {
     }
 
     @Override
+    public String getTypeName() {
+        return "Matrix";
+    }
+
+    @Override
     public ArrayList<DataSource> getChildren() {
         return new ArrayList();
     }
@@ -54,6 +59,5 @@ public class Matrix extends DataSource {
 
     @Override
     public void persistObject(Object object) {
-        
     }
 }

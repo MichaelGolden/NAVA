@@ -82,6 +82,7 @@ public abstract class DataSource implements Serializable
         return title;
     }
     
+    
     @Override
     public String toString()
     {
@@ -93,4 +94,5 @@ public abstract class DataSource implements Serializable
     public abstract Object getObject();
     public abstract Object getObject(DataSourceCache cache);
     public abstract void persistObject(Object object);
+    public abstract String getTypeName();
 }

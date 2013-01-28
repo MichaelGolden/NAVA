@@ -21,7 +21,12 @@ public class Annotations extends DataSource {
 
     @Override
     public Icon getIcon() {
-        return new ImageIcon(ClassLoader.getSystemResource("resources/icons/annotations-16x16.png"));   
+        return new ImageIcon(ClassLoader.getSystemResource("resources/icons/annotations-16x16.png"));
+    }
+
+    @Override
+    public String getTypeName() {
+        return "Annotations";
     }
 
     @Override
@@ -33,7 +38,7 @@ public class Annotations extends DataSource {
     public Object getObject() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-    
+
     @Override
     public Object getObject(DataSourceCache cache) {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -47,5 +52,4 @@ public class Annotations extends DataSource {
             Logger.getLogger(Annotations.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
 }

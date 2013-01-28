@@ -22,6 +22,11 @@ public class Tabular extends DataSource {
     public Icon getIcon() {
         return new ImageIcon(ClassLoader.getSystemResource("resources/icons/tabular-16x16.png"));
     }
+    
+    @Override
+    public String getTypeName() {
+        return "Tabular";
+    }
 
     @Override
     public ArrayList<TabularField> getChildren() {

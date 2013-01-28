@@ -39,7 +39,6 @@ public class ConsoleBuffer extends Thread {
         this.className = className;
         this.typeName = typeName;
         this.n = (int) db.getRowCount(className, typeName);
-        System.out.println("N=" + this.n);
         start();
     }
 
@@ -120,20 +119,30 @@ public class ConsoleBuffer extends Thread {
     int sleepTime = 200;
     int mod = bufferMaxTime / sleepTime;
     final Integer lock = new Integer(0);
+    
+    public void bufferedWrite(String line, String className, String typeName)
+    {
+        bufferedWrite(line, className, typeName, false);
+    }
 
-    public void bufferedWrite(String line, String className, String typeName) {
+    
+    public void bufferedWrite(String line, String className, String typeName, boolean immediateWrite) {        
         synchronized (lock) {
+            this.immediateWrite = immediateWrite;
             writeBuffer.add(new ConsoleRecord(className, typeName, line, System.currentTimeMillis()));
+            System.out.println("Line: "+line);
         }
     }
     boolean running = true;
+    boolean immediateWrite = false;
 
     @Override
     public void run() {
         for (int i = 1; running; i++) {
-            if (i % mod == 0 || writeBuffer.size() >= bufferMaxLines) {
+            if (immediateWrite || i % mod == 0 || writeBuffer.size() >= bufferMaxLines) {                
                 if (!writeBuffer.isEmpty()) {
                     synchronized (lock) {
+                        immediateWrite = false;
                         try {
                             addRecords(writeBuffer);
                             writeBuffer.clear();
@@ -147,7 +156,7 @@ public class ConsoleBuffer extends Thread {
             }
 
             try {
-                Thread.sleep(200);
+                Thread.sleep(sleepTime);
             } catch (InterruptedException ex) {
                 Logger.getLogger(ConsoleBuffer.class.getName()).log(Level.SEVERE, null, ex);
             }

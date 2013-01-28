@@ -34,6 +34,11 @@ public class StructureList extends DataSource {
     public Icon getIcon() {
         return new ImageIcon(ClassLoader.getSystemResource("resources/icons/structure-multi-16x16.png"));
     }
+    
+    @Override
+    public String getTypeName() {
+        return "Structure list";
+    }
 
     @Override
     public ArrayList<SecondaryStructure> getChildren() {

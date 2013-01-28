@@ -9,12 +9,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import nava.data.types.Alignment;
-import nava.data.types.DataSource;
+import nava.data.types.*;
 import nava.data.types.DataType.FileFormat;
-import nava.data.types.Matrix;
-import nava.data.types.Tabular;
 import nava.ui.MainFrame;
+import nava.utils.RNAFoldingTools;
 
 /**
  *
@@ -32,6 +30,9 @@ public class DataExport {
         exportableFormats.add(new ExportableFormat("alignment", Alignment.class, FileFormat.NEXUS));
         exportableFormats.add(new ExportableFormat("alignment", Alignment.class, FileFormat.CLUSTAL));
         exportableFormats.add(new ExportableFormat("tabular", Tabular.class, FileFormat.CSV));
+        exportableFormats.add(new ExportableFormat("structure", SecondaryStructure.class, FileFormat.VIENNA_DOT_BRACKET));
+        exportableFormats.add(new ExportableFormat("structure", SecondaryStructure.class, FileFormat.CONNECT_FILE));
+       // exportableFormats.add(new ExportableFormat("structure", SecondaryStructure.class, FileFormat.BPSEQ));
         exportableFormats.add(new ExportableFormat("matrix", Matrix.class, FileFormat.COORDINATE_LIST_MATRIX));
         exportableFormats.add(new ExportableFormat("matrix", Matrix.class, FileFormat.DENSE_MATRIX));
     }
@@ -63,6 +64,16 @@ public class DataExport {
                 break;
             case CSV:
                 Files.copy(Paths.get(dataSource.importedDataSourcePath), Paths.get(outputFile.getAbsolutePath()));
+            case VIENNA_DOT_BRACKET:
+                SecondaryStructureData s = FileImport.readDotBracketFile(new File(dataSource.importedDataSourcePath)).get(0);
+                RNAFoldingTools.saveDotBracketFile(outputFile, s.pairedSites, s.title, s.sequence);
+                break;
+            case CONNECT_FILE:
+                SecondaryStructureData s2 = FileImport.readDotBracketFile(new File(dataSource.importedDataSourcePath)).get(0);
+                RNAFoldingTools.saveCtFile(outputFile, s2.pairedSites, s2.title, s2.sequence);
+                break;
+            //case BPSEQ:
+            //    break;
             case COORDINATE_LIST_MATRIX:
                 if(dataSource instanceof Matrix)
                 {

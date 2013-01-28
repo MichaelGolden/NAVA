@@ -45,13 +45,13 @@ public class NavigatorPanel extends javax.swing.JPanel implements TreeSelectionL
         projectController.addView(projectController.projectModel.navigatorTreeModel);
         
         NavigatorTreeRenderer navigatorRenderer = new NavigatorTreeRenderer();
-        jTree1.setRootVisible(false);
-        jTree1.setModel(projectController.projectModel.navigatorTreeModel);
-        jTree1.setCellRenderer(navigatorRenderer);
-        jTree1.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        jTree1.addTreeSelectionListener(this);
+        navigationTree.setRootVisible(false);
+        navigationTree.setModel(projectController.projectModel.navigatorTreeModel);
+        navigationTree.setCellRenderer(navigatorRenderer);
+        navigationTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        navigationTree.addTreeSelectionListener(this);
 
-        jTree1.setDropTarget(new DropTarget() {
+        navigationTree.setDropTarget(new DropTarget() {
 
             public synchronized void drop(DropTargetDropEvent evt) {
                 try {
@@ -67,45 +67,7 @@ public class NavigatorPanel extends javax.swing.JPanel implements TreeSelectionL
                     ex.printStackTrace();
                 }
             }
-        });
-
-        /*Alignment a = new Alignment();
-        a.title = "alignment.fas";
-
-        StructureList list = new StructureList("Structure list");
-        SecondaryStructure s1 = new SecondaryStructure();
-        s1.title = "Structure S1";
-        list.structures.add(s1);
-        SecondaryStructure s2 = new SecondaryStructure();
-        s2.title = "Structure S2";
-        list.structures.add(s2);
-        SecondaryStructure s3 = new SecondaryStructure();
-        s3.title = "Structure S3";
-        list.structures.add(s3);
-
-        Annotations annotations = new Annotations();
-        annotations.title = "Annotations";
-
-        Matrix matrix = new Matrix();
-        matrix.title = "Matrix data";
-
-        TabularData data = new TabularData();
-        data.title = "spreadsheet.xlsx";
-        TabularField f1 = new TabularField("Id");
-        data.fields.add(f1);
-        TabularField f2 = new TabularField("Weight");
-        data.fields.add(f2);
-
-        navigatorTreeModel.addDataSource(a);
-        navigatorTreeModel.addDataSource(list);
-        navigatorTreeModel.addDataSource(annotations);
-        navigatorTreeModel.addDataSource(matrix);
-        navigatorTreeModel.addDataSource(data);*/
-        //navigatorTreeModel.insertNodeInto(new NavigatorTreeNode(a), dataNode, 0);
-        //navigatorTreeModel.insertNodeInto(new NavigatorTreeNode(list), dataNode, 1);
-        //navigatorTreeModel.insertNodeInto(new NavigatorTreeNode(annotations), dataNode, 2);
-        //navigatorTreeModel.insertNodeInto(new NavigatorTreeNode(matrix), dataNode, 3);
-        //navigatorTreeModel.insertNodeInto(new NavigatorTreeNode(data), dataNode, 4);
+        });        
     }
 
     /**
@@ -118,17 +80,17 @@ public class NavigatorPanel extends javax.swing.JPanel implements TreeSelectionL
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTree1 = new javax.swing.JTree();
+        navigationTree = new javax.swing.JTree();
 
         setLayout(new java.awt.BorderLayout());
 
-        jScrollPane1.setViewportView(jTree1);
+        jScrollPane1.setViewportView(navigationTree);
 
         add(jScrollPane1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTree jTree1;
+    private javax.swing.JTree navigationTree;
     // End of variables declaration//GEN-END:variables
     protected EventListenerList listeners = new EventListenerList();
 
@@ -154,7 +116,7 @@ public class NavigatorPanel extends javax.swing.JPanel implements TreeSelectionL
     @Override
     public void valueChanged(TreeSelectionEvent e) {
         NavigationEvent navigationEvent = new NavigationEvent();       
-        TreePath[] paths = jTree1.getSelectionPaths();
+        TreePath[] paths = navigationTree.getSelectionPaths();
         for (TreePath path : paths) {
             NavigatorTreeNode node = (NavigatorTreeNode) path.getLastPathComponent();
             node.isNew = false;
@@ -169,21 +131,21 @@ public class NavigatorPanel extends javax.swing.JPanel implements TreeSelectionL
 
     @Override
     public void treeNodesChanged(TreeModelEvent e) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        //throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public void treeNodesInserted(TreeModelEvent e) {
-        jTree1.expandPath(e.getTreePath());
+        navigationTree.expandPath(e.getTreePath());
     }
 
     @Override
     public void treeNodesRemoved(TreeModelEvent e) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        //throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public void treeStructureChanged(TreeModelEvent e) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        //throw new UnsupportedOperationException("Not supported yet.");
     }
 }

@@ -39,6 +39,12 @@ public class Alignment extends DataSource {
                 return null;
         }
     }
+    
+    
+    @Override
+    public String getTypeName() {
+        return "Alignment";
+    }
 
     @Override
     public ArrayList<DataSource> getChildren() {

@@ -5,13 +5,10 @@
 package nava.ui.navigator;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.util.ArrayList;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
 import nava.data.types.DataSource;
@@ -31,6 +28,7 @@ public class NavigatorTreeNode extends DefaultMutableTreeNode implements Seriali
     }
 
     public NavigatorTreeNode(DataSource dataSource) {
+        super();
         this.dataSource = dataSource;
 
         ArrayList<DataSource> children = this.dataSource.getChildren();

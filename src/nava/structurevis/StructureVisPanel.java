@@ -19,7 +19,6 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
 import nava.structurevis.data.*;
 import nava.ui.ProjectController;
 import nava.ui.ProjectView;

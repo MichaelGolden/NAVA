@@ -34,6 +34,11 @@ public class Sequence extends DataSource {
         }
         return null;
     }
+    
+    @Override
+    public String getTypeName() {
+        return "Sequence";
+    }
 
     @Override
     public ArrayList<DataSource> getChildren() {

@@ -5,6 +5,8 @@
 package nava.ui.navigator;
 
 import java.io.Serializable;
+import java.util.Enumeration;
+import java.util.Objects;
 import javax.swing.event.ListDataEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -51,6 +53,24 @@ public class NavigatorTreeModel extends DefaultTreeModel implements Serializable
 
         tabularNode = NavigatorTreeNode.createFolderNode("Tabular data");
         dataNode.add(tabularNode);
+    }
+    
+    public NavigatorTreeNode findNode(DataSource dataSource)
+    {
+        Enumeration<DefaultMutableTreeNode> en = ((DefaultMutableTreeNode) getRoot()).breadthFirstEnumeration();
+        while(en.hasMoreElements())
+        {
+            DefaultMutableTreeNode node = en.nextElement();
+            if(node instanceof NavigatorTreeNode)
+            {
+                NavigatorTreeNode nnode = (NavigatorTreeNode)node;
+                if(Objects.equals(nnode.dataSource, dataSource))
+                {
+                    return nnode;
+                }
+            }
+        }
+        return null;
     }
 
     public void addDataSource(DataSource dataSource) {

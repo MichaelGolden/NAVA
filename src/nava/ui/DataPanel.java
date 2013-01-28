@@ -7,7 +7,6 @@ package nava.ui;
 import java.awt.BorderLayout;
 import nava.tasks.applications.ApplicationController;
 import nava.data.types.TabularField;
-import nava.structurevis.DataInspectorPanel;
 import nava.ui.navigator.NavigationEvent;
 import nava.ui.navigator.NavigationListener;
 import nava.ui.navigator.NavigatorPanel;
@@ -36,7 +35,7 @@ public class DataPanel extends javax.swing.JPanel implements NavigationListener 
 
         navigatorPanel = new NavigatorPanel(projectController);
         navigatorPanel.addNavigationListener(this);
-        dataInspectorPanel = new DataInspectorPanel();
+        dataInspectorPanel = new DataInspectorPanel(projectController);
         applicationPanel = new ApplicationPanel(appController, projectController);
         taskPanel = new TaskPanel();
 
@@ -66,6 +65,8 @@ public class DataPanel extends javax.swing.JPanel implements NavigationListener 
         jPanel1.setLayout(new java.awt.BorderLayout());
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Data inspector"));
+        jPanel3.setMinimumSize(new java.awt.Dimension(350, 23));
+        jPanel3.setPreferredSize(new java.awt.Dimension(500, 23));
         jPanel3.setLayout(new java.awt.BorderLayout());
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Actions"));
@@ -81,9 +82,10 @@ public class DataPanel extends javax.swing.JPanel implements NavigationListener 
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 244, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 215, Short.MAX_VALUE)
-                .addGap(10, 10, 10)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE)
+                .addContainerGap())
             .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(

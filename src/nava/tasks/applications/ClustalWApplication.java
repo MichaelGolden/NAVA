@@ -27,7 +27,6 @@ public class ClustalWApplication extends Application {
     @Override
     protected void start() {
         File tempDir = createTemporaryDirectory();
-        System.out.println(tempDir);
         
         File inFastaFile = new File(inputDataSource.importedDataSourcePath);
         File outFastaFile = new File(tempDir.getAbsolutePath() + File.separator + "temp.fas");

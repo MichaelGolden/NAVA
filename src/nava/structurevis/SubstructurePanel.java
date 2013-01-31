@@ -160,7 +160,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         StructureDataDialog d = new StructureDataDialog(null, true, projectController.projectModel, structureVisController);
-        d.setSize(640, 480);
+        d.setSize(640, 580);
         d.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables

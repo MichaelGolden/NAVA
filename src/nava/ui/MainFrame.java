@@ -7,12 +7,16 @@ package nava.ui;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.FontFormatException;
+import java.awt.Image;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.PropertyResourceBundle;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import nava.tasks.applications.ApplicationController;
 import nava.data.types.DataSourceCache;
@@ -26,6 +30,7 @@ import nava.ui.navigator.NavigatorPanel;
  */
 public class MainFrame extends javax.swing.JFrame implements WindowListener {
 
+    public static PropertyResourceBundle resources = (PropertyResourceBundle) ResourceBundle.getBundle("resources.text.text");
     public static TaskManager taskManager;
     public static DataSourceCache dataSourceCache = new DataSourceCache();
     
@@ -42,7 +47,7 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
     public static JFileChooser browseDialog = new JFileChooser();
     
     public void startup()
-    {
+    {        
         try {
             fontLiberationSans = Font.createFont(Font.PLAIN, ClassLoader.getSystemResourceAsStream("resources/fonts/LiberationSans-Regular.ttf")).deriveFont(12.0f);
             fontDroidSansMono = Font.createFont(Font.PLAIN, ClassLoader.getSystemResourceAsStream("resources/fonts/DroidSansMono.ttf")).deriveFont(12.0f);
@@ -83,6 +88,7 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
         jPanel2.add(structureVisPanel, BorderLayout.CENTER);
         
         
+        this.setIconImage(new ImageIcon(ClassLoader.getSystemResource("resources/icons/icon-32x32.png")).getImage());
         this.addWindowListener(this);
     }
 
@@ -100,6 +106,7 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
         jPanel2 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Nucleic Acid Visualisation and Analysis");
         setPreferredSize(new java.awt.Dimension(800, 600));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {

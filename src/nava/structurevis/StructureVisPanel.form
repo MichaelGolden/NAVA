@@ -94,7 +94,7 @@
                     <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                       <Image iconType="3" name="/resources/icons/tabular-field-16x16.png"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="Edit 1D data"/>
+                    <Property name="text" type="java.lang.String" value="Edit 1D overlay"/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="edit1DDataButtonActionPerformed"/>
@@ -105,7 +105,7 @@
                     <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                       <Image iconType="3" name="/resources/icons/tabular-field-16x16.png"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="Add 1D data"/>
+                    <Property name="text" type="java.lang.String" value="Add 1D overlay"/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="add1DDataButtonActionPerformed"/>
@@ -138,7 +138,7 @@
                     <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                       <Image iconType="3" name="/resources/icons/tabular-field-16x16.png"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="Edit 2D data"/>
+                    <Property name="text" type="java.lang.String" value="Edit 2D overlay"/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="edit2DDataButtonActionPerformed"/>
@@ -149,7 +149,7 @@
                     <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                       <Image iconType="3" name="/resources/icons/tabular-field-16x16.png"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="Add 2D data"/>
+                    <Property name="text" type="java.lang.String" value="Add 2D overlay"/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="add2DDataButtonActionPerformed"/>

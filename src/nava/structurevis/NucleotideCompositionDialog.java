@@ -5,6 +5,7 @@
 package nava.structurevis;
 
 import java.awt.BorderLayout;
+import javax.swing.ImageIcon;
 import nava.structurevis.data.AnnotationSource;
 import nava.structurevis.data.NucleotideComposition;
 import nava.ui.ProjectModel;
@@ -30,6 +31,8 @@ public class NucleotideCompositionDialog extends javax.swing.JDialog {
 
         nucleotidePanel = new NucleotideCompositionPanel(projectModel);
         this.jPanel1.add(nucleotidePanel, BorderLayout.CENTER);
+        
+        this.setIconImage(new ImageIcon(ClassLoader.getSystemResource("resources/icons/icon-32x32.png")).getImage());
     }
 
     /**
@@ -42,7 +45,7 @@ public class NucleotideCompositionDialog extends javax.swing.JDialog {
     private void initComponents() {
 
         jPanel2 = new javax.swing.JPanel();
-        jButton3 = new javax.swing.JButton();
+        cancelButton = new javax.swing.JButton();
         addButton = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
 
@@ -50,8 +53,13 @@ public class NucleotideCompositionDialog extends javax.swing.JDialog {
 
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
-        jButton3.setText("Cancel");
-        jPanel2.add(jButton3);
+        cancelButton.setText("Cancel");
+        cancelButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelButtonActionPerformed(evt);
+            }
+        });
+        jPanel2.add(cancelButton);
 
         addButton.setText("Add");
         addButton.addActionListener(new java.awt.event.ActionListener() {
@@ -86,6 +94,10 @@ public class NucleotideCompositionDialog extends javax.swing.JDialog {
         structureVisController.addNucleotideCompositionSource(nucleotideComposition);
         this.dispose();
     }//GEN-LAST:event_addButtonActionPerformed
+
+    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+        this.dispose();
+    }//GEN-LAST:event_cancelButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -138,7 +150,7 @@ public class NucleotideCompositionDialog extends javax.swing.JDialog {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
-    private javax.swing.JButton jButton3;
+    private javax.swing.JButton cancelButton;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     // End of variables declaration//GEN-END:variables

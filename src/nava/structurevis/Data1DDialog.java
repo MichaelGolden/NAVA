@@ -5,6 +5,7 @@
 package nava.structurevis;
 
 import java.awt.BorderLayout;
+import javax.swing.ImageIcon;
 import nava.ui.ProjectModel;
 
 /**
@@ -39,6 +40,8 @@ public class Data1DDialog extends javax.swing.JDialog {
         {
             this.addButton.setText("Add");
         }
+        
+        this.setIconImage(new ImageIcon(ClassLoader.getSystemResource("resources/icons/icon-32x32.png")).getImage());
     }
 
     /**
@@ -53,19 +56,25 @@ public class Data1DDialog extends javax.swing.JDialog {
         jButton1 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
-        jButton3 = new javax.swing.JButton();
+        cancelButton = new javax.swing.JButton();
         addButton = new javax.swing.JButton();
 
         jButton1.setText("jButton1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Add 1-dimensional data overlay");
 
         jPanel1.setLayout(new java.awt.BorderLayout());
 
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
-        jButton3.setText("Cancel");
-        jPanel2.add(jButton3);
+        cancelButton.setText("Cancel");
+        cancelButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelButtonActionPerformed(evt);
+            }
+        });
+        jPanel2.add(cancelButton);
 
         addButton.setText("Add");
         addButton.addActionListener(new java.awt.event.ActionListener() {
@@ -97,6 +106,10 @@ public class Data1DDialog extends javax.swing.JDialog {
         structureVisController.addStructureVisDataSource1D(data1DPanel.getDataSource1D());
         this.dispose();
     }//GEN-LAST:event_addButtonActionPerformed
+
+    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+        this.dispose();
+    }//GEN-LAST:event_cancelButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -149,8 +162,8 @@ public class Data1DDialog extends javax.swing.JDialog {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
+    private javax.swing.JButton cancelButton;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     // End of variables declaration//GEN-END:variables

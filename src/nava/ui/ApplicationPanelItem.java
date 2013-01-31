@@ -39,33 +39,36 @@ public class ApplicationPanelItem extends javax.swing.JPanel {
 
         this.appLabel.setText(name);
         String text = "<html><i>No description available.</i></html>";
-        if(description != null && description.length() != 0)
-        {
+        if (description != null && description.length() != 0) {
             text = description.replaceAll("\n", "<br>");
         }
-        String html = "<html>"+text+"</html>";
+        String html = "<html>" + text + "</html>";
         this.setToolTipText(html);
     }
     
-    /*
-    public void resizeTextArea()
+    public static void main(String [] args)
     {
-        Dimension minSize = new Dimension(100, 100);
-        jTextArea2.setPreferredSize(minSize);
-        jTextArea2.setSize(minSize);
-        try {
-            Rectangle r = jTextArea2.modelToView(jTextArea2.getDocument().getLength());
-            jTextArea2.setSize(jTextArea2.getPreferredSize());
-            
-            System.out.println("HAHAH"+jTextArea2.getBounds());
-            System.out.println("HAHAB"+jTextArea2.getPreferredScrollableViewportSize());
-            System.out.println("HAHAH"+jTextArea2.getPreferredSize());
-            jTextArea2.setPreferredSize(new Dimension(minSize.width, r.y + r.height));
-        } catch (BadLocationException ex) {
-            
-        }
-    }*/
+        //System.out.println(ApplicationPanelItem.wrapText("Hello my name is Mark, I'm a robot here to eat you.\nPlease collect $200 before passing GO. Okay I'm not quite sure what is up with that.\nNewlines are like daisies they blow in the wind, but you can't see the wind.", 50));
+    }
 
+    
+
+    /*
+     * public void resizeTextArea() { Dimension minSize = new Dimension(100,
+     * 100); jTextArea2.setPreferredSize(minSize); jTextArea2.setSize(minSize);
+     * try { Rectangle r =
+     * jTextArea2.modelToView(jTextArea2.getDocument().getLength());
+     * jTextArea2.setSize(jTextArea2.getPreferredSize());
+     *
+     * System.out.println("HAHAH"+jTextArea2.getBounds());
+     * System.out.println("HAHAB"+jTextArea2.getPreferredScrollableViewportSize());
+     * System.out.println("HAHAH"+jTextArea2.getPreferredSize());
+     * jTextArea2.setPreferredSize(new Dimension(minSize.width, r.y +
+     * r.height)); } catch (BadLocationException ex) {
+     *
+     * }
+     * }
+     */
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -91,10 +94,10 @@ public class ApplicationPanelItem extends javax.swing.JPanel {
         jPanel3.setLayout(new javax.swing.BoxLayout(jPanel3, javax.swing.BoxLayout.PAGE_AXIS));
 
         jPanel2.setOpaque(false);
-        jPanel2.setPreferredSize(new java.awt.Dimension(100, 24));
+        jPanel2.setPreferredSize(new java.awt.Dimension(100, 20));
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel1.setText("Application name:");
+        jLabel1.setText("Name:");
         jPanel2.add(jLabel1);
 
         appLabel.setText("app_name");
@@ -102,11 +105,12 @@ public class ApplicationPanelItem extends javax.swing.JPanel {
 
         jPanel3.add(jPanel2);
 
+        jPanel1.setMinimumSize(new java.awt.Dimension(130, 20));
         jPanel1.setOpaque(false);
         jPanel1.setPreferredSize(new java.awt.Dimension(0, 24));
         jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel3.setText("Required data source(s):");
+        jLabel3.setText("Usage:");
         jPanel1.add(jLabel3);
 
         jPanel3.add(jPanel1);
@@ -121,5 +125,4 @@ public class ApplicationPanelItem extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     // End of variables declaration//GEN-END:variables
-
 }

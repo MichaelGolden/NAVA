@@ -71,8 +71,8 @@ public class RNAalifoldApplication extends Application {
         }
 
         try {
-            String tempPath = System.getProperty("java.io.tmpdir") + "/";
-            File tempClustalFile = new File(tempPath + "temp.clustalw");
+            File tempPath = createTemporaryDirectory();
+            File tempClustalFile = new File(tempPath.getAbsolutePath() + "temp.clustalw");
             saveClustalW(sequences, sequenceNames, tempClustalFile);
             String args = executable + " " + "-p " + arguments;
             String file = tempClustalFile.getAbsolutePath();
@@ -83,8 +83,8 @@ public class RNAalifoldApplication extends Application {
 
             // create a process builder to execute in temporary directory
             ProcessBuilder processBuilder = new ProcessBuilder();
-            processBuilder.directory(new File(tempPath));
-            ArrayList<String> commands = new ArrayList<String>();
+            processBuilder.directory(tempPath);
+            ArrayList<String> commands = new ArrayList<>();
             String[] split = args.split("(\\s)+");
             for (int i = 0; i < split.length; i++) {
                 commands.add(split[i]);
@@ -106,15 +106,77 @@ public class RNAalifoldApplication extends Application {
 
             RNAalifoldResult result = new RNAalifoldResult();
             if (useMatrix) {
-                result.matrix = loadBasePairProbMatrix(new File(tempPath + "alidot.ps"), sequences.get(0).length());
+                result.matrix = loadBasePairProbMatrix(new File(tempPath.getAbsolutePath() + "alidot.ps"), sequences.get(0).length());
             }
-            result.pairedSites = RNAFoldingTools.getPairedSitesFromDotBracketString(loadDotBracketStructure(new File(tempPath + "alifold.out")));
+            result.pairedSites = RNAFoldingTools.getPairedSitesFromDotBracketString(loadDotBracketStructure(new File(tempPath.getAbsolutePath() + "alifold.out")));
             result.firstSequence = sequences.get(0);
             return result;
         } catch (Exception ex) {
             ex.printStackTrace();
         }
         return null;
+    }
+
+    public void execute(List<String> sequences, List<String> sequenceNames, String arguments) throws Exception {
+        if (useOldParams) {
+            arguments = arguments.replaceAll(" --cfactor ", " -cv ");
+            arguments = arguments.replaceAll(" --nfactor ", " -nc ");
+        }
+
+        try {
+            String tempPath = createTemporaryDirectory().getAbsolutePath()+File.separator;
+            File tempClustalFile = new File(tempPath + "temp.clustalw");
+            saveClustalW(sequences, sequenceNames, tempClustalFile);
+            String args = executable + " " + "-p " + arguments;
+            String file = tempClustalFile.getAbsolutePath();
+            if (useOldParams) {
+                args = executable + " " + "-p " + arguments;
+            }
+
+
+            // create a process builder to execute in temporary directory
+            ProcessBuilder processBuilder = new ProcessBuilder();
+            processBuilder.directory(new File(tempPath));
+            ArrayList<String> commands = new ArrayList<>();
+            String[] split = args.split("(\\s)+");
+            for (int i = 0; i < split.length; i++) {
+                commands.add(split[i]);
+            }
+            commands.add(file);
+            //System.out.println(commands);
+            processBuilder.command(commands);
+
+            process = processBuilder.start();
+            startConsoleInputBuffer(process);
+            startConsoleErrorBuffer(process);
+
+            int exitCode = process.waitFor();
+
+            if (exitCode == 0) {
+                File matrixFile = new File(tempPath + "rnaalifold.cmat");
+                saveBasePairProbMatrixAsCoordinateListMatrix(new File(tempPath + "alidot.ps"), sequences.get(0).length(), matrixFile);
+
+                ApplicationOutput outputFile1 = new ApplicationOutput();
+                outputFile1.file = null;
+                SecondaryStructure structure = new SecondaryStructure();
+                structure.title = inputDataSource.title;
+                structure.parentSource = inputDataSource;
+                outputFile1.dataSource = structure;
+                outputFile1.object = new SecondaryStructureData(inputDataSource.title, sequences.get(0), RNAFoldingTools.getPairedSitesFromDotBracketString(loadDotBracketStructure(new File(tempPath + "alifold.out"))));
+                outputFiles.add(outputFile1);
+
+                ApplicationOutput outputFile2 = new ApplicationOutput();
+                outputFile2.file = matrixFile;
+                System.out.println(matrixFile);
+                Matrix matrix = new Matrix();
+                matrix.title = inputDataSource.title;
+                matrix.parentSource = inputDataSource;
+                outputFile2.dataSource = matrix;
+                outputFiles.add(outputFile2);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     public static void saveClustalW(List<String> sequences, List<String> sequenceNames, File outFile) {
@@ -160,7 +222,7 @@ public class RNAalifoldApplication extends Application {
                     if (split.length >= 7 && split[6].endsWith("ubox")) {
                         int x = Integer.parseInt(split[3]) - 1;
                         int y = Integer.parseInt(split[4]) - 1;
-                        double prob = Double.parseDouble(split[5]);
+                        double prob = Math.pow(Double.parseDouble(split[5]),2);
                         matrix[x][y] = prob;
                         matrix[y][x] = prob;
                     }
@@ -174,6 +236,33 @@ public class RNAalifoldApplication extends Application {
         }
 
         return matrix;
+    }
+
+    public static void saveBasePairProbMatrixAsCoordinateListMatrix(File basePairFile, int length, File outFile) {
+        try {
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(basePairFile));
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outFile));
+            String textline = null;
+            boolean cont = false;
+            while ((textline = bufferedReader.readLine()) != null) {
+                if (cont) {
+                    String[] split = textline.split("(\\s)+");
+                    if (split.length >= 7 && split[6].endsWith("ubox")) {
+                        int x = Integer.parseInt(split[3]) - 1;
+                        int y = Integer.parseInt(split[4]) - 1;
+                        double prob = Double.parseDouble(split[5]);
+                        bufferedWriter.write(x + "," + y + "," + prob + "\n");
+                        bufferedWriter.write(y + "," + x + "," + prob + "\n");
+                    }
+                } else if (textline.startsWith("drawgrid")) {
+                    cont = true;
+                }
+            }
+            bufferedReader.close();
+            bufferedWriter.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
     private Alignment inputDataSource;
     boolean started = false;
@@ -189,16 +278,16 @@ public class RNAalifoldApplication extends Application {
             started = true;
             running = true;
             AlignmentData alignmentData = inputDataSource.getObject(MainFrame.dataSourceCache);
-            RNAalifoldResult result = null;
+
             try {
                 ArrayList<String> sequenceNames = new ArrayList<String>();
                 for (int i = 0; i < alignmentData.sequences.size(); i++) {
                     sequenceNames.add("S" + i);
                 }
 
-                result = fold(alignmentData.sequences, sequenceNames, "");
-
-                if (result != null) {
+                //result = fold(alignmentData.sequences, sequenceNames, "");
+                execute(alignmentData.sequences, sequenceNames, "");
+                /*if (result != null) {
                     ApplicationOutput outputFile1 = new ApplicationOutput();
 
                     outputFile1.file = null;
@@ -217,7 +306,7 @@ public class RNAalifoldApplication extends Application {
                     outputFile2.dataSource = matrix;
                     outputFile2.object = new DenseMatrixData(result.matrix);
                     outputFiles.add(outputFile2);
-                }
+                }*/
             } catch (Exception ex) {
                 Logger.getLogger(RNAalifoldApplication.class.getName()).log(Level.SEVERE, null, ex);
             }

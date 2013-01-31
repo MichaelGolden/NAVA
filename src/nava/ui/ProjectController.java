@@ -50,7 +50,7 @@ public class ProjectController implements ListDataListener {
 
                     if (structures.size() == 1) {
                         dataSource = new SecondaryStructure();
-                        createPath(dataSource,dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1),dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1));          
+                        createPath(dataSource, dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1), dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1));
                         dataSource.originalFile = dataFile;
                         dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                         dataSource.dataType = dataType;
@@ -58,7 +58,7 @@ public class ProjectController implements ListDataListener {
                         dataSource.fileSize = new FileSize(dataFile.length());
                     } else {
                         dataSource = new StructureList(dataFile.getName());
-                        createPath(dataSource,dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1),dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1));          
+                        createPath(dataSource, dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1), dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1));
                         dataSource.originalFile = dataFile;
                         dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                         dataSource.dataType = dataType;
@@ -77,8 +77,8 @@ public class ProjectController implements ListDataListener {
                 try {
                     if (dataType.fileFormat.equals(DataType.FileFormat.EXCEL)) {
                         dataSource = ExcelIO.getTabularRepresentation(dataFile);
-                        createPath(dataSource,dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1),"csv");                
-                        dataSource.originalFile = dataFile;                        
+                        createPath(dataSource, dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1), "csv");
+                        dataSource.originalFile = dataFile;
                         dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                         dataSource.dataType = dataType;
                         dataSource.persistObject(dataSource);
@@ -86,8 +86,8 @@ public class ProjectController implements ListDataListener {
                         ExcelIO.saveAsCSV(dataFile, Paths.get(dataSource.importedDataSourcePath).toFile());
                     } else if (dataType.fileFormat.equals(DataType.FileFormat.CSV)) {
                         dataSource = CsvReader.getTabularRepresentation(dataFile);
-                        createPath(dataSource,dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1),"csv");                
-                        dataSource.originalFile = dataFile;                        
+                        createPath(dataSource, dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1), "csv");
+                        dataSource.originalFile = dataFile;
                         dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                         dataSource.dataType = dataType;
                         dataSource.persistObject(dataSource);
@@ -103,8 +103,8 @@ public class ProjectController implements ListDataListener {
             case ANNOTATION_DATA:
                 try {
                     dataSource = new Annotations();
-                    createPath(dataSource,dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1),"gb");                
-                    dataSource.originalFile = dataFile;                   
+                    createPath(dataSource, dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1), "gb");
+                    dataSource.originalFile = dataFile;
                     dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                     dataSource.dataType = dataType;
                     //dataSource.persistObject(dataSource);
@@ -118,21 +118,21 @@ public class ProjectController implements ListDataListener {
                 break;
             case MATRIX:
                 dataSource = new Matrix();
-                createPath(dataSource,dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1),"matrix");                
-                dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");                
+                createPath(dataSource, dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1), "matrix");
+                dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                 dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                 dataSource.dataType = dataType;
                 dataSource.fileSize = new FileSize(dataFile.length());
 
                 if (dataType.fileFormat == DataType.FileFormat.DENSE_MATRIX) {
                     try {
-                        PersistentSparseMatrix.createMatrixFromDenseMatrix(dataFile, "[\\s,;]+", new File(dataSource.importedDataSourcePath));
+                        PersistentSparseMatrix.createMatrixFromDenseMatrixFile(dataFile, "[\\s,;]+", new File(dataSource.importedDataSourcePath));
                     } catch (IOException ex) {
                         Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 } else if (dataType.fileFormat == DataType.FileFormat.COORDINATE_LIST_MATRIX) {
                     try {
-                        PersistentSparseMatrix.createMatrixFromCoordinateListMatrix(dataFile, "[\\s,;]+", new File(dataSource.importedDataSourcePath));
+                        PersistentSparseMatrix.createMatrixFromCoordinateListMatrixFile(dataFile, "[\\s,;]+", new File(dataSource.importedDataSourcePath));
                     } catch (IOException ex) {
                         Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -140,8 +140,8 @@ public class ProjectController implements ListDataListener {
                 break;
             case ALIGNMENT:
                 Alignment al = new Alignment();
-                createPath(al,dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1), "fas");          
-                al.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");   
+                createPath(al, dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1), "fas");
+                al.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                 al.dataType = dataType;
                 al.fileSize = new FileSize(dataFile.length());
 
@@ -182,13 +182,18 @@ public class ProjectController implements ListDataListener {
                 projectModel.dataSources.addElement(structure);
             }
         } else if (outputFile.dataSource instanceof Matrix) {
-            if (outputFile.object != null) {
+            if (outputFile.file != null) {
                 Matrix matrix = (Matrix) outputFile.dataSource;
                 matrix.setImportId(getNextImportId());
                 matrix.originalDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "matrix").toString();
                 matrix.importedDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "matrix").toString();
                 matrix.title = outputFile.dataSource.title;
-                matrix.persistObject(outputFile.object);
+                System.out.println("OVJER "+outputFile.file);
+                try {
+                    PersistentSparseMatrix.createMatrixFromCoordinateListMatrixFile(outputFile.file, "[\\s,;]+", new File(matrix.importedDataSourcePath));
+                } catch (IOException ex) {
+                    Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
+                }
 
                 matrix.fileSize = new FileSize(Paths.get(matrix.originalDataSourcePath).toFile().length());
                 projectModel.dataSources.addElement(matrix);

@@ -48,4 +48,36 @@ public class Utils {
         
         return true;        
     }
+    
+    public static String wrapText(String s, int width) {
+        String wrappedText = "";
+
+        String[] split = s.split("\n");
+        for (int k = 0 ; k < split.length ; k++) {
+            String wrappedLine = "";
+            String line = split[k];
+            String remainingText = line;
+            while (remainingText.length() > width) {
+                int i = remainingText.lastIndexOf(" ", width);
+                if (i == -1) {
+                    i = width;
+                }
+                wrappedLine += remainingText.substring(0, i).trim() + "\n";
+                remainingText = remainingText.substring(i);
+            }
+            wrappedLine += remainingText.trim();
+            wrappedText += wrappedLine;
+            if(k != split.length-1)
+            {
+                wrappedText += "\n";
+            }
+        }
+        
+        return wrappedText;
+    }
+    
+    public static String plainTextToHtml(String plainText)
+    {
+        return "<html>"+plainText.replaceAll("\n", "<br>") +"</html>";
+    }
 }

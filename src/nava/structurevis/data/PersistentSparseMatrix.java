@@ -15,7 +15,7 @@ import nava.data.types.DenseMatrixData;
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
 public class PersistentSparseMatrix implements Serializable {
-
+    
     public static double DEFAULT_EMPTY_VALUE = Double.MIN_VALUE;
     public static final int ELEMENT_SIZE = 12;
     private File matrixFile;
@@ -36,7 +36,7 @@ public class PersistentSparseMatrix implements Serializable {
     private static Random random = new Random();
     private int n;
     private int m;
-
+    
     public PersistentSparseMatrix(File matrixFile) throws IOException {
         this.matrixFile = matrixFile;
         DataInputStream dataInputStream = new DataInputStream(new FileInputStream(matrixFile));
@@ -66,7 +66,7 @@ public class PersistentSparseMatrix implements Serializable {
             m = Math.max(m, maxColIndexInRow[i]);
         }
     }
-
+    
     public DenseMatrixData getDenseMatrixData(double fillEmptyWith) throws Exception {
         double[][] matrix = new double[n][m];
         for (int i = 0; i < n; i++) {
@@ -78,10 +78,10 @@ public class PersistentSparseMatrix implements Serializable {
                 matrix[i][j] = val;
             }
         }
-
+        
         return new DenseMatrixData(matrix);
     }
-
+    
     public RowElement get(RandomAccessFile randomAccessFile, int i, int j) throws IOException {
         long seekPos = headerLength;
         if (i > 0) {
@@ -107,26 +107,26 @@ public class PersistentSparseMatrix implements Serializable {
                 break;
             }
         }
-
+        
         if (key == elem.index) {
             return elem;
         } else {
             return null;
         }
     }
-
+    
     public RowElement get(int i, int j) throws IOException {
         RandomAccessFile randomAccessFile = new RandomAccessFile(matrixFile, "r");
         RowElement elem = get(randomAccessFile, i, j);
         randomAccessFile.close();
         return elem;
     }
-
+    
     public double getValue(int i, int j) throws IOException {
         if (i < 0 || i >= n || j < 0 || j >= m) {
             return emptyValue;
         }
-
+        
         CachedLine cachedLine = getCachedLineForPosition(i, j);
         for (int n = Math.max(0, j - 4); n < Math.min(j + 4, rowCounts.length); n++) {
             getCachedLineForPosition(i, n);
@@ -139,7 +139,7 @@ public class PersistentSparseMatrix implements Serializable {
         }
         return emptyValue;
     }
-
+    
     public CachedLine getCachedLineForPosition(int i, int j) throws IOException {
         CachedLineKey cachedLineKey = new CachedLineKey(i, j / cacheLineSize);
         CachedLine cachedLine = lineCache.get(cachedLineKey);
@@ -191,7 +191,7 @@ public class PersistentSparseMatrix implements Serializable {
                 }
             }
             randomAccessFile.close();
-
+            
             this.lineCache.put(cachedLineKey, cachedLine);
             if (keyQueue.contains(cachedLineKey)) {
                 keyQueue.remove(cachedLineKey);
@@ -208,7 +208,7 @@ public class PersistentSparseMatrix implements Serializable {
         }
         return cachedLine;
     }
-
+    
     public RowElement getRowElementUnsafe(RandomAccessFile randomAccessFile, int i, int offset) throws IOException {
         long seekPos = headerLength;
         if (i > 0) {
@@ -221,23 +221,23 @@ public class PersistentSparseMatrix implements Serializable {
         double value = randomAccessFile.readDouble();
         return new RowElement(index, value);
     }
-
+    
     public double getMinValue() {
         return minValue;
     }
-
+    
     public double getMaxValue() {
         return maxValue;
     }
-
+    
     public double getEmptyValue() {
         return emptyValue;
     }
-
-    public static void createMatrixFromDenseMatrix(File inFile, String regexSeperator, File outFile) throws IOException {
+    
+    public static void createMatrixFromDenseMatrixFile(File inFile, String regexSeperator, File outFile) throws IOException {
         createMatrixFromDenseMatrix(inFile, regexSeperator, new File(System.getProperty("java.io.tmpdir") + "/" + Math.abs(random.nextLong()) + "_persistent_temp.matrix"), outFile);
     }
-
+    
     public static void createMatrixFromDenseMatrix(File inFile, String regexSeperator, File tempFile, File outFile) throws IOException {
         HashMap<Integer, Integer> rowCount = new HashMap<>(); // i, count
         HashMap<Integer, Integer> maxColIndexMap = new HashMap<>(); // i, maxIndex
@@ -245,10 +245,10 @@ public class PersistentSparseMatrix implements Serializable {
         int elements = 0;
         double minValue = Double.MAX_VALUE;
         double maxValue = Double.MIN_VALUE;
-
+        
         BufferedReader buffer = new BufferedReader(new FileReader(inFile));
         String textline = null;
-
+        
         int firstLength = -1;
         int k = 0;
         while ((textline = buffer.readLine()) != null) {
@@ -261,7 +261,7 @@ public class PersistentSparseMatrix implements Serializable {
                 maxRowIndex = Math.max(maxRowIndex, k);
                 maxColIndexMap.put(k, firstLength);
                 elements += firstLength;
-
+                
                 for (int j = 0; j < split.length; j++) {
                     double v = Double.parseDouble(split[j].trim());
                     minValue = Math.min(minValue, v);
@@ -273,7 +273,7 @@ public class PersistentSparseMatrix implements Serializable {
             }
         }
         buffer.close();
-
+        
         int[] rowCounts = new int[maxRowIndex + 1];
         int[] rowCountsSum = new int[rowCounts.length];
         int[] maxColIndexInRow = new int[rowCounts.length];
@@ -286,7 +286,7 @@ public class PersistentSparseMatrix implements Serializable {
                 rowCountsSum[i] = rowCounts[i];
             }
         }
-
+        
         DataOutputStream outBuffer = new DataOutputStream(new FileOutputStream(tempFile));
         outBuffer.writeDouble(DEFAULT_EMPTY_VALUE); // write empty value
         outBuffer.writeInt(maxRowIndex); // write max rows
@@ -297,16 +297,16 @@ public class PersistentSparseMatrix implements Serializable {
             outBuffer.writeInt(maxColIndexInRow[i]);
         }
         outBuffer.close();
-
+        
         RandomAccessFile randomAccessIntermediate = new RandomAccessFile(tempFile, "rw");
         long headerLength = randomAccessIntermediate.length();
         long newLength = headerLength + elements * ELEMENT_SIZE;
         randomAccessIntermediate.setLength(newLength);
         randomAccessIntermediate.seek(headerLength);
-
-
-
-
+        
+        
+        
+        
         HashMap<Integer, Integer> elementsWrittenToRow = new HashMap<>(); // row i, elements written
         BufferedReader inBuffer = new BufferedReader(new FileReader(inFile));
         textline = null;
@@ -334,8 +334,8 @@ public class PersistentSparseMatrix implements Serializable {
         }
         inBuffer.close();
         randomAccessIntermediate.close();
-
-
+        
+        
         RandomAccessFile randomAccessFinal = new RandomAccessFile(outFile, "rw");
         randomAccessFinal.setLength(newLength);
         randomAccessFinal.seek(0);
@@ -347,14 +347,14 @@ public class PersistentSparseMatrix implements Serializable {
         randomAccessFinal.seek(20);
         randomAccessFinal.writeDouble(maxValue);
         for (int i = 0; i < rowCounts.length; i++) {
-
+            
             randomAccessFinal.seek(28 + (i * 8));
             randomAccessFinal.writeInt(rowCounts[i]);
             randomAccessFinal.seek(32 + (i * 8));
             randomAccessFinal.writeInt(maxColIndexInRow[i]);
         }
         randomAccessFinal.seek(headerLength);
-
+        
         DataInputStream dataBuffer = new DataInputStream(new FileInputStream(tempFile));
         double emptyValue = dataBuffer.readDouble();
         maxRowIndex = dataBuffer.readInt();
@@ -366,18 +366,18 @@ public class PersistentSparseMatrix implements Serializable {
             rowCounts[i] = dataBuffer.readInt();
             maxColIndexInRow[i] = dataBuffer.readInt();
         }
-
+        
         for (int y = 0; y < rowCounts.length; y++) {
             int offset = 0;
             if (y > 0) {
                 offset = rowCountsSum[y - 1] * ELEMENT_SIZE;
             }
-
+            
             ArrayList<RowElement> rowElements = new ArrayList<>();
             for (int z = 0; z < rowCounts[y]; z++) {
                 rowElements.add(new RowElement(dataBuffer.readInt(), dataBuffer.readDouble()));
             }
-
+            
             Collections.sort(rowElements);
             if (rowElements.size() > 0) {
                 //int lastIndex = rowElements.get(rowElements.size() - 1).index;
@@ -393,11 +393,11 @@ public class PersistentSparseMatrix implements Serializable {
         randomAccessFinal.close();
         dataBuffer.close();
     }
-
-    public static void createMatrixFromCoordinateListMatrix(File inFile, String regexSeperator, File outFile) throws IOException {
+    
+    public static void createMatrixFromCoordinateListMatrixFile(File inFile, String regexSeperator, File outFile) throws IOException {
         createMatrixFromCoordinateListMatrix(inFile, regexSeperator, new File(System.getProperty("java.io.tmpdir") + "/" + Math.abs(random.nextLong()) + "_persistent_temp.matrix"), outFile);
     }
-
+    
     public static void createMatrixFromCoordinateListMatrix(File inFile, String regexSeperator, File tempFile, File outFile) throws IOException {
         HashMap<Integer, Integer> rowCount = new HashMap<>(); // i, count
         HashMap<Integer, Integer> maxColIndexMap = new HashMap<>(); // i, maxIndex
@@ -405,7 +405,7 @@ public class PersistentSparseMatrix implements Serializable {
         int elements = 0;
         double minValue = Double.MAX_VALUE;
         double maxValue = Double.MIN_VALUE;
-
+        
         BufferedReader buffer = new BufferedReader(new FileReader(inFile));
         String textline = null;
         while ((textline = buffer.readLine()) != null) {
@@ -417,21 +417,21 @@ public class PersistentSparseMatrix implements Serializable {
                     double v = Double.parseDouble(split[2].trim());
                     minValue = Math.min(minValue, v);
                     maxValue = Math.max(maxValue, v);
-
+                    
                     int icount = rowCount.get(i) == null ? 1 : rowCount.get(i) + 1;
                     rowCount.put(i, icount);
                     maxRowIndex = Math.max(maxRowIndex, i);
-
+                    
                     int maxColIndexV = maxColIndexMap.get(i) == null ? j : maxColIndexMap.get(i);
                     maxColIndexMap.put(i, Math.max(maxColIndexV, j));
-
+                    
                     elements++;
                 } catch (NumberFormatException ex) {
                 }
             }
         }
         buffer.close();
-
+        
         int[] rowCounts = new int[maxRowIndex + 1];
         int[] rowCountsSum = new int[rowCounts.length];
         int[] maxColIndexInRow = new int[rowCounts.length];
@@ -444,7 +444,7 @@ public class PersistentSparseMatrix implements Serializable {
                 rowCountsSum[i] = rowCounts[i];
             }
         }
-
+        
         DataOutputStream outBuffer = new DataOutputStream(new FileOutputStream(tempFile));
         outBuffer.writeDouble(DEFAULT_EMPTY_VALUE); // write empty value
         outBuffer.writeInt(maxRowIndex); // write max rows
@@ -455,14 +455,14 @@ public class PersistentSparseMatrix implements Serializable {
             outBuffer.writeInt(maxColIndexInRow[i]);
         }
         outBuffer.close();
-
+        
         RandomAccessFile randomAccessIntermediate = new RandomAccessFile(tempFile, "rw");
         long headerLength = randomAccessIntermediate.length();
         long newLength = headerLength + elements * ELEMENT_SIZE;
         randomAccessIntermediate.setLength(newLength);
         randomAccessIntermediate.seek(headerLength);
-
-
+        
+        
         HashMap<Integer, Integer> elementsWrittenToRow = new HashMap<>(); // row i, elements written
         BufferedReader inBuffer = new BufferedReader(new FileReader(inFile));
         textline = null;
@@ -473,7 +473,7 @@ public class PersistentSparseMatrix implements Serializable {
                     int i = Integer.parseInt(split[0].trim());
                     int j = Integer.parseInt(split[1].trim());
                     double v = Double.parseDouble(split[2].trim());
-
+                    
                     long seekPos = headerLength;
                     int elementsWritten = elementsWrittenToRow.get(i) == null ? 0 : elementsWrittenToRow.get(i);
                     if (i > 0) {
@@ -491,8 +491,8 @@ public class PersistentSparseMatrix implements Serializable {
         }
         inBuffer.close();
         randomAccessIntermediate.close();
-
-
+        
+        
         RandomAccessFile randomAccessFinal = new RandomAccessFile(outFile, "rw");
         randomAccessFinal.setLength(newLength);
         randomAccessFinal.seek(0);
@@ -504,14 +504,14 @@ public class PersistentSparseMatrix implements Serializable {
         randomAccessFinal.seek(20);
         randomAccessFinal.writeDouble(maxValue);
         for (int i = 0; i < rowCounts.length; i++) {
-
+            
             randomAccessFinal.seek(28 + (i * 8));
             randomAccessFinal.writeInt(rowCounts[i]);
             randomAccessFinal.seek(32 + (i * 8));
             randomAccessFinal.writeInt(maxColIndexInRow[i]);
         }
         randomAccessFinal.seek(headerLength);
-
+        
         DataInputStream dataBuffer = new DataInputStream(new FileInputStream(tempFile));
         double emptyValue = dataBuffer.readDouble();
         maxRowIndex = dataBuffer.readInt();
@@ -522,18 +522,18 @@ public class PersistentSparseMatrix implements Serializable {
             rowCounts[i] = dataBuffer.readInt();
             maxColIndexInRow[i] = dataBuffer.readInt();
         }
-
+        
         for (int y = 0; y < rowCounts.length; y++) {
             int offset = 0;
             if (y > 0) {
                 offset = rowCountsSum[y - 1] * ELEMENT_SIZE;
             }
-
+            
             ArrayList<RowElement> rowElements = new ArrayList<>();
             for (int z = 0; z < rowCounts[y]; z++) {
                 rowElements.add(new RowElement(dataBuffer.readInt(), dataBuffer.readDouble()));
             }
-
+            
             Collections.sort(rowElements);
             if (rowElements.size() > 0) {
                 //int lastIndex = rowElements.get(rowElements.size() - 1).index;
@@ -549,7 +549,7 @@ public class PersistentSparseMatrix implements Serializable {
         randomAccessFinal.close();
         dataBuffer.close();
     }
-
+    
     public void saveAsCoordinateListMatrix(File outFile) throws IOException {
         BufferedWriter buffer = new BufferedWriter(new FileWriter(outFile));
         Iterator<Element> it = iterator();
@@ -560,15 +560,14 @@ public class PersistentSparseMatrix implements Serializable {
         }
         buffer.close();
     }
-
+    
     public void saveAsDenseMatrix(File outFile) throws IOException {
         BufferedWriter buffer = new BufferedWriter(new FileWriter(outFile));
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
                 double val = getValue(i, j);
-                buffer.write(val+"");
-                if(j != m -1)
-                {
+                buffer.write(val + "");
+                if (j != m - 1) {
                     buffer.write("\t");
                 }
             }
@@ -576,13 +575,13 @@ public class PersistentSparseMatrix implements Serializable {
         }
         buffer.close();
     }
-
+    
     public Iterator<Element> iterator() {
         Iterator<Element> it = new Iterator<Element>() {
-
+            
             private int i = 0;
             private int j = 0;
-
+            
             @Override
             public boolean hasNext() {
                 try {
@@ -607,7 +606,7 @@ public class PersistentSparseMatrix implements Serializable {
                 }
                 return false;
             }
-
+            
             @Override
             public Element next() {
                 try {
@@ -633,14 +632,14 @@ public class PersistentSparseMatrix implements Serializable {
                 }
                 return null;
             }
-
+            
             @Override
             public void remove() {
             }
         };
         return it;
     }
-
+    
     public static void main(String[] args) {
         try {
             //PersistentSparseMatrix.createMatrixFromCoordinateListMatrix(new File("examples/tabular/p-values.csv"), ",", new File("out.sparse"));
@@ -666,46 +665,46 @@ public class PersistentSparseMatrix implements Serializable {
             Logger.getLogger(PersistentSparseMatrix.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
     static class Element {
-
+        
         public int i;
         public int j;
         public double value;
-
+        
         public Element(int i, int j, double value) {
             this.i = i;
             this.j = j;
             this.value = value;
         }
     }
-
+    
     static class CachedLine {
-
+        
         int row;
         int line;
         HashMap<Integer, Double> cache = new HashMap<Integer, Double>();
-
+        
         public CachedLine(int row, int j) {
             this.row = row;
             this.line = j / cacheLineSize;
         }
-
+        
         public void put(int j, double value) {
             cache.put(j, value);
         }
     }
-
+    
     static class RowElement implements Comparable<RowElement> {
-
+        
         int index;
         double value;
-
+        
         public RowElement(int index, double value) {
             this.index = index;
             this.value = value;
         }
-
+        
         @Override
         public int compareTo(RowElement o) {
             int c = this.index - o.index;
@@ -720,23 +719,23 @@ public class PersistentSparseMatrix implements Serializable {
             }
             return c;
         }
-
+        
         @Override
         public String toString() {
             return "RowElement{" + "index=" + index + ", value=" + value + '}';
         }
     }
-
+    
     static class CachedLineKey {
-
+        
         int i;
         int j;
-
+        
         public CachedLineKey(int i, int j) {
             this.i = i;
             this.j = j;
         }
-
+        
         @Override
         public boolean equals(Object obj) {
             if (obj == null) {
@@ -754,7 +753,7 @@ public class PersistentSparseMatrix implements Serializable {
             }
             return true;
         }
-
+        
         @Override
         public int hashCode() {
             int hash = 3;
@@ -762,5 +761,38 @@ public class PersistentSparseMatrix implements Serializable {
             hash = 37 * hash + this.j;
             return hash;
         }
+    }
+    
+    public ArrayList<Double> getSample(int sampleSize) throws IOException {
+        Random random = new Random(4920275133465331511L);
+        ArrayList<Double> sample = new ArrayList<>();
+        int lines = 0;
+        while (sample.size() < sampleSize || lines < 10) {
+            int i = random.nextInt(n);
+            int j = random.nextInt(m);
+            
+           // int j1 = (j / cacheLineSize) * cacheLineSize;
+            //int j2 = j1 + cacheLineSize;
+            CachedLine cachedLine = getCachedLineForPosition(i, j);
+            Set<Integer> keys = cachedLine.cache.keySet();
+            Iterator<Integer> it = keys.iterator();
+            while(it.hasNext())
+            {
+                double val = cachedLine.cache.get(it.next());
+                if (val != emptyValue) {
+                    sample.add(val);
+                }
+                
+            }
+            lines++;
+            /*for (int a = 0 ; a < 50 ; a++) {  
+                this.
+                double val = this.getValue(i, j1 + random.nextInt(cacheLineSize));
+                if (val != emptyValue) {
+                    sample.add(val);
+                }                
+            }*/
+        }
+        return sample;
     }
 }

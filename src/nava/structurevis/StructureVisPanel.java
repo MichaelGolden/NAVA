@@ -188,7 +188,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         jPanel1.add(data1DComboBox);
 
         edit1DDataButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/tabular-field-16x16.png"))); // NOI18N
-        edit1DDataButton.setText("Edit 1D data");
+        edit1DDataButton.setText("Edit 1D overlay");
         edit1DDataButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 edit1DDataButtonActionPerformed(evt);
@@ -197,7 +197,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         jPanel1.add(edit1DDataButton);
 
         add1DDataButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/tabular-field-16x16.png"))); // NOI18N
-        add1DDataButton.setText("Add 1D data");
+        add1DDataButton.setText("Add 1D overlay");
         add1DDataButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 add1DDataButtonActionPerformed(evt);
@@ -210,7 +210,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         jPanel1.add(data2DComboBox);
 
         edit2DDataButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/tabular-field-16x16.png"))); // NOI18N
-        edit2DDataButton.setText("Edit 2D data");
+        edit2DDataButton.setText("Edit 2D overlay");
         edit2DDataButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 edit2DDataButtonActionPerformed(evt);
@@ -219,7 +219,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         jPanel1.add(edit2DDataButton);
 
         add2DDataButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/tabular-field-16x16.png"))); // NOI18N
-        add2DDataButton.setText("Add 2D data");
+        add2DDataButton.setText("Add 2D overlay");
         add2DDataButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 add2DDataButtonActionPerformed(evt);
@@ -278,7 +278,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
 
     private void addNucleotideOverlayButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addNucleotideOverlayButtonActionPerformed
         NucleotideCompositionDialog d = new NucleotideCompositionDialog(null, true, projectController.projectModel, structureVisController);
-        d.setSize(920, 690);
+        d.setSize(600, 80);
         //d.editMode = false;
         d.setVisible(true);
         populateNucleotideComboBox();
@@ -290,14 +290,14 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         if (dataSource2D != null) {
             d.data2DPanel.setDataSource2D(dataSource2D);
             d.editMode = true;
-            d.setSize(920, 690);
+            d.setSize(750, 690);
             d.setVisible(true);
         }
     }//GEN-LAST:event_edit2DDataButtonActionPerformed
 
     private void add2DDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_add2DDataButtonActionPerformed
         Data2DDialog d = new Data2DDialog(null, true, projectController.projectModel, structureVisController);
-        d.setSize(920, 690);
+        d.setSize(750, 690);
         d.editMode = false;
         d.setVisible(true);
     }//GEN-LAST:event_add2DDataButtonActionPerformed

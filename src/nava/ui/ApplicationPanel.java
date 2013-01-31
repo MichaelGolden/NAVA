@@ -85,7 +85,7 @@ public class ApplicationPanel extends javax.swing.JPanel implements ListSelectio
     @Override
     public void valueChanged(ListSelectionEvent e) {
         Application app = (Application) jList1.getSelectedValue();
-        if(app.canProcessDataSources(selectedDataSources))
+        if(app != null && app.canProcessDataSources(selectedDataSources))
         {
             runButton.setEnabled(true);
         }        
@@ -121,8 +121,8 @@ public class ApplicationPanel extends javax.swing.JPanel implements ListSelectio
             Color useableSelectedColor = new Color(190,255,190);
             Color useableUnselectedColor = new Color(230,255,230);
             
-            Color unusuableSelectedColor = new Color(255, 200, 225);
-            Color unusueableUnselectedColor = new Color(255, 220, 245);
+            Color unusuableSelectedColor = new Color(235, 235, 255);
+            Color unusueableUnselectedColor = new Color(255, 255, 255);
             ApplicationPanelItem item = new ApplicationPanelItem(app.getName(), null, app.getDescription());
             if (isSelected) {
                 if (useable) {

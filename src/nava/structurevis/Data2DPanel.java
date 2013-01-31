@@ -15,10 +15,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.InputVerifier;
-import javax.swing.JComponent;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.text.DefaultFormatter;
 import javax.swing.text.DefaultFormatterFactory;
 import nava.data.types.Alignment;
@@ -45,8 +42,9 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
     DataLegend dataLegend = new DataLegend();
     ProjectModel projectModel;
     DefaultFormatter numberFormatter;
-    TabularField selectedField = null;
-    TabularField dataLoadedForField = null;
+    Matrix selectedMatrix = null;
+    PersistentSparseMatrix matrixData = null;
+    Matrix dataLoadedForMatrix = null;
     DataTransform selectedTransform = null;
     //DataSource1D dataSource1D = null;
     DataSource2D dataSource2D = null;
@@ -124,6 +122,16 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
 
         populateDataMatrixComboBox(Collections.list(projectModel.dataSources.elements()));
         populateMappingSourceComboBox(Collections.list(projectModel.dataSources.elements()));
+        
+        
+        ToolTipManager.sharedInstance().setInitialDelay(0);
+        ToolTipManager.sharedInstance().setReshowDelay(0);
+        
+        this.matrixHelpLabel.setToolTipText(Utils.plainTextToHtml(Utils.wrapText(MainFrame.resources.getString("matrixHelpText"), 60)));
+        this.mappingHelpLabel.setToolTipText(Utils.plainTextToHtml(Utils.wrapText(MainFrame.resources.getString("mappingSourceHelpText"), 60)));
+        this.transformHelpLabel.setToolTipText(Utils.plainTextToHtml(Utils.wrapText(MainFrame.resources.getString("transformHelpText"), 60)));
+        this.rangeHelpLabel.setToolTipText(Utils.plainTextToHtml(Utils.wrapText(MainFrame.resources.getString("rangeHelpText"), 60)));
+        this.positionHelpLabel.setToolTipText(Utils.plainTextToHtml(Utils.wrapText(MainFrame.resources.getString("positionHelpText"), 60)));        
     }
 
     public void populateDataMatrixComboBox(List<DataSource> dataSources) {
@@ -146,10 +154,17 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
     ArrayList<Double> values = new ArrayList<>();
 
     public void updateLegend() {
-        if (selectedField != null) {
-            if (!selectedField.equals(dataLoadedForField)) {
-                values = (ArrayList<Double>) selectedField.getObject(MainFrame.dataSourceCache).getNumericValues();
-                dataLoadedForField = selectedField;
+        if (selectedMatrix != null) {
+            if (!selectedMatrix.equals(dataLoadedForMatrix)) {
+                try
+                {
+                    values = (ArrayList<Double>) selectedMatrix.getObject(MainFrame.dataSourceCache).getSample(10000);
+                }
+                catch(Exception ex)
+                {
+                    values = new ArrayList<Double>();
+                }
+                dataLoadedForMatrix = selectedMatrix;
             }
 
             ArrayList<Double> transformedValues = new ArrayList<>(values.size());
@@ -177,8 +192,12 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
         {
              matrixRegion = MatrixRegion.LOWER_TRIANGLE;
         }
-        dataSource2D = DataSource2D.getDataSource2D((Matrix) dataMatrixComboBox.getSelectedItem(), dataTitleField.getText(), naturalRadioButton.isSelected(), true, codonCheckButton.isSelected(), (Double) dataMinField.getValue(), (Double) dataMaxField.getValue(), missingDataRadioButton.isSelected(), selectedTransform, dataLegend.colorGradient, mappingSource, matrixRegion);
-        dataSource2D.loadData();
+        
+        if(dataMatrixComboBox.getSelectedItem() != null)
+        {
+            dataSource2D = DataSource2D.getDataSource2D((Matrix) dataMatrixComboBox.getSelectedItem(), dataTitleField.getText(), naturalRadioButton.isSelected(), true, codonCheckButton.isSelected(), (Double) dataMinField.getValue(), (Double) dataMaxField.getValue(), missingDataRadioButton.isSelected(), selectedTransform, dataLegend.colorGradient, mappingSource, matrixRegion);
+            dataSource2D.loadData();
+        }
     }
 
     public void setDataSource2D(DataSource2D dataSource2D) {
@@ -211,6 +230,7 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
         jPanel1 = new javax.swing.JPanel();
         naturalRadioButton = new javax.swing.JRadioButton();
         codonCheckButton = new javax.swing.JCheckBox();
+        positionHelpLabel = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         dataMatrixComboBox = new javax.swing.JComboBox();
@@ -226,19 +246,21 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
         dataMaxField = new javax.swing.JFormattedTextField();
         dataMinField = new javax.swing.JFormattedTextField();
         restMinMaxButton = new javax.swing.JButton();
+        rangeHelpLabel = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         mappingSourceComboBox = new javax.swing.JComboBox();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        mappingHelpLabel = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         transformComboBox = new javax.swing.JComboBox();
         dataLegendPanel = new javax.swing.JPanel();
+        transformHelpLabel = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
         useEntireMatrixRadioButton = new javax.swing.JRadioButton();
         useUpperMatrixRadioButton = new javax.swing.JRadioButton();
         useLowerMatrixRadioButton = new javax.swing.JRadioButton();
+        matrixHelpLabel = new javax.swing.JLabel();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("2. Specify how the values are positioned"));
 
@@ -247,6 +269,9 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
         naturalRadioButton.setText("Natural (1, 2, 3, ...)");
 
         codonCheckButton.setText("Positions are codon positions");
+
+        positionHelpLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        positionHelpLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/question-24x24.png"))); // NOI18N
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -258,17 +283,23 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
                     .addComponent(naturalRadioButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(codonCheckButton)
-                        .addGap(0, 123, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 95, Short.MAX_VALUE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(positionHelpLabel)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(naturalRadioButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(codonCheckButton)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(naturalRadioButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(codonCheckButton)
+                        .addGap(0, 10, Short.MAX_VALUE))
+                    .addComponent(positionHelpLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("1. Select a data field"));
@@ -307,7 +338,7 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(dataTitleField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(43, Short.MAX_VALUE))
         );
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("5. Specify the numeric range"));
@@ -356,6 +387,9 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
             }
         });
 
+        rangeHelpLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        rangeHelpLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/question-24x24.png"))); // NOI18N
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -382,7 +416,9 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
                         .addContainerGap()
                         .addComponent(missingDataRadioButton)
                         .addGap(18, 18, 18)
-                        .addComponent(clampedRadioButton)))
+                        .addComponent(clampedRadioButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(rangeHelpLabel)))
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
@@ -399,11 +435,14 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
                     .addComponent(dataMaxField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(restMinMaxButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel8)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(missingDataRadioButton)
-                    .addComponent(clampedRadioButton)))
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(jLabel8)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(missingDataRadioButton)
+                            .addComponent(clampedRadioButton)))
+                    .addComponent(rangeHelpLabel)))
         );
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("4. Map the data values to the structure"));
@@ -412,19 +451,8 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
 
         mappingSourceComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
-        jScrollPane1.setBorder(null);
-        jScrollPane1.setOpaque(false);
-
-        jTextArea1.setColumns(20);
-        jTextArea1.setEditable(false);
-        jTextArea1.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jTextArea1.setLineWrap(true);
-        jTextArea1.setRows(5);
-        jTextArea1.setText("You should choose a mapping source (a sequence or an alignment) where the nucleotide positions (column positions) correspond exactly to the data values. This allows the data values to be automatically mapped against the structure.");
-        jTextArea1.setWrapStyleWord(true);
-        jTextArea1.setBorder(null);
-        jTextArea1.setOpaque(false);
-        jScrollPane1.setViewportView(jTextArea1);
+        mappingHelpLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        mappingHelpLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/question-24x24.png"))); // NOI18N
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -432,12 +460,11 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(jLabel4)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(mappingSourceComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE))
+                .addComponent(jLabel4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(mappingSourceComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(mappingHelpLabel)
                 .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
@@ -447,9 +474,10 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(mappingSourceComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE)
-                .addContainerGap())
+                .addContainerGap(47, Short.MAX_VALUE))
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addComponent(mappingHelpLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("6. Choose how the data values are displayed"));
@@ -458,7 +486,11 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
 
         transformComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
+        dataLegendPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         dataLegendPanel.setLayout(new java.awt.BorderLayout());
+
+        transformHelpLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        transformHelpLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/question-24x24.png"))); // NOI18N
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -471,16 +503,21 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(transformComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(transformComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
+                        .addComponent(transformHelpLabel)))
                 .addContainerGap())
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(transformComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel5)
+                            .addComponent(transformComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(transformHelpLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(dataLegendPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -503,6 +540,9 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
         matrixGroup.add(useLowerMatrixRadioButton);
         useLowerMatrixRadioButton.setText("Use only lower triangle");
 
+        matrixHelpLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        matrixHelpLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/question-24x24.png"))); // NOI18N
+
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
@@ -510,20 +550,29 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(useEntireMatrixRadioButton)
-                    .addComponent(useUpperMatrixRadioButton)
-                    .addComponent(useLowerMatrixRadioButton))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addComponent(useLowerMatrixRadioButton)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(useEntireMatrixRadioButton)
+                            .addComponent(useUpperMatrixRadioButton))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(matrixHelpLabel)))
+                .addContainerGap())
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(useEntireMatrixRadioButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(useUpperMatrixRadioButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(useLowerMatrixRadioButton))
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(matrixHelpLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addComponent(useEntireMatrixRadioButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(useUpperMatrixRadioButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(useLowerMatrixRadioButton)))
+                .addContainerGap(39, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -533,16 +582,15 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -554,14 +602,14 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap())
         );
 
         jPanel6.getAccessibleContext().setAccessibleName("3. Select which parts of the matrix to use");
@@ -576,9 +624,9 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
     }//GEN-LAST:event_dataMaxFieldActionPerformed
 
     private void restMinMaxButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_restMinMaxButtonActionPerformed
-        if (selectedField != null) {
-            this.dataMinField.setValue(selectedField.getMinimum());
-            this.dataMaxField.setValue(selectedField.getMaximum());
+        if (selectedMatrix != null) {
+            this.dataMinField.setValue(matrixData.getMinValue());
+            this.dataMaxField.setValue(matrixData.getMaxValue());
             this.update();
         }
     }//GEN-LAST:event_restMinMaxButtonActionPerformed
@@ -618,15 +666,18 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JLabel mappingHelpLabel;
     private javax.swing.JComboBox mappingSourceComboBox;
     private javax.swing.ButtonGroup matrixGroup;
+    private javax.swing.JLabel matrixHelpLabel;
     private javax.swing.JRadioButton missingDataRadioButton;
     private javax.swing.JRadioButton naturalRadioButton;
     private javax.swing.ButtonGroup positionGroup;
+    private javax.swing.JLabel positionHelpLabel;
+    private javax.swing.JLabel rangeHelpLabel;
     private javax.swing.JButton restMinMaxButton;
     private javax.swing.JComboBox transformComboBox;
+    private javax.swing.JLabel transformHelpLabel;
     private javax.swing.JRadioButton useEntireMatrixRadioButton;
     private javax.swing.JRadioButton useLowerMatrixRadioButton;
     private javax.swing.JRadioButton useUpperMatrixRadioButton;
@@ -636,10 +687,11 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
     @Override
     public void itemStateChanged(ItemEvent e) {
         if (e.getSource().equals(this.dataMatrixComboBox)) {
-            Matrix matrix = (Matrix) this.dataMatrixComboBox.getSelectedItem();
-            PersistentSparseMatrix p = matrix.getObject(MainFrame.dataSourceCache);
-            this.dataMinField.setValue(p.getMinValue());
-            this.dataMaxField.setValue(p.getMaxValue());
+            selectedMatrix = (Matrix) this.dataMatrixComboBox.getSelectedItem();
+            matrixData = selectedMatrix.getObject(MainFrame.dataSourceCache);
+            this.dataTitleField.setText(selectedMatrix.title);
+            this.dataMinField.setValue(matrixData.getMinValue());
+            this.dataMaxField.setValue(matrixData.getMaxValue());
         } else if (e.getSource().equals(this.naturalRadioButton)) {
             boolean enable = false;
         }

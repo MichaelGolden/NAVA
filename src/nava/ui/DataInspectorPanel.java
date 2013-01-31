@@ -144,7 +144,8 @@ public class DataInspectorPanel extends javax.swing.JPanel implements ItemListen
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(titleField)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(editTitleButton)))
+                        .addComponent(editTitleButton)
+                        .addGap(58, 58, 58)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -283,6 +284,7 @@ public class DataInspectorPanel extends javax.swing.JPanel implements ItemListen
         final DataExportDialog exportDialog = new DataExportDialog(null, true, className, "out");
         exportDialog.setTitle("Export output");
         exportDialog.setSize(640, 480);
+        exportDialog.closeButton.setEnabled(false);
 
         new Thread() {
 
@@ -321,6 +323,8 @@ public class DataInspectorPanel extends javax.swing.JPanel implements ItemListen
                         }
                     }
                 }
+                
+                exportDialog.closeButton.setEnabled(true);
             }
         }.start();
 

@@ -1,0 +1,154 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package nava.alignment;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import javax.swing.AbstractListModel;
+import nava.data.types.AlignmentData;
+
+/**
+ *
+ * @author Michael Golden <michaelgolden0@gmail.com>
+ */
+public class AlignmentModel extends AbstractListModel {
+
+    AlignmentData alignment;
+    int[] modelToView;
+    int[] viewToModel;
+    
+    List<AlignmentItem> items = null;
+    
+    int [] subItemCount;
+    int [] itemCount;
+    int [] itemCountMod;
+    
+    public void setAlignment(Alignment alignment)
+    {
+        this.items = alignment.items;
+        modelToView = new int[items.size()];
+        viewToModel = new int[modelToView.length];
+        for (int i = 0; i < modelToView.length; i++) {
+            modelToView[i] = i;
+            viewToModel[i] = i;
+        }
+        
+        calculateCounts();
+    }    
+    
+    public void setStructuralAlignment(SecondaryStructureAlignment structureAlignment)
+    {
+        this.setAlignment(structureAlignment);
+    }
+    
+    public void setAlignment(ArrayList<AlignmentItem> items) {
+        this.items = items;
+        modelToView = new int[items.size()];
+        viewToModel = new int[modelToView.length];
+        for (int i = 0; i < modelToView.length; i++) {
+            modelToView[i] = i;
+            viewToModel[i] = i;
+        }
+        
+        calculateCounts();
+    }
+    
+    public void calculateCounts()
+    {
+        subItemCount = new int[items.size()];
+        subItemCount[0] = items.get(0).getSubItemCount();
+        for(int i = 1 ; i < items.size() ; i++)
+        {
+            subItemCount[i] = subItemCount[i-1]+items.get(i).getSubItemCount();
+        }
+        
+        int k = 0;
+        itemCount = new int[subItemCount[subItemCount.length-1]];
+        itemCountMod = new int[itemCount.length];
+        for(int i = 0 ; i < items.size() ; i++)
+        {
+            for(int mod = 0 ; mod < items.get(i).getSubItemCount() ; mod++)
+            {               
+                itemCount[k] = i;
+                itemCountMod[k] = mod;
+                k++;
+            }
+        }
+    }
+
+    @Override
+    public int getSize() {
+        return subItemCount[subItemCount.length-1];
+    }
+    
+    public ItemRange getItemRange(int viewIndex)
+    {
+        return new ItemRange(itemCount[viewIndex], itemCountMod[viewIndex], items.get(itemCount[viewIndex]).getSubItemCount());
+    }
+    
+    public void setSubItemAt(int viewIndex, String s)
+    {
+        items.get(itemCount[viewIndex]).setSubItem(itemCountMod[viewIndex], s);
+    }
+    
+    public int getElementTypeAt(int viewIndex)
+    {
+        return itemCountMod[viewIndex];
+    }
+    
+    @Override
+    public String getElementAt(int viewIndex) {
+        return items.get(itemCount[viewIndex]).getSubItem(itemCountMod[viewIndex]);
+    }
+    
+     public String getElementNameAt(int viewIndex) {
+         if(itemCountMod[viewIndex] < items.get(itemCount[viewIndex]).getSubItemNameCount())
+         {
+            return items.get(itemCount[viewIndex]).getSubItemName(itemCountMod[viewIndex]);
+         }
+         else
+         {
+             return items.get(itemCount[viewIndex]).name;
+         }
+    }
+
+    public int modelIndex(int viewIndex) {
+        return viewToModel[viewIndex];
+    }
+
+    public static final int ASCENDING = 1;
+    public static final int DESCENDING = -1;
+    public static final int NOT_SORTED = 0;
+    public static int sortOrder = ASCENDING;
+    
+    
+    public void sort (int order)
+    {
+        AlignmentModel.sortOrder = order;
+        Collections.sort(items);
+        for(int i = 0 ; i < items.size() ; i++)
+        {
+            viewToModel[i] = items.get(i).modelIndex;
+            modelToView[items.get(i).modelIndex] = i;    
+        }
+        calculateCounts();
+        fireContentsChanged(this, 0, items.size()-1);
+    }
+    
+    public class ItemRange
+    {
+        int startIndex;
+        int mod;
+        int length;
+        
+        public ItemRange(int startIndex, int mod, int length)
+        {
+            this.startIndex = startIndex;
+            this.mod = mod;
+            this.length = length;
+        }
+    }
+}

@@ -5,11 +5,10 @@
 package nava.alignment;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import java.util.ArrayList;
 import nava.data.io.IO;
 import nava.data.types.AlignmentData;
 
@@ -17,7 +16,7 @@ import nava.data.types.AlignmentData;
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class AlignmentEditor extends javax.swing.JPanel {
+public class AlignmentEditor extends javax.swing.JPanel implements AlignmentPanelListener {
 
     /**
      * Creates new form AlignmentEditor
@@ -28,14 +27,32 @@ public class AlignmentEditor extends javax.swing.JPanel {
         AlignmentData al = new AlignmentData();
         IO.loadFastaSequences(new File("examples/alignments/hiv500.fas"), al.sequences, al.sequenceNames);
         
-        SequenceListModel sequenceModel = new SequenceListModel();
-        sequenceModel.setAlignment(al);
+        AlignmentModel sequenceModel = new AlignmentModel();
+        //sequenceModel.setAlignment(al);
+        ArrayList<AlignmentItem> items = new ArrayList<>();
+        for(int i = 0 ; i < al.sequenceNames.size() ; i++)
+        {
+            ArrayList<String> subItems = new ArrayList<>();
+            ArrayList<String> subItemNames = new ArrayList<>();
+            subItems.add(al.sequences.get(i));
+            if(i % 1 == 0)
+            {
+                subItems.add("(((....)..)).................((...((..)))...)");
+            }
+            items.add(new AlignmentItem(al.sequenceNames.get(i),subItems,subItemNames, i));
+        }
+        Alignment alignment = new Alignment(items);
+        sequenceModel.setAlignment(alignment);
         
-        JPanel panel = new JPanel();
-        AlignmentPanel alignmentPanel = new AlignmentPanel(sequenceModel);
+        AlignmentNamePanel sequenceNamePanel = new AlignmentNamePanel(sequenceModel);
+        AlignmentPanel alignmentPanel = new AlignmentPanel(sequenceModel, sequenceNamePanel);
+        alignmentPanel.addAlignmentPanelListener(this);
         
-        leftPanel.add(panel, BorderLayout.CENTER);
+        leftPanel.add(sequenceNamePanel, BorderLayout.CENTER);
         rightScrollPane.setViewportView(alignmentPanel);
+        
+        sequenceModel.sort(AlignmentModel.ASCENDING);
+        alignmentPanel.repaint();        
     }
 
     /**
@@ -60,6 +77,8 @@ public class AlignmentEditor extends javax.swing.JPanel {
         jSplitPane1.setLeftComponent(leftPanel);
 
         rightPanel.setLayout(new java.awt.BorderLayout());
+
+        rightScrollPane.setBorder(null);
         rightPanel.add(rightScrollPane, java.awt.BorderLayout.CENTER);
 
         jSplitPane1.setRightComponent(rightPanel);
@@ -72,4 +91,10 @@ public class AlignmentEditor extends javax.swing.JPanel {
     private javax.swing.JPanel rightPanel;
     private javax.swing.JScrollPane rightScrollPane;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void mouseDraggedOffVisibleRegion(int x, int y) {
+        rightScrollPane.getHorizontalScrollBar().setValue(rightScrollPane.getHorizontalScrollBar().getValue()+x);
+        rightScrollPane.getVerticalScrollBar().setValue(rightScrollPane.getVerticalScrollBar().getValue()+y);
+    }
 }

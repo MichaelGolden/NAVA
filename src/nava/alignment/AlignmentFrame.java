@@ -4,6 +4,9 @@
  */
 package nava.alignment;
 
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
 /**
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
@@ -71,11 +74,14 @@ public class AlignmentFrame extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
 
             public void run() {
-                new AlignmentFrame().setVisible(true);
+                AlignmentFrame frame = new AlignmentFrame();
+                frame.setSize(800, 600);
+                frame.setVisible(true);
             }
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private nava.alignment.AlignmentEditor alignmentEditor1;
     // End of variables declaration//GEN-END:variables
+
 }

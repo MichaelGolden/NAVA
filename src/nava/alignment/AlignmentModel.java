@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.AbstractListModel;
+import javax.swing.event.EventListenerList;
 import nava.data.types.AlignmentData;
 
 /**
@@ -22,9 +23,9 @@ public class AlignmentModel extends AbstractListModel {
     
     List<AlignmentItem> items = null;
     
-    int [] subItemCount;
-    int [] itemCount;
-    int [] itemCountMod;
+    int [] subItemCount = new int[1];
+    int [] itemCount = new int[1];
+    int [] itemCountMod = new int[1];
     
     public void setAlignment(Alignment alignment)
     {
@@ -127,6 +128,7 @@ public class AlignmentModel extends AbstractListModel {
     
     public void sort (int order)
     {
+        int oldOrder = order;
         AlignmentModel.sortOrder = order;
         Collections.sort(items);
         for(int i = 0 ; i < items.size() ; i++)
@@ -136,6 +138,7 @@ public class AlignmentModel extends AbstractListModel {
         }
         calculateCounts();
         fireContentsChanged(this, 0, items.size()-1);
+        fireAlignmentSortOrderChanged(oldOrder,order);
     }
     
     public class ItemRange
@@ -149,6 +152,27 @@ public class AlignmentModel extends AbstractListModel {
             this.startIndex = startIndex;
             this.mod = mod;
             this.length = length;
+        }
+    }
+    
+    protected EventListenerList listeners = new EventListenerList();
+
+    public void addAlignmentModelListener(AlignmentModelListener listener) {
+        listeners.add(AlignmentModelListener.class, listener);
+    }
+
+    public void removeAlignmentModelListener(AlignmentModelListener listener) {
+        listeners.remove(AlignmentModelListener.class, listener);
+    }
+
+    public void fireAlignmentSortOrderChanged(int oldOrder, int newOlder) {
+        Object[] listeners = this.listeners.getListenerList();
+        // Each listener occupies two elements - the first is the listener class
+        // and the second is the listener instance
+        for (int i = 0; i < listeners.length; i += 2) {
+            if (listeners[i] == AlignmentModelListener.class) {
+                ((AlignmentModelListener) listeners[i + 1]).alignmentSortOrderChanged(oldOrder, newOlder);
+            }
         }
     }
 }

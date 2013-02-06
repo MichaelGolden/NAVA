@@ -1014,19 +1014,15 @@ public class RNAFoldingTools {
     public static int[] getPairedSitesFromCtFile(File ctFile) {
         try {
             BufferedReader buffer = new BufferedReader(new FileReader(ctFile));
-
-            String textline = null;
-
             int[] pairedSites = null;
-            while ((textline = buffer.readLine()) != null) {
-                String[] split = textline.trim().split("(\\s)+");
-                int length = Integer.parseInt(split[0]);
-                pairedSites = new int[length];
-                //String sequence = "";
-                for (int i = 0; i < length && (textline = buffer.readLine()) != null; i++) {
-                    String[] split2 = textline.trim().split("(\\s)+");
-                    pairedSites[Integer.parseInt(split2[0]) - 1] = Integer.parseInt(split2[4]);
-                }
+            String textline = null;
+            String[] split = buffer.readLine().trim().split("(\\s)+");
+            int length = Integer.parseInt(split[0]);
+            pairedSites = new int[length];
+            //String sequence = "";
+            for (int i = 0; i < length && (textline = buffer.readLine()) != null; i++) {
+                String[] split2 = textline.trim().split("(\\s)+");
+                pairedSites[Integer.parseInt(split2[0]) - 1] = Integer.parseInt(split2[4]);
             }
 
             buffer.close();
@@ -1252,5 +1248,28 @@ public class RNAFoldingTools {
 
         double ratio = countRNA / countNonRNA;
         return ratio > 0.5;
+    }
+    
+    public static String getSequenceFromCtFile(File ctFile) {
+        String seq = "";
+        try {
+            BufferedReader buffer = new BufferedReader(new FileReader(ctFile));
+
+            String textline = null;
+            String[] split = buffer.readLine().trim().split("(\\s)+");
+            int length = Integer.parseInt(split[0]);
+            //String sequence = "";
+            for (int i = 0; i < length && (textline = buffer.readLine()) != null; i++) {
+                String[] split2 = textline.trim().split("(\\s)+");
+                seq += split2[1].trim().charAt(0);
+            }
+
+            buffer.close();
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        return seq;
     }
 }

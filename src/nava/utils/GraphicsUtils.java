@@ -26,6 +26,18 @@ public class GraphicsUtils {
         //System.out.println(s+"\t"+x1 +"\t"+y1);
         g.drawString(s, (float) x1, (float) y1);  // Draw the string.
     }
+    
+    public static void drawStringVerticallyCentred(Graphics2D g, double x, double y, String s) {
+        FontMetrics fm = g.getFontMetrics();
+        java.awt.geom.Rectangle2D rect = fm.getStringBounds(s, g);
+
+        double textHeight = rect.getHeight();
+        double x1 = x;
+        double y1 = y + (-textHeight / 2 + fm.getAscent());
+
+        //System.out.println(s+"\t"+x1 +"\t"+y1);
+        g.drawString(s, (float) x1, (float) y1);  // Draw the string.
+    }
 
     public static Ellipse2D getCircleCenteredAt(double x, double y, double diameter) {
         return new Ellipse2D.Double(x - (diameter / 2), y - (diameter / 2), diameter, diameter);

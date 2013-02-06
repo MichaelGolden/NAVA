@@ -12,6 +12,26 @@ import java.util.Scanner;
  */
 public class Utils {
     
+    public static String padStringRight(String s, int n, char c)
+    {
+        String ret = s;
+        for(int i = s.length() ; i < n ; i++)
+        {
+            ret += c;
+        }
+        return ret;
+    }
+    
+    public static String padStringLeft(String s, int n, char c)
+    {
+        String ret = s;
+        for(int i = s.length() ; i < n ; i++)
+        {
+            ret = c+ret;
+        }
+        return ret;
+    }
+    
     public static String nChars(char c, int n)
     {
         String ret = "";

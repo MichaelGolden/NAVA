@@ -17,6 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.text.BadLocationException;
 import nava.data.types.DataSource;
+import nava.utils.Utils;
 
 /**
  *
@@ -38,12 +39,11 @@ public class ApplicationPanelItem extends javax.swing.JPanel {
         this.description = description;
 
         this.appLabel.setText(name);
-        String text = "<html><i>No description available.</i></html>";
+        String text = "No description available.";
         if (description != null && description.length() != 0) {
-            text = description.replaceAll("\n", "<br>");
+            text = description;
         }
-        String html = "<html>" + text + "</html>";
-        this.setToolTipText(html);
+        this.setToolTipText(Utils.plainTextToHtml(Utils.wrapText(text,70)));
     }
     
     public static void main(String [] args)

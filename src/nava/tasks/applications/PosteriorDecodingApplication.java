@@ -132,6 +132,6 @@ public class PosteriorDecodingApplication extends Application {
 
     @Override
     public String getDescription() {
-        return "Given a base-pairing probability matrix, returns the secondary structures that maximises the expected number of correctly predicted positions.";
+        return "Given a base-pairing probability matrix, returns the secondary structure that maximises the expected number of correctly predicted positions.";
     }
 }

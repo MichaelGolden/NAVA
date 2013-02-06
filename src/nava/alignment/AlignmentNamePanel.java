@@ -5,8 +5,11 @@
 package nava.alignment;
 
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
+import javax.swing.ImageIcon;
 import nava.utils.GraphicsUtils;
 import nava.utils.Utils;
 
@@ -14,8 +17,11 @@ import nava.utils.Utils;
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class AlignmentNamePanel extends javax.swing.JPanel {
+public class AlignmentNamePanel extends javax.swing.JPanel implements MouseListener {
 
+    ImageIcon sortAscIcon = new ImageIcon(ClassLoader.getSystemResource("resources/icons/sort_asc.png"));
+    ImageIcon sortDescIcon = new ImageIcon(ClassLoader.getSystemResource("resources/icons/sort_desc.png"));
+    ImageIcon sortOrigIcon = new ImageIcon(ClassLoader.getSystemResource("resources/icons/sort_orig.png"));
     AlignmentModel alignmentModel;
     Color fontNumberingColor = Color.gray;
     Color fontColor = Color.black;
@@ -27,6 +33,8 @@ public class AlignmentNamePanel extends javax.swing.JPanel {
     public AlignmentNamePanel(AlignmentModel alignmentModel) {
         initComponents();
         this.alignmentModel = alignmentModel;
+
+        addMouseListener(this);
     }
 
     @Override
@@ -49,7 +57,7 @@ public class AlignmentNamePanel extends javax.swing.JPanel {
             int n = 0;
             for (int seq = startSeq; seq < endSeq; seq++) {
                 AlignmentModel.ItemRange itemRange = alignmentModel.getItemRange(seq);
-                double y = AlignmentPanel.rulerHeight+yoffset + j * AlignmentPanel.blockHeight;
+                double y = AlignmentPanel.rulerHeight + yoffset + j * AlignmentPanel.blockHeight;
                 if (itemRange.mod == 0) {
                     // draw horizontal line
                     g2.setColor(new Color(255, 130, 130));
@@ -57,14 +65,36 @@ public class AlignmentNamePanel extends javax.swing.JPanel {
                     g2.draw(hr);
                     // draw seq no
                     g2.setColor(fontNumberingColor);
-                    GraphicsUtils.drawStringVerticallyCentred(g2, 4, y + (AlignmentPanel.blockHeight / 2), Utils.padStringRight((alignmentModel.itemCount[seq]+1)+ "", padding, ' '));
-                    
+                    GraphicsUtils.drawStringVerticallyCentred(g2, 4, y + (AlignmentPanel.blockHeight / 2), Utils.padStringRight((alignmentModel.itemCount[seq] + 1) + "", padding, ' '));
+
                     g2.setColor(fontColor);
                     GraphicsUtils.drawStringVerticallyCentred(g2, 4, y + (AlignmentPanel.blockHeight / 2), Utils.padStringRight("", padding, ' ') + alignmentModel.getElementNameAt(seq) + "");
                 }
-               
+
                 j++;
             }
+            g2.setColor(Color.white);
+            g2.fill(new Rectangle.Double(0, 0, getWidth(), AlignmentPanel.rulerHeight));
+            
+            switch (AlignmentModel.sortOrder) {
+                case AlignmentModel.ASCENDING:
+                    g2.draw(new Line2D.Double(0, visibleRect.height, getWidth(), visibleRect.height));
+                    g2.drawImage(sortAscIcon.getImage(), 1, 1, this);
+                    break;
+                case AlignmentModel.DESCENDING:
+                    g2.draw(new Line2D.Double(0, visibleRect.height, getWidth(), visibleRect.height));
+                    g2.drawImage(sortDescIcon.getImage(), 1, 1, this);
+                    break;
+                case AlignmentModel.NOT_SORTED:
+                    g2.draw(new Line2D.Double(0, visibleRect.height, getWidth(), visibleRect.height));
+                    g2.drawImage(sortOrigIcon.getImage(), 1, 1, this);
+                    break;
+            }
+            
+            
+
+            g2.setColor(this.getBackground());
+            g2.fill(new Rectangle.Double(0, visibleRect.height, getWidth(), 100));
         }
     }
 
@@ -101,4 +131,38 @@ public class AlignmentNamePanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        switch (AlignmentModel.sortOrder) {
+            case AlignmentModel.ASCENDING:
+                alignmentModel.sort(AlignmentModel.DESCENDING);
+                repaint();
+                break;
+            case AlignmentModel.DESCENDING:
+                alignmentModel.sort(AlignmentModel.NOT_SORTED);
+                repaint();
+                break;
+            case AlignmentModel.NOT_SORTED:
+                alignmentModel.sort(AlignmentModel.ASCENDING);
+                repaint();
+                break;
+        }
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+    }
 }

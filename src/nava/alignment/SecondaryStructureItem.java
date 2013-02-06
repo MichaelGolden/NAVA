@@ -12,30 +12,39 @@ import nava.utils.RNAFoldingTools;
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
 public class SecondaryStructureItem extends AlignmentItem {
-    
-    public SecondaryStructureItem(String name, String sequence, int [] pairedSites, int modelIndex)
-    {
+
+    int[] pairedSites;
+
+    public SecondaryStructureItem(String name, String sequence, int[] pairedSites, int modelIndex) {
         super();
         this.name = name;
         this.subItems = new ArrayList<>();
         this.subItems.add(sequence);
         this.subItems.add(RNAFoldingTools.getDotBracketStringFromPairedSites(pairedSites));
+        this.pairedSites = pairedSites;
         this.subItemNames = new ArrayList<>();
-        this.modelIndex = modelIndex; 
-    }    
+        this.modelIndex = modelIndex;
+    }
     
-    public void setSequence(String sequence)
+    public String getSequence()
     {
+        return subItems.get(0);
+    }
+    
+    public int [] getPairedSites()
+    {
+        return pairedSites;
+    }
+
+    public void setSequence(String sequence) {
         this.setSubItem(0, sequence);
     }
-    
-    public void setStructure(int [] pairedSites)
-    {
+
+    public void setStructure(int[] pairedSites) {
         this.setSubItem(1, RNAFoldingTools.getDotBracketStringFromPairedSites(pairedSites));
     }
-    
-    public void setStructure(String structure)
-    {
+
+    public void setStructure(String structure) {
         this.setSubItem(1, name);
     }
 }

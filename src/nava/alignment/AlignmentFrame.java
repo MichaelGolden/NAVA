@@ -4,6 +4,7 @@
  */
 package nava.alignment;
 
+import java.awt.BorderLayout;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -18,6 +19,7 @@ public class AlignmentFrame extends javax.swing.JFrame {
      */
     public AlignmentFrame() {
         initComponents();
+        this.add(new AlignmentEditor(),BorderLayout.CENTER);
     }
 
     /**
@@ -29,10 +31,8 @@ public class AlignmentFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        alignmentEditor1 = new nava.alignment.AlignmentEditor();
-
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        getContentPane().add(alignmentEditor1, java.awt.BorderLayout.CENTER);
+        setTitle("Secondary structure comparison tool");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -81,7 +81,6 @@ public class AlignmentFrame extends javax.swing.JFrame {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private nava.alignment.AlignmentEditor alignmentEditor1;
     // End of variables declaration//GEN-END:variables
 
 }

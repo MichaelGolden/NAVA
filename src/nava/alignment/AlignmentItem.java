@@ -4,6 +4,7 @@
  */
 package nava.alignment;
 
+import java.awt.Color;
 import java.util.ArrayList;
 
 /**
@@ -16,6 +17,8 @@ public class AlignmentItem implements Comparable<AlignmentItem> {
     String name;
     protected ArrayList<String> subItems = new ArrayList<>();
     protected ArrayList<String> subItemNames = new ArrayList<>();
+    Color color = Color.gray;
+    boolean selected = false;
     
     protected AlignmentItem()
     {
@@ -58,6 +61,11 @@ public class AlignmentItem implements Comparable<AlignmentItem> {
     
     public int getSubItemNameCount() {
         return subItemNames.size();
+    }
+    
+    public void setColor(Color color)
+    {
+        this.color = color;
     }
 
     @Override

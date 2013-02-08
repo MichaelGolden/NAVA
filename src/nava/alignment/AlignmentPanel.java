@@ -37,19 +37,22 @@ public class AlignmentPanel extends javax.swing.JPanel implements KeyListener, M
     AlignmentModel alignmentModel;
     AlignmentNamePanel namePanel;
     AlignmentChartPanel chartPanel;
+    RulerPanel rulerPanel;
     int selectionStartSeq = -1;
     int selectionEndSeq = -1;
     int selectionStartPos = -1;
     int selectionEndPos = -1;
+    boolean allowEditing = false;
 
     /**
      * Creates new form AlignmentPanel
      */
-    public AlignmentPanel(AlignmentModel alignmentModel, AlignmentNamePanel namePanel, AlignmentChartPanel chartPanel) {
+    public AlignmentPanel(AlignmentModel alignmentModel, AlignmentNamePanel namePanel, AlignmentChartPanel chartPanel, RulerPanel rulerPanel) {
         initComponents();
         this.alignmentModel = alignmentModel;
         this.namePanel = namePanel;
         this.chartPanel = chartPanel;
+        this.rulerPanel = rulerPanel;
         this.setPreferredSize(new Dimension(50000, 50000));
         try {
             fontLiberationSans = Font.createFont(Font.PLAIN, ClassLoader.getSystemResourceAsStream("resources/fonts/LiberationSans-Regular.ttf")).deriveFont(12.0f);
@@ -68,24 +71,24 @@ public class AlignmentPanel extends javax.swing.JPanel implements KeyListener, M
     
     @Override
     public void paintComponent(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        
+        
         if (alignmentModel != null && alignmentModel.getSize() > 0) {
             //int length = alignmentModel.item.get(0).getSequence().length();
-            int length = alignmentModel.items.get(0).getSubItem(0).length();
+            int length = alignmentModel.maxSequenceLength;
             int numSequences = alignmentModel.getSize();
             setPreferredSize(new Dimension((int) (length * blockWidth), (int) (AlignmentPanel.rulerHeight + numSequences * blockHeight)));
             
-            Graphics2D g2 = (Graphics2D) g;
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
             g2.setFont(fontLiberationSans);
             Rectangle viewableRect = g2.getClipBounds();
-            //Rectangle viewableRect = getVisibleRect();
-
             
             g2.setColor(Color.white);
             g2.fill(new Rectangle2D.Double(viewableRect.x, viewableRect.y, viewableRect.width, viewableRect.height));
             
-            double yoffset = rulerHeight;
+            double yoffset = 0;
             
             int startNuc = (int) (viewableRect.x / blockWidth);
             int endNuc = Math.min(length, (int) ((viewableRect.x + viewableRect.width) / blockWidth) + 1);
@@ -123,25 +126,18 @@ public class AlignmentPanel extends javax.swing.JPanel implements KeyListener, M
                     }
                 }
             }
-            
-            Rectangle visibleRect = getVisibleRect();
-            int rulerTickMarkInterval = 10;
+        } else {
+            Rectangle visibleRect = this.getVisibleRect();
+            setPreferredSize(new Dimension(visibleRect.width, visibleRect.height));
             g2.setColor(Color.white);
-            g2.fill(new Rectangle.Double(visibleRect.x, visibleRect.y, visibleRect.width, rulerHeight));
-            g2.setColor(Color.gray);
-            for (int nuc = startNuc; nuc < endNuc; nuc++) {
-                if (nuc % rulerTickMarkInterval == 0) {
-                    GraphicsUtils.drawStringCentred(g2, nuc * blockWidth + (blockWidth / 2), visibleRect.y + (blockHeight / 2), (nuc + 1) + "");
-                    Line2D.Double tick = new Line2D.Double(nuc * blockWidth + (blockWidth / 2), visibleRect.y + rulerHeight - 1, nuc * blockWidth + (blockWidth / 2), visibleRect.y + rulerHeight + 1);
-                    g2.draw(tick);
-                }
-            }
-            g2.setColor(Color.darkGray);
-            g2.draw(new Line2D.Double(visibleRect.x, visibleRect.y + rulerHeight, visibleRect.x + visibleRect.width, visibleRect.y + rulerHeight));
-            
-            namePanel.setVisibleRect(visibleRect);
-            chartPanel.setVisibleRect(visibleRect);
+            visibleRect = this.getVisibleRect();
+            g2.fillRect(visibleRect.x, visibleRect.y, visibleRect.width, visibleRect.height);
         }
+        
+        Rectangle visibleRect = getVisibleRect();
+        namePanel.setVisibleRect(visibleRect);
+        chartPanel.setVisibleRect(visibleRect);
+        rulerPanel.setVisibleRect(visibleRect);
     }
     
     public static Color getNucleotideColor(char c) {
@@ -199,8 +195,8 @@ public class AlignmentPanel extends javax.swing.JPanel implements KeyListener, M
         if (SwingUtilities.isLeftMouseButton(e)) {
             mouseClickedStartPos = (int) (e.getX() / blockWidth);
             mouseClickedEndPos = (int) (e.getX() / blockWidth);
-            mouseClickedStartSeq = (int) ((e.getY() - rulerHeight) / blockHeight);
-            mouseClickedEndSeq = (int) ((e.getY() - rulerHeight) / blockHeight);
+            mouseClickedStartSeq = (int) ((e.getY()) / blockHeight);
+            mouseClickedEndSeq = (int) ((e.getY()) / blockHeight);
             
             selectionStartPos = mouseClickedStartPos;
             selectionEndPos = mouseClickedEndPos;
@@ -225,7 +221,7 @@ public class AlignmentPanel extends javax.swing.JPanel implements KeyListener, M
     @Override
     public void mouseDragged(MouseEvent e) {
         int gridX = (int) (e.getX() / blockWidth);
-        int gridY = (int) ((e.getY() - rulerHeight) / blockHeight);
+        int gridY = (int) ((e.getY()) / blockHeight);
         selectionStartPos = mouseClickedStartPos;
         selectionStartSeq = mouseClickedStartSeq;
         if (gridX < mouseClickedStartPos) {
@@ -291,11 +287,13 @@ public class AlignmentPanel extends javax.swing.JPanel implements KeyListener, M
     
     @Override
     public void keyTyped(KeyEvent e) {
-        for (int i = selectionStartSeq; i <= selectionEndSeq; i++) {
-            StringBuffer sb = new StringBuffer(alignmentModel.getElementAt(i));
-            alignmentModel.setSubItemAt(i, sb.insert(selectionStartPos, Utils.nChars('-', Math.abs(selectionStartPos - selectionEndPos) + 1)).toString());
+        if (allowEditing) {
+            for (int i = selectionStartSeq; i <= selectionEndSeq; i++) {
+                StringBuffer sb = new StringBuffer(alignmentModel.getElementAt(i));
+                alignmentModel.setSubItemAt(i, sb.insert(selectionStartPos, Utils.nChars('-', Math.abs(selectionStartPos - selectionEndPos) + 1)).toString());
+            }
+            repaint();
         }
-        repaint();
     }
     
     @Override
@@ -308,6 +306,16 @@ public class AlignmentPanel extends javax.swing.JPanel implements KeyListener, M
     
     @Override
     public void alignmentSortOrderChanged(int oldOrder, int newOrder) {
+        repaint();
+    }
+    
+    @Override
+    public void alignmentChanged(Alignment alignment) {
+        repaint();
+    }
+    
+    @Override
+    public void itemStateDataChanged(AlignmentItem item) {
         repaint();
     }
 }

@@ -5,11 +5,14 @@
 package nava.alignment;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
-import javax.swing.ImageIcon;
+import java.util.ArrayList;
+import javax.swing.*;
 import nava.utils.GraphicsUtils;
 import nava.utils.Utils;
 
@@ -17,15 +20,30 @@ import nava.utils.Utils;
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class AlignmentNamePanel extends javax.swing.JPanel implements MouseListener {
+public class AlignmentNamePanel extends javax.swing.JPanel implements ActionListener, MouseListener {
 
-    ImageIcon sortAscIcon = new ImageIcon(ClassLoader.getSystemResource("resources/icons/sort_asc.png"));
-    ImageIcon sortDescIcon = new ImageIcon(ClassLoader.getSystemResource("resources/icons/sort_desc.png"));
-    ImageIcon sortOrigIcon = new ImageIcon(ClassLoader.getSystemResource("resources/icons/sort_orig.png"));
     AlignmentModel alignmentModel;
     Color fontNumberingColor = Color.gray;
     Color fontColor = Color.black;
     Rectangle visibleRect = null;
+    ImageIcon tickSelected = new ImageIcon(ClassLoader.getSystemResource("resources/icons/tick_on_12x12.png"));
+    ImageIcon tickUnselected = new ImageIcon(ClassLoader.getSystemResource("resources/icons/tick_off_12x12.png"));
+    ArrayList<ItemAndRectangle<AlignmentItem>> tickMarks = new ArrayList<>();
+    ArrayList<ItemAndRectangle<AlignmentItem>> itemAreas = new ArrayList<>();
+    JPopupMenu popupMenu = new JPopupMenu();
+    JMenuItem nameItem = new JMenuItem("Edit name");
+    JMenuItem removeItem = new JMenuItem("Remove");
+
+    class ItemAndRectangle<T> {
+
+        T item;
+        Rectangle2D rect;
+
+        public ItemAndRectangle(T item, Rectangle2D rect) {
+            this.item = item;
+            this.rect = rect;
+        }
+    }
 
     /**
      * Creates new form SequenceNamePanel
@@ -35,6 +53,12 @@ public class AlignmentNamePanel extends javax.swing.JPanel implements MouseListe
         this.alignmentModel = alignmentModel;
 
         addMouseListener(this);
+
+        nameItem.addActionListener(this);
+        popupMenu.add(nameItem);
+
+        removeItem.addActionListener(this);
+        popupMenu.add(removeItem);
     }
 
     @Override
@@ -55,43 +79,46 @@ public class AlignmentNamePanel extends javax.swing.JPanel implements MouseListe
             int padding = (int) Math.log10(alignmentModel.getSize()) + 2;
             int j = 0;
             int n = 0;
+            tickMarks = new ArrayList<>();
+            itemAreas = new ArrayList<>();
             for (int seq = startSeq; seq < endSeq; seq++) {
                 AlignmentModel.ItemRange itemRange = alignmentModel.getItemRange(seq);
-                double y = AlignmentPanel.rulerHeight + yoffset + j * AlignmentPanel.blockHeight;
+                double y = yoffset + j * AlignmentPanel.blockHeight;
+                double xoffset = 16;
                 if (itemRange.mod == 0) {
+
+                    AlignmentItem item = alignmentModel.getItemAt(seq);
+                    if (item.selected) {
+                        g2.drawImage(tickSelected.getImage(), 2, (int) (y + AlignmentPanel.blockHeight / 2 - 7) + 2, this);
+                    } else {
+                        g2.drawImage(tickUnselected.getImage(), 2, (int) (y + AlignmentPanel.blockHeight / 2 - 7) + 2, this);
+                    }
+                    tickMarks.add(new ItemAndRectangle(alignmentModel.getItemAt(seq), new Rectangle2D.Double(2, (int) (y + AlignmentPanel.blockHeight / 2 - 7) + 2, 12, 12)));
+                    itemAreas.add(new ItemAndRectangle(alignmentModel.getItemAt(seq), new Rectangle2D.Double(0, y, getWidth(), itemRange.length * AlignmentPanel.blockHeight)));
                     // draw horizontal line
                     g2.setColor(new Color(255, 130, 130));
                     Line2D.Double hr = new Line2D.Double(0, y, getWidth(), y);
                     g2.draw(hr);
                     // draw seq no
                     g2.setColor(fontNumberingColor);
-                    GraphicsUtils.drawStringVerticallyCentred(g2, 4, y + (AlignmentPanel.blockHeight / 2), Utils.padStringRight((alignmentModel.itemCount[seq] + 1) + "", padding, ' '));
+                    GraphicsUtils.drawStringVerticallyCentred(g2, xoffset + 4, y + (AlignmentPanel.blockHeight / 2), Utils.padStringRight((alignmentModel.itemCount[seq] + 1) + "", padding, ' '));
 
                     g2.setColor(fontColor);
-                    GraphicsUtils.drawStringVerticallyCentred(g2, 4, y + (AlignmentPanel.blockHeight / 2), Utils.padStringRight("", padding, ' ') + alignmentModel.getElementNameAt(seq) + "");
+                    GraphicsUtils.drawStringVerticallyCentred(g2, xoffset + 4, y + (AlignmentPanel.blockHeight / 2), Utils.padStringRight("", padding, ' ') + alignmentModel.getElementNameAt(seq) + "");
+
+                    double legendKeyWidth = 12;
+                    double legendKeyHeight = 12;
+                    Rectangle2D.Double legendKeyRect = new Rectangle2D.Double(getWidth() - 2 - legendKeyWidth, y + (AlignmentPanel.blockHeight / 2) - (legendKeyWidth / 2), legendKeyWidth, legendKeyHeight);
+                    g2.setColor(alignmentModel.getItemAt(seq).color);
+                    g2.fill(legendKeyRect);
+                    g2.setColor(Color.black);
+                    g2.draw(legendKeyRect);
                 }
+
+
 
                 j++;
             }
-            g2.setColor(Color.white);
-            g2.fill(new Rectangle.Double(0, 0, getWidth(), AlignmentPanel.rulerHeight));
-            
-            switch (AlignmentModel.sortOrder) {
-                case AlignmentModel.ASCENDING:
-                    g2.draw(new Line2D.Double(0, visibleRect.height, getWidth(), visibleRect.height));
-                    g2.drawImage(sortAscIcon.getImage(), 1, 1, this);
-                    break;
-                case AlignmentModel.DESCENDING:
-                    g2.draw(new Line2D.Double(0, visibleRect.height, getWidth(), visibleRect.height));
-                    g2.drawImage(sortDescIcon.getImage(), 1, 1, this);
-                    break;
-                case AlignmentModel.NOT_SORTED:
-                    g2.draw(new Line2D.Double(0, visibleRect.height, getWidth(), visibleRect.height));
-                    g2.drawImage(sortOrigIcon.getImage(), 1, 1, this);
-                    break;
-            }
-            
-            
 
             g2.setColor(this.getBackground());
             g2.fill(new Rectangle.Double(0, visibleRect.height, getWidth(), 100));
@@ -131,22 +158,24 @@ public class AlignmentNamePanel extends javax.swing.JPanel implements MouseListe
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
+    AlignmentItem popupItem = null;
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        switch (AlignmentModel.sortOrder) {
-            case AlignmentModel.ASCENDING:
-                alignmentModel.sort(AlignmentModel.DESCENDING);
-                repaint();
-                break;
-            case AlignmentModel.DESCENDING:
-                alignmentModel.sort(AlignmentModel.NOT_SORTED);
-                repaint();
-                break;
-            case AlignmentModel.NOT_SORTED:
-                alignmentModel.sort(AlignmentModel.ASCENDING);
-                repaint();
-                break;
+        if (SwingUtilities.isLeftMouseButton(e)) {
+            for (ItemAndRectangle<AlignmentItem> tickMark : tickMarks) {
+                if (tickMark.rect.contains(e.getX(), e.getY())) {
+                    tickMark.item.selected = !tickMark.item.selected;
+                    alignmentModel.fireAlignmentStateDataChanged(tickMark.item);
+                }
+            }
+        } else if (SwingUtilities.isRightMouseButton(e)) {
+            for (ItemAndRectangle<AlignmentItem> itemArea : itemAreas) {
+                if (itemArea.rect.contains(e.getX(), e.getY())) {
+                    popupItem = itemArea.item;
+                    popupMenu.show(this, e.getX(), e.getY());
+                }
+            }
         }
     }
 
@@ -164,5 +193,28 @@ public class AlignmentNamePanel extends javax.swing.JPanel implements MouseListe
 
     @Override
     public void mouseExited(MouseEvent e) {
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource().equals(removeItem)) {
+            alignmentModel.alignment.items.remove(popupItem);
+            alignmentModel.setAlignment(alignmentModel.alignment);
+        } else if (e.getSource().equals(nameItem)) {
+
+            String s = (String) JOptionPane.showInputDialog(
+                    this,
+                    "Enter a new name:",
+                    "Edit name",
+                    JOptionPane.PLAIN_MESSAGE,
+                    null,
+                    null,
+                    popupItem.name);
+            if (s != null) {
+                popupItem.name = s;
+                alignmentModel.setAlignment(alignmentModel.alignment);
+            }
+
+        }
     }
 }

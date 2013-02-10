@@ -95,6 +95,7 @@ public class AlignmentPanel extends javax.swing.JPanel implements KeyListener, M
             int startSeq = Math.max(0, (int) ((viewableRect.y - AlignmentPanel.rulerHeight) / blockHeight));
             int endSeq = Math.max(0, Math.min(numSequences, (int) (((viewableRect.y - AlignmentPanel.rulerHeight) + viewableRect.height) / blockHeight) + 1));
             
+            
             for (int seq = startSeq; seq < endSeq; seq++) {
                 //String sequence = alignmentModel.getElementAt(seq).getSequence();
                 String sequence = alignmentModel.getElementAt(seq);

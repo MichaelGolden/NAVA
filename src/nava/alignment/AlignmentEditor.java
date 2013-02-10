@@ -29,11 +29,14 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import nava.alignment.AlignmentChartData.ChartType;
+import nava.alignment.AlignmentChartData.Marker;
 import nava.data.io.FileImport;
 import nava.data.io.FileImport.ParserException;
 import nava.data.types.DataType.FileFormat;
 import nava.data.types.SecondaryStructureData;
+import nava.structure.Structure;
 import nava.structure.StructureAlign;
+import nava.structure.StructureAlign.Region;
 import nava.utils.RNAFoldingTools;
 
 /**
@@ -134,6 +137,7 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
     JMenuItem exportViennaAlignmentItem = new JMenuItem("Export structural alignment (Vienna dot-bracket format)");
     JMenu alignMenu = new JMenu("Align");
     JMenuItem alignMAFFTItem = new JMenuItem("Align using MAFFT");
+    JMenuItem identifySubtructuresItem = new JMenuItem("Identify conserved substructures");
     JMenu helpMenu = new JMenu("Help");
     JMenuItem aboutItem = new JMenuItem("About");
 
@@ -151,6 +155,9 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
 
         alignMAFFTItem.addActionListener(this);
         alignMenu.add(alignMAFFTItem);
+
+        identifySubtructuresItem.addActionListener(this);
+        alignMenu.add(identifySubtructuresItem);
 
         aboutItem.addActionListener(this);
         helpMenu.add(aboutItem);
@@ -226,12 +233,18 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
                     for (int k = 0; k < sim.length; k++) {
                         simOffset[k + (windowSize / 2)] = sim[k];
                     }
-                    AlignmentChartData chartData = new AlignmentChartData(simOffset, ChartType.DASHED_LINE, itemi.color, itemj.color, null);
+                    AlignmentChartData chartData = new AlignmentChartData(simOffset, ChartType.DASHED_LINE, itemi.color, itemj.color, null, Marker.NONE);
                     chartDataList.add(chartData);
+
+                    double[] sequenceSim = StructureAlign.slidingWeightedSequenceSimilarity(itemi.getSubItem(0), itemj.getSubItem(0), (Integer) settingsPanel.substructureWindowSpinner.getValue());
+                    for (int k = 0; k < simOffset.length && k < sequenceSim.length; k++) {
+                        System.out.println(k + "\t"+ simOffset[k]+"\t"+ sequenceSim[k]);
+                    }
+                    chartDataList.add(new AlignmentChartData(sequenceSim, ChartType.DASHED_LINE, itemi.color, itemj.color, null, Marker.CIRCLE));
                 }
             }
         }
-
+        
         chartPanel.setAlignmentChartData(chartDataList);
     }
 
@@ -244,7 +257,7 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jSplitPane1 = new javax.swing.JSplitPane();
+        verticalSplitPane = new javax.swing.JSplitPane();
         leftPanel = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         leftSplitPane = new javax.swing.JSplitPane();
@@ -259,7 +272,7 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
 
         setLayout(new java.awt.BorderLayout());
 
-        jSplitPane1.setDividerLocation(200);
+        verticalSplitPane.setDividerLocation(200);
 
         leftPanel.setLayout(new java.awt.BorderLayout());
 
@@ -281,7 +294,7 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
 
         leftPanel.add(leftSplitPane, java.awt.BorderLayout.CENTER);
 
-        jSplitPane1.setLeftComponent(leftPanel);
+        verticalSplitPane.setLeftComponent(leftPanel);
 
         rightPanel.setLayout(new java.awt.BorderLayout());
 
@@ -308,16 +321,15 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
 
         rightPanel.add(rightSplitPane, java.awt.BorderLayout.CENTER);
 
-        jSplitPane1.setRightComponent(rightPanel);
+        verticalSplitPane.setRightComponent(rightPanel);
 
-        add(jSplitPane1, java.awt.BorderLayout.CENTER);
+        add(verticalSplitPane, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane chartScrollPane;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JPanel leftPanel;
     private javax.swing.JSplitPane leftSplitPane;
     private javax.swing.JPanel namePanelHolder;
@@ -325,6 +337,7 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
     private javax.swing.JScrollPane rightScrollPane;
     private javax.swing.JSplitPane rightSplitPane;
     private javax.swing.JPanel rulerPanelHolder;
+    private javax.swing.JSplitPane verticalSplitPane;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -338,26 +351,18 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
         System.out.println(e.getSource());
     }
 
-    public void updatePanels(Alignment alignment) {
-        for (int i = 0; i < alignment.items.size(); i++) {
+    @Override
+    public void alignmentChanged(Alignment alignment) {
+         for (int i = 0; i < alignment.items.size(); i++) {
             AlignmentItem item = (AlignmentItem) alignment.items.get(i);
             item.setColor(AlignmentEditor.getColor(i, alignment.items.size()));
         }
-        /*
-         * legendListModel = new DefaultListModel<>(); for (int i = 0; i <
-         * alignment.items.size(); i++) { AlignmentItem item = (AlignmentItem)
-         * alignment.items.get(i); item.setColor(AlignmentEditor.getColor(i,
-         * alignment.items.size())); legendListModel.addElement(new
-         * LegendItem(item.name, getColor(i, alignment.items.size()), true,
-         * item)); } jList1.setModel(legendListModel);
-         */
-
         refreshAlignmentChartData();
-    }
-
-    @Override
-    public void alignmentChanged(Alignment alignment) {
-        updatePanels(alignment);
+        //this.chartPanel.revalidate();
+        //this.verticalSplitPane.revalidate();
+        //this.rightScrollPane.revalidate();
+        System.out.println("Alignment changed");
+        this.alignmentPanel.revalidate();
     }
 
     @Override
@@ -410,6 +415,26 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
         if (e.getSource().equals(this.settingsPanel.relaxedRadioButton)) {
             refreshAlignmentChartData();
         }
+    }
+
+    public ArrayList<Region> identifyConservedSubstructures(Alignment alignment) {
+        int windowSize = (Integer) settingsPanel.substructureWindowSpinnerModel.getValue();
+        ArrayList<Structure> alignedStructures = new ArrayList<>();
+        ArrayList<String> alignedSequences = new ArrayList<>();
+        ArrayList<String> names = new ArrayList<>();
+
+        for (int i = 0; i < alignment.items.size(); i++) {
+            SecondaryStructureItem item = (SecondaryStructureItem) alignment.items.get(i);
+            if (item.selected) {
+                alignedStructures.add(new Structure(RNAFoldingTools.getPairedSitesFromDotBracketString(item.getSubItem(1)), item.name));
+                alignedSequences.add(item.getSubItem(0));
+                names.add(item.name);
+            }
+        }
+        double cutoff = (Double) settingsPanel.similarityCutoffSpinnerModel.getValue();
+        boolean useMinMethod = settingsPanel.useMinMethod.isSelected();
+
+        return StructureAlign.getConservedStructures(alignedStructures, alignedSequences, names, windowSize, cutoff, useMinMethod);
     }
 
     public void saveDataAsCSV(Alignment alignment, File csvFile, boolean selectedOnly) throws IOException {
@@ -546,7 +571,10 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
             }
         } else if (e.getSource().equals(this.aboutItem)) {
             System.out.println("About item");
-            
+        } else if (e.getSource().equals(identifySubtructuresItem)) {
+            ArrayList<Region> conservedRegions = identifyConservedSubstructures(alignmentModel.getAlignment());
+            System.out.println(conservedRegions);
+            chartPanel.setHighlightRegions(conservedRegions);
         }
     }
 }

@@ -17,6 +17,9 @@ public class AlignmentChartData {
 
         DASHED_LINE, LINE, BAR
     };
+    public enum Marker{
+        NONE,CIRCLE,SQUARE
+    }
     double[] data;
     double[] normalised;
     double min = Double.MAX_VALUE;
@@ -25,14 +28,16 @@ public class AlignmentChartData {
     Color lineColor2;
     String lineLabel = null;
     ChartType chartType;
+    Marker marker;
     
 
-    public AlignmentChartData(double[] data,ChartType chartType, Color lineColor1, Color lineColor2, String lineLabel) {
+    public AlignmentChartData(double[] data,ChartType chartType, Color lineColor1, Color lineColor2, String lineLabel, Marker marker) {
         this.data = data;
         this.lineColor1 = lineColor1;
         this.lineColor2 = lineColor2;
         this.chartType = chartType;
         this.lineLabel = lineLabel;
+        this.marker = marker;
 
         for (int i = 0; i < data.length; i++) {
             min = Math.min(min, data[i]);

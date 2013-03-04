@@ -4,7 +4,7 @@
  */
 package nava.tasks.applications;
 
-import java.io.File;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import nava.data.types.DataSource;
@@ -54,6 +54,27 @@ public abstract class Application extends Task {
     public void startConsoleErrorBuffer(Process process) {
         consoleErrorHandler = new ConsoleInputHandler(combinedBuffer, taskInstanceId, "standard_err", process.getErrorStream());
         //consoleErrorHandler = new ConsoleInputHandler(consoleInputBuffer, process.getErrorStream());        
+    }
+    
+    public static void nullOutput(final InputStream inputStream)
+    {
+        new Thread()
+        {
+            @Override
+            public void run()
+            {
+                try {
+
+                    BufferedReader buffer = new BufferedReader(new InputStreamReader(inputStream));
+                    String textline = null;
+                    while ((textline = buffer.readLine()) != null) {
+
+                    }
+                    buffer.close();
+                } catch (IOException ex) {
+                }
+            }
+        }.start();
     }
       
     protected abstract void start();

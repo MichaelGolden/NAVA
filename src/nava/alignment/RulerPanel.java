@@ -46,6 +46,7 @@ public class RulerPanel extends JPanel {
         {
             g2.setColor(Color.white);
             Rectangle visibleRect = this.getVisibleRect();
+            System.out.println("HEREA"+visibleRect);
             g2.fillRect(visibleRect.x, visibleRect.y, visibleRect.width, visibleRect.height);
         }
     }

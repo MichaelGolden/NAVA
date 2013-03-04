@@ -9,9 +9,14 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import nava.structurevis.data.NucleotideComposition;
+import nava.utils.AmbiguityCodes;
 import nava.utils.RNAFoldingTools;
+import nava.utils.Utils;
 
 /**
  *
@@ -19,7 +24,6 @@ import nava.utils.RNAFoldingTools;
  */
 public class StructureAlign {
 
-   
     public static void saveConservedSubstructuresProgressiveScan(ArrayList<Structure> alignedStructures, ArrayList<String> alignedSequences, ArrayList<String> structureNames, int startWindowSize, double cutoff, String prefix) {
         boolean relaxed = true;
 
@@ -137,8 +141,26 @@ public class StructureAlign {
         }
     }
 
-    public static ArrayList<Region> getConservedStructures(ArrayList<Structure> alignedStructures, ArrayList<String> alignedSequences, ArrayList<String> structureNames, int windowSize, double cutoff, String prefix, boolean useMinMethod) {
-        boolean relaxed = true;
+    public enum Method {
+
+        AND, MINIMUM, MEAN;
+
+        @Override
+        public String toString() {
+            switch (this) {
+                case AND:
+                    return "AND";
+                case MINIMUM:
+                    return "Minimum";
+                case MEAN:
+                    return "Mean";
+                default:
+                    return "";
+            }
+        }
+    }
+
+    public static ArrayList<Region> getConservedStructures(ArrayList<Structure> alignedStructures, ArrayList<String> alignedSequences, ArrayList<String> structureNames, int windowSize, double cutoff, boolean relaxed, Method method) {
 
         ArrayList<double[]> pairwiseMountainSimiliarity = new ArrayList<>();
         ArrayList<String> nameCombinations = new ArrayList<>();
@@ -150,20 +172,36 @@ public class StructureAlign {
         }
 
 
+
         boolean[] conservedPositions = null;
 
-        if (useMinMethod) {
-            conservedPositions = getConservedPositions(getMinimumVector(pairwiseMountainSimiliarity), cutoff, windowSize);
-
-        } else {
-            ArrayList<boolean[]> conservedList = new ArrayList<>();
-            for (int m = 0; m < pairwiseMountainSimiliarity.size(); m++) {
-                conservedList.add(getConservedPositions(pairwiseMountainSimiliarity.get(m), cutoff, windowSize));
-            }
-            conservedPositions = ANDvectors(conservedList);
+        switch (method) {
+            case MINIMUM:
+                conservedPositions = getConservedPositions(getMinimumVector(pairwiseMountainSimiliarity), cutoff, windowSize);
+                break;
+            case AND:
+                ArrayList<boolean[]> conservedList = new ArrayList<>();
+                for (int m = 0; m < pairwiseMountainSimiliarity.size(); m++) {
+                    conservedList.add(getConservedPositions(pairwiseMountainSimiliarity.get(m), cutoff, windowSize));
+                }
+                conservedPositions = ANDvectors(conservedList);
+                break;
+            case MEAN:
+                conservedPositions = getConservedPositions(getMeanVector(pairwiseMountainSimiliarity), cutoff, windowSize);
+                break;
         }
 
         ArrayList<Region> conservedRegions = getConservedRegions(conservedPositions);
+        double[] avgSim = getMeanVector(pairwiseMountainSimiliarity);
+        for (Region conservedRegion : conservedRegions) {
+            conservedRegion.score = 0;
+            int end = Math.min(avgSim.length, conservedRegion.startPos + conservedRegion.length - windowSize + 1);
+            for (int i = conservedRegion.startPos; i < end; i++) {
+                conservedRegion.score += avgSim[i];
+            }
+            conservedRegion.score /= ((double) Math.max(1, end - conservedRegion.startPos));
+        }
+
         return conservedRegions;
     }
 
@@ -508,10 +546,22 @@ public class StructureAlign {
         return minimum;
     }
 
+    public static double[] getMeanVector(ArrayList<double[]> vectors) {
+        double[] mean = new double[vectors.get(0).length];
+        for (int i = 0; i < mean.length; i++) {
+            for (int j = 0; j < vectors.size(); j++) {
+                mean[i] = mean[i] + vectors.get(j)[i];
+            }
+            mean[i] /= ((double) vectors.size());
+        }
+        return mean;
+    }
+
     public static boolean[] getConservedPositions(double[] similarity, double cutoff, int windowSize) {
         boolean[] conserved = new boolean[similarity.length + windowSize];
         for (int i = 0; i < similarity.length; i++) {
             if (similarity[i] >= cutoff) {
+                System.out.println(i);
                 for (int j = 0; j < windowSize; j++) {
                     conserved[i + j] = true;
                 }
@@ -521,8 +571,10 @@ public class StructureAlign {
     }
 
     public static double[] slidingWeightedMountainSimilarity(int[] pairedSites1, int[] pairedSites2, int windowSize, boolean relaxed) {
+        //System.out.println(pairedSites1.length+"\t"+windowSize);
         double[] sim = new double[pairedSites1.length - windowSize];
-        for (int i = 0; i < pairedSites1.length - windowSize; i++) {
+        int end = Math.min(pairedSites1.length - windowSize, pairedSites2.length - windowSize);
+        for (int i = 0; i < end; i++) {
             int[] pairedSitesSub1;
             int[] pairedSitesSub2;
             if (relaxed) {
@@ -535,6 +587,157 @@ public class StructureAlign {
             sim[i] = 1 - MountainMetrics.calculateNormalizedWeightedMountainDistance(pairedSitesSub1, pairedSitesSub2);
         }
         return sim;
+    }
+
+    public static double permutationTest(Region region, double sim, int[] pairedSites1, int[] pairedSites2, int windowSize, boolean relaxed, boolean slidingSim, int permutations) {
+        double permCount = 0;
+        double permTotal = 0;
+
+
+        Random random = new Random(-1380401484108201L);
+        boolean[] indices = new boolean[pairedSites1.length - region.length];
+        indices[region.startPos] = true;
+        Utils.randomBooleanArray(random, permutations < 0 ? indices.length : permutations, indices);
+
+        //Arrays.fill(indices, true);
+        int[] subPairedSites2 = null;
+        if (relaxed) {
+            subPairedSites2 = StructureAlign.getSubstructureRelaxed(pairedSites2, region.startPos, region.length);
+        } else {
+            subPairedSites2 = StructureAlign.getSubstructure(pairedSites2, region.startPos, region.length);
+        }
+        for (int k = 0; k < pairedSites1.length - region.length; k++) {
+            if (indices[k]) {
+                //int[] permutedPairedSites1 = StructureAlign.getSubstructureRelaxed(pairedSites1, k, region.length);
+                int[] permutedPairedSites1 = null;
+                if (relaxed) {
+                    permutedPairedSites1 = StructureAlign.getSubstructureRelaxed(pairedSites1, k, region.length);
+                } else {
+                    permutedPairedSites1 = StructureAlign.getSubstructure(pairedSites1, k, region.length);
+                }
+                double permSim = 0;
+                if (slidingSim) {
+                    permSim = StructureAlign.slidingWeightedMountainSimilarityAverage(permutedPairedSites1, subPairedSites2, windowSize - 1, relaxed);
+                } else {
+                    permSim = 1 - MountainMetrics.calculateNormalizedWeightedMountainDistance(permutedPairedSites1, subPairedSites2);
+
+                }
+                if (sim > permSim) {
+                    permCount++;
+                }
+                permTotal++;
+                //System.out.println(permTotal);
+            }
+        }
+
+        return 1 - (permCount / permTotal);
+    }
+
+    public static double permutationTest2(Region region, int[] pairedSites1, int[] pairedSites2, int windowSize, boolean relaxed) {
+        double permCount = 0;
+        double permTotal = 0;
+
+        int[] sub1 = StructureAlign.getSubstructureRelaxed(pairedSites1, region.startPos, region.length);
+        int[] sub2 = StructureAlign.getSubstructureRelaxed(pairedSites2, region.startPos, region.length);
+        double sim = StructureAlign.slidingWeightedMountainSimilarityAverage(sub1, sub2, windowSize - 1, relaxed);
+        double[] simVector = slidingWeightedMountainSimilarity(pairedSites1, pairedSites2, windowSize, relaxed);
+        for (int k = 0; k < pairedSites1.length - region.length; k++) {
+            if (k != region.startPos) {
+                //int[] permSites = StructureAlign.getSubstructureRelaxed(pairedSites1, k, region.length);
+                //double permSim = StructureAlign.slidingWeightedMountainSimilarityAverage(permSites, pairedSites2, windowSize - 1, relaxed);
+                double permSim = average(simVector, k, k + region.length - windowSize + 1);
+                if (sim > permSim) {
+                    permCount++;
+                }
+                permTotal++;
+            }
+        }
+
+        return 1 - (permCount / permTotal);
+    }
+
+    public static double average(double[] vector, int startPos, int endPos) {
+        double sum = 0;
+        for (int i = startPos; i < endPos; i++) {
+            sum += vector[i];
+        }
+        return sum / ((double) (endPos - startPos));
+    }
+
+    public static double slidingWeightedMountainSimilarityAverage(int[] pairedSites1, int[] pairedSites2, int windowSize, boolean relaxed) {
+        double[] sim = slidingWeightedMountainSimilarity(pairedSites1, pairedSites2, Math.min(pairedSites1.length-1, windowSize), relaxed);
+        double sum = 0;
+        for (int i = 0; i < sim.length; i++) {
+            sum += sim[i];
+        }
+        return sum / ((double) sim.length);
+    }
+
+    public static double[] slidingWeightedSequenceSimilarity(ArrayList<String> sequences, int windowSize) {
+        AmbiguityCodes ambiguityCodes = new AmbiguityCodes();
+        double[][] nucFreq = new double[sequences.get(0).length()][5];
+        for (int i = 0; i < sequences.size(); i++) {
+            String sequence = sequences.get(i);
+            for (int j = 0; j < nucFreq.length; j++) {
+                double[] baseScores = ambiguityCodes.getBaseScores(sequence.charAt(j) + "");
+                for (int k = 0; k < baseScores.length; k++) {
+                    nucFreq[j][k] += baseScores[k];
+                }
+            }
+        }
+
+        double[] nucleotideConservation = new double[nucFreq.length];
+        for (int i = 0; i < nucleotideConservation.length; i++) {
+            double total = 0;
+            for (int j = 0; j < 4; j++) {
+                total += nucFreq[i][j];
+            }
+            for (int j = 0; j < 4; j++) {
+                nucFreq[i][j] /= total;
+            }
+
+
+            double[] shannonEntropy = NucleotideComposition.getShannonEntropy(nucFreq[i], sequences.size());
+            for (int j = 0; j < shannonEntropy.length; j++) {
+                nucleotideConservation[i] += shannonEntropy[j];
+            }
+            nucleotideConservation[i] /= 8.0;
+        }
+
+        double[] sim = new double[sequences.get(0).length() - windowSize];
+        for (int i = 0; i < sim.length; i++) {
+            for (int j = 0; j < windowSize; j++) {
+                sim[i] += nucleotideConservation[i + j];
+            }
+            sim[i] /= ((double) windowSize);
+        }
+
+        return sim;
+    }
+
+    public static double[] slidingWeightedSequenceSimilarity(String seq1, String seq2, int windowSize) {
+        AmbiguityCodes ambiguityCodes = new AmbiguityCodes();
+        double[] sim = new double[seq1.length()];
+        for (int i = 0; i < seq1.length() && i < seq2.length(); i++) {
+            double[] b1 = ambiguityCodes.getBaseScores(seq1.charAt(i) + "");
+            double[] b2 = ambiguityCodes.getBaseScores(seq2.charAt(i) + "");
+            for (int j = 0; j < 5; j++) {
+                sim[i] += Math.abs(b1[j] - b2[j]);
+            }
+            sim[i] = 1 - (sim[i] / 2);
+            //System.out.println(i+"\t*"+sim[i]);
+        }
+
+        double[] simWindow = new double[sim.length + windowSize];
+        Arrays.fill(simWindow, Double.MIN_VALUE);
+        for (int i = 0; i < sim.length - windowSize; i++) {
+            for (int j = 0; j < windowSize; j++) {
+                simWindow[i + (windowSize / 2)] += sim[i + j];
+            }
+            simWindow[i + (windowSize / 2)] /= ((double) windowSize);
+        }
+
+        return simWindow;
     }
 
     public static Structure loadStructureFromCtFile(File ctFile) {
@@ -563,20 +766,15 @@ public class StructureAlign {
     public static String findAlignedSequence(ArrayList<String> sequences, String sequence) {
         String s = sequence.replaceAll("-", "").trim().toUpperCase().replaceAll("U", "T");
         for (int i = 0; i < sequences.size(); i++) {
-            /*if(i == 0)
-            {
-                String a = s;
-                String b = sequences.get(i).replaceAll("-", "").trim().toUpperCase().replaceAll("U", "T");
-                boolean same = true;
-                for(int j = 0 ; j < Math.min(a.length(),b.length()) ; j++)
-                {
-                    if(a.charAt(j) != b.charAt(j))
-                    {
-                        same = false;
-                    }
-                    System.out.println(j+"\t"+a.charAt(j)+"\t"+b.charAt(j) + "\t" + same);
-                }
-            }*/
+            /*
+             * if(i == 0) { String a = s; String b =
+             * sequences.get(i).replaceAll("-",
+             * "").trim().toUpperCase().replaceAll("U", "T"); boolean same =
+             * true; for(int j = 0 ; j < Math.min(a.length(),b.length()) ; j++)
+             * { if(a.charAt(j) != b.charAt(j)) { same = false; }
+             * System.out.println(j+"\t"+a.charAt(j)+"\t"+b.charAt(j) + "\t" +
+             * same); } }
+             */
             if (sequences.get(i).replaceAll("-", "").trim().toUpperCase().replaceAll("U", "T").startsWith(s)) {
                 return sequences.get(i);
             }
@@ -623,8 +821,10 @@ public class StructureAlign {
 
     public static class Region {
 
+        public int id;
         public int startPos;
         public int length;
+        public double score;
 
         public Region(int startPos, int length) {
             this.startPos = startPos;

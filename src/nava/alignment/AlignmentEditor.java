@@ -4,11 +4,7 @@
  */
 package nava.alignment;
 
-import au.com.bytecode.opencsv.CSVReader;
-import au.com.bytecode.opencsv.CSVWriter;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -21,6 +17,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.PropertyResourceBundle;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
@@ -36,6 +34,7 @@ import nava.data.types.DataType.FileFormat;
 import nava.data.types.SecondaryStructureData;
 import nava.structure.Structure;
 import nava.structure.StructureAlign;
+import nava.structure.StructureAlign.Method;
 import nava.structure.StructureAlign.Region;
 import nava.utils.RNAFoldingTools;
 
@@ -45,6 +44,7 @@ import nava.utils.RNAFoldingTools;
  */
 public class AlignmentEditor extends javax.swing.JPanel implements ActionListener, AlignmentModelListener, AlignmentPanelListener, ListSelectionListener, ChangeListener, ItemListener {
 
+    public static PropertyResourceBundle resources = (PropertyResourceBundle) ResourceBundle.getBundle("resources.text.text");
     AlignmentModel alignmentModel;
     AlignmentNamePanel sequenceNamePanel;
     AlignmentChartPanel chartPanel;
@@ -52,6 +52,7 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
     SettingsPanel settingsPanel;
     SortPanel sortPanel;
     RulerPanel rulerPanel;
+    SubstructureTable substructureTable = new SubstructureTable();
     //DefaultListModel<LegendItem> legendListModel;
     // ArrayList<SecondaryStructureItem> secondaryStructureItems;
     public static JFileChooser browseDialog = new JFileChooser();
@@ -76,17 +77,29 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
 
         settingsPanel = new SettingsPanel();
         settingsPanel.substructureWindowSpinner.addChangeListener(this);
+        settingsPanel.similarityCutoffSpinner.addChangeListener(this);
         settingsPanel.relaxedRadioButton.addItemListener(this);
         settingsPanel.strictRadioButton.addItemListener(this);
+        settingsPanel.identifyConservedSubstructuresCheckBox.addItemListener(this);
         jPanel4.add(settingsPanel, BorderLayout.CENTER);
 
         rulerPanelHolder.add(rulerPanel, BorderLayout.CENTER);
+
         alignmentPanel = new AlignmentPanel(alignmentModel, sequenceNamePanel, chartPanel, rulerPanel);
         alignmentPanel.addAlignmentPanelListener(this);
 
         namePanelHolder.add(sequenceNamePanel, BorderLayout.CENTER);
-        rightScrollPane.setViewportView(alignmentPanel);
+        alignmentScrollPane.setViewportView(alignmentPanel);
         chartScrollPane.setViewportView(chartPanel);
+
+        DefaultComboBoxModel<Method> methodComboBoxModel = new DefaultComboBoxModel();
+        for (Method method : Method.values()) {
+            methodComboBoxModel.addElement(method);
+        }
+        settingsPanel.methodComboBox.setModel(methodComboBoxModel);
+        settingsPanel.methodComboBox.addItemListener(this);
+
+        jPanel3.add(substructureTable, BorderLayout.CENTER);
 
         rightSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
 
@@ -107,20 +120,7 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
         });
 
         setupMenu();
-
-
-        /*
-         * LegendCellRenderer cellRenderer = new LegendCellRenderer();
-         * jList1.setCellRenderer(cellRenderer); jList1.addMouseListener(new
-         * MouseAdapter() {
-         *
-         * @Override public void mouseClicked(MouseEvent e) { if
-         * (SwingUtilities.isLeftMouseButton(e)) { int index =
-         * jList1.locationToIndex(e.getPoint()); LegendItem item = (LegendItem)
-         * jList1.getModel().getElementAt(index); item.selected =
-         * !item.selected; jList1.repaint(jList1.getCellBounds(index, index));
-         * refreshAlignmentChartData(); } } });
-         */
+        setupInstructions();
 
         leftSplitPane.setDividerLocation(400);
         rightSplitPane.setDividerLocation(400);
@@ -133,8 +133,11 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
     JMenu importMenu = new JMenu("Import");
     JMenuItem importStructureItem = new JMenuItem("Import structure(s)");
     JMenu exportMenu = new JMenu("Export");
-    JMenuItem exportChartDataItem = new JMenuItem("Export chart data (.csv)");
-    JMenuItem exportViennaAlignmentItem = new JMenuItem("Export structural alignment (Vienna dot-bracket format)");
+    JMenuItem exportChartDataItem = new JMenuItem("Chart data (.csv)");
+    JMenuItem exportViennaAlignmentItem = new JMenuItem("Full structural alignment (Vienna dot-bracket format)");
+    JMenuItem exportSequenceAlignmentItem = new JMenuItem("Sequence alignment only (FASTA format)");
+    JMenuItem exportConservedSubstructuresAlignmentViennaItem = new JMenuItem("Conserved substructures alignment (Vienna dot-bracket format)");
+    JMenuItem exportConservedSubstructuresTableItem = new JMenuItem("Conserved substructures table (.csv)");
     JMenu alignMenu = new JMenu("Align");
     JMenuItem alignMAFFTItem = new JMenuItem("Align using MAFFT");
     JMenuItem identifySubtructuresItem = new JMenuItem("Identify conserved substructures");
@@ -149,6 +152,15 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
 
         exportViennaAlignmentItem.addActionListener(this);
         exportMenu.add(exportViennaAlignmentItem);
+        
+        exportSequenceAlignmentItem.addActionListener(this);
+        exportMenu.add(exportSequenceAlignmentItem);
+
+        exportConservedSubstructuresAlignmentViennaItem.addActionListener(this);
+        exportMenu.add(exportConservedSubstructuresAlignmentViennaItem);
+
+        exportConservedSubstructuresTableItem.addActionListener(this);
+        exportMenu.add(exportConservedSubstructuresTableItem);
 
         exportChartDataItem.addActionListener(this);
         exportMenu.add(exportChartDataItem);
@@ -156,8 +168,8 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
         alignMAFFTItem.addActionListener(this);
         alignMenu.add(alignMAFFTItem);
 
-        identifySubtructuresItem.addActionListener(this);
-        alignMenu.add(identifySubtructuresItem);
+        //identifySubtructuresItem.addActionListener(this);
+        //alignMenu.add(identifySubtructuresItem);
 
         aboutItem.addActionListener(this);
         helpMenu.add(aboutItem);
@@ -167,52 +179,14 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
         menuBar.add(exportMenu);
         menuBar.add(helpMenu);
     }
+    JTextPane instructionsTextPane = new JTextPane();
 
-    /*
-     * public void test() { ArrayList<String> sequences = new
-     * ArrayList<String>(); ArrayList<String> sequenceNames = new
-     * ArrayList<String>(); IO.loadFastaSequences(new
-     * File("C:/Users/Michael/Dropbox/HCV fold 2/shape_aligned.fasta"),
-     * sequences, sequenceNames);
-     *
-     * Structure h77structure = StructureAlign.loadStructureFromCtFile(new
-     * File("C:/Users/Michael/Dropbox/HCV fold/Genomic
-     * models/H77_genomemodel_corrected.ct")); Structure con1structure =
-     * StructureAlign.loadStructureFromCtFile(new
-     * File("C:/Users/Michael/Dropbox/HCV fold/Genomic
-     * models/HCV_Con1bgenome.ct")); Structure jfh1structure =
-     * StructureAlign.loadStructureFromCtFile(new
-     * File("C:/Users/Michael/Dropbox/HCV fold/Genomic
-     * models/JFH1_genomicmodel.ct"));
-     *
-     * secondaryStructureItems = new ArrayList<>();
-     * secondaryStructureItems.add(new SecondaryStructureItem("h77",
-     * h77structure.sequence, h77structure.pairedSites, 0));
-     * secondaryStructureItems.add(new SecondaryStructureItem("con",
-     * con1structure.sequence, con1structure.pairedSites, 1));
-     * secondaryStructureItems.add(new SecondaryStructureItem("jfh1",
-     * jfh1structure.sequence, jfh1structure.pairedSites, 2));
-     *
-     * alignmentModel.setStructuralAlignment(new
-     * SecondaryStructureAlignment(secondaryStructureItems));
-     *
-     * legendListModel = new DefaultListModel<>(); for (int i = 0; i <
-     * secondaryStructureItems.size(); i++) { legendListModel.addElement(new
-     * LegendItem(secondaryStructureItems.get(i).name, getColor(i,
-     * secondaryStructureItems.size()), true, secondaryStructureItems.get(i)));
-     * } LegendCellRenderer cellRenderer = new LegendCellRenderer();
-     * jList1.setCellRenderer(cellRenderer); jList1.setModel(legendListModel);
-     * jList1.addMouseListener(new MouseAdapter() {
-     *
-     * @Override public void mouseClicked(MouseEvent e) { if
-     * (SwingUtilities.isLeftMouseButton(e)) { int index =
-     * jList1.locationToIndex(e.getPoint()); LegendItem item = (LegendItem)
-     * jList1.getModel().getElementAt(index); item.selected = !item.selected;
-     * jList1.repaint(jList1.getCellBounds(index, index));
-     * refreshAlignmentChartData(); } } });
-     *
-     * refreshAlignmentChartData(); }
-     */
+    public void setupInstructions() {
+        instructionsTextPane.setEditable(false);
+        instructionsTextPane.setContentType("text/html");
+        instructionsTextPane.setText(resources.getString("secondaryStructureComparisonInstructionsText"));
+    }
+
     public static Color getColor(int i, int n) {
         return new Color(Color.HSBtoRGB(((float) i) / ((float) n), 1.0f, 1.0f));
     }
@@ -237,15 +211,37 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
                     chartDataList.add(chartData);
 
                     double[] sequenceSim = StructureAlign.slidingWeightedSequenceSimilarity(itemi.getSubItem(0), itemj.getSubItem(0), (Integer) settingsPanel.substructureWindowSpinner.getValue());
-                    for (int k = 0; k < simOffset.length && k < sequenceSim.length; k++) {
-                        System.out.println(k + "\t"+ simOffset[k]+"\t"+ sequenceSim[k]);
+
+                    //System.out.println("OVERALL="+(1 - MountainMetrics.calculateNormalizedWeightedMountainDistance(itemi.getPairedSites(), itemj.getPairedSites())));
+                    for (int k = 5; k < 5000; k = k + 5) {
+                        // System.out.println(k + "\t" + StructureAlign.slidingWeightedMountainSimilarityAverage(itemi.getPairedSites(), itemj.getPairedSites(), k, settingsPanel.relaxedRadioButton.isSelected()));
                     }
-                    chartDataList.add(new AlignmentChartData(sequenceSim, ChartType.DASHED_LINE, itemi.color, itemj.color, null, Marker.CIRCLE));
+                    //chartDataList.add(new AlignmentChartData(sequenceSim, ChartType.DASHED_LINE, itemi.color, itemj.color, null, Marker.CIRCLE));
                 }
             }
         }
-        
+
         chartPanel.setAlignmentChartData(chartDataList);
+        refreshConservedStructuresData(alignment);
+
+    }
+    ArrayList<Region> conservedRegions = new ArrayList<>();
+
+    public void refreshConservedStructuresData(Alignment alignment) {
+        if (this.settingsPanel.identifyConservedSubstructuresCheckBox.isSelected()) {
+            conservedRegions = identifyConservedSubstructures(alignment);
+            chartPanel.setHighlightRegions(conservedRegions);
+            substructureTable.tableDataModel.clear();
+            int id = 1;
+            for (Region region : conservedRegions) {
+                substructureTable.tableDataModel.addSubstructure(id, new Location(region.startPos + 1, region.startPos + region.length), region.length, region.score);
+                id++;
+            }
+        } else {
+            conservedRegions = new ArrayList<Region>();
+            substructureTable.tableDataModel.clear();
+            chartPanel.setHighlightRegions(conservedRegions);
+        }
     }
 
     /**
@@ -266,9 +262,11 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
         rightPanel = new javax.swing.JPanel();
         rulerPanelHolder = new javax.swing.JPanel();
         rightSplitPane = new javax.swing.JSplitPane();
-        rightScrollPane = new javax.swing.JScrollPane();
+        alignmentScrollPane = new javax.swing.JScrollPane();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         chartScrollPane = new javax.swing.JScrollPane();
+        jPanel3 = new javax.swing.JPanel();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -308,8 +306,8 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
         rightSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         rightSplitPane.setLastDividerLocation(400);
 
-        rightScrollPane.setBorder(null);
-        rightSplitPane.setLeftComponent(rightScrollPane);
+        alignmentScrollPane.setBorder(null);
+        rightSplitPane.setLeftComponent(alignmentScrollPane);
 
         jPanel1.setLayout(new java.awt.BorderLayout());
 
@@ -317,7 +315,12 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
         chartScrollPane.setPreferredSize(new java.awt.Dimension(100, 150));
         jPanel1.add(chartScrollPane, java.awt.BorderLayout.CENTER);
 
-        rightSplitPane.setRightComponent(jPanel1);
+        jTabbedPane1.addTab("Mountain similarity graph", jPanel1);
+
+        jPanel3.setLayout(new java.awt.BorderLayout());
+        jTabbedPane1.addTab("Conserved substructures", jPanel3);
+
+        rightSplitPane.setRightComponent(jTabbedPane1);
 
         rightPanel.add(rightSplitPane, java.awt.BorderLayout.CENTER);
 
@@ -326,15 +329,17 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
         add(verticalSplitPane, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JScrollPane alignmentScrollPane;
     private javax.swing.JScrollPane chartScrollPane;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JPanel leftPanel;
     private javax.swing.JSplitPane leftSplitPane;
     private javax.swing.JPanel namePanelHolder;
     private javax.swing.JPanel rightPanel;
-    private javax.swing.JScrollPane rightScrollPane;
     private javax.swing.JSplitPane rightSplitPane;
     private javax.swing.JPanel rulerPanelHolder;
     private javax.swing.JSplitPane verticalSplitPane;
@@ -342,8 +347,8 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
 
     @Override
     public void mouseDraggedOffVisibleRegion(int x, int y) {
-        rightScrollPane.getHorizontalScrollBar().setValue(rightScrollPane.getHorizontalScrollBar().getValue() + x);
-        rightScrollPane.getVerticalScrollBar().setValue(rightScrollPane.getVerticalScrollBar().getValue() + y);
+        alignmentScrollPane.getHorizontalScrollBar().setValue(alignmentScrollPane.getHorizontalScrollBar().getValue() + x);
+        alignmentScrollPane.getVerticalScrollBar().setValue(alignmentScrollPane.getVerticalScrollBar().getValue() + y);
     }
 
     @Override
@@ -353,16 +358,18 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
 
     @Override
     public void alignmentChanged(Alignment alignment) {
-         for (int i = 0; i < alignment.items.size(); i++) {
-            AlignmentItem item = (AlignmentItem) alignment.items.get(i);
-            item.setColor(AlignmentEditor.getColor(i, alignment.items.size()));
+        if (alignment.items.size() > 0) {
+
+            for (int i = 0; i < alignment.items.size(); i++) {
+                AlignmentItem item = (AlignmentItem) alignment.items.get(i);
+                item.setColor(AlignmentEditor.getColor(i, alignment.items.size()));
+            }
+            refreshAlignmentChartData();
+            alignmentScrollPane.setViewportView(alignmentPanel);
+        } else {
+            rulerPanel.setVisibleRect(null);
+            alignmentScrollPane.setViewportView(instructionsTextPane);
         }
-        refreshAlignmentChartData();
-        //this.chartPanel.revalidate();
-        //this.verticalSplitPane.revalidate();
-        //this.rightScrollPane.revalidate();
-        System.out.println("Alignment changed");
-        this.alignmentPanel.revalidate();
     }
 
     @Override
@@ -378,6 +385,8 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
     public void stateChanged(ChangeEvent e) {
         if (e.getSource().equals(settingsPanel.substructureWindowSpinner)) {
             refreshAlignmentChartData();
+        } else if (e.getSource().equals(settingsPanel.similarityCutoffSpinner)) {
+            refreshConservedStructuresData(alignmentModel.getAlignment());
         }
     }
 
@@ -414,6 +423,12 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
     public void itemStateChanged(ItemEvent e) {
         if (e.getSource().equals(this.settingsPanel.relaxedRadioButton)) {
             refreshAlignmentChartData();
+        } else if (e.getSource().equals(settingsPanel.identifyConservedSubstructuresCheckBox)) {
+            refreshConservedStructuresData(alignmentModel.getAlignment());
+        } else if (e.getSource().equals(settingsPanel.methodComboBox)) {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                refreshConservedStructuresData(alignmentModel.getAlignment());
+            }
         }
     }
 
@@ -432,9 +447,43 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
             }
         }
         double cutoff = (Double) settingsPanel.similarityCutoffSpinnerModel.getValue();
-        boolean useMinMethod = settingsPanel.useMinMethod.isSelected();
+        boolean relaxed = settingsPanel.relaxedRadioButton.isSelected();
 
-        return StructureAlign.getConservedStructures(alignedStructures, alignedSequences, names, windowSize, cutoff, useMinMethod);
+        if (alignedStructures.size() > 1) {
+            return StructureAlign.getConservedStructures(alignedStructures, alignedSequences, names, windowSize, cutoff, relaxed, (Method) settingsPanel.methodComboBox.getSelectedItem());
+        }
+
+        return new ArrayList<>();
+    }
+
+    public void saveConservedTableDataAsCSV(File csvFile) throws IOException {
+        BufferedWriter buffer = new BufferedWriter(new FileWriter(csvFile));
+        ArrayList<Object[]> rows = substructureTable.tableDataModel.rows;
+        buffer.write("id,location,length,mean similarity\n");
+        for (Object[] row : rows) {
+            buffer.write(row[0] + "," + row[1] + "," + row[2] + "," + row[3]);
+        }
+        buffer.close();
+    }
+
+    public void saveConservedStructuresAsViennaDotBracketAlignment(Alignment alignment, File dbnFile) throws IOException {
+        BufferedWriter buffer = new BufferedWriter(new FileWriter(dbnFile));
+        int id = 1;
+        for (Region conservedRegion : conservedRegions) {
+            for (int i = 0; i < alignment.items.size(); i++) {
+                SecondaryStructureItem item = (SecondaryStructureItem) alignment.items.get(i);
+                if (item.selected) {
+                    buffer.write(">" + (conservedRegion.startPos + 1) + "-" + (conservedRegion.startPos + conservedRegion.length + 1) + ", " + id + ", \"" + item.name + "\", sim=" + conservedRegion.score);
+                    id++;
+                    buffer.newLine();
+                    buffer.write(item.getSubItem(0).substring(conservedRegion.startPos, Math.min(item.getSubItem(0).length(), conservedRegion.startPos + conservedRegion.length)));
+                    buffer.newLine();
+                    buffer.write(item.getSubItem(1).substring(conservedRegion.startPos, Math.min(item.getSubItem(1).length(), conservedRegion.startPos + conservedRegion.length)));
+                    buffer.newLine();
+                }
+            }
+        }
+        buffer.close();
     }
 
     public void saveDataAsCSV(Alignment alignment, File csvFile, boolean selectedOnly) throws IOException {
@@ -516,6 +565,20 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
             buffer.close();
         }
     }
+    
+    public void saveSequenceAlignment(Alignment alignment, File fastaFile) throws IOException {
+        if (alignment instanceof SecondaryStructureAlignment) {
+            BufferedWriter buffer = new BufferedWriter(new FileWriter(fastaFile));
+            for (int i = 0; i < alignment.items.size(); i++) {
+                SecondaryStructureItem item = (SecondaryStructureItem) alignment.items.get(i);
+                buffer.write(">" + item.name);
+                buffer.newLine();
+                buffer.write(item.getSubItem(0));
+                buffer.newLine();
+            }
+            buffer.close();
+        }
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -550,6 +613,7 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
                 alignmentModel.setStructuralAlignment(SecondaryStructureAlignment.mafftAlign((SecondaryStructureAlignment) alignment));
             }
         } else if (e.getSource().equals(this.exportChartDataItem)) {
+            saveDialog.setSelectedFile(new File(saveDialog.getCurrentDirectory().getAbsolutePath() + File.separator + "chart.csv"));
             int ret = saveDialog.showSaveDialog(this);
             if (ret == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = saveDialog.getSelectedFile();
@@ -560,6 +624,7 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
                 }
             }
         } else if (e.getSource().equals(this.exportViennaAlignmentItem)) {
+            saveDialog.setSelectedFile(new File(saveDialog.getCurrentDirectory().getAbsolutePath() + File.separator + "full-alignment.dbn"));
             int ret = saveDialog.showSaveDialog(this);
             if (ret == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = saveDialog.getSelectedFile();
@@ -569,11 +634,51 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
                     Logger.getLogger(AlignmentEditor.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+        } else if (e.getSource().equals(this.exportSequenceAlignmentItem)) {
+            saveDialog.setSelectedFile(new File(saveDialog.getCurrentDirectory().getAbsolutePath() + File.separator + "full-alignment.fas"));
+            int ret = saveDialog.showSaveDialog(this);
+            if (ret == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = saveDialog.getSelectedFile();
+                try {
+                    saveSequenceAlignment(alignmentModel.getAlignment(), selectedFile);
+                } catch (IOException ex) {
+                    Logger.getLogger(AlignmentEditor.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        else if (e.getSource().equals(this.exportConservedSubstructuresTableItem)) {
+            saveDialog.setSelectedFile(new File(saveDialog.getCurrentDirectory().getAbsolutePath() + File.separator + "conserved-structures.csv"));
+            int ret = saveDialog.showSaveDialog(this);
+            if (ret == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = saveDialog.getSelectedFile();
+                try {
+                    saveConservedTableDataAsCSV(selectedFile);
+                } catch (IOException ex) {
+                    Logger.getLogger(AlignmentEditor.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        } else if (e.getSource().equals(this.exportConservedSubstructuresAlignmentViennaItem)) {
+            saveDialog.setSelectedFile(new File(saveDialog.getCurrentDirectory().getAbsolutePath() + File.separator + "conserved-structures.dbn"));
+            int ret = saveDialog.showSaveDialog(this);
+            if (ret == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = saveDialog.getSelectedFile();
+                try {
+                    saveConservedStructuresAsViennaDotBracketAlignment(alignmentModel.getAlignment(), selectedFile);
+                } catch (IOException ex) {
+                    Logger.getLogger(AlignmentEditor.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
         } else if (e.getSource().equals(this.aboutItem)) {
-            System.out.println("About item");
+            AboutDialog d = new AboutDialog(null, true);
+            d.setIconImage(new ImageIcon(ClassLoader.getSystemResource("resources/icons/icon-32x32.png")).getImage());
+            final Toolkit toolkit = Toolkit.getDefaultToolkit();
+            final Dimension screenSize = toolkit.getScreenSize();
+            final int x = (screenSize.width - d.getWidth()) / 2;
+            final int y = (screenSize.height - d.getHeight()) / 2;
+            d.setLocation(x, y);
+            d.setVisible(true);
         } else if (e.getSource().equals(identifySubtructuresItem)) {
             ArrayList<Region> conservedRegions = identifyConservedSubstructures(alignmentModel.getAlignment());
-            System.out.println(conservedRegions);
             chartPanel.setHighlightRegions(conservedRegions);
         }
     }

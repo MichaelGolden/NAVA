@@ -4,12 +4,12 @@
  */
 package nava.tasks.applications;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import nava.data.io.IO;
 import nava.data.types.Alignment;
 import nava.data.types.DataSource;
 import nava.data.types.SecondaryStructure;
@@ -25,6 +25,60 @@ public class MAFFTApplication extends Application {
     public static String MAFFT_EXECUTABLE = "bin/mafft-6.952-win64/mafft-win/mafft.bat";
     Alignment inputDataSource = null;
     ArrayList<ApplicationOutput> outputFiles = new ArrayList<>();
+
+    public ArrayList<String> align(ArrayList<String> inSequences) throws Exception {
+        File tempDir = createTemporaryDirectory();
+
+        File inFastaFile = new File(tempDir.getAbsolutePath() + File.separator + "in.fas");
+        File outFastaFile = new File(tempDir.getAbsolutePath() + File.separator + "out.fas");
+        BufferedWriter writer = new BufferedWriter(new FileWriter(inFastaFile));
+        for (int i = 0; i < inSequences.size(); i++) {
+            writer.write(">a" + i + "\n");
+            writer.write(inSequences.get(i) + "\n");
+        }
+        writer.close();
+
+        //String cmd = new File(MAFFT_EXECUTABLE).getAbsolutePath() + " --auto " + inFastaFile.getAbsolutePath() + " > " + outFastaFile.getAbsolutePath();
+        String cmd = new File(MAFFT_EXECUTABLE).getAbsolutePath() + " --retree 5 --maxiterate 25 " + inFastaFile.getAbsolutePath() + " > " + outFastaFile.getAbsolutePath();
+        process = Runtime.getRuntime().exec(cmd, null, tempDir);
+
+        Application.nullOutput(process.getInputStream());
+        try {
+
+            BufferedReader buffer = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            String textline = null;
+            System.out.println("Standard:");
+            while ((textline = buffer.readLine()) != null) {
+                System.out.println(textline);
+            }
+            buffer.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        ArrayList<String> sequences = new ArrayList<>();
+        ArrayList<String> sequencesOrdered;
+        ArrayList<String> sequenceNames = new ArrayList<>();
+
+        int exitCode = process.waitFor();
+        if (exitCode == 0) {
+            IO.loadFastaSequences(outFastaFile, sequences, sequenceNames);
+            sequencesOrdered  = new ArrayList<>();
+            for(int i = 0 ; i < sequences.size() ; i++)
+            {
+                sequencesOrdered.add("");
+            }
+            for(int i = 0 ; i < sequences.size() ; i++)
+            {
+                int no = Integer.parseInt(sequenceNames.get(i).substring(1));
+                sequencesOrdered.set(no, sequences.get(i));
+            }
+            
+            return sequencesOrdered;
+        } else {
+            throw new Exception("");
+        }
+    }
 
     @Override
     protected void start() {

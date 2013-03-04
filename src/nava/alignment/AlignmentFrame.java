@@ -7,6 +7,7 @@ package nava.alignment;
 import java.awt.BorderLayout;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import javax.swing.ImageIcon;
 
 /**
  *
@@ -20,6 +21,8 @@ public class AlignmentFrame extends javax.swing.JFrame {
     public AlignmentFrame() {
         initComponents();
         this.add(new AlignmentEditor(),BorderLayout.CENTER);
+        
+        this.setIconImage(new ImageIcon(ClassLoader.getSystemResource("resources/icons/icon-32x32.png")).getImage());
     }
 
     /**

@@ -48,7 +48,20 @@ public class SecondaryStructureAlignment extends Alignment {
 
             
             for (int i = 0; i < alignedSequences.size(); i++) {
-                String structure = StructureAlign.mapStringToAlignedSequence(RNAFoldingTools.getDotBracketStringFromPairedSites(((SecondaryStructureItem) inAlignment.items.get(i)).getOriginalPairedSites()), alignedSequences.get(i), "-");
+                
+                // get dot bracket structure corresponding to non-gap characters in sequence
+                String newDbn = "";
+                String dbn = ((SecondaryStructureItem) inAlignment.items.get(i)).getSubItem(1);                
+                String seq = ((SecondaryStructureItem) inAlignment.items.get(i)).getSubItem(0);
+                for(int j = 0 ; j < seq.length() ; j++)
+                {
+                    if(seq.charAt(j) != '-' && j < dbn.length())
+                    {
+                        newDbn += dbn.charAt(j);
+                    }
+                }
+                
+                String structure = StructureAlign.mapStringToAlignedSequence(newDbn, alignedSequences.get(i), "-");
                 SecondaryStructureItem origItem = (SecondaryStructureItem) inAlignment.items.get(i);
                 SecondaryStructureItem item = new SecondaryStructureItem(origItem.name, alignedSequences.get(i), structure, i);
                 item.selected = origItem.selected;

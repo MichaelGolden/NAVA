@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import javax.swing.event.EventListenerList;
 import nava.structurevis.data.*;
+import nava.structurevis.navigator.DataOverlayTreeModel;
 import nava.ui.navigator.NavigationEvent;
 import nava.ui.navigator.NavigationListener;
 import nava.utils.Mapping;
@@ -47,6 +48,8 @@ public class SubstructureModel implements Serializable {
     double thresholdMin2D;
     double thresholdMax2D;
     StructureVisController structureVisController;
+    
+    public DataOverlayTreeModel navigatorTreeModel = null;
 
     public SubstructureModel(StructureVisController structureVisController) {
         this.structureVisController = structureVisController;

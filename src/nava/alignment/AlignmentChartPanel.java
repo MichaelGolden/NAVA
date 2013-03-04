@@ -109,7 +109,7 @@ public class AlignmentChartPanel extends JPanel implements Scrollable {
 
                 if (highlightRegions != null) {
                     for (Region highlightRegion : highlightRegions) {
-                        g2.setColor(new Color(255, 0, 0, 200));
+                        g2.setColor(new Color(255, 0, 0, 70));
                         Rectangle2D.Double rect = new Rectangle2D.Double((highlightRegion.startPos * AlignmentPanel.blockWidth) - visibleRect.x, 0, (highlightRegion.length * AlignmentPanel.blockWidth), getHeight());
                         g2.fill(rect);
                     }
@@ -152,7 +152,7 @@ public class AlignmentChartPanel extends JPanel implements Scrollable {
                         g2.setColor(chartData.lineColor1);
                         g2.setStroke(new BasicStroke(1));
                         for (int i = startNuc; i < endNuc; i++) {
-                            if (i % 10 == 0 && chartData.data[i] != Double.MIN_VALUE) {
+                            if (i % 10 == 0 && i < chartData.data.length && chartData.data[i] != Double.MIN_VALUE) {
                                 if (chartData.marker == Marker.CIRCLE) {
                                     double x1 = i * AlignmentPanel.blockWidth - visibleRect.x;
                                     double val = (chartData.data[i] - min) / (max - min);

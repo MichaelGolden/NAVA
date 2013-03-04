@@ -4,6 +4,7 @@
  */
 package nava.structure;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import nava.utils.RNAFoldingTools;
 
@@ -30,7 +31,7 @@ public class MountainMetrics {
         System.out.println(calculateWeightedMountainDistance(s1, sz));
     }
 
-    public static double calculateNormalizedWeightedMountainDistance(int[] pairedSites1, int[] pairedSites2) {        
+    public static double calculateNormalizedWeightedMountainDistance(int[] pairedSites1, int[] pairedSites2) {
         return calculateWeightedMountainDistance(pairedSites1, pairedSites2) / calculateWeightedMountainDiameter(pairedSites1.length);
     }
 
@@ -58,7 +59,51 @@ public class MountainMetrics {
         return Math.pow(d, 1 / p);
     }
 
+    /**
+     * Optimised mountain vector calculation.
+     *
+     * @param pairedSites
+     * @param weighted
+     * @return
+     */
     public static double[] getMountainVector(int[] pairedSites, boolean weighted) {
+        double[] f1 = new double[pairedSites.length];
+        if (weighted) {
+            if (pairedSites[0] != 0) {
+                f1[0] += 1 / ((double) (pairedSites[0] - 1 - 0));
+            }
+
+            for (int i = 1; i < pairedSites.length; i++) {
+                f1[i] = f1[i - 1];
+                if (pairedSites[i] != 0) {
+                    f1[i] += 1 / ((double) (pairedSites[i] - 1 - i));
+                }
+            }
+            return f1;
+        } else {
+            if (pairedSites[0] != 0) {
+                if (pairedSites[0] > 0) {
+                    f1[0] += 1;
+                } else {
+                    f1[0] -= 1;
+                }
+            }
+
+            for (int i = 1; i < pairedSites.length; i++) {
+                f1[i] = f1[i - 1];
+                if (pairedSites[i] != 0) {
+                    if (pairedSites[i] > i) {
+                        f1[i] += 1;
+                    } else {
+                        f1[i] -= 1;
+                    }
+                }
+            }
+            return f1;
+        }
+    }
+
+    public static double[] getMountainVector2(int[] pairedSites, boolean weighted) {
         String s1 = RNAFoldingTools.getDotBracketStringFromPairedSites(pairedSites);
         double[] f1 = new double[pairedSites.length];
 
@@ -76,7 +121,7 @@ public class MountainMetrics {
             if (weighted) {
                 w = 1 / (double) Math.abs(pairedSites[i] - 1 - i);
             }
-            
+
             f1[i] = f1[i - 1];
             if (s1.charAt(i) == '(') {
                 f1[i] += w;
@@ -85,6 +130,35 @@ public class MountainMetrics {
             }
         }
         return f1;
+    }
+
+    public static double[] compareMountainSlopes(int[] pairedSites1, int[] pairedSites2, boolean weighted) {
+        double[] mountain1 = MountainMetrics.getMountainVector(pairedSites1, weighted);
+        double[] mountain2 = MountainMetrics.getMountainVector(pairedSites2, weighted);
+
+        int windowSize = 10;
+        double[] slope1 = getMountainSlopeVector(pairedSites1, weighted, windowSize);
+        double[] slope2 = getMountainSlopeVector(pairedSites2, weighted, windowSize);
+
+        for (int i = 0; i < slope1.length; i++) {
+            double angle1 = Math.acos(slope1[i]);
+            double angle2 = Math.acos(slope2[i]);
+            double sim = 1 - (Math.abs(angle1 - angle2) / Math.PI);
+
+
+            System.out.println(i+"\t"+mountain1[i]+"\t"+mountain2[i]+"\t"+slope1[i]+"\t"+slope2[i]+"\t"+angle1 + "\t" + angle2 + "\t" + sim);
+        }
+
+        return null;
+    }
+
+    public static double[] getMountainSlopeVector(int[] pairedSites, boolean weighted, int windowSize) {
+        double[] mountain = MountainMetrics.getMountainVector(pairedSites, weighted);
+        double[] slope = new double[mountain.length];
+        for (int i = windowSize ; i < mountain.length; i++) {
+            slope[i] = (mountain[i] - mountain[i - windowSize])/((double)windowSize);
+        }
+        return slope;
     }
 
     public static int[] getStructureStar(int length) {

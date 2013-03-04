@@ -33,6 +33,8 @@ public class AlignmentNamePanel extends javax.swing.JPanel implements ActionList
     JPopupMenu popupMenu = new JPopupMenu();
     JMenuItem nameItem = new JMenuItem("Edit name");
     JMenuItem removeItem = new JMenuItem("Remove");
+    JMenuItem removeSelectedItem = new JMenuItem("Remove selected");
+    JMenuItem removeUnselectedItem = new JMenuItem("Remove unselected");
 
     class ItemAndRectangle<T> {
 
@@ -59,6 +61,12 @@ public class AlignmentNamePanel extends javax.swing.JPanel implements ActionList
 
         removeItem.addActionListener(this);
         popupMenu.add(removeItem);
+
+        removeSelectedItem.addActionListener(this);
+        popupMenu.add(removeSelectedItem);
+
+        removeUnselectedItem.addActionListener(this);
+        popupMenu.add(removeUnselectedItem);
     }
 
     @Override
@@ -199,6 +207,31 @@ public class AlignmentNamePanel extends javax.swing.JPanel implements ActionList
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(removeItem)) {
             alignmentModel.alignment.items.remove(popupItem);
+            alignmentModel.setAlignment(alignmentModel.alignment);
+        }
+        else
+        if (e.getSource().equals(removeSelectedItem)) {
+            for (int i = 0; i < alignmentModel.alignment.items.size(); i++) {
+                AlignmentItem item = (AlignmentItem) alignmentModel.alignment.items.get(i);
+                if(item.selected)
+                {
+                     alignmentModel.alignment.items.remove(item);
+                     i--;
+                }
+            }
+            alignmentModel.setAlignment(alignmentModel.alignment);
+        }
+        else
+        if (e.getSource().equals(removeUnselectedItem)) {
+             for (int i = 0; i < alignmentModel.alignment.items.size(); i++) {
+                AlignmentItem item = (AlignmentItem) alignmentModel.alignment.items.get(i);
+                if(!item.selected)
+                {
+                     alignmentModel.alignment.items.remove(item);
+                     i--;
+                     System.out.println(">>>>"+i+"\t"+alignmentModel.alignment.items.size());
+                }
+            }
             alignmentModel.setAlignment(alignmentModel.alignment);
         } else if (e.getSource().equals(nameItem)) {
 

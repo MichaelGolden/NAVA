@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import nava.data.types.DataType;
 import nava.data.types.DataType.FileFormat;
 import nava.data.types.DataType.MatrixFormat;
-import nava.data.types.DataType.StructureFormat;
 import nava.data.types.SecondaryStructureData;
 import nava.utils.RNAFoldingTools;
 import org.biojavax.bio.seq.io.GenbankFormat;
@@ -20,39 +19,39 @@ import org.biojavax.bio.seq.io.GenbankFormat;
  */
 public class FileImport {
 
-    public static ArrayList<StructureFormat> parsableStructureFormats(File inFile) {
-        ArrayList<StructureFormat> parsableFormats = new ArrayList<StructureFormat>();
+    public static ArrayList<FileFormat> parsableStructureFormats(File inFile) {
+        ArrayList<FileFormat> parsableFormats = new ArrayList<>();
 
         try {
             readConnectFile(inFile);
-            parsableFormats.add(StructureFormat.CONNECT_FILE);
+            parsableFormats.add(FileFormat.CONNECT_FILE);
         } catch (Exception ex) {
             //ex.printStackTrace();
         }
 
         try {
             readDotBracketFile(inFile);
-            parsableFormats.add(StructureFormat.VIENNA_DOT_BRACKET);
+            parsableFormats.add(FileFormat.VIENNA_DOT_BRACKET);
         } catch (Exception ex) {
         }
 
         try {
             readDotBracketOnlyFile(inFile);
-            parsableFormats.add(StructureFormat.DOT_BRACKET_ONLY);
+            parsableFormats.add(FileFormat.DOT_BRACKET_ONLY);
         } catch (Exception ex) {
             // ex.printStackTrace();
         }
 
         try {
             readTabDelimittedHelixFile(inFile);
-            parsableFormats.add(StructureFormat.TAB_DELIMITTED_HELIX);
+            parsableFormats.add(FileFormat.TAB_DELIMITTED_HELIX);
         } catch (Exception ex) {
             //ex.printStackTrace();
         }
 
         try {
             readBpseqFile(inFile);
-            parsableFormats.add(StructureFormat.BPSEQ);
+            parsableFormats.add(FileFormat.BPSEQ);
         } catch (Exception ex) {
             //ex.printStackTrace();
         }
@@ -104,10 +103,10 @@ public class FileImport {
 
     public static ArrayList<DataType> getPossibleDataTypes(File inFile) {
         ArrayList<DataType> possibleDataTypes = new ArrayList<DataType>();
-        ArrayList<StructureFormat> parsableStructureFormats = parsableStructureFormats(inFile);
+        ArrayList<FileFormat> parsableStructureFormats = parsableStructureFormats(inFile);
 
         for (int i = 0; i < parsableStructureFormats.size(); i++) {
-            possibleDataTypes.add(new DataType(DataType.Primary.SECONDARY_STRUCTURE, DataType.FileFormat.valueOf(parsableStructureFormats.get(i).name())));
+            possibleDataTypes.add(new DataType(DataType.Primary.SECONDARY_STRUCTURE, parsableStructureFormats.get(i)));
         }
         try {
             if (FileImport.isGenbankFormat(inFile)) {
@@ -177,7 +176,7 @@ public class FileImport {
 
         for (int j = 0; j < files.size(); j++) {
             try {
-                ArrayList<StructureFormat> parsableFormats = parsableStructureFormats(files.get(j));
+                ArrayList<FileFormat> parsableFormats = parsableStructureFormats(files.get(j));
                 System.out.println(">" + files.get(j));
                 for (int i = 0; i < parsableFormats.size(); i++) {
                     System.out.println(parsableFormats.get(i).name());

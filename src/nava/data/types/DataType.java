@@ -12,10 +12,13 @@ import java.io.Serializable;
  */
 public class DataType implements Serializable {
 
+    /*
     public enum StructureFormat {
 
         CONNECT_FILE, VIENNA_DOT_BRACKET, DOT_BRACKET_ONLY, BPSEQ, TAB_DELIMITTED_HELIX
     };
+    * 
+    */
 
     public enum TabularFormat {
 

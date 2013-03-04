@@ -203,6 +203,7 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
 
         substructureGroup.add(jRadioButton2);
         jRadioButton2.setText("From a file");
+        jRadioButton2.setEnabled(false);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -354,8 +355,23 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
     public void update() {
         SecondaryStructure structure = (SecondaryStructure) structureComboBox.getSelectedItem();
         MappingSource mappingSource = null;
+        
+        SecondaryStructureData data = (SecondaryStructureData) structure.getObject(MainFrame.dataSourceCache);
+        if(data.sequence.length() == 0)
+        {
+            embeddSequenceRadioButton.setEnabled(false);
+            if(embeddSequenceRadioButton.isSelected())
+            {
+                fromAlignmentRadioButton.setSelected(true);
+            }
+        }
+        else
+        {
+            embeddSequenceRadioButton.setEnabled(true);
+        }
+        
         if (this.embeddSequenceRadioButton.isSelected()) {
-            SecondaryStructureData data = (SecondaryStructureData) structure.getObject(MainFrame.dataSourceCache);
+            
             mappingSource = new MappingSource(data.sequence);
             System.out.println(data.sequence);
         } else if (this.fromAlignmentRadioButton.isSelected()) {

@@ -35,7 +35,7 @@ public class ConsoleInputHandler extends Thread {
         this.typeName = typeName;
         start();
     }
-
+    
     @Override
     public void run() {
         try {

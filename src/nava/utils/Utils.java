@@ -4,6 +4,7 @@
  */
 package nava.utils;
 
+import java.util.Random;
 import java.util.Scanner;
 
 /**
@@ -11,69 +12,56 @@ import java.util.Scanner;
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
 public class Utils {
-    
-    public static String padStringRight(String s, int n, char c)
-    {
+
+    public static String padStringRight(String s, int n, char c) {
         String ret = s;
-        for(int i = s.length() ; i < n ; i++)
-        {
+        for (int i = s.length(); i < n; i++) {
             ret += c;
         }
         return ret;
     }
-    
-    public static String padStringLeft(String s, int n, char c)
-    {
+
+    public static String padStringLeft(String s, int n, char c) {
         String ret = s;
-        for(int i = s.length() ; i < n ; i++)
-        {
-            ret = c+ret;
+        for (int i = s.length(); i < n; i++) {
+            ret = c + ret;
         }
         return ret;
     }
-    
-    public static String nChars(char c, int n)
-    {
+
+    public static String nChars(char c, int n) {
         String ret = "";
-        for(int i = 0 ; i < n ; i++)
-        {
+        for (int i = 0; i < n; i++) {
             ret += c;
         }
         return ret;
     }
-    
-    public static boolean isInteger(String s)
-    {
-        try
-        {
+
+    public static boolean isInteger(String s) {
+        try {
             Integer.parseInt(s);
-        }
-        catch(NumberFormatException ex)
-        {
+        } catch (NumberFormatException ex) {
             return false;
         }
-        
-        return true;       
+
+        return true;
     }
 
     public static boolean isNumeric(String s) {
-        try
-        {
+        try {
             Double.parseDouble(s);
-        }
-        catch(NumberFormatException ex)
-        {
+        } catch (NumberFormatException ex) {
             return false;
         }
-        
-        return true;        
+
+        return true;
     }
-    
+
     public static String wrapText(String s, int width) {
         String wrappedText = "";
 
         String[] split = s.split("\n");
-        for (int k = 0 ; k < split.length ; k++) {
+        for (int k = 0; k < split.length; k++) {
             String wrappedLine = "";
             String line = split[k];
             String remainingText = line;
@@ -87,17 +75,32 @@ public class Utils {
             }
             wrappedLine += remainingText.trim();
             wrappedText += wrappedLine;
-            if(k != split.length-1)
-            {
+            if (k != split.length - 1) {
                 wrappedText += "\n";
             }
         }
-        
+
         return wrappedText;
     }
-    
-    public static String plainTextToHtml(String plainText)
-    {
-        return "<html>"+plainText.replaceAll("\n", "<br>") +"</html>";
+
+    public static String plainTextToHtml(String plainText) {
+        return "<html>" + plainText.replaceAll("\n", "<br>") + "</html>";
+    }
+
+    public static boolean[] randomBooleanArray(Random random, int n, boolean [] array) {
+        int end = Math.min(n, array.length);
+        for(int i = 0 ; i < end ; i++)
+        {
+            int a = random.nextInt(array.length);
+            for(int j = a ; j < a + array.length ; j++)
+            {
+                if(!array[j%array.length])
+                {
+                    array[j%array.length] = true;
+                    break;
+                }
+            }
+        }
+        return array;
     }
 }

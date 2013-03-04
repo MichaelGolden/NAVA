@@ -91,7 +91,7 @@ public class AlignmentModel extends AbstractListModel {
     }
 
     public ItemRange getItemRange(int viewIndex) {
-        if (itemCount[viewIndex] < items.size()) {
+        if (viewIndex < itemCount.length) {
             return new ItemRange(itemCount[viewIndex], itemCountMod[viewIndex], items.get(itemCount[viewIndex]).getSubItemCount());
         }
         return null;
@@ -107,7 +107,7 @@ public class AlignmentModel extends AbstractListModel {
 
     @Override
     public String getElementAt(int viewIndex) {
-        if (itemCount[viewIndex] < items.size()) {
+        if (viewIndex < itemCount.length) {
             return items.get(itemCount[viewIndex]).getSubItem(itemCountMod[viewIndex]);
         }
         return null;

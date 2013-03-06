@@ -6,11 +6,17 @@ package nava.structurevis.navigator;
 
 import java.util.ArrayList;
 import nava.data.types.DataSource;
+import nava.structurevis.data.Overlay;
 
 /**
  *
  * @author Michael
  */
 public class DataOverlayTreeEvent {
-    public ArrayList<DataSource> selectedDataSources = new ArrayList<>();
+
+    public ArrayList<Overlay> selectedDataSources = new ArrayList<>();
+
+    public DataOverlayTreeEvent() {
+        super();
+    }
 }

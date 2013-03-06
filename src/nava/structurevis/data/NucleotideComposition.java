@@ -5,6 +5,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import nava.data.io.IO;
 import nava.data.types.Alignment;
 import nava.data.types.AlignmentData;
@@ -14,9 +16,8 @@ import nava.utils.Mapping;
  *
  * @author Michael Golden
  */
-public class NucleotideComposition implements Serializable {
+public class NucleotideComposition extends Overlay implements Serializable {
 
-    public String name;
     double[] weights;
     public int[] nonGapCount;
     public double[][] frequencyComposition = null;
@@ -42,7 +43,15 @@ public class NucleotideComposition implements Serializable {
     public double[] getMappedFrequencyAtNucleotide(Mapping mapping, int structurePos) {
         if (mapping != null) {
             int mappedPos = mapping.bToA(structurePos);
+           // System.out.println("MFAN" + mappedPos + "->" + structurePos);
+
+
+            for (int i = 0; i < frequencyComposition.length; i++) {
+                //System.out.println(i + "\t" + frequencyComposition[i][0] + "\t" + frequencyComposition[i][1] + "\t" + frequencyComposition[i][2] + "\t" + frequencyComposition[i][3] + "\t" + frequencyComposition[i][4] + "\t");
+            }
+
             if (mappedPos != -1) {
+
                 return frequencyComposition[mappedPos];
             }
         }
@@ -397,5 +406,10 @@ public class NucleotideComposition implements Serializable {
 
     public String getType() {
         return "NucleotideComposition";
+    }
+
+    @Override
+    public Icon getIcon() {
+        return new ImageIcon(ClassLoader.getSystemResource("resources/icons/nucleotide-alignment-16x16.png"));
     }
 }

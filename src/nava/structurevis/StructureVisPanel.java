@@ -31,8 +31,8 @@ import org.biojava.bio.BioException;
 public class StructureVisPanel extends javax.swing.JPanel implements ItemListener, ProjectView, SubstructureModelListener {
 
     //DefaultComboBoxModel<Alignment> mappingSourceComboBoxModel = new DefaultComboBoxModel<>();
-    DefaultComboBoxModel<DataSource1D> data1DComboBoxModel = new DefaultComboBoxModel<>();
-    DefaultComboBoxModel<DataSource2D> data2DComboBoxModel = new DefaultComboBoxModel<>();
+    DefaultComboBoxModel<DataOverlay1D> data1DComboBoxModel = new DefaultComboBoxModel<>();
+    DefaultComboBoxModel<DataOverlay2D> data2DComboBoxModel = new DefaultComboBoxModel<>();
     ProjectController projectController;
     public StructureVisController structureVisController;
     SubstructurePanel substructurePanel;
@@ -47,12 +47,17 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         initComponents();
 
         File structureVisModelFile = new File(projectController.projectModel.getProjectPath().toFile().getAbsolutePath() + File.separatorChar + "structurevis.model");
+        System.out.println(structureVisModelFile);
+        System.out.println(structureVisModelFile.exists());
         if (structureVisModelFile.exists()) {
             try {
                 this.structureVisController = StructureVisController.loadProject(structureVisModelFile);
 
             } catch (Exception ex) {
                 this.structureVisController = new StructureVisController(projectController.projectModel.getProjectPath().toFile());
+                System.out.println("AHADA1");
+                ex.printStackTrace();
+                System.out.println("AHADA2");
                 // TODO - handle this better.
             }
         } else {
@@ -122,7 +127,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
 
     public void populateDataSource1DComboBox() {
         data1DComboBoxModel.removeAllElements();
-        ArrayList<DataSource1D> list = Collections.list(structureVisController.structureVisDataSources1D.elements());
+        ArrayList<DataOverlay1D> list = Collections.list(structureVisController.structureVisDataOverlays1D.elements());
         for (int i = 0; i < list.size(); i++) {
             //ComboBoxItem<Substructure> item = new ComboBoxItem<>(list.get(i), i + "");
             data1DComboBoxModel.addElement(list.get(i));
@@ -131,7 +136,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
 
     public void populateDataSource2DComboBox() {
         data1DComboBoxModel.removeAllElements();
-        ArrayList<DataSource2D> list = Collections.list(structureVisController.structureVisDataSources2D.elements());
+        ArrayList<DataOverlay2D> list = Collections.list(structureVisController.structureVisDataOverlays2D.elements());
         for (int i = 0; i < list.size(); i++) {
             //ComboBoxItem<Substructure> item = new ComboBoxItem<>(list.get(i), i + "");
             data2DComboBoxModel.addElement(list.get(i));
@@ -267,7 +272,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
 
     private void edit1DDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edit1DDataButtonActionPerformed
         Data1DDialog d = new Data1DDialog(null, true, projectController.projectModel, structureVisController);
-        DataSource1D dataSource1D = (DataSource1D) data1DComboBoxModel.getSelectedItem();
+        DataOverlay1D dataSource1D = (DataOverlay1D) data1DComboBoxModel.getSelectedItem();
         if (dataSource1D != null) {
             d.data1DPanel.setDataSource1D(dataSource1D);
             d.editMode = true;
@@ -286,7 +291,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
 
     private void edit2DDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edit2DDataButtonActionPerformed
         Data2DDialog d = new Data2DDialog(null, true, projectController.projectModel, structureVisController);
-        DataSource2D dataSource2D = (DataSource2D) data2DComboBoxModel.getSelectedItem();
+        DataOverlay2D dataSource2D = (DataOverlay2D) data2DComboBoxModel.getSelectedItem();
         if (dataSource2D != null) {
             d.data2DPanel.setDataSource2D(dataSource2D);
             d.editMode = true;
@@ -322,12 +327,12 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
     @Override
     public void itemStateChanged(ItemEvent e) {
         if (e.getSource().equals(data1DComboBox)) {
-            DataSource1D dataSource1D = (DataSource1D) data1DComboBox.getSelectedItem();
+            DataOverlay1D dataSource1D = (DataOverlay1D) data1DComboBox.getSelectedItem();
             if (dataSource1D != null) {
                 structureVisController.substructureModel.setDataSource1D(dataSource1D);
             }
         } else if (e.getSource().equals(data2DComboBox)) {
-            DataSource2D dataSource2D = (DataSource2D) data2DComboBox.getSelectedItem();
+            DataOverlay2D dataSource2D = (DataOverlay2D) data2DComboBox.getSelectedItem();
             if (dataSource2D != null) {
                 structureVisController.substructureModel.setDataSource2D(dataSource2D);
             }
@@ -390,11 +395,11 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
      *
      */
     @Override
-    public void dataSource1DChanged(DataSource1D dataSource1D) {
+    public void dataSource1DChanged(DataOverlay1D dataSource1D) {
     }
 
     @Override
-    public void dataSource2DChanged(DataSource2D dataSource2D) {
+    public void dataSource2DChanged(DataOverlay2D dataSource2D) {
     }
 
     @Override

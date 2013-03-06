@@ -6,6 +6,8 @@ package nava.structurevis.data;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import nava.data.types.Alignment;
 import nava.data.types.Tabular;
 import nava.data.types.TabularData;
@@ -18,9 +20,8 @@ import nava.utils.Utils;
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class DataSource1D implements Serializable {
+public class DataOverlay1D extends Overlay implements Serializable {
 
-    public String title;
     public ColorGradient defaultColorGradient;
     public ColorGradient colorGradient;
     public DataTransform dataTransform;
@@ -154,26 +155,31 @@ public class DataSource1D implements Serializable {
         }
     }
 
-    public static DataSource1D getDataSource1D(Tabular dataTable, TabularField field, String title, TabularField positionField, boolean naturalPositions, boolean oneOffset, int dataOffset, boolean codonPositions, double min, double max, boolean excludeValuesOutOfRange, DataTransform dataTransform, ColorGradient colorGradient, MappingSource mappingSource) {
-        DataSource1D dataSource = new DataSource1D();
-        dataSource.dataTable = dataTable;
-        dataSource.dataField = field;
-        dataSource.title = title;
-        dataSource.positionField = positionField;
-        dataSource.naturalPositions = naturalPositions;
-        dataSource.mappingSource = mappingSource;
-        dataSource.oneOffset = oneOffset;
-        dataSource.dataOffset = dataOffset;
-        dataSource.codonPositions = codonPositions;
-        dataSource.minValue = min;
-        dataSource.maxValue = max;
-        dataSource.excludeValuesOutOfRange = excludeValuesOutOfRange;
-        dataSource.dataTransform = dataTransform;
-        dataSource.colorGradient = colorGradient;
+    public static DataOverlay1D getDataOverlay1D(Tabular dataTable, TabularField field, String title, TabularField positionField, boolean naturalPositions, boolean oneOffset, int dataOffset, boolean codonPositions, double min, double max, boolean excludeValuesOutOfRange, DataTransform dataTransform, ColorGradient colorGradient, MappingSource mappingSource) {
+        DataOverlay1D dataOverlay = new DataOverlay1D();
+        dataOverlay.dataTable = dataTable;
+        dataOverlay.dataField = field;
+        dataOverlay.title = title;
+        dataOverlay.positionField = positionField;
+        dataOverlay.naturalPositions = naturalPositions;
+        dataOverlay.mappingSource = mappingSource;
+        dataOverlay.oneOffset = oneOffset;
+        dataOverlay.dataOffset = dataOffset;
+        dataOverlay.codonPositions = codonPositions;
+        dataOverlay.minValue = min;
+        dataOverlay.maxValue = max;
+        dataOverlay.excludeValuesOutOfRange = excludeValuesOutOfRange;
+        dataOverlay.dataTransform = dataTransform;
+        dataOverlay.colorGradient = colorGradient;
         if (colorGradient != null) {
-            dataSource.defaultColorGradient = colorGradient.clone();
+            dataOverlay.defaultColorGradient = colorGradient.clone();
         }
 
-        return dataSource;
+        return dataOverlay;
+    }
+
+    @Override
+    public Icon getIcon() {
+        return new ImageIcon(ClassLoader.getSystemResource("resources/icons/tabular-16x16.png"));
     }
 }

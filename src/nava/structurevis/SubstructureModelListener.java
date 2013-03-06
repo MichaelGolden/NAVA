@@ -14,13 +14,13 @@ import nava.structurevis.data.*;
  */
 public interface SubstructureModelListener extends EventListener {
 
-    public void dataSource1DChanged(DataSource1D dataSource1D);
+    public void dataSource1DChanged(DataOverlay1D dataSource1D);
 
-    public void dataSource2DChanged(DataSource2D dataSource2D);
+    public void dataSource2DChanged(DataOverlay2D dataSource2D);
 
     public void structureSourceChanged(StructureSource structureSource);
-    
+
     public void annotationSourceChanged(AnnotationSource annotationSource);
-            
-   public void nucleotideSourceChanged(NucleotideComposition nucleotideSource);
+
+    public void nucleotideSourceChanged(NucleotideComposition nucleotideSource);
 }

@@ -23,7 +23,7 @@ import nava.data.types.DataSource;
 import nava.data.types.Matrix;
 import nava.data.types.TabularField;
 import nava.structurevis.data.*;
-import nava.structurevis.data.DataSource2D.MatrixRegion;
+import nava.structurevis.data.DataOverlay2D.MatrixRegion;
 import nava.ui.MainFrame;
 import nava.ui.ProjectModel;
 import nava.utils.ColorGradient;
@@ -47,7 +47,7 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
     Matrix dataLoadedForMatrix = null;
     DataTransform selectedTransform = null;
     //DataSource1D dataSource1D = null;
-    DataSource2D dataSource2D = null;
+    DataOverlay2D dataSource2D = null;
     DataPreviewTable previewTable = new DataPreviewTable();
 
     public Data2DPanel(ProjectModel projectModel) {
@@ -195,12 +195,12 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
         
         if(dataMatrixComboBox.getSelectedItem() != null)
         {
-            dataSource2D = DataSource2D.getDataSource2D((Matrix) dataMatrixComboBox.getSelectedItem(), dataTitleField.getText(), naturalRadioButton.isSelected(), true, codonCheckButton.isSelected(), (Double) dataMinField.getValue(), (Double) dataMaxField.getValue(), missingDataRadioButton.isSelected(), selectedTransform, dataLegend.colorGradient, mappingSource, matrixRegion);
+            dataSource2D = DataOverlay2D.getDataOverlay2D((Matrix) dataMatrixComboBox.getSelectedItem(), dataTitleField.getText(), naturalRadioButton.isSelected(), true, codonCheckButton.isSelected(), (Double) dataMinField.getValue(), (Double) dataMaxField.getValue(), missingDataRadioButton.isSelected(), selectedTransform, dataLegend.colorGradient, mappingSource, matrixRegion);
             dataSource2D.loadData();
         }
     }
 
-    public void setDataSource2D(DataSource2D dataSource2D) {
+    public void setDataSource2D(DataOverlay2D dataSource2D) {
         this.dataMatrixComboBoxModel.setSelectedItem(dataSource2D.dataMatrix);
         this.dataTitleField.setText(dataSource2D.title);
         this.naturalRadioButton.setSelected(dataSource2D.naturalPositions);
@@ -698,7 +698,7 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
         update();
     }
 
-    public DataSource2D getDataSource2D() {
+    public DataOverlay2D getDataSource2D() {
         return dataSource2D;
     }
 

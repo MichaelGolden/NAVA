@@ -22,7 +22,7 @@ import nava.ui.ProjectController;
  */
 public class NavigatorPanel extends javax.swing.JPanel implements TreeSelectionListener, TreeModelListener {
 
-    ProjectController projectController;    
+    ProjectController projectController;   
     /**
      * Creates new form NavigatorPanel
      */
@@ -67,7 +67,9 @@ public class NavigatorPanel extends javax.swing.JPanel implements TreeSelectionL
                     ex.printStackTrace();
                 }
             }
-        });        
+        }); 
+        
+        
     }
 
     /**

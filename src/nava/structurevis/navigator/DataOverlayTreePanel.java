@@ -8,22 +8,34 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.List;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 import javax.swing.event.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import nava.structurevis.StructureVisController;
-import nava.ui.ProjectController;
+import nava.structurevis.data.*;
 
 /**
  *
  * @author Michael
  */
-public class DataOverlayTreePanel extends javax.swing.JPanel implements TreeSelectionListener, TreeModelListener {
+public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionListener, MouseListener, TreeSelectionListener, TreeModelListener {
 
-    StructureVisController structureVisController;    
+    StructureVisController structureVisController;
+    JPopupMenu popupMenu = new JPopupMenu();
+    JMenuItem setAsOverlayItem = new JMenuItem("Set as overlay");
+    JMenuItem editItem = new JMenuItem("Edit");
+    JMenuItem deleteItem = new JMenuItem("Delete");
+
     /**
      * Creates new form NavigatorPanel
      */
@@ -34,24 +46,18 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements TreeSele
 
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode();
-        if(structureVisController.substructureModel.navigatorTreeModel == null)
-        {
-           structureVisController.substructureModel.navigatorTreeModel = new DataOverlayTreeModel(root);
-        }
-        else
-        {
-            
+        if (structureVisController.substructureModel.navigatorTreeModel == null) {
+            structureVisController.substructureModel.navigatorTreeModel = new DataOverlayTreeModel(root, structureVisController);
+        } else {
         }
         structureVisController.substructureModel.navigatorTreeModel.addTreeModelListener(this);
-        //projectController.addView(projectController.projectModel.navigatorTreeModel);
-        
+
         DataOverlayTreeRenderer navigatorRenderer = new DataOverlayTreeRenderer();
         navigationTree.setRootVisible(false);
         navigationTree.setModel(structureVisController.substructureModel.navigatorTreeModel);
         navigationTree.setCellRenderer(navigatorRenderer);
         navigationTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         navigationTree.addTreeSelectionListener(this);
-
         navigationTree.setDropTarget(new DropTarget() {
 
             public synchronized void drop(DropTargetDropEvent evt) {
@@ -59,16 +65,27 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements TreeSele
                     evt.acceptDrop(DnDConstants.ACTION_COPY);
                     List<File> droppedFiles = (List<File>) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
                     for (int i = 0; i < droppedFiles.size(); i++) {
-                       /* NavigatorPanel.this.projectController.autoAddDataSource(droppedFiles.get(i));
-                        if (droppedFiles.get(i).isDirectory()) {
-                            System.err.println("TODO this file is a folder. How should we handle this?");
-                        }*/
+                        /*
+                         * NavigatorPanel.this.projectController.autoAddDataSource(droppedFiles.get(i));
+                         * if (droppedFiles.get(i).isDirectory()) {
+                         * System.err.println("TODO this file is a folder. How
+                         * should we handle this?"); }
+                         */
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
             }
-        });        
+        });
+
+        setAsOverlayItem.addActionListener(this);
+        popupMenu.add(setAsOverlayItem);
+        editItem.addActionListener(this);
+        popupMenu.add(editItem);
+        deleteItem.addActionListener(this);
+        popupMenu.add(deleteItem);
+
+        navigationTree.addMouseListener(this);
     }
 
     /**
@@ -116,17 +133,15 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements TreeSele
 
     @Override
     public void valueChanged(TreeSelectionEvent e) {
-        DataOverlayTreeEvent navigationEvent = new DataOverlayTreeEvent();       
+        DataOverlayTreeEvent navigationEvent = new DataOverlayTreeEvent();
         TreePath[] paths = navigationTree.getSelectionPaths();
         for (TreePath path : paths) {
             DataOverlayTreeNode node = (DataOverlayTreeNode) path.getLastPathComponent();
-            node.isNew = false;
-            if (node.dataSource != null) 
-            {               
-                navigationEvent.selectedDataSources.add(node.dataSource);                
+            if (node.overlay != null) {
+                navigationEvent.selectedDataSources.add(node.overlay);
             }
         }
-        
+
         this.fireDataSourceSelectionChanged(navigationEvent);
     }
 
@@ -148,5 +163,71 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements TreeSele
     @Override
     public void treeStructureChanged(TreeModelEvent e) {
         //throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        if (SwingUtilities.isRightMouseButton(e)) {
+            TreePath tp = navigationTree.getClosestPathForLocation(e.getX(), e.getY());
+            if (((DataOverlayTreeNode) tp.getLastPathComponent()).overlay != null) {
+                if (tp != null) {
+                    navigationTree.setSelectionPath(tp);
+                }
+                popupMenu.show(e.getComponent(), e.getX(), e.getY());
+            }
+        }
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource().equals(setAsOverlayItem)) {
+            Overlay overlay = ((DataOverlayTreeNode) navigationTree.getSelectionPath().getLastPathComponent()).overlay;
+
+            if (overlay instanceof DataOverlay1D) {
+                if (overlay.getState() == Overlay.OverlayState.PRIMARY_SELECTED) {
+                    structureVisController.substructureModel.setDataSource1D(null);
+                } else {
+                    structureVisController.substructureModel.setDataSource1D((DataOverlay1D) overlay);
+                }
+            } else if (overlay instanceof DataOverlay2D) {
+                if (overlay.getState() == Overlay.OverlayState.PRIMARY_SELECTED) {
+                    structureVisController.substructureModel.setDataSource2D(null);
+                } else {
+                    structureVisController.substructureModel.setDataSource2D((DataOverlay2D) overlay);
+                }
+            } else if (overlay instanceof NucleotideComposition) {
+                if (overlay.getState() == Overlay.OverlayState.PRIMARY_SELECTED) {
+                    structureVisController.substructureModel.setNucleotideSource(null);
+                } else {
+                    structureVisController.substructureModel.setNucleotideSource((NucleotideComposition) overlay);
+                }
+            } else if (overlay instanceof StructureSource) {
+                if (overlay.getState() == Overlay.OverlayState.PRIMARY_SELECTED) {
+                    structureVisController.substructureModel.setStructureSource(null);
+                } else {
+                    structureVisController.substructureModel.setStructureSource((StructureSource) overlay);
+                }
+               
+            }
+            
+            // update node icons on tree
+            structureVisController.substructureModel.navigatorTreeModel.valueForPathChanged(navigationTree.getSelectionPath(), overlay);
+        }
     }
 }

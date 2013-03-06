@@ -57,7 +57,9 @@ public class NucleotideCompositionPanel extends javax.swing.JPanel {
         selectedAlignment = (Alignment) nucleotideAlignmentComboBoxModel.getSelectedItem();
         if(selectedAlignment != null)
         {
-            return new NucleotideComposition(selectedAlignment);
+            NucleotideComposition nuc = new NucleotideComposition(selectedAlignment);
+            nuc.title = selectedAlignment.title;
+            return nuc;
         }
         return null;
     }

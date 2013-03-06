@@ -7,64 +7,82 @@ package nava.structurevis.navigator;
 import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.Objects;
+import javax.swing.DefaultListModel;
 import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import nava.data.types.*;
-import nava.ui.ProjectModel;
+import nava.data.types.DataSource;
+import nava.structurevis.StructureVisController;
+import nava.structurevis.data.*;
 import nava.ui.ProjectView;
 
 /**
  *
  * @author Michael
  */
-public class DataOverlayTreeModel extends DefaultTreeModel implements Serializable, ProjectView {
+public class DataOverlayTreeModel extends DefaultTreeModel implements Serializable, ProjectView, ListDataListener {
+    //DefaultMutableTreeNode origDataNode = null;
+    //DefaultMutableTreeNode dataNode = null;
 
-    DefaultMutableTreeNode origDataNode = null;
-    DefaultMutableTreeNode dataNode = null;
-    DefaultMutableTreeNode alignmentsNode = null;
-    DefaultMutableTreeNode annotationsNode = null;
-    DefaultMutableTreeNode matricesNode = null;
-    DefaultMutableTreeNode structuresNode = null;
-    DefaultMutableTreeNode tabularNode = null;
-    
-    ProjectModel projectModel;
+    DefaultMutableTreeNode oneDimensionalData = null;
+    DefaultMutableTreeNode twoDimensionalData = null;
+    DefaultMutableTreeNode nucleotideData = null;
+    DefaultMutableTreeNode structureData = null;
+    StructureVisController structureVisController;
+    //ProjectModel projectModel;
 
-    public DataOverlayTreeModel(DefaultMutableTreeNode root) {
+    public DataOverlayTreeModel(DefaultMutableTreeNode root, StructureVisController structureVisController) {
         super(root);
+        this.structureVisController = structureVisController;
+        //this.projectModel = projectModel;
 
-        origDataNode = DataOverlayTreeNode.createFolderNode("Original data sources");
-        dataNode = DataOverlayTreeNode.createFolderNode("Imported data sources");
-        root.add(origDataNode);
-        root.add(dataNode);
-        
-        alignmentsNode = DataOverlayTreeNode.createFolderNode("Alignments");
-        dataNode.add(alignmentsNode);
+        //origDataNode = NavigatorTreeNode.createFolderNode("Original data sources");
+        // dataNode = DataOverlayTreeNode.createFolderNode("Data overlays");
+        //root.add(origDataNode);
+        //root.add(dataNode);
+        // root.add(dataNode);
 
-        annotationsNode = DataOverlayTreeNode.createFolderNode("Annotations");
-        dataNode.add(annotationsNode);
+        oneDimensionalData = DataOverlayTreeNode.createFolderNode("1D overlays");
+        root.add(oneDimensionalData);
 
-        structuresNode = DataOverlayTreeNode.createFolderNode("Structures");
-        dataNode.add(structuresNode);
+        twoDimensionalData = DataOverlayTreeNode.createFolderNode("2D overlays");
+        root.add(twoDimensionalData);
 
-        matricesNode = DataOverlayTreeNode.createFolderNode("Matrix data");
-        dataNode.add(matricesNode);
+        nucleotideData = DataOverlayTreeNode.createFolderNode("Nucleotide overlays");
+        root.add(nucleotideData);
 
-        tabularNode = DataOverlayTreeNode.createFolderNode("Tabular data");
-        dataNode.add(tabularNode);
+        structureData = DataOverlayTreeNode.createFolderNode("Structures");
+        root.add(structureData);
+
+        for (int i = 0; i < structureVisController.structureVisDataOverlays1D.size(); i++) {
+            oneDimensionalData.add(new DataOverlayTreeNode(structureVisController.structureVisDataOverlays1D.get(i)));
+        }
+        for (int i = 0; i < structureVisController.structureVisDataOverlays2D.size(); i++) {
+            twoDimensionalData.add(new DataOverlayTreeNode(structureVisController.structureVisDataOverlays2D.get(i)));
+        }
+        for (int i = 0; i < structureVisController.nucleotideSources.size(); i++) {
+            nucleotideData.add(new DataOverlayTreeNode(structureVisController.nucleotideSources.get(i)));
+        }
+        for (int i = 0; i < structureVisController.structureSources.size(); i++) {
+            System.out.println(i + "[]\t" + structureVisController.structureSources.get(i).title);
+            structureData.add(new DataOverlayTreeNode(structureVisController.structureSources.get(i)));
+        }
+
+        structureVisController.structureVisDataOverlays1D.addListDataListener(this);
+        structureVisController.structureVisDataOverlays2D.addListDataListener(this);
+        structureVisController.nucleotideSources.addListDataListener(this);
+        structureVisController.structureSources.addListDataListener(this);
+
     }
-    
-    public DataOverlayTreeNode findNode(DataSource dataSource)
-    {
+
+    public DataOverlayTreeNode findNode(DataSource dataSource) {
         Enumeration<DefaultMutableTreeNode> en = ((DefaultMutableTreeNode) getRoot()).breadthFirstEnumeration();
-        while(en.hasMoreElements())
-        {
+        while (en.hasMoreElements()) {
             DefaultMutableTreeNode node = en.nextElement();
-            if(node instanceof DataOverlayTreeNode)
-            {
-                DataOverlayTreeNode nnode = (DataOverlayTreeNode)node;
-                if(Objects.equals(nnode.dataSource, dataSource))
-                {
+            if (node instanceof DataOverlayTreeNode) {
+                DataOverlayTreeNode nnode = (DataOverlayTreeNode) node;
+                if (Objects.equals(nnode.overlay, dataSource)) {
                     return nnode;
                 }
             }
@@ -72,31 +90,44 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
         return null;
     }
 
-    public void addDataSource(DataSource dataSource) {
-        if(dataSource instanceof Alignment)
-        {
-            insertNodeInto(new DataOverlayTreeNode(dataSource), alignmentsNode, alignmentsNode.getChildCount());
+    public void addDataOverlay(Overlay dataOverlay) {
+        if (dataOverlay instanceof DataOverlay1D) {
+             insertNodeInto(new DataOverlayTreeNode(dataOverlay), oneDimensionalData, oneDimensionalData.getChildCount());
         }
-        
-        if(dataSource instanceof Annotations)
-        {
-            insertNodeInto(new DataOverlayTreeNode(dataSource), annotationsNode, annotationsNode.getChildCount());
+
+        if (dataOverlay instanceof DataOverlay2D) {
+            insertNodeInto(new DataOverlayTreeNode(dataOverlay), twoDimensionalData, twoDimensionalData.getChildCount());            
         }
-        
-        if(dataSource instanceof Matrix)
-        {
-             insertNodeInto(new DataOverlayTreeNode(dataSource), matricesNode, matricesNode.getChildCount());
+
+        if (dataOverlay instanceof NucleotideComposition) {
+            insertNodeInto(new DataOverlayTreeNode(dataOverlay), nucleotideData, nucleotideData.getChildCount());
         }
-        
-        if(dataSource instanceof SecondaryStructure || dataSource instanceof StructureList)
-        {
-            insertNodeInto(new DataOverlayTreeNode(dataSource), structuresNode, structuresNode.getChildCount());
+
+        if (dataOverlay instanceof StructureSource) {
+            insertNodeInto(new DataOverlayTreeNode(dataOverlay), structureData, structureData.getChildCount());
         }
-        
-        if(dataSource instanceof Tabular || dataSource instanceof TabularField)
-        {
-            insertNodeInto(new DataOverlayTreeNode(dataSource), tabularNode, tabularNode.getChildCount());
-        }
+
+        /*
+         * if (dataSource instanceof Alignment) { insertNodeInto(new
+         * NavigatorTreeNode(dataSource), alignmentsNode,
+         * alignmentsNode.getChildCount()); }
+         *
+         * if (dataSource instanceof Annotations) { insertNodeInto(new
+         * NavigatorTreeNode(dataSource), annotationsNode,
+         * annotationsNode.getChildCount()); }
+         *
+         * if (dataSource instanceof Matrix) { insertNodeInto(new
+         * NavigatorTreeNode(dataSource), matricesNode,
+         * matricesNode.getChildCount()); }
+         *
+         * if (dataSource instanceof SecondaryStructure || dataSource instanceof
+         * StructureList) { insertNodeInto(new NavigatorTreeNode(dataSource),
+         * structuresNode, structuresNode.getChildCount()); }
+         *
+         * if (dataSource instanceof Tabular || dataSource instanceof
+         * TabularField) { insertNodeInto(new NavigatorTreeNode(dataSource),
+         * tabularNode, tabularNode.getChildCount()); }
+         */
     }
 
     @Override
@@ -107,22 +138,37 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
     @Override
     public void dataSourcesIntervalAdded(ListDataEvent e) {
         System.out.println("NavigatorTreeModel dataSourcesIntervalAdded");
-        for(int i = e.getIndex0() ; i < e.getIndex1() + 1 ; i++)
-        {
-            addDataSource(projectModel.dataSources.get(i));
+        for (int i = e.getIndex0(); i < e.getIndex1() + 1; i++) {
+//            addDataSource(projectModel.dataSources.get(i));
         }
         //throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public void dataSourcesIntervalRemoved(ListDataEvent e) {
-         System.out.println("dataSourcesIntervalRemoved");
+        System.out.println("dataSourcesIntervalRemoved");
         //throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public void dataSourcesContentsChanged(ListDataEvent e) {
-         System.out.println("dataSourcesContentsChanged");
+        System.out.println("dataSourcesContentsChanged");
         //throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void intervalAdded(ListDataEvent e) {
+        System.out.println("StructureVis source added");
+        for (int i = e.getIndex0(); i < e.getIndex1() + 1; i++) {
+            addDataOverlay(((DefaultListModel<Overlay>)e.getSource()).get(i));
+        }
+    }
+
+    @Override
+    public void intervalRemoved(ListDataEvent e) {
+    }
+
+    @Override
+    public void contentsChanged(ListDataEvent e) {
     }
 }

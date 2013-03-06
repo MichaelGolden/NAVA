@@ -4,6 +4,7 @@
  */
 package nava.structurevis;
 
+import java.awt.BorderLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import nava.data.types.DataSource;
 import nava.data.types.SecondaryStructure;
 import nava.data.types.SecondaryStructureData;
 import nava.structurevis.data.*;
+import nava.structurevis.navigator.DataOverlayTreePanel;
 import nava.ui.MainFrame;
 import nava.ui.ProjectController;
 import nava.utils.CustomItem;
@@ -56,6 +58,8 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         substructureComboBox.addItemListener(this);
 
         structureVisController.structureSources.addListDataListener(this);
+
+        treePanel.add(new DataOverlayTreePanel(structureVisController), BorderLayout.CENTER);
 
         dataLegend1D.addChangeListener(this);
         dataLegend2D.addChangeListener(this);
@@ -100,10 +104,14 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
     private void initComponents() {
 
         jSplitPane1 = new javax.swing.JSplitPane();
-        jPanel1 = new javax.swing.JPanel();
-        topPanel = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
         topScrollPane = new javax.swing.JScrollPane();
         legendPanel = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
+        treePanel = new javax.swing.JPanel();
+        jButton2 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         structureComboBox = new javax.swing.JComboBox();
@@ -111,29 +119,64 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         substructureComboBox = new javax.swing.JComboBox();
         jButton1 = new javax.swing.JButton();
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 287, Short.MAX_VALUE)
-        );
+        jSplitPane1.setDividerLocation(150);
 
-        jSplitPane1.setLeftComponent(jPanel1);
-
-        topPanel.setLayout(new javax.swing.BoxLayout(topPanel, javax.swing.BoxLayout.LINE_AXIS));
+        jPanel4.setLayout(new javax.swing.BoxLayout(jPanel4, javax.swing.BoxLayout.LINE_AXIS));
 
         topScrollPane.setMinimumSize(new java.awt.Dimension(40, 23));
         topScrollPane.setPreferredSize(new java.awt.Dimension(500, 2));
-        topPanel.add(topScrollPane);
+        jPanel4.add(topScrollPane);
 
         legendPanel.setMaximumSize(new java.awt.Dimension(300, 32767));
         legendPanel.setPreferredSize(new java.awt.Dimension(150, 289));
         legendPanel.setLayout(new javax.swing.BoxLayout(legendPanel, javax.swing.BoxLayout.PAGE_AXIS));
-        topPanel.add(legendPanel);
+        jPanel4.add(legendPanel);
+
+        jSplitPane1.setRightComponent(jPanel4);
+
+        jPanel1.setPreferredSize(new java.awt.Dimension(200, 319));
+
+        treePanel.setLayout(new java.awt.BorderLayout());
+
+        jButton2.setText("Add 1D data");
+
+        jButton3.setText("Add 2D data");
+
+        jButton4.setText("Add nucleotide data");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(treePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(0, 0, 0)
+                        .addComponent(jButton4)
+                        .addContainerGap())
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jButton3)
+                            .addComponent(jButton2))
+                        .addContainerGap())))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGap(0, 0, 0)
+                .addComponent(treePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButton2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton4)
+                .addContainerGap())
+        );
+
+        jSplitPane1.setLeftComponent(jPanel1);
 
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
@@ -161,23 +204,14 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 254, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(topPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 264, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 618, Short.MAX_VALUE)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(topPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(1, 1, 1))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jSplitPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 289, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addComponent(jSplitPane1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -189,33 +223,42 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
     }//GEN-LAST:event_jButton1ActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JPanel legendPanel;
     private javax.swing.JComboBox structureComboBox;
     private javax.swing.JComboBox substructureComboBox;
-    private javax.swing.JPanel topPanel;
     private javax.swing.JScrollPane topScrollPane;
+    private javax.swing.JPanel treePanel;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void itemStateChanged(ItemEvent e) {
         if (e.getSource().equals(structureComboBox)) {
             StructureSource structureSource = (StructureSource) structureComboBox.getSelectedItem();
-            if (structureSource != null) {
-                if (structureSource.mappingSource != null) {
-                    //structureVisController.addStructureSource(structureSource);
-                    structureSource.loadData();
-                    structureVisController.substructureModel.setStructureSource(structureSource);
-                    if (structureSource.substructures.size() > 0) {
-                        structureDrawPanel.openSubstructure(structureSource.substructures.get(0));
-                    }
-                    populateSubtructureComboBox();
-                }
+
+            if (structureSource != null && structureSource.mappingSource != null) {
+                structureVisController.substructureModel.setStructureSource(structureSource);
             }
+
+            /*
+             * if (structureSource != null && structureSource.mappingSource !=
+             * null) {
+             * //structureVisController.addStructureSource(structureSource);
+             * structureSource.loadData();
+             * structureVisController.substructureModel.setStructureSource(structureSource);
+             * if (structureSource.substructures.size() > 0) {
+             * structureDrawPanel.openSubstructure(structureSource.substructures.get(0));
+             * } populateSubtructureComboBox();
+            }
+             */
         } else if (e.getSource().equals(substructureComboBox)) {
             CustomItem<Substructure> comboBoxItem = (CustomItem<Substructure>) substructureComboBoxModel.getSelectedItem();
             if (comboBoxItem != null) {
@@ -249,19 +292,43 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
     }
 
     @Override
-    public void dataSource1DChanged(DataSource1D dataSource1D) {
-        dataLegend1D.setLegend(dataSource1D.title, dataSource1D.dataTransform, dataSource1D.colorGradient, dataSource1D.defaultColorGradient);
+    public void dataSource1DChanged(DataOverlay1D dataSource1D) {
+        if (dataSource1D == null) {
+            dataLegend1D.setVisible(false);
+        } else {
+            dataLegend1D.setVisible(true);
+            dataLegend1D.setLegend(dataSource1D.title, dataSource1D.dataTransform, dataSource1D.colorGradient, dataSource1D.defaultColorGradient);
+        }
         structureDrawPanel.redraw();
     }
 
     @Override
-    public void dataSource2DChanged(DataSource2D dataSource2D) {
-        dataLegend2D.setLegend(dataSource2D.title, dataSource2D.dataTransform, dataSource2D.colorGradient, dataSource2D.defaultColorGradient);
+    public void dataSource2DChanged(DataOverlay2D dataSource2D) {
+        if (dataSource2D == null) {
+            dataLegend2D.setVisible(false);
+        } else {
+            dataLegend2D.setVisible(true);
+            dataLegend2D.setLegend(dataSource2D.title, dataSource2D.dataTransform, dataSource2D.colorGradient, dataSource2D.defaultColorGradient);
+        }
+
         structureDrawPanel.redraw();
     }
 
     @Override
     public void structureSourceChanged(StructureSource structureSource) {
+        if (structureSource != null && structureSource.mappingSource != null) {
+            //structureVisController.addStructureSource(structureSource);
+            structureSource.loadData();
+            if (structureSource.substructures.size() > 0) {
+                System.out.println(structureSource.substructures.get(0));
+                structureDrawPanel.openSubstructure(structureSource.substructures.get(0));
+            }
+            populateSubtructureComboBox();
+        }
+        else
+        {
+            structureDrawPanel.openSubstructure(null);
+        }
         structureDrawPanel.redraw();
     }
 
@@ -271,8 +338,8 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
     }
 
     @Override
-    public void nucleotideSourceChanged(NucleotideComposition nucleotideSource) {
-        System.out.println("Nucleotide source changed " + nucleotideSource);
+    public void nucleotideSourceChanged(NucleotideComposition nucleotideSource) {        
+        structureDrawPanel.redraw();
     }
 
     @Override

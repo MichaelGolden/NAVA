@@ -6,11 +6,13 @@ package nava.structurevis.navigator;
 
 import java.awt.Color;
 import java.awt.Component;
-import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
-import nava.data.types.DataSource;
+import nava.structurevis.data.Overlay;
 
 /**
  *
@@ -25,8 +27,6 @@ public class DataOverlayTreeRenderer implements TreeCellRenderer {
     Color backgroundNonSelectionColor;
 
     public DataOverlayTreeRenderer() {
-        //label.setForeground(Color.BLUE);
-
         backgroundSelectionColor = defaultRenderer.getBackgroundSelectionColor();
         backgroundNonSelectionColor = defaultRenderer.getBackgroundNonSelectionColor();
     }
@@ -45,8 +45,7 @@ public class DataOverlayTreeRenderer implements TreeCellRenderer {
                     label.setText(node.title);
                 }
             } else {
-                DataSource userObject = node.dataSource;
-                
+                Overlay userObject = node.overlay;
                 label.setIcon(node.getIcon());
                 label.setText(userObject.title);
             }

@@ -4,16 +4,12 @@
  */
 package nava.structurevis;
 
-import nava.structurevis.data.NucleotideComposition;
-import nava.structurevis.data.Substructure;
 import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
 import javax.swing.event.EventListenerList;
 import nava.structurevis.data.*;
 import nava.structurevis.navigator.DataOverlayTreeModel;
-import nava.ui.navigator.NavigationEvent;
-import nava.ui.navigator.NavigationListener;
 import nava.utils.Mapping;
 
 /**
@@ -26,9 +22,9 @@ public class SubstructureModel implements Serializable {
     public static Color filteredDataColor = Color.darkGray;
     int sequenceLength;
     private AnnotationSource annotationSource = null;
-    DataSource1D data1D = null;
+    DataOverlay1D data1D = null;
     Mapping mapping1D = null;
-    DataSource2D data2D = null;
+    DataOverlay2D data2D = null;
     Mapping mapping2D = null;
     NucleotideComposition nucleotideSource = null;
     Mapping nucleotideMapping = null;
@@ -48,8 +44,7 @@ public class SubstructureModel implements Serializable {
     double thresholdMin2D;
     double thresholdMax2D;
     StructureVisController structureVisController;
-    
-    public DataOverlayTreeModel navigatorTreeModel = null;
+    public transient DataOverlayTreeModel navigatorTreeModel = null;
 
     public SubstructureModel(StructureVisController structureVisController) {
         this.structureVisController = structureVisController;
@@ -72,38 +67,72 @@ public class SubstructureModel implements Serializable {
         }
     }
 
-    public void setDataSource1D(DataSource1D dataSource1D) {
-        dataSource1D.loadData();
+    public void setDataSource1D(DataOverlay1D dataSource1D) {
+        if (dataSource1D != null) {
+            dataSource1D.loadData();
+        }
         this.data1D = dataSource1D;
         if (data1D != null && data1D.mappingSource != null && structureSource != null && structureSource.mappingSource != null) {
             mapping1D = structureVisController.getMapping(data1D.mappingSource, structureSource.mappingSource);
         }
+
+        // set selection state
+        for (int i = 0; i < structureVisController.structureVisDataOverlays1D.size(); i++) {
+            if (structureVisController.structureVisDataOverlays1D.get(i).equals(data1D)) {
+                structureVisController.structureVisDataOverlays1D.get(i).setState(Overlay.OverlayState.PRIMARY_SELECTED);
+            } else {
+                structureVisController.structureVisDataOverlays1D.get(i).setState(Overlay.OverlayState.UNSELECTED);
+            }
+        }
         fireDataSource1DChanged(dataSource1D);
     }
 
-    public void setDataSource2D(DataSource2D dataSource2D) {
-        dataSource2D.loadData();
+    public void setDataSource2D(DataOverlay2D dataSource2D) {
+        if (dataSource2D != null) {
+            dataSource2D.loadData();
+        }
         this.data2D = dataSource2D;
         if (data2D != null && data2D.mappingSource != null && structureSource != null && structureSource.mappingSource != null) {
             mapping2D = structureVisController.getMapping(data2D.mappingSource, structureSource.mappingSource);
+        }
+
+        // set selection state
+        for (int i = 0; i < structureVisController.structureVisDataOverlays2D.size(); i++) {
+            if (structureVisController.structureVisDataOverlays2D.get(i).equals(data2D)) {
+                structureVisController.structureVisDataOverlays2D.get(i).setState(Overlay.OverlayState.PRIMARY_SELECTED);
+            } else {
+                structureVisController.structureVisDataOverlays2D.get(i).setState(Overlay.OverlayState.UNSELECTED);
+            }
         }
         fireDataSource2DChanged(dataSource2D);
     }
 
     public void setStructureSource(StructureSource structureSource) {
-        structureSource.loadData();
+        if (structureSource != null) {
+            structureSource.loadData();
+        }
         this.structureSource = structureSource;
-        this.sequenceLength = structureSource.pairedSites.length;
-        if (data1D != null && data1D.mappingSource != null && structureSource != null && structureSource.mappingSource != null) {
-            mapping1D = structureVisController.getMapping(data1D.mappingSource, structureSource.mappingSource);
+        if (structureSource != null) {
+
+            this.sequenceLength = structureSource.pairedSites.length;
+            if (data1D != null && data1D.mappingSource != null && structureSource.mappingSource != null) {
+                mapping1D = structureVisController.getMapping(data1D.mappingSource, structureSource.mappingSource);
+            }
+            if (data2D != null && data2D.mappingSource != null && structureSource.mappingSource != null) {
+                mapping2D = structureVisController.getMapping(data2D.mappingSource, structureSource.mappingSource);
+            }
+            if (nucleotideSource != null && nucleotideSource.mappingSource != null) {
+                nucleotideMapping = structureVisController.getMapping(nucleotideSource.mappingSource, structureSource.mappingSource);
+            }
         }
-        if (data2D != null && data2D.mappingSource != null && structureSource != null && structureSource.mappingSource != null) {
-            mapping2D = structureVisController.getMapping(data2D.mappingSource, structureSource.mappingSource);
+
+        for (int i = 0; i < structureVisController.structureSources.size(); i++) {
+            if (structureVisController.structureSources.get(i).equals(structureSource)) {
+                structureVisController.structureSources.get(i).setState(Overlay.OverlayState.PRIMARY_SELECTED);
+            } else {
+                structureVisController.structureSources.get(i).setState(Overlay.OverlayState.UNSELECTED);
+            }
         }
-        if (nucleotideSource != null && nucleotideSource.mappingSource != null) {
-            nucleotideMapping = structureVisController.getMapping(nucleotideSource.mappingSource, structureSource.mappingSource);
-        }
-        //this.annotationSource = AnnotationSource.getMappedAnnotations(annotationSource, structureSource, structureVisController);
         fireStructureSourceChanged(structureSource);
     }
 
@@ -111,14 +140,13 @@ public class SubstructureModel implements Serializable {
         this.nucleotideSource = nucleotideSource;
         if (nucleotideSource != null && nucleotideSource.mappingSource != null) {
             nucleotideMapping = structureVisController.getMapping(nucleotideSource.mappingSource, structureSource.mappingSource);
-            /*
-            for(int i = 0 ; i < nucleotideMapping.getALength() ; i++)
-            {
-                System.out.println(i+" -> "+nucleotideMapping.aToB(i)+" -> "+nucleotideSource.consensus.charAt(nucleotideMapping.aToB(i)));
+        }
+        for (int i = 0; i < structureVisController.nucleotideSources.size(); i++) {
+            if (structureVisController.nucleotideSources.get(i).equals(nucleotideSource)) {
+                structureVisController.nucleotideSources.get(i).setState(Overlay.OverlayState.PRIMARY_SELECTED);
+            } else {
+                structureVisController.nucleotideSources.get(i).setState(Overlay.OverlayState.UNSELECTED);
             }
-            System.out.println(nucleotideSource.consensus);
-            *
-            */
         }
         fireNucleotideSourceChanged(nucleotideSource);
     }
@@ -148,7 +176,7 @@ public class SubstructureModel implements Serializable {
         listeners.remove(SubstructureModelListener.class, listener);
     }
 
-    public void fireDataSource1DChanged(DataSource1D dataSource1D) {
+    public void fireDataSource1DChanged(DataOverlay1D dataSource1D) {
         Object[] listeners = this.listeners.getListenerList();
         // Each listener occupies two elements - the first is the listener class
         // and the second is the listener instance
@@ -159,7 +187,7 @@ public class SubstructureModel implements Serializable {
         }
     }
 
-    public void fireDataSource2DChanged(DataSource2D dataSource2D) {
+    public void fireDataSource2DChanged(DataOverlay2D dataSource2D) {
         Object[] listeners = this.listeners.getListenerList();
         // Each listener occupies two elements - the first is the listener class
         // and the second is the listener instance

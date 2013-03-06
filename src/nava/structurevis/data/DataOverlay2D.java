@@ -6,6 +6,8 @@ package nava.structurevis.data;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import nava.data.types.Alignment;
 import nava.data.types.Matrix;
 import nava.data.types.TabularField;
@@ -18,9 +20,8 @@ import nava.utils.Utils;
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class DataSource2D implements Serializable {
+public class DataOverlay2D extends Overlay implements Serializable {
 
-    public String title;
     public ColorGradient defaultColorGradient;
     public ColorGradient colorGradient;
     public DataTransform dataTransform;
@@ -52,25 +53,25 @@ public class DataSource2D implements Serializable {
         }
     }
 
-    public static DataSource2D getDataSource2D(Matrix matrix, String title,boolean naturalPositions, boolean oneOffset, boolean codonPositions, double min, double max, boolean excludeValuesOutOfRange, DataTransform dataTransform, ColorGradient colorGradient, MappingSource mappingSource, MatrixRegion matrixRegion) {
-        DataSource2D dataSource = new DataSource2D();
-        dataSource.matrix = matrix;
-        dataSource.title = title;
-        dataSource.naturalPositions = naturalPositions;
-        dataSource.mappingSource = mappingSource;
-        dataSource.oneOffset = oneOffset;
-        dataSource.codonPositions = codonPositions;
-        dataSource.minValue = min;
-        dataSource.maxValue = max;
-        dataSource.excludeValuesOutOfRange = excludeValuesOutOfRange;
-        dataSource.dataTransform = dataTransform;
-        dataSource.colorGradient = colorGradient;
+    public static DataOverlay2D getDataOverlay2D(Matrix matrix, String title,boolean naturalPositions, boolean oneOffset, boolean codonPositions, double min, double max, boolean excludeValuesOutOfRange, DataTransform dataTransform, ColorGradient colorGradient, MappingSource mappingSource, MatrixRegion matrixRegion) {
+        DataOverlay2D dataOverlay = new DataOverlay2D();
+        dataOverlay.matrix = matrix;
+        dataOverlay.title = title;
+        dataOverlay.naturalPositions = naturalPositions;
+        dataOverlay.mappingSource = mappingSource;
+        dataOverlay.oneOffset = oneOffset;
+        dataOverlay.codonPositions = codonPositions;
+        dataOverlay.minValue = min;
+        dataOverlay.maxValue = max;
+        dataOverlay.excludeValuesOutOfRange = excludeValuesOutOfRange;
+        dataOverlay.dataTransform = dataTransform;
+        dataOverlay.colorGradient = colorGradient;
         if (colorGradient != null) {
-            dataSource.defaultColorGradient = colorGradient.clone();
+            dataOverlay.defaultColorGradient = colorGradient.clone();
         }
-        dataSource.matrixRegion = matrixRegion;
+        dataOverlay.matrixRegion = matrixRegion;
 
-        return dataSource;
+        return dataOverlay;
     }
     
     public double get(int i, int j, Mapping mapping)
@@ -110,5 +111,10 @@ public class DataSource2D implements Serializable {
             ex.printStackTrace();
             return emptyValue;
         }
+    }
+    
+    @Override
+    public Icon getIcon() {
+        return new ImageIcon(ClassLoader.getSystemResource("resources/icons/matrix-16x16.png"));
     }
 }

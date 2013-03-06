@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
 import nava.data.types.DataSource;
+import nava.structurevis.data.Overlay;
 
 /**
  *
@@ -20,27 +21,20 @@ import nava.data.types.DataSource;
 public class DataOverlayTreeNode extends DefaultMutableTreeNode implements Serializable {
 
     public boolean isFolder = false;
-    public boolean isNew = true;
     public String title;
-    public DataSource dataSource;
+    public Overlay overlay;
 
     private DataOverlayTreeNode() {
     }
 
-    public DataOverlayTreeNode(DataSource dataSource) {
+    public DataOverlayTreeNode(Overlay overlay) {
         super();
-        this.dataSource = dataSource;
-
-        ArrayList<DataSource> children = this.dataSource.getChildren();
-        for (int i = 0; i < children.size(); i++) {
-           DataOverlayTreeNode childNode = new DataOverlayTreeNode(children.get(i));
-           childNode.isNew = false;
-           this.add(childNode);
-        }
+        this.overlay = overlay;
+        this.title = overlay.title;
     }
 
     public static DataOverlayTreeNode createFolderNode(String title) {
-        
+
         DataOverlayTreeNode node = new DataOverlayTreeNode();
         node.isFolder = true;
         node.title = title;
@@ -51,19 +45,35 @@ public class DataOverlayTreeNode extends DefaultMutableTreeNode implements Seria
         if (isFolder) {
             return new ImageIcon(ClassLoader.getSystemResource("resources/icons/gnome-folder-open-16x16.png"));
         } else {
-            if (isNew) {
-                ImageIcon dataSourceIcon = (ImageIcon) dataSource.getIcon();
-                BufferedImage newIcon = new BufferedImage(dataSourceIcon.getIconWidth()+3, dataSourceIcon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
-                Graphics2D ng = (Graphics2D) newIcon.getGraphics();
-                ng.setColor(new Color(128, 255, 160, 255));
-                ng.fillRect(0, 0,2,dataSourceIcon.getIconHeight());
-                ng.drawImage(dataSourceIcon.getImage(), 3, 0, null);
-                 //ng.drawImage(new ImageIcon(ClassLoader.getSystemResource("resources/icons/star-7x7.png")).getImage(), dataSourceIcon.getIconWidth()-7, dataSourceIcon.getIconHeight()-7, null);
-              //  ng.setColor(new Color(240, 200, 14, 220));
-               // ng.drawString("*",dataSourceIcon.getIconWidth() - 5, 10);
-                return new ImageIcon(newIcon);
-            } else {
-                return (ImageIcon) dataSource.getIcon();
+            switch (overlay.getState()) {
+                case PRIMARY_SELECTED:
+                    /*
+                     * ImageIcon dataSourceIcon = (ImageIcon) overlay.getIcon();
+                     * BufferedImage newIcon = new
+                     * BufferedImage(dataSourceIcon.getIconWidth()+3,
+                     * dataSourceIcon.getIconHeight(),
+                     * BufferedImage.TYPE_INT_ARGB); Graphics2D ng =
+                     * (Graphics2D) newIcon.getGraphics(); ng.setColor(new
+                     * Color(128, 255, 160, 255)); ng.fillRect(0,
+                     * 0,2,dataSourceIcon.getIconHeight());
+                     * ng.drawImage(dataSourceIcon.getImage(), 3, 0, null);
+                     * return new ImageIcon(newIcon);
+                     */
+
+                    ImageIcon dataSourceIcon = (ImageIcon) overlay.getIcon();
+                    ImageIcon eyeIcon = new ImageIcon(ClassLoader.getSystemResource("resources/icons/eye-13x7.png"));
+                    BufferedImage icon = new BufferedImage(dataSourceIcon.getIconWidth(), dataSourceIcon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+                    Graphics2D ng = (Graphics2D) icon.getGraphics();
+                    ng.drawImage(dataSourceIcon.getImage(), 0, 0, null);
+                    ng.drawImage(eyeIcon.getImage(), icon.getWidth()/2-6, icon.getHeight() - 8, null);
+                    return new ImageIcon(icon);
+
+                case SECONDARY_SELECTED:
+                    return (ImageIcon) overlay.getIcon();
+                case UNSELECTED:
+                    return (ImageIcon) overlay.getIcon();
+                default:
+                    return (ImageIcon) overlay.getIcon();
             }
         }
     }

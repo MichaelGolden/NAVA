@@ -12,5 +12,11 @@ import nava.data.types.DataSource;
  * @author Michael
  */
 public class NavigationEvent {
+    
     public ArrayList<DataSource> selectedDataSources = new ArrayList<>();
+    
+    public NavigationEvent()
+    {
+        super();
+    }
 }

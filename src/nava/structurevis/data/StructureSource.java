@@ -7,19 +7,18 @@ package nava.structurevis.data;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import nava.data.types.Alignment;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import nava.data.types.SecondaryStructure;
 import nava.data.types.SecondaryStructureData;
 import nava.ui.MainFrame;
-import nava.utils.RNAFoldingTools;
 
 /**
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class StructureSource implements Serializable {
+public class StructureSource extends Overlay implements Serializable {
     
-    public String title;
     public SecondaryStructure structure;
     public MappingSource mappingSource;
     
@@ -33,6 +32,7 @@ public class StructureSource implements Serializable {
         this.structure = structure;
         this.mappingSource = mappingSource;
         this.title = structure.title;
+        System.out.println("SecondaryStructure.title"+this.title);
     }
     
     public void loadData ()
@@ -162,5 +162,10 @@ public class StructureSource implements Serializable {
             //System.out.println("added=" + added + ", n="+structures.size());
             recursivelyEnumerateSubstructures(minLength, maxLength, structures, end, level+1);
         }
+    }
+
+    @Override
+    public Icon getIcon() {
+        return new ImageIcon(ClassLoader.getSystemResource("resources/icons/structure-16x16.png"));
     }
 }

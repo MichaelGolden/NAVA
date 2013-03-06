@@ -15,7 +15,7 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
-import nava.structurevis.data.DataSource1D;
+import nava.structurevis.data.DataOverlay1D;
 
 /**
  *
@@ -55,7 +55,7 @@ public class DataPreviewTable extends JPanel {
         Class[] columnClasses = {Integer.class, String.class, String.class};
         public ArrayList<Object[]> rows = new ArrayList<>();
 
-        public void setDataSource1D(DataSource1D dataSource1D) {
+        public void setDataSource1D(DataOverlay1D dataSource1D) {
             if (dataSource1D != null) {
                 ArrayList<Object[]> rows = new ArrayList<>();
                 int j = 1;

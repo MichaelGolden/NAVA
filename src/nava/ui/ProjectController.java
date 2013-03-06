@@ -219,9 +219,10 @@ public class ProjectController implements ListDataListener {
 
     public void createPath(DataSource dataSource, String origExtension, String newExtension) {
         dataSource.setImportId(getNextImportId());
-        Path p = projectModel.getProjectPath().resolve(Paths.get(dataSource.getId() + "." + newExtension));
+        Path p = generatePath(dataSource.getImportId(),newExtension);
         while (Files.exists(p)) {
             dataSource.setImportId(getNextImportId());
+            p = generatePath(dataSource.getImportId(), newExtension);
         }
         dataSource.originalDataSourcePath = generatePath(dataSource.getImportId(), "orig." + origExtension).toString();
         dataSource.importedDataSourcePath = generatePath(dataSource.getImportId(), newExtension).toString();
@@ -229,9 +230,7 @@ public class ProjectController implements ListDataListener {
 
     public Path generatePath(long id, String extension) {
         Path p = projectModel.getProjectPath().resolve(Paths.get(id + "." + extension));
-        if (Files.exists(p)) {
-            System.err.println("This file already exists should throw an error or do something about it.");
-        }
+        
         return p;
     }
 

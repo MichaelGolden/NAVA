@@ -23,7 +23,7 @@ import javax.swing.text.DefaultFormatter;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
 import nava.data.types.*;
-import nava.structurevis.data.DataSource1D;
+import nava.structurevis.data.DataOverlay1D;
 import nava.structurevis.data.DataTransform;
 import nava.structurevis.data.Histogram;
 import nava.structurevis.data.MappingSource;
@@ -49,7 +49,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
     TabularField selectedField = null;
     TabularField dataLoadedForField = null;
     DataTransform selectedTransform = null;
-    DataSource1D dataSource1D = null;
+    DataOverlay1D dataSource1D = null;
     DataPreviewTable previewTable = new DataPreviewTable();
 
     public Data1DPanel(ProjectModel projectModel) {
@@ -197,13 +197,13 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
         if (selectedField != null && positionComboBox.getSelectedItem() != null) {
             MappingSource mappingSource = new MappingSource((Alignment) mappingSourceComboBox.getSelectedItem());
 
-            dataSource1D = DataSource1D.getDataSource1D((Tabular) dataSourceComboBox.getSelectedItem(), selectedField, dataTitleField.getText(), (TabularField) positionComboBox.getSelectedItem(), naturalRadioButton.isSelected(), onePositionRadioButton.isSelected(), headerCheckButton.isSelected() ? 1 : 0, codonCheckButton.isSelected(), (Double) dataMinField.getValue(), (Double) dataMaxField.getValue(), missingDataRadioButton.isSelected(), selectedTransform, dataLegend.colorGradient, mappingSource);
+            dataSource1D = DataOverlay1D.getDataOverlay1D((Tabular) dataSourceComboBox.getSelectedItem(), selectedField, dataTitleField.getText(), (TabularField) positionComboBox.getSelectedItem(), naturalRadioButton.isSelected(), onePositionRadioButton.isSelected(), headerCheckButton.isSelected() ? 1 : 0, codonCheckButton.isSelected(), (Double) dataMinField.getValue(), (Double) dataMaxField.getValue(), missingDataRadioButton.isSelected(), selectedTransform, dataLegend.colorGradient, mappingSource);
             dataSource1D.loadData();
             previewTable.tableDataModel.setDataSource1D(dataSource1D);
         }
     }
 
-    public void setDataSource1D(DataSource1D dataSource1D) {
+    public void setDataSource1D(DataOverlay1D dataSource1D) {
         this.dataSourceComboBoxModel.setSelectedItem(dataSource1D.dataTable);
         this.dataFieldComboBoxModel.setSelectedItem(dataSource1D.dataField);
         this.dataTitleField.setText(dataSource1D.title);
@@ -734,7 +734,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
         update();
     }
 
-    public DataSource1D getDataSource1D() {
+    public DataOverlay1D getDataSource1D() {
         return dataSource1D;
     }
 

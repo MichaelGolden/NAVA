@@ -24,8 +24,8 @@ import nava.utils.Pair;
 public class StructureVisController implements Serializable {
 
     public transient DefaultListModel<StructureSource> structureSources = new DefaultListModel<>();
-    public transient DefaultListModel<DataSource1D> structureVisDataSources1D = new DefaultListModel<>();
-    public transient DefaultListModel<DataSource2D> structureVisDataSources2D = new DefaultListModel<>();
+    public transient DefaultListModel<DataOverlay1D> structureVisDataOverlays1D = new DefaultListModel<>();
+    public transient DefaultListModel<DataOverlay2D> structureVisDataOverlays2D = new DefaultListModel<>();
     public transient DefaultListModel<AnnotationSource> annotationSources = new DefaultListModel<>();
     public transient DefaultListModel<NucleotideComposition> nucleotideSources = new DefaultListModel<>();
     public SubstructureModel substructureModel = null;
@@ -43,15 +43,15 @@ public class StructureVisController implements Serializable {
         for (int i = 0; i < structureSources.size(); i++) {
             StructureSource s = structureSources.get(i);
 
-            for (int j = 0; j < structureVisDataSources1D.size(); j++) {
-                DataSource1D dataSource = structureVisDataSources1D.get(j);
+            for (int j = 0; j < structureVisDataOverlays1D.size(); j++) {
+                DataOverlay1D dataSource = structureVisDataOverlays1D.get(j);
                 if (s.mappingSource != null && dataSource.mappingSource != null) {
                     MainFrame.taskManager.queueUITask(new MappingTask(this, dataSource.mappingSource, s.mappingSource));
                 }
             }
             
-             for (int j = 0; j < structureVisDataSources2D.size(); j++) {
-                DataSource2D dataSource = structureVisDataSources2D.get(j);
+             for (int j = 0; j < structureVisDataOverlays2D.size(); j++) {
+                DataOverlay2D dataSource = structureVisDataOverlays2D.get(j);
                 if (s.mappingSource != null && dataSource.mappingSource != null) {
                     MainFrame.taskManager.queueUITask(new MappingTask(this, dataSource.mappingSource, s.mappingSource));
                 }
@@ -85,14 +85,14 @@ public class StructureVisController implements Serializable {
         }
     }
 
-    public void addStructureVisDataSource1D(DataSource1D dataSource) {
-        structureVisDataSources1D.addElement(dataSource);
+    public void addStructureVisDataSource1D(DataOverlay1D dataSource) {
+        structureVisDataOverlays1D.addElement(dataSource);
         refreshMappings();
     }
 
-    public void addStructureVisDataSource2D(DataSource2D dataSource) {
-        structureVisDataSources2D.addElement(dataSource);
-        System.out.println(structureVisDataSources2D);
+    public void addStructureVisDataSource2D(DataOverlay2D dataSource) {
+        structureVisDataOverlays2D.addElement(dataSource);
+        System.out.println(structureVisDataOverlays2D);
         refreshMappings();
     }
 
@@ -159,15 +159,15 @@ public class StructureVisController implements Serializable {
         return mapping;
     }
     public ArrayList<StructureSource> structureSourcesPersistent = new ArrayList<>();
-    public ArrayList<DataSource1D> structureVisDataSources1DPersistent = new ArrayList<>();
-    public ArrayList<DataSource2D> structureVisDataSources2DPersistent = new ArrayList<>();
+    public ArrayList<DataOverlay1D> structureVisDataSources1DPersistent = new ArrayList<>();
+    public ArrayList<DataOverlay2D> structureVisDataSources2DPersistent = new ArrayList<>();
     public ArrayList<AnnotationSource> annotationSourcesPersistent = new ArrayList<>();
     public ArrayList<NucleotideComposition> nucleotideSourcesPersistent = new ArrayList<>();
 
     public void saveStructureVisModel(File outFile) {
         structureSourcesPersistent = Collections.list(structureSources.elements());
-        structureVisDataSources1DPersistent = Collections.list(structureVisDataSources1D.elements());
-        structureVisDataSources2DPersistent = Collections.list(structureVisDataSources2D.elements());
+        structureVisDataSources1DPersistent = Collections.list(structureVisDataOverlays1D.elements());
+        structureVisDataSources2DPersistent = Collections.list(structureVisDataOverlays2D.elements());
         annotationSourcesPersistent = Collections.list(annotationSources.elements());
         nucleotideSourcesPersistent = Collections.list(nucleotideSources.elements());
         try {
@@ -177,12 +177,12 @@ public class StructureVisController implements Serializable {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+        System.out.println("StructureVis project saved");
     }
 
     public static StructureVisController loadProject(File inFile) throws IOException, ClassNotFoundException {
         ObjectInputStream in = new ObjectInputStream(new FileInputStream(inFile));
         StructureVisController ret = (StructureVisController) in.readObject();
-
         ret.structureSources = new DefaultListModel<>();
         for (StructureSource s : ret.structureSourcesPersistent) {
             ret.structureSources.addElement(s);
@@ -190,15 +190,15 @@ public class StructureVisController implements Serializable {
         ret.structureSourcesPersistent = null;
 
 
-        ret.structureVisDataSources1D = new DefaultListModel<>();
-        for (DataSource1D s : ret.structureVisDataSources1DPersistent) {
-            ret.structureVisDataSources1D.addElement(s);
+        ret.structureVisDataOverlays1D = new DefaultListModel<>();
+        for (DataOverlay1D s : ret.structureVisDataSources1DPersistent) {
+            ret.structureVisDataOverlays1D.addElement(s);
         }
         ret.structureVisDataSources1DPersistent = null;
 
-        ret.structureVisDataSources2D = new DefaultListModel<>();
-        for (DataSource2D s : ret.structureVisDataSources2DPersistent) {
-            ret.structureVisDataSources2D.addElement(s);
+        ret.structureVisDataOverlays2D = new DefaultListModel<>();
+        for (DataOverlay2D s : ret.structureVisDataSources2DPersistent) {
+            ret.structureVisDataOverlays2D.addElement(s);
         }
         ret.structureVisDataSources2DPersistent = null;
 
@@ -216,6 +216,8 @@ public class StructureVisController implements Serializable {
 
         ret.substructureModel.initialise();
         in.close();
+        
+        System.out.println("StructureVis project loaded");
         return ret;
     }
 }

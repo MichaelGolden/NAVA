@@ -25,7 +25,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
-import nava.structurevis.data.DataSource1D;
+import nava.structurevis.data.DataOverlay1D;
 import nava.structurevis.data.DataTransform;
 import nava.structurevis.data.DataTransform.TransformType;
 import nava.structurevis.data.Histogram;

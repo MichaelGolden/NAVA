@@ -6,8 +6,10 @@ package nava.ui.navigator;
 
 import java.awt.Color;
 import java.awt.Component;
-import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 import nava.data.types.DataSource;

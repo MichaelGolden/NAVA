@@ -19,6 +19,7 @@ public class NucleotideCompositionDialog extends javax.swing.JDialog {
     StructureVisController structureVisController;
     ProjectModel projectModel;
     NucleotideCompositionPanel nucleotidePanel;
+    public boolean editMode;
 
     /**
      * Creates new form AnnotationsDialog
@@ -31,8 +32,17 @@ public class NucleotideCompositionDialog extends javax.swing.JDialog {
 
         nucleotidePanel = new NucleotideCompositionPanel(projectModel);
         this.jPanel1.add(nucleotidePanel, BorderLayout.CENTER);
-        
+
         this.setIconImage(new ImageIcon(ClassLoader.getSystemResource("resources/icons/icon-32x32.png")).getImage());
+    }
+
+    public void setEditMode(boolean editMode) {
+        this.editMode = editMode;
+        if (editMode) {
+            this.addButton.setText("Save");
+        } else {
+            this.addButton.setText("Add");
+        }
     }
 
     /**
@@ -50,6 +60,7 @@ public class NucleotideCompositionDialog extends javax.swing.JDialog {
         jPanel1 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Add a nucleotide overlay");
 
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 

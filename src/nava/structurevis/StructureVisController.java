@@ -105,8 +105,13 @@ public class StructureVisController implements Serializable {
         nucleotideSources.addElement(nucleotideComposition);
         refreshMappings();
     }
+    
+    public Mapping getMapping(MappingSource a, MappingSource b)
+    {
+        return getMapping(a,b,1);
+    }
 
-    public Mapping getMapping(MappingSource a, MappingSource b) {
+    public Mapping getMapping(MappingSource a, MappingSource b, int select) {
         if (a == null || b == null) {
             return null;
         }
@@ -114,13 +119,13 @@ public class StructureVisController implements Serializable {
         Pair p = new Pair(a, b);
         Mapping m = mappings.get(p);
         if (m == null) {
-            m = createMapping(a, b);
+            m = createMapping(a, b, select);
             mappings.put(p, m);
         }
         return m;
     }
 
-    public Mapping createMapping(MappingSource a, MappingSource b) {
+    public Mapping createMapping(MappingSource a, MappingSource b, int select) {
         ArrayList<String> sequencesA = new ArrayList<>();
         ArrayList<String> sequencesNamesA = new ArrayList<>();
         ArrayList<String> sequencesB = new ArrayList<>();
@@ -154,7 +159,7 @@ public class StructureVisController implements Serializable {
         System.out.println(sequencesB);
         System.out.println("----------");
 
-        Mapping mapping = Mapping.createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, maxSequencesToLoad);
+        Mapping mapping = Mapping.createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, select);
         mappings.put(new Pair(a, b), mapping);
         return mapping;
     }

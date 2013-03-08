@@ -6,6 +6,7 @@ package nava.structurevis;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Frame;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
@@ -14,13 +15,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.event.ListDataEvent;
 import nava.structurevis.data.*;
 import nava.ui.ProjectController;
+import nava.ui.ProjectModel;
 import nava.ui.ProjectView;
 import org.biojava.bio.BioException;
 
@@ -266,44 +265,63 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
     private void add1DDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_add1DDataButtonActionPerformed
         Data1DDialog d = new Data1DDialog(null, true, projectController.projectModel, structureVisController);
         d.setSize(920, 690);
-        d.editMode = false;
+        d.setEditMode(false);
         d.setVisible(true);
     }//GEN-LAST:event_add1DDataButtonActionPerformed
 
     private void edit1DDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edit1DDataButtonActionPerformed
-        Data1DDialog d = new Data1DDialog(null, true, projectController.projectModel, structureVisController);
         DataOverlay1D dataSource1D = (DataOverlay1D) data1DComboBoxModel.getSelectedItem();
+        showEditDialog(dataSource1D, null, projectController.projectModel, structureVisController);
+    }//GEN-LAST:event_edit1DDataButtonActionPerformed
+
+    public static void showEditDialog(DataOverlay1D dataSource1D, Frame parent, ProjectModel projectModel, StructureVisController structureVisController) {
+        Data1DDialog d = new Data1DDialog(parent, true, projectModel, structureVisController);
         if (dataSource1D != null) {
             d.data1DPanel.setDataSource1D(dataSource1D);
-            d.editMode = true;
+            d.setEditMode(true);
             d.setSize(920, 690);
             d.setVisible(true);
         }
-    }//GEN-LAST:event_edit1DDataButtonActionPerformed
+    }
 
     private void addNucleotideOverlayButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addNucleotideOverlayButtonActionPerformed
         NucleotideCompositionDialog d = new NucleotideCompositionDialog(null, true, projectController.projectModel, structureVisController);
-        d.setSize(600, 80);
-        //d.editMode = false;
+        d.setSize(600, 150);
+        d.setEditMode(false);
         d.setVisible(true);
         populateNucleotideComboBox();
     }//GEN-LAST:event_addNucleotideOverlayButtonActionPerformed
 
+    public static void showEditDialog(NucleotideComposition nucleotideComposition, Frame parent, ProjectModel projectModel, StructureVisController structureVisController) {
+        NucleotideCompositionDialog d = new NucleotideCompositionDialog(parent, true, projectModel, structureVisController);
+        if (nucleotideComposition != null) {
+            d.setEditMode(true);
+            d.nucleotidePanel.setNucleotideSource(nucleotideComposition);
+            d.setSize(600, 150);
+            d.setVisible(true);
+        }
+    }
+
     private void edit2DDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edit2DDataButtonActionPerformed
-        Data2DDialog d = new Data2DDialog(null, true, projectController.projectModel, structureVisController);
+
         DataOverlay2D dataSource2D = (DataOverlay2D) data2DComboBoxModel.getSelectedItem();
+        showEditDialog(dataSource2D, null, projectController.projectModel, structureVisController);
+    }//GEN-LAST:event_edit2DDataButtonActionPerformed
+
+    public static void showEditDialog(DataOverlay2D dataSource2D, Frame parent, ProjectModel projectModel, StructureVisController structureVisController) {
+        Data2DDialog d = new Data2DDialog(parent, true, projectModel, structureVisController);
         if (dataSource2D != null) {
             d.data2DPanel.setDataSource2D(dataSource2D);
-            d.editMode = true;
+            d.setEditMode(true);
             d.setSize(750, 690);
             d.setVisible(true);
         }
-    }//GEN-LAST:event_edit2DDataButtonActionPerformed
+    }
 
     private void add2DDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_add2DDataButtonActionPerformed
         Data2DDialog d = new Data2DDialog(null, true, projectController.projectModel, structureVisController);
         d.setSize(750, 690);
-        d.editMode = false;
+        d.setEditMode(false);
         d.setVisible(true);
     }//GEN-LAST:event_add2DDataButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -373,8 +391,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
      * populateDataSource1DComboBox(); }
      *
      * @Override public void contentsChanged(ListDataEvent e) {
-     * populateDataSource1DComboBox();
-    }
+     * populateDataSource1DComboBox(); }
      */
 
     /*

@@ -26,22 +26,21 @@ public class Data2DDialog extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         
-        this.editMode = false;
         this.projectModel = projectModel;
         this.structureVisController = structureVisController;
         data2DPanel = new Data2DPanel(projectModel);
         this.jPanel1.add(data2DPanel, BorderLayout.CENTER);
-        
-        if(this.editMode)
-        {
+        this.setIconImage(new ImageIcon(ClassLoader.getSystemResource("resources/icons/icon-32x32.png")).getImage());
+    }
+    
+    
+    public void setEditMode(boolean editMode) {
+        this.editMode = editMode;
+        if (editMode) {
             this.addButton.setText("Save");
-        }
-        else
-        {
+        } else {
             this.addButton.setText("Add");
         }
-        
-        this.setIconImage(new ImageIcon(ClassLoader.getSystemResource("resources/icons/icon-32x32.png")).getImage());
     }
 
     /**

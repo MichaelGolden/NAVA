@@ -52,6 +52,11 @@ public class NucleotideCompositionPanel extends javax.swing.JPanel {
             }
         }
     }
+    
+    public void setNucleotideSource(NucleotideComposition nucleotideComposition)
+    {
+        this.nucleotideAlignmentComboBoxModel.setSelectedItem(nucleotideComposition.alignment);
+    }
 
     public NucleotideComposition getNucleotideSource() {
         selectedAlignment = (Alignment) nucleotideAlignmentComboBoxModel.getSelectedItem();

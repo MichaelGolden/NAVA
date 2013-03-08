@@ -5,6 +5,7 @@
 package nava.structurevis;
 
 import java.awt.BorderLayout;
+import java.awt.Frame;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import nava.structurevis.data.*;
 import nava.structurevis.navigator.DataOverlayTreePanel;
 import nava.ui.MainFrame;
 import nava.ui.ProjectController;
+import nava.ui.ProjectModel;
 import nava.utils.CustomItem;
 
 /**
@@ -59,7 +61,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
 
         structureVisController.structureSources.addListDataListener(this);
 
-        treePanel.add(new DataOverlayTreePanel(structureVisController), BorderLayout.CENTER);
+        treePanel.add(new DataOverlayTreePanel(projectController,structureVisController), BorderLayout.CENTER);
 
         dataLegend1D.addChangeListener(this);
         dataLegend2D.addChangeListener(this);
@@ -110,8 +112,6 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         jPanel1 = new javax.swing.JPanel();
         treePanel = new javax.swing.JPanel();
         jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         structureComboBox = new javax.swing.JComboBox();
@@ -138,42 +138,32 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
 
         treePanel.setLayout(new java.awt.BorderLayout());
 
-        jButton2.setText("Add 1D data");
-
-        jButton3.setText("Add 2D data");
-
-        jButton4.setText("Add nucleotide data");
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/add-16x16.png"))); // NOI18N
+        jButton2.setText("Add data overlay");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(treePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(treePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(0, 0, 0)
-                        .addComponent(jButton4)
-                        .addContainerGap())
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton3)
-                            .addComponent(jButton2))
-                        .addContainerGap())))
+                        .addContainerGap()
+                        .addComponent(jButton2)))
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGap(0, 0, 0)
-                .addComponent(treePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton2)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(treePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 303, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton4)
-                .addContainerGap())
+                .addComponent(jButton2))
         );
 
         jSplitPane1.setLeftComponent(jPanel1);
@@ -210,22 +200,37 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jSplitPane1)
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 336, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
+     public static void showEditDialog(StructureSource structureSource, Frame parent, ProjectModel projectModel, StructureVisController structureVisController) {
+        StructureDataDialog d = new StructureDataDialog(parent, true, projectModel, structureVisController);
+        if (structureSource != null) {            
+            d.setEditMode(true);
+            d.structureDataPanel.setStructureSource(structureSource);
+            d.setSize(640, 580);
+            d.setVisible(true);
+        }
+    }
+    
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         StructureDataDialog d = new StructureDataDialog(null, true, projectController.projectModel, structureVisController);
         d.setSize(640, 580);
+        d.setEditMode(false);
         d.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        AddDataOverlayDialog dialog = new AddDataOverlayDialog(null, true, projectController.projectModel, structureVisController);
+        dialog.setVisible(true);
+    }//GEN-LAST:event_jButton2ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;

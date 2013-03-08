@@ -15,8 +15,8 @@ public class StructureDataDialog extends javax.swing.JDialog {
 
     ProjectModel projectModel;
     StructureVisController structureVisController;
-    StructureDataPanel structureDataPanel;
-    
+    public StructureDataPanel structureDataPanel;
+    boolean editMode = false;
     /**
      * Creates new form StructureDataDialog
      */
@@ -28,6 +28,17 @@ public class StructureDataDialog extends javax.swing.JDialog {
         this.structureVisController = structureVisController;
         structureDataPanel = new StructureDataPanel(projectModel);
         this.jPanel1.add(structureDataPanel, BorderLayout.CENTER);
+    }
+    
+    
+    
+    public void setEditMode(boolean editMode) {
+        this.editMode = editMode;
+        if (editMode) {
+            this.addButton.setText("Save");
+        } else {
+            this.addButton.setText("Add");
+        }
     }
 
     /**

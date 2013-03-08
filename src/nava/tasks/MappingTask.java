@@ -30,7 +30,7 @@ public class MappingTask<Mapping> extends UITask {
     public void task() {
         if(structureVisController != null)
         {
-            mapping = structureVisController.createMapping(a, b);
+            mapping = structureVisController.createMapping(a, b,3);
         }
     }
     

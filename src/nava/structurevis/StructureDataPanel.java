@@ -16,6 +16,7 @@ import javax.swing.event.ChangeListener;
 import nava.data.types.*;
 import nava.structurevis.data.MappingSource;
 import nava.structurevis.data.StructureSource;
+import nava.structurevis.data.StructureSource.MappingSourceOption;
 import nava.ui.MainFrame;
 import nava.ui.ProjectModel;
 
@@ -355,31 +356,36 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
     public void update() {
         SecondaryStructure structure = (SecondaryStructure) structureComboBox.getSelectedItem();
         MappingSource mappingSource = null;
-        
+
         SecondaryStructureData data = (SecondaryStructureData) structure.getObject(MainFrame.dataSourceCache);
-        if(data.sequence.length() == 0)
-        {
+        if (data.sequence.length() == 0) {
             embeddSequenceRadioButton.setEnabled(false);
-            if(embeddSequenceRadioButton.isSelected())
-            {
+            if (embeddSequenceRadioButton.isSelected()) {
                 fromAlignmentRadioButton.setSelected(true);
             }
-        }
-        else
-        {
+        } else {
             embeddSequenceRadioButton.setEnabled(true);
         }
-        
+
         if (this.embeddSequenceRadioButton.isSelected()) {
-            
             mappingSource = new MappingSource(data.sequence);
-            System.out.println(data.sequence);
         } else if (this.fromAlignmentRadioButton.isSelected()) {
             mappingSource = new MappingSource((Alignment) alignmentComboBox.getSelectedItem());
         } else if (this.fromSequenceRadioButton.isSelected()) {
             mappingSource = new MappingSource(sequenceTextField.getText());
         }
         structureSource = new StructureSource(structure, mappingSource);
+        structureSource.minStructureSize = (Integer) this.minSpinnerModel.getValue();
+        structureSource.maxStructureSize = (Integer) this.maxSpinnerModel.getValue();
+        structureSource.nonOverlappingSubstructures = this.jCheckBox1.isSelected();
+
+        if (this.embeddSequenceRadioButton.isSelected()) {
+            structureSource.mappingSourceOption = MappingSourceOption.EMBEDDED;
+        } else if (this.fromAlignmentRadioButton.isSelected()) {
+            structureSource.mappingSourceOption = MappingSourceOption.ALIGNMENT;
+        } else if (this.fromSequenceRadioButton.isSelected()) {
+            structureSource.mappingSourceOption = MappingSourceOption.STRING;
+        }
 
         if (this.circularRadioButton.isSelected()) {
             structureSource.circular = true;
@@ -393,6 +399,27 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
             structureSource.substructures = StructureSource.enumerateAdjacentSubstructures(structureSource.pairedSites, 10, 250, false);
             //System.out.println(structureSource.substructures);
         }
+    }
+
+    public void setStructureSource(StructureSource structureSource) {
+        // TODO
+        this.structureComboBoxModel.setSelectedItem(structureSource.structure);
+        this.circularRadioButton.setSelected(structureSource.circular);
+        switch (structureSource.mappingSourceOption) {
+            case EMBEDDED:
+                this.embeddSequenceRadioButton.setSelected(true);
+                break;
+            case ALIGNMENT:
+                this.fromAlignmentRadioButton.setSelected(true);
+                break;
+            case STRING:
+                this.fromSequenceRadioButton.setSelected(true);
+                sequenceTextField.setText(structureSource.mappingSource.sequence);
+                break;
+        }
+        this.minSpinnerModel.setValue(structureSource.minStructureSize);
+        this.maxSpinnerModel.setValue(structureSource.maxStructureSize);
+        this.jCheckBox1.setSelected(structureSource.nonOverlappingSubstructures);
     }
 
     public StructureSource getStructureSource() {

@@ -23,6 +23,7 @@ public class NucleotideComposition extends Overlay implements Serializable {
     public double[][] frequencyComposition = null;
     public double[][] shannonComposition = null;
     public String consensus;
+    public Alignment alignment;
     public MappingSource mappingSource;
 
     public enum Type implements Serializable {
@@ -35,7 +36,8 @@ public class NucleotideComposition extends Overlay implements Serializable {
     }
 
     public NucleotideComposition(Alignment alignmentSource) {
-        AlignmentData data = alignmentSource.getObject();
+        this.alignment = alignmentSource;
+        AlignmentData data = alignment.getObject();
         mappingSource = new MappingSource(alignmentSource);
         calculateFrequencies(data.sequences, data.sequenceNames);
     }

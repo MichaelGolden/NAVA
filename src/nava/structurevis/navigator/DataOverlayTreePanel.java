@@ -22,7 +22,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import nava.structurevis.StructureVisController;
+import nava.structurevis.StructureVisPanel;
+import nava.structurevis.SubstructurePanel;
 import nava.structurevis.data.*;
+import nava.ui.ProjectController;
 
 /**
  *
@@ -30,6 +33,7 @@ import nava.structurevis.data.*;
  */
 public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionListener, MouseListener, TreeSelectionListener, TreeModelListener {
 
+    ProjectController projectController;
     StructureVisController structureVisController;
     JPopupMenu popupMenu = new JPopupMenu();
     JMenuItem setAsOverlayItem = new JMenuItem("Set as overlay");
@@ -39,9 +43,10 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
     /**
      * Creates new form NavigatorPanel
      */
-    public DataOverlayTreePanel(StructureVisController structureVisController) {
+    public DataOverlayTreePanel(ProjectController projectController, StructureVisController structureVisController) {
         initComponents();
 
+        this.projectController = projectController;
         this.structureVisController = structureVisController;
 
 
@@ -224,6 +229,26 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
                     structureVisController.substructureModel.setStructureSource((StructureSource) overlay);
                 }
                
+            }
+            
+            // update node icons on tree
+            structureVisController.substructureModel.navigatorTreeModel.valueForPathChanged(navigationTree.getSelectionPath(), overlay);
+        }
+        else
+        if (e.getSource().equals(editItem)) {
+            Overlay overlay = ((DataOverlayTreeNode) navigationTree.getSelectionPath().getLastPathComponent()).overlay;
+
+            if (overlay instanceof DataOverlay1D) {
+                StructureVisPanel.showEditDialog((DataOverlay1D)overlay, null, projectController.projectModel, structureVisController);
+            } else if (overlay instanceof DataOverlay2D) {
+                StructureVisPanel.showEditDialog((DataOverlay2D)overlay, null, projectController.projectModel, structureVisController);
+                
+            } else if (overlay instanceof NucleotideComposition) {
+                StructureVisPanel.showEditDialog((NucleotideComposition)overlay, null, projectController.projectModel, structureVisController);
+                
+            } else if (overlay instanceof StructureSource) {
+                
+               SubstructurePanel.showEditDialog((StructureSource)overlay, null, projectController.projectModel, structureVisController);
             }
             
             // update node icons on tree

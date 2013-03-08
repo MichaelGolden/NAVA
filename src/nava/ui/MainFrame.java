@@ -115,10 +115,10 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
         });
 
         jPanel1.setLayout(new java.awt.BorderLayout());
-        jTabbedPane1.addTab("tab1", jPanel1);
+        jTabbedPane1.addTab("Data analysis", jPanel1);
 
         jPanel2.setLayout(new java.awt.BorderLayout());
-        jTabbedPane1.addTab("tab2", jPanel2);
+        jTabbedPane1.addTab("Visualisation", jPanel2);
 
         jTabbedPane1.setSelectedComponent(jPanel2);
 

@@ -15,6 +15,10 @@ import nava.data.types.Sequence;
  */
 public class MappingSource implements Serializable {
     
+    public enum Type{ALIGNMENT, SEQUENCE, STRING};
+    
+    public Type mappingType = Type.ALIGNMENT; 
+    
     public Alignment alignmentSource;
     public Sequence sequenceSource;
     public String sequence;
@@ -22,16 +26,19 @@ public class MappingSource implements Serializable {
     public MappingSource (Alignment alignmentSource)
     {
         this.alignmentSource = alignmentSource;
+        this.mappingType = Type.ALIGNMENT;
     }
     
     public MappingSource(Sequence sequenceSource)
     {
         this.sequenceSource = sequenceSource;
+        this.mappingType = Type.SEQUENCE;
     }
     
     public MappingSource(String sequence)
     {
         this.sequence = sequence;
+        this.mappingType = Type.STRING;
     }
 
     @Override

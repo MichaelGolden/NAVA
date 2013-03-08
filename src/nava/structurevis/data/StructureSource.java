@@ -22,6 +22,13 @@ public class StructureSource extends Overlay implements Serializable {
     public SecondaryStructure structure;
     public MappingSource mappingSource;
     
+    public enum MappingSourceOption {EMBEDDED, ALIGNMENT, STRING};
+    public MappingSourceOption mappingSourceOption = MappingSourceOption.EMBEDDED;
+    
+    public int minStructureSize = 10;
+    public int maxStructureSize = 250;
+    public boolean nonOverlappingSubstructures = false;
+    
     public transient SecondaryStructureData data;
     public transient int [] pairedSites;
     public ArrayList<Substructure> substructures = new ArrayList<>();

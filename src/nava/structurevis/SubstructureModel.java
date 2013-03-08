@@ -138,7 +138,7 @@ public class SubstructureModel implements Serializable {
 
     public void setNucleotideSource(NucleotideComposition nucleotideSource) {
         this.nucleotideSource = nucleotideSource;
-        if (nucleotideSource != null && nucleotideSource.mappingSource != null) {
+        if (nucleotideSource != null && nucleotideSource.mappingSource != null && structureSource != null) {
             nucleotideMapping = structureVisController.getMapping(nucleotideSource.mappingSource, structureSource.mappingSource);
         }
         for (int i = 0; i < structureVisController.nucleotideSources.size(); i++) {

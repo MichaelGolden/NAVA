@@ -36,7 +36,7 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
     ProjectController projectController;
     StructureVisController structureVisController;
     JPopupMenu popupMenu = new JPopupMenu();
-    JMenuItem setAsOverlayItem = new JMenuItem("Set as overlay");
+    JMenuItem setAsOverlayItem = new JMenuItem("View");
     JMenuItem editItem = new JMenuItem("Edit");
     JMenuItem deleteItem = new JMenuItem("Delete");
 
@@ -51,15 +51,16 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
 
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode();
-        if (structureVisController.substructureModel.navigatorTreeModel == null) {
-            structureVisController.substructureModel.navigatorTreeModel = new DataOverlayTreeModel(root, structureVisController);
+        if (structureVisController.substructureModel.overlayNavigatorTreeModel == null) {
+            structureVisController.substructureModel.overlayNavigatorTreeModel = new DataOverlayTreeModel(root, structureVisController);
         } else {
         }
-        structureVisController.substructureModel.navigatorTreeModel.addTreeModelListener(this);
+        
+        structureVisController.substructureModel.overlayNavigatorTreeModel.addTreeModelListener(this);
 
         DataOverlayTreeRenderer navigatorRenderer = new DataOverlayTreeRenderer();
         navigationTree.setRootVisible(false);
-        navigationTree.setModel(structureVisController.substructureModel.navigatorTreeModel);
+        navigationTree.setModel(structureVisController.substructureModel.overlayNavigatorTreeModel);
         navigationTree.setCellRenderer(navigatorRenderer);
         navigationTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         navigationTree.addTreeSelectionListener(this);
@@ -140,14 +141,16 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
     public void valueChanged(TreeSelectionEvent e) {
         DataOverlayTreeEvent navigationEvent = new DataOverlayTreeEvent();
         TreePath[] paths = navigationTree.getSelectionPaths();
-        for (TreePath path : paths) {
-            DataOverlayTreeNode node = (DataOverlayTreeNode) path.getLastPathComponent();
-            if (node.overlay != null) {
-                navigationEvent.selectedDataSources.add(node.overlay);
+        if (paths != null) {
+            for (TreePath path : paths) {
+                DataOverlayTreeNode node = (DataOverlayTreeNode) path.getLastPathComponent();
+                if (node.overlay != null) {
+                    navigationEvent.selectedDataSources.add(node.overlay);
+                }
             }
-        }
 
-        this.fireDataSourceSelectionChanged(navigationEvent);
+            this.fireDataSourceSelectionChanged(navigationEvent);
+        }
     }
 
     @Override
@@ -174,11 +177,21 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
     public void mouseClicked(MouseEvent e) {
         if (SwingUtilities.isRightMouseButton(e)) {
             TreePath tp = navigationTree.getClosestPathForLocation(e.getX(), e.getY());
-            if (((DataOverlayTreeNode) tp.getLastPathComponent()).overlay != null) {
+            Overlay selectedOverlay = ((DataOverlayTreeNode) tp.getLastPathComponent()).overlay;
+            if (selectedOverlay != null) {
                 if (tp != null) {
                     navigationTree.setSelectionPath(tp);
                 }
                 popupMenu.show(e.getComponent(), e.getX(), e.getY());
+                switch (selectedOverlay.getState()) {
+                    case PRIMARY_SELECTED:
+                    case SECONDARY_SELECTED:
+                        setAsOverlayItem.setText("Hide");
+                        break;
+                    case UNSELECTED:
+                        setAsOverlayItem.setText("View");
+                        break;
+                }
             }
         }
     }
@@ -228,31 +241,29 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
                 } else {
                     structureVisController.substructureModel.setStructureSource((StructureSource) overlay);
                 }
-               
+
             }
-            
+
             // update node icons on tree
-            structureVisController.substructureModel.navigatorTreeModel.valueForPathChanged(navigationTree.getSelectionPath(), overlay);
-        }
-        else
-        if (e.getSource().equals(editItem)) {
+            structureVisController.substructureModel.overlayNavigatorTreeModel.valueForPathChanged(navigationTree.getSelectionPath(), overlay);
+        } else if (e.getSource().equals(editItem)) {
             Overlay overlay = ((DataOverlayTreeNode) navigationTree.getSelectionPath().getLastPathComponent()).overlay;
 
             if (overlay instanceof DataOverlay1D) {
-                StructureVisPanel.showEditDialog((DataOverlay1D)overlay, null, projectController.projectModel, structureVisController);
+                StructureVisPanel.showEditDialog((DataOverlay1D) overlay, null, projectController.projectModel, structureVisController);
             } else if (overlay instanceof DataOverlay2D) {
-                StructureVisPanel.showEditDialog((DataOverlay2D)overlay, null, projectController.projectModel, structureVisController);
-                
+                StructureVisPanel.showEditDialog((DataOverlay2D) overlay, null, projectController.projectModel, structureVisController);
+
             } else if (overlay instanceof NucleotideComposition) {
-                StructureVisPanel.showEditDialog((NucleotideComposition)overlay, null, projectController.projectModel, structureVisController);
-                
+                StructureVisPanel.showEditDialog((NucleotideComposition) overlay, null, projectController.projectModel, structureVisController);
+
             } else if (overlay instanceof StructureSource) {
-                
-               SubstructurePanel.showEditDialog((StructureSource)overlay, null, projectController.projectModel, structureVisController);
+
+                SubstructurePanel.showEditDialog((StructureSource) overlay, null, projectController, structureVisController);
             }
-            
+
             // update node icons on tree
-            structureVisController.substructureModel.navigatorTreeModel.valueForPathChanged(navigationTree.getSelectionPath(), overlay);
+            structureVisController.substructureModel.overlayNavigatorTreeModel.valueForPathChanged(navigationTree.getSelectionPath(), overlay);
         }
     }
 }

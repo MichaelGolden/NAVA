@@ -5,6 +5,7 @@
 package nava.structurevis;
 
 import java.awt.BorderLayout;
+import nava.ui.ProjectController;
 import nava.ui.ProjectModel;
 
 /**
@@ -13,20 +14,20 @@ import nava.ui.ProjectModel;
  */
 public class StructureDataDialog extends javax.swing.JDialog {
 
-    ProjectModel projectModel;
+    ProjectController projectController;
     StructureVisController structureVisController;
     public StructureDataPanel structureDataPanel;
     boolean editMode = false;
     /**
      * Creates new form StructureDataDialog
      */
-    public StructureDataDialog(java.awt.Frame parent, boolean modal, ProjectModel projectModel, StructureVisController structureVisController) {
+    public StructureDataDialog(java.awt.Frame parent, boolean modal, ProjectController projectController, StructureVisController structureVisController) {
         super(parent, modal);
         initComponents();
-        this.projectModel = projectModel;
+        this.projectController = projectController;
         
         this.structureVisController = structureVisController;
-        structureDataPanel = new StructureDataPanel(projectModel);
+        structureDataPanel = new StructureDataPanel(projectController);
         this.jPanel1.add(structureDataPanel, BorderLayout.CENTER);
     }
     
@@ -93,7 +94,8 @@ public class StructureDataDialog extends javax.swing.JDialog {
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
         structureDataPanel.post();
-        structureVisController.addStructureSource( structureDataPanel.getStructureSource());
+        structureVisController.addStructureSource(structureDataPanel.getStructureSource());
+        
         this.dispose();
     }//GEN-LAST:event_addButtonActionPerformed
 

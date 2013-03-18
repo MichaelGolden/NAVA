@@ -120,8 +120,8 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
         this.naturalRadioButton.addItemListener(this);
         this.codonCheckButton.addItemListener(this);
 
-        populateDataMatrixComboBox(Collections.list(projectModel.dataSources.elements()));
-        populateMappingSourceComboBox(Collections.list(projectModel.dataSources.elements()));
+        populateDataMatrixComboBox(projectModel.dataSources.getArrayListShallowCopy());
+        populateMappingSourceComboBox(projectModel.dataSources.getArrayListShallowCopy());
         
         
         ToolTipManager.sharedInstance().setInitialDelay(0);

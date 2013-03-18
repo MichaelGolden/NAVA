@@ -4,6 +4,8 @@
  */
 package nava.structurevis;
 
+import javax.swing.ImageIcon;
+import nava.ui.ProjectController;
 import nava.ui.ProjectModel;
 
 /**
@@ -12,17 +14,19 @@ import nava.ui.ProjectModel;
  */
 public class AddDataOverlayDialog extends javax.swing.JDialog {
 
-    ProjectModel projectModel;
+    ProjectController projectController;
     StructureVisController structureVisController;
 
     /**
      * Creates new form AddDataOverlayDialog
      */
-    public AddDataOverlayDialog(java.awt.Frame parent, boolean modal, ProjectModel projectModel, StructureVisController structureVisController) {
+    public AddDataOverlayDialog(java.awt.Frame parent, boolean modal, ProjectController projectController, StructureVisController structureVisController) {
         super(parent, modal);
         initComponents();
-        this.projectModel = projectModel;
+        this.projectController = projectController;
         this.structureVisController = structureVisController;
+        
+        this.setIconImage(new ImageIcon(ClassLoader.getSystemResource("resources/icons/icon-32x32.png")).getImage());
     }
 
     /**
@@ -34,59 +38,59 @@ public class AddDataOverlayDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
+        add1DButton = new javax.swing.JButton();
+        add2DButton = new javax.swing.JButton();
+        addNucleotideButton = new javax.swing.JButton();
+        addStructureButton = new javax.swing.JButton();
+        cancelButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Add data overlay");
 
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/tabular-16x16.png"))); // NOI18N
-        jButton1.setText("Add 1D overlay");
-        jButton1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jButton1.setIconTextGap(10);
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        add1DButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/tabular-16x16.png"))); // NOI18N
+        add1DButton.setText("Add 1D overlay");
+        add1DButton.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        add1DButton.setIconTextGap(10);
+        add1DButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                add1DButtonActionPerformed(evt);
             }
         });
 
-        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/matrix-16x16.png"))); // NOI18N
-        jButton2.setText("Add 2D overlay");
-        jButton2.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jButton2.setIconTextGap(10);
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        add2DButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/matrix-16x16.png"))); // NOI18N
+        add2DButton.setText("Add 2D overlay");
+        add2DButton.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        add2DButton.setIconTextGap(10);
+        add2DButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                add2DButtonActionPerformed(evt);
             }
         });
 
-        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/nucleotide-alignment-16x16.png"))); // NOI18N
-        jButton3.setText("Add nucleotide overlay");
-        jButton3.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jButton3.setIconTextGap(10);
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        addNucleotideButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/nucleotide-alignment-16x16.png"))); // NOI18N
+        addNucleotideButton.setText("Add nucleotide overlay");
+        addNucleotideButton.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        addNucleotideButton.setIconTextGap(10);
+        addNucleotideButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                addNucleotideButtonActionPerformed(evt);
             }
         });
 
-        jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/structure-16x16.png"))); // NOI18N
-        jButton4.setText("Add structure");
-        jButton4.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jButton4.setIconTextGap(10);
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
+        addStructureButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/structure-16x16.png"))); // NOI18N
+        addStructureButton.setText("Add structure");
+        addStructureButton.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        addStructureButton.setIconTextGap(10);
+        addStructureButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
+                addStructureButtonActionPerformed(evt);
             }
         });
 
-        jButton5.setText("Cancel");
-        jButton5.addActionListener(new java.awt.event.ActionListener() {
+        cancelButton.setText("Cancel");
+        cancelButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton5ActionPerformed(evt);
+                cancelButtonActionPerformed(evt);
             }
         });
 
@@ -97,73 +101,73 @@ public class AddDataOverlayDialog extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jButton5)
+                    .addComponent(cancelButton)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(add1DButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(add2DButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(addStructureButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(addNucleotideButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButton1)
+                .addComponent(add1DButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton2)
+                .addComponent(add2DButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton4)
+                .addComponent(addStructureButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton3)
+                .addComponent(addNucleotideButton)
                 .addGap(18, 18, 18)
-                .addComponent(jButton5)
+                .addComponent(cancelButton)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
         this.dispose();
-    }//GEN-LAST:event_jButton5ActionPerformed
+    }//GEN-LAST:event_cancelButtonActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void addNucleotideButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addNucleotideButtonActionPerformed
         this.dispose();
-        NucleotideCompositionDialog d = new NucleotideCompositionDialog(null, true, projectModel, structureVisController);
+        NucleotideCompositionDialog d = new NucleotideCompositionDialog(null, true, projectController.projectModel, structureVisController);
         d.setSize(600, 150);
         d.setEditMode(false);
         d.setVisible(true);
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }//GEN-LAST:event_addNucleotideButtonActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void add1DButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_add1DButtonActionPerformed
         this.dispose();
-        Data1DDialog d = new Data1DDialog(null, true, projectModel, structureVisController);
+        Data1DDialog d = new Data1DDialog(null, true, projectController.projectModel, structureVisController);
         d.setSize(920, 690);
         d.setEditMode(false);
         d.setVisible(true);
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_add1DButtonActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void add2DButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_add2DButtonActionPerformed
         this.dispose();
-        Data2DDialog d = new Data2DDialog(null, true, projectModel, structureVisController);
+        Data2DDialog d = new Data2DDialog(null, true, projectController.projectModel, structureVisController);
         d.setSize(750, 690);
         d.setEditMode(false);
         d.setVisible(true);
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_add2DButtonActionPerformed
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+    private void addStructureButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addStructureButtonActionPerformed
         this.dispose();
-        StructureDataDialog d = new StructureDataDialog(null, true, projectModel, structureVisController);
+        StructureDataDialog d = new StructureDataDialog(null, true, projectController, structureVisController);
         d.setSize(640, 580);
         d.setEditMode(false);
         d.setVisible(true);
-    }//GEN-LAST:event_jButton4ActionPerformed
+    }//GEN-LAST:event_addStructureButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
+    private javax.swing.JButton add1DButton;
+    private javax.swing.JButton add2DButton;
+    private javax.swing.JButton addNucleotideButton;
+    private javax.swing.JButton addStructureButton;
+    private javax.swing.JButton cancelButton;
     // End of variables declaration//GEN-END:variables
 }

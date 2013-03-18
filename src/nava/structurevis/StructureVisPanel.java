@@ -53,14 +53,14 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
                 this.structureVisController = StructureVisController.loadProject(structureVisModelFile);
 
             } catch (Exception ex) {
-                this.structureVisController = new StructureVisController(projectController.projectModel.getProjectPath().toFile());
+                this.structureVisController = new StructureVisController(projectController, projectController.projectModel, projectController.projectModel.getProjectPath().toFile());
                 System.out.println("AHADA1");
                 ex.printStackTrace();
                 System.out.println("AHADA2");
                 // TODO - handle this better.
             }
         } else {
-            this.structureVisController = new StructureVisController(projectController.projectModel.getProjectPath().toFile());
+            this.structureVisController = new StructureVisController(projectController, projectController.projectModel, projectController.projectModel.getProjectPath().toFile());
         }
         this.projectController = projectController;
 
@@ -81,7 +81,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         topScrollPane.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.darkGray));
         topScrollPane.setViewportView(layerPanel);
 
-        verticalSplitPane.setDividerLocation(annotationsLayerRight.getPreferredSize().height + jPanel1.getPreferredSize().height + 3);
+        verticalSplitPane.setDividerLocation(annotationsLayerRight.getPreferredSize().height + 3 + 50);
 
 
         substructurePanel = new SubstructurePanel(structureVisController, projectController);
@@ -90,18 +90,6 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
 
         // populateStructureComboBox(Collections.list(projectController.projectModel.dataSources.elements()));
         projectController.addView(this);
-
-        data1DComboBox.setModel(data1DComboBoxModel);
-        data1DComboBox.addItemListener(this);
-        populateDataSource1DComboBox();
-
-        data2DComboBox.setModel(data2DComboBoxModel);
-        data2DComboBox.addItemListener(this);
-        populateDataSource2DComboBox();
-
-        nucleotideAlignmentComboBox.setModel(nucleotideComboBoxModel);
-        nucleotideAlignmentComboBox.addItemListener(this);
-        populateNucleotideComboBox();
 
         substructurePanel.refresh();
 
@@ -163,16 +151,6 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         verticalSplitPane = new javax.swing.JSplitPane();
         topSplit = new javax.swing.JPanel();
         topScrollPane = new javax.swing.JScrollPane();
-        jPanel1 = new javax.swing.JPanel();
-        data1DComboBox = new javax.swing.JComboBox();
-        edit1DDataButton = new javax.swing.JButton();
-        add1DDataButton = new javax.swing.JButton();
-        filler4 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
-        data2DComboBox = new javax.swing.JComboBox();
-        edit2DDataButton = new javax.swing.JButton();
-        add2DDataButton = new javax.swing.JButton();
-        nucleotideAlignmentComboBox = new javax.swing.JComboBox();
-        addNucleotideOverlayButton = new javax.swing.JButton();
         bottomSplit = new javax.swing.JPanel();
 
         verticalSplitPane.setDividerLocation(300);
@@ -182,67 +160,6 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
 
         topScrollPane.setBorder(null);
         topSplit.add(topScrollPane);
-
-        jPanel1.setMaximumSize(new java.awt.Dimension(32767, 100));
-        jPanel1.setMinimumSize(new java.awt.Dimension(83, 10));
-        jPanel1.setPreferredSize(new java.awt.Dimension(461, 35));
-        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-
-        data1DComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jPanel1.add(data1DComboBox);
-
-        edit1DDataButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/tabular-field-16x16.png"))); // NOI18N
-        edit1DDataButton.setText("Edit 1D overlay");
-        edit1DDataButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                edit1DDataButtonActionPerformed(evt);
-            }
-        });
-        jPanel1.add(edit1DDataButton);
-
-        add1DDataButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/tabular-field-16x16.png"))); // NOI18N
-        add1DDataButton.setText("Add 1D overlay");
-        add1DDataButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                add1DDataButtonActionPerformed(evt);
-            }
-        });
-        jPanel1.add(add1DDataButton);
-        jPanel1.add(filler4);
-
-        data2DComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jPanel1.add(data2DComboBox);
-
-        edit2DDataButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/tabular-field-16x16.png"))); // NOI18N
-        edit2DDataButton.setText("Edit 2D overlay");
-        edit2DDataButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                edit2DDataButtonActionPerformed(evt);
-            }
-        });
-        jPanel1.add(edit2DDataButton);
-
-        add2DDataButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/tabular-field-16x16.png"))); // NOI18N
-        add2DDataButton.setText("Add 2D overlay");
-        add2DDataButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                add2DDataButtonActionPerformed(evt);
-            }
-        });
-        jPanel1.add(add2DDataButton);
-
-        nucleotideAlignmentComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jPanel1.add(nucleotideAlignmentComboBox);
-
-        addNucleotideOverlayButton.setText("Add nucleotide overlay");
-        addNucleotideOverlayButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addNucleotideOverlayButtonActionPerformed(evt);
-            }
-        });
-        jPanel1.add(addNucleotideOverlayButton);
-
-        topSplit.add(jPanel1);
 
         verticalSplitPane.setLeftComponent(topSplit);
 
@@ -262,18 +179,6 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void add1DDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_add1DDataButtonActionPerformed
-        Data1DDialog d = new Data1DDialog(null, true, projectController.projectModel, structureVisController);
-        d.setSize(920, 690);
-        d.setEditMode(false);
-        d.setVisible(true);
-    }//GEN-LAST:event_add1DDataButtonActionPerformed
-
-    private void edit1DDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edit1DDataButtonActionPerformed
-        DataOverlay1D dataSource1D = (DataOverlay1D) data1DComboBoxModel.getSelectedItem();
-        showEditDialog(dataSource1D, null, projectController.projectModel, structureVisController);
-    }//GEN-LAST:event_edit1DDataButtonActionPerformed
-
     public static void showEditDialog(DataOverlay1D dataSource1D, Frame parent, ProjectModel projectModel, StructureVisController structureVisController) {
         Data1DDialog d = new Data1DDialog(parent, true, projectModel, structureVisController);
         if (dataSource1D != null) {
@@ -283,14 +188,6 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
             d.setVisible(true);
         }
     }
-
-    private void addNucleotideOverlayButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addNucleotideOverlayButtonActionPerformed
-        NucleotideCompositionDialog d = new NucleotideCompositionDialog(null, true, projectController.projectModel, structureVisController);
-        d.setSize(600, 150);
-        d.setEditMode(false);
-        d.setVisible(true);
-        populateNucleotideComboBox();
-    }//GEN-LAST:event_addNucleotideOverlayButtonActionPerformed
 
     public static void showEditDialog(NucleotideComposition nucleotideComposition, Frame parent, ProjectModel projectModel, StructureVisController structureVisController) {
         NucleotideCompositionDialog d = new NucleotideCompositionDialog(parent, true, projectModel, structureVisController);
@@ -302,12 +199,6 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         }
     }
 
-    private void edit2DDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edit2DDataButtonActionPerformed
-
-        DataOverlay2D dataSource2D = (DataOverlay2D) data2DComboBoxModel.getSelectedItem();
-        showEditDialog(dataSource2D, null, projectController.projectModel, structureVisController);
-    }//GEN-LAST:event_edit2DDataButtonActionPerformed
-
     public static void showEditDialog(DataOverlay2D dataSource2D, Frame parent, ProjectModel projectModel, StructureVisController structureVisController) {
         Data2DDialog d = new Data2DDialog(parent, true, projectModel, structureVisController);
         if (dataSource2D != null) {
@@ -318,25 +209,9 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         }
     }
 
-    private void add2DDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_add2DDataButtonActionPerformed
-        Data2DDialog d = new Data2DDialog(null, true, projectController.projectModel, structureVisController);
-        d.setSize(750, 690);
-        d.setEditMode(false);
-        d.setVisible(true);
-    }//GEN-LAST:event_add2DDataButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton add1DDataButton;
-    private javax.swing.JButton add2DDataButton;
-    private javax.swing.JButton addNucleotideOverlayButton;
     private javax.swing.JPanel bottomSplit;
-    private javax.swing.JComboBox data1DComboBox;
-    private javax.swing.JComboBox data2DComboBox;
-    private javax.swing.JButton edit1DDataButton;
-    private javax.swing.JButton edit2DDataButton;
-    private javax.swing.Box.Filler filler4;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JComboBox nucleotideAlignmentComboBox;
     private javax.swing.JScrollPane topScrollPane;
     private javax.swing.JPanel topSplit;
     private javax.swing.JSplitPane verticalSplitPane;
@@ -344,23 +219,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
 
     @Override
     public void itemStateChanged(ItemEvent e) {
-        if (e.getSource().equals(data1DComboBox)) {
-            DataOverlay1D dataSource1D = (DataOverlay1D) data1DComboBox.getSelectedItem();
-            if (dataSource1D != null) {
-                structureVisController.substructureModel.setDataSource1D(dataSource1D);
-            }
-        } else if (e.getSource().equals(data2DComboBox)) {
-            DataOverlay2D dataSource2D = (DataOverlay2D) data2DComboBox.getSelectedItem();
-            if (dataSource2D != null) {
-                structureVisController.substructureModel.setDataSource2D(dataSource2D);
-            }
-        } else if (e.getSource().equals(nucleotideAlignmentComboBox)) {
-            NucleotideComposition nucleotideComposition = (NucleotideComposition) nucleotideAlignmentComboBox.getSelectedItem();
-            if (nucleotideComposition != null) {
-                structureVisController.substructureModel.setNucleotideSource(nucleotideComposition);
-            }
-        }
-        substructurePanel.structureDrawPanel.redraw();
+        
     }
 
     @Override

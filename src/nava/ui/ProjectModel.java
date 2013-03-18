@@ -10,14 +10,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import javax.swing.DefaultListModel;
 import nava.ui.navigator.NavigatorTreeModel;
+import nava.utils.SafeListModel;
 
 /**
  *
  * @author Michael
  */
 public class ProjectModel implements Serializable {
-
-    public DefaultListModel<DataSource> dataSources = new DefaultListModel();
+    
+    public SafeListModel<DataSource> dataSources = new SafeListModel();
+    
     public NavigatorTreeModel navigatorTreeModel;
     public long dataSourceCounter = 0;
     public long importCounter = 0;

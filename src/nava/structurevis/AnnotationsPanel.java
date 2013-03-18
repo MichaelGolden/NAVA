@@ -41,7 +41,7 @@ public class AnnotationsPanel extends javax.swing.JPanel implements ItemListener
         this.annotationsSourceComboBox.setModel(annotationsComboBoxModel);
         this.annotationsSourceComboBox.addItemListener(this);
 
-        populateAnnotationsSourceComboBox(Collections.list(projectModel.dataSources.elements()));
+        populateAnnotationsSourceComboBox(projectModel.dataSources.getArrayListShallowCopy());
     }
 
     public void populateAnnotationsSourceComboBox(List<DataSource> dataSources) {

@@ -24,6 +24,7 @@ public class StructureSource extends Overlay implements Serializable {
     
     public enum MappingSourceOption {EMBEDDED, ALIGNMENT, STRING};
     public MappingSourceOption mappingSourceOption = MappingSourceOption.EMBEDDED;
+    public boolean addMappingSourceAsNucleotideOverlay = true;
     
     public int minStructureSize = 10;
     public int maxStructureSize = 250;

@@ -151,11 +151,11 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(treePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jButton2)))
+                .addContainerGap()
+                .addComponent(jButton2)
+                .addContainerGap())
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(treePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -206,8 +206,8 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         );
     }// </editor-fold>//GEN-END:initComponents
 
-     public static void showEditDialog(StructureSource structureSource, Frame parent, ProjectModel projectModel, StructureVisController structureVisController) {
-        StructureDataDialog d = new StructureDataDialog(parent, true, projectModel, structureVisController);
+     public static void showEditDialog(StructureSource structureSource, Frame parent, ProjectController projectController, StructureVisController structureVisController) {
+        StructureDataDialog d = new StructureDataDialog(parent, true, projectController, structureVisController);
         if (structureSource != null) {            
             d.setEditMode(true);
             d.structureDataPanel.setStructureSource(structureSource);
@@ -217,14 +217,14 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
     }
     
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        StructureDataDialog d = new StructureDataDialog(null, true, projectController.projectModel, structureVisController);
+        StructureDataDialog d = new StructureDataDialog(null, true, projectController, structureVisController);
         d.setSize(640, 580);
         d.setEditMode(false);
         d.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        AddDataOverlayDialog dialog = new AddDataOverlayDialog(null, true, projectController.projectModel, structureVisController);
+        AddDataOverlayDialog dialog = new AddDataOverlayDialog(null, true, projectController, structureVisController);
         dialog.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 

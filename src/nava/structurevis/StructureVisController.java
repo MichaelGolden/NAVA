@@ -10,10 +10,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
 import javax.swing.DefaultListModel;
+import javax.swing.event.TreeModelListener;
 import nava.data.io.IO;
+import nava.data.types.Alignment;
+import nava.data.types.DataSource;
+import nava.data.types.DataType;
 import nava.structurevis.data.*;
 import nava.tasks.MappingTask;
 import nava.ui.MainFrame;
+import nava.ui.ProjectController;
+import nava.ui.ProjectModel;
 import nava.utils.Mapping;
 import nava.utils.Pair;
 
@@ -31,8 +37,12 @@ public class StructureVisController implements Serializable {
     public SubstructureModel substructureModel = null;
     Hashtable<Pair<MappingSource, MappingSource>, Mapping> mappings = new Hashtable<>();
     public File structureVisModelFile = null;
+    transient ProjectController projectController;
+    transient ProjectModel projectModel;
 
-    public StructureVisController(File workingDirectory) {
+    public StructureVisController(ProjectController projectController, ProjectModel projectModel, File workingDirectory) {
+        this.projectController = projectController;
+        this.projectModel = projectModel;
         substructureModel = new SubstructureModel(this);
         structureVisModelFile = new File(workingDirectory.getAbsolutePath() + File.separatorChar + "structurevis.model");
 
@@ -49,8 +59,8 @@ public class StructureVisController implements Serializable {
                     MainFrame.taskManager.queueUITask(new MappingTask(this, dataSource.mappingSource, s.mappingSource));
                 }
             }
-            
-             for (int j = 0; j < structureVisDataOverlays2D.size(); j++) {
+
+            for (int j = 0; j < structureVisDataOverlays2D.size(); j++) {
                 DataOverlay2D dataSource = structureVisDataOverlays2D.get(j);
                 if (s.mappingSource != null && dataSource.mappingSource != null) {
                     MainFrame.taskManager.queueUITask(new MappingTask(this, dataSource.mappingSource, s.mappingSource));
@@ -70,6 +80,7 @@ public class StructureVisController implements Serializable {
 
             for (int j = 0; j < nucleotideSources.size(); j++) {
                 NucleotideComposition nucleotideComposition = nucleotideSources.get(j);
+                System.out.println("CREATING NUC " + j+"\t"+nucleotideComposition);
                 if (s.mappingSource != null && nucleotideComposition.mappingSource != null) {
                     //getMapping(f.mappingSource, s.mappingSource);
                     MainFrame.taskManager.queueUITask(new MappingTask(this, nucleotideComposition.mappingSource, s.mappingSource));
@@ -80,6 +91,38 @@ public class StructureVisController implements Serializable {
 
     public void addStructureSource(StructureSource structureSource) {
         if (!structureSources.contains(structureSource)) {
+            if (structureSource.addMappingSourceAsNucleotideOverlay) {
+                switch (structureSource.mappingSourceOption) {
+                    case ALIGNMENT:
+                        addNucleotideCompositionSource(NucleotideCompositionPanel.getNucleotideSource(structureSource.mappingSource.alignmentSource));
+                        break;
+                    case EMBEDDED:
+                        if (structureSource.structure != null && structureSource.structure.parentSource != null && structureSource.structure.parentSource instanceof Alignment) {
+                            addNucleotideCompositionSource(NucleotideCompositionPanel.getNucleotideSource((Alignment) structureSource.structure.parentSource));
+                            break;
+                        }
+                    case STRING:
+                        try {
+                            File dir = new File(System.getProperty("java.io.tmpdir") + File.separator + System.currentTimeMillis() + File.separator);
+                            dir.mkdirs();
+                            File fastaFile = new File(dir.getAbsolutePath() + File.separator + "sequence.fas");
+                            BufferedWriter buffer = new BufferedWriter(new FileWriter(fastaFile));
+                            buffer.write(">seq");
+                            buffer.newLine();
+                            buffer.write(structureSource.mappingSource.sequence);
+                            buffer.newLine();
+                            buffer.close();
+
+                            DataSource dataSource = projectController.importDataSourceFromFile(fastaFile, new DataType(DataType.Primary.ALIGNMENT, DataType.FileFormat.FASTA));
+                            dataSource.title = structureSource.title;
+                            if (dataSource instanceof Alignment) {
+                                addNucleotideCompositionSource(NucleotideCompositionPanel.getNucleotideSource((Alignment) dataSource));
+                            }
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
+                }
+            }
             structureSources.addElement(structureSource);
             refreshMappings();
         }
@@ -105,10 +148,9 @@ public class StructureVisController implements Serializable {
         nucleotideSources.addElement(nucleotideComposition);
         refreshMappings();
     }
-    
-    public Mapping getMapping(MappingSource a, MappingSource b)
-    {
-        return getMapping(a,b,1);
+
+    public Mapping getMapping(MappingSource a, MappingSource b) {
+        return getMapping(a, b, 1);
     }
 
     public Mapping getMapping(MappingSource a, MappingSource b, int select) {
@@ -152,12 +194,13 @@ public class StructureVisController implements Serializable {
         }
 
 
-        System.out.println("Mapping");
-        System.out.println((a.sequenceSource == null) + "\t" + (a.sequence == null));
-        System.out.println((b.sequenceSource == null) + "\t" + (b.sequence == null));
-        System.out.println(sequencesA);
-        System.out.println(sequencesB);
-        System.out.println("----------");
+        /*
+         * System.out.println("Mapping"); System.out.println((a.sequenceSource
+         * == null) + "\t" + (a.sequence == null));
+         * System.out.println((b.sequenceSource == null) + "\t" + (b.sequence ==
+         * null)); System.out.println(sequencesA);
+         * System.out.println(sequencesB); System.out.println("----------");
+         */
 
         Mapping mapping = Mapping.createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, select);
         mappings.put(new Pair(a, b), mapping);
@@ -175,6 +218,33 @@ public class StructureVisController implements Serializable {
         structureVisDataSources2DPersistent = Collections.list(structureVisDataOverlays2D.elements());
         annotationSourcesPersistent = Collections.list(annotationSources.elements());
         nucleotideSourcesPersistent = Collections.list(nucleotideSources.elements());
+
+
+        System.out.println(substructureModel.overlayNavigatorTreeModel.getTreeModelListeners().length);
+        ArrayList<TreeModelListener> treeListenersList = new ArrayList<>();
+        TreeModelListener[] overlayTreeListeners = substructureModel.overlayNavigatorTreeModel.getTreeModelListeners();
+        for (int i = 0; i < overlayTreeListeners.length; i++) {
+            treeListenersList.add(overlayTreeListeners[i]);
+            substructureModel.overlayNavigatorTreeModel.removeTreeModelListener(overlayTreeListeners[i]);
+        }
+
+        TreeModelListener[] navigatorTreeListeners = projectModel.navigatorTreeModel.getTreeModelListeners();
+        for (int i = 0; i < navigatorTreeListeners.length; i++) {
+            //treeListenersList.add(navigatorTreeListeners[i]);
+            projectModel.navigatorTreeModel.removeTreeModelListener(navigatorTreeListeners[i]);
+        }
+
+        /*
+         * TreeModelListener[] projectTreeListneers =
+         * substructureModel.overlayNavigatorTreeModel.getTreeModelListeners();
+         * for (int i = 0; i < projectTreeListneers.length; i++) { //
+         * treeListenersList.add(projectTreeListneers[i]);
+         * substructureModel.overlayNavigatorTreeModel.removeTreeModelListener(projectTreeListneers[i]);
+        }
+         */
+
+        System.out.println(substructureModel.overlayNavigatorTreeModel.getTreeModelListeners().length);
+
         try {
             ObjectOutput out = new ObjectOutputStream(new FileOutputStream(outFile));
             out.writeObject(this);
@@ -182,6 +252,12 @@ public class StructureVisController implements Serializable {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+
+        // re-add the listeners, this is only necessary if the application stays open
+        for (int i = 0; i < overlayTreeListeners.length; i++) {
+            substructureModel.overlayNavigatorTreeModel.addTreeModelListener(treeListenersList.get(i));
+        }
+        System.out.println(substructureModel.overlayNavigatorTreeModel.getTreeModelListeners().length);
         System.out.println("StructureVis project saved");
     }
 
@@ -193,7 +269,6 @@ public class StructureVisController implements Serializable {
             ret.structureSources.addElement(s);
         }
         ret.structureSourcesPersistent = null;
-
 
         ret.structureVisDataOverlays1D = new DefaultListModel<>();
         for (DataOverlay1D s : ret.structureVisDataSources1DPersistent) {
@@ -221,7 +296,7 @@ public class StructureVisController implements Serializable {
 
         ret.substructureModel.initialise();
         in.close();
-        
+
         System.out.println("StructureVis project loaded");
         return ret;
     }

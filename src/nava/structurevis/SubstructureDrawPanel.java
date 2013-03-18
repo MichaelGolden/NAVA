@@ -227,31 +227,27 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
      * openStructure(structure); }
      */
     public void openSubstructure(Substructure s) {
-        model.structure = s;
-        if (model.structure.length < 500) {
-            model.structureDistanceMatrix = new DistanceMatrix(model.structure.pairedSites);
+
+        if (s == null) {
+            this.noStructure = true;
+            repaint();
         } else {
-            model.structureDistanceMatrix = null;
+            this.noStructure = false;
+            model.structure = s;
+            if (model.structure.length < 500) {
+                model.structureDistanceMatrix = new DistanceMatrix(model.structure.pairedSites);
+            } else {
+                model.structureDistanceMatrix = null;
+            }
+
+            if (showDNA) {
+                dnaMenuItem.setSelected(true);
+            } else {
+                rnaMenuItem.setSelected(true);
+            }
+
+            computeAndDraw();
         }
-
-//        mainapp.genomeLegend1.setSelectedRegion(s.startPosition - 1, s.getEndPosition() - 1);
-
-        if (showDNA) {
-            dnaMenuItem.setSelected(true);
-        } else {
-            rnaMenuItem.setSelected(true);
-        }
-
-        System.out.println("Drawing");
-
-        computeAndDraw();
-
-        /*
-         * if (saveStructures) { try { Thread.sleep(200); } catch
-         * (InterruptedException ex) {
-         * Logger.getLogger(StructureDrawPanel.class.getName()).log(Level.SEVERE,
-         * null, ex); } mainapp.callNext(); }
-         */
     }
 
     /*
@@ -1175,20 +1171,23 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
      * double f = Math.exp((Math.log10(pval) - Math.log10(maxPval)) * scale);
      * return f; }
      */
+    boolean noStructure = false;
 
-    /*
-     * public static Color getColorForDsValue(double ds) { float x =
-     * (float)Math.max(Math.min(ds/2, 1), 0); return
-     * mainapp.data1D.colorGradient.getColor(x); }
-     */
     @Override
     public void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
         Graphics2D g = (Graphics2D) graphics;
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+        if (noStructure) {
+            g.setColor(Color.white);
+            g.fillRect(0, 0, getWidth(), getHeight());
+            return;
+        }
+
         int panelWidth = (int) ((maxx - minx) * horizontalScale + xoffset * 2);
         int panelHeight = (int) ((maxy - miny) * verticalScale + 100);
+
         if (repaint) {
             repaint = false;
             currentDrawType = drawComplexStructure();

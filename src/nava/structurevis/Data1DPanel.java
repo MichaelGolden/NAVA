@@ -132,8 +132,8 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
         this.headerCheckButton.addItemListener(this);
         this.codonCheckButton.addItemListener(this);
 
-        populateDataSourceComboBox(Collections.list(projectModel.dataSources.elements()));
-        populateMappingSourceComboBox(Collections.list(projectModel.dataSources.elements()));
+        populateDataSourceComboBox(projectModel.dataSources.getArrayListShallowCopy());
+        populateMappingSourceComboBox(projectModel.dataSources.getArrayListShallowCopy());
         previewPanel.add(previewTable, BorderLayout.CENTER);
 
         this.mappingHelpLabel.setToolTipText(Utils.plainTextToHtml(Utils.wrapText(MainFrame.resources.getString("mappingSourceHelpText"), 60)));

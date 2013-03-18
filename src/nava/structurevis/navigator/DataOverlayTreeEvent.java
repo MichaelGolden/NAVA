@@ -5,7 +5,6 @@
 package nava.structurevis.navigator;
 
 import java.util.ArrayList;
-import nava.data.types.DataSource;
 import nava.structurevis.data.Overlay;
 
 /**

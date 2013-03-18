@@ -18,6 +18,7 @@ import nava.structurevis.data.MappingSource;
 import nava.structurevis.data.StructureSource;
 import nava.structurevis.data.StructureSource.MappingSourceOption;
 import nava.ui.MainFrame;
+import nava.ui.ProjectController;
 import nava.ui.ProjectModel;
 
 /**
@@ -26,6 +27,7 @@ import nava.ui.ProjectModel;
  */
 public class StructureDataPanel extends javax.swing.JPanel implements ChangeListener, ItemListener {
 
+    ProjectController projectController;
     ProjectModel projectModel;
     DefaultComboBoxModel<SecondaryStructure> structureComboBoxModel = new DefaultComboBoxModel<>();
     DefaultComboBoxModel<Alignment> alignmentComboBoxModel = new DefaultComboBoxModel<>();
@@ -36,9 +38,11 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
     /**
      * Creates new form StructureDataPanel
      */
-    public StructureDataPanel(ProjectModel projectModel) {
+    public StructureDataPanel(ProjectController projectController) {
         initComponents();
-        this.projectModel = projectModel;
+        
+        this.projectController = projectController;
+        this.projectModel = projectController.projectModel;
 
         this.structureComboBox.setModel(structureComboBoxModel);
         this.structureComboBox.addItemListener(this);
@@ -51,8 +55,8 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
         this.maxSpinner.setModel(this.maxSpinnerModel);
         this.maxSpinner.addChangeListener(this);
 
-        populateStructureComboBox(Collections.list(projectModel.dataSources.elements()));
-        populateAlignmentComboBox(Collections.list(projectModel.dataSources.elements()));
+        populateStructureComboBox(projectModel.dataSources.getArrayListShallowCopy());
+        populateAlignmentComboBox(projectModel.dataSources.getArrayListShallowCopy());
     }
 
     public void populateStructureComboBox(List<DataSource> dataSources) {
@@ -98,13 +102,13 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
         jButton2 = new javax.swing.JButton();
         fromSequenceRadioButton = new javax.swing.JRadioButton();
         sequenceTextField = new javax.swing.JTextField();
+        addMappingAlignmentAsOverlayCheckBox = new javax.swing.JCheckBox();
         jPanel2 = new javax.swing.JPanel();
         minSpinner = new javax.swing.JSpinner();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         maxSpinner = new javax.swing.JSpinner();
         jCheckBox1 = new javax.swing.JCheckBox();
-        jButton3 = new javax.swing.JButton();
         jRadioButton1 = new javax.swing.JRadioButton();
         jRadioButton2 = new javax.swing.JRadioButton();
         linearRadioButton = new javax.swing.JRadioButton();
@@ -118,12 +122,13 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
         jLabel3.setText("or");
 
         jButton1.setText("Add structure from file");
+        jButton1.setEnabled(false);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Choose a mapping alignment"));
 
         mappingGroup.add(embeddSequenceRadioButton);
         embeddSequenceRadioButton.setSelected(true);
-        embeddSequenceRadioButton.setText("Use embedded sequence");
+        embeddSequenceRadioButton.setText("Use embedded sequence alignment or sequence");
 
         mappingGroup.add(fromAlignmentRadioButton);
         fromAlignmentRadioButton.setText("From alignment");
@@ -140,9 +145,13 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
         jLabel5.setText("or");
 
         jButton2.setText("Add alignment from file");
+        jButton2.setEnabled(false);
 
         mappingGroup.add(fromSequenceRadioButton);
-        fromSequenceRadioButton.setText("From sequence string");
+        fromSequenceRadioButton.setText("From sequence string (ctrl-v to paste here)");
+
+        addMappingAlignmentAsOverlayCheckBox.setSelected(true);
+        addMappingAlignmentAsOverlayCheckBox.setText("Add this mapping alignment as a nucleotide overlay (recommended)");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -154,9 +163,11 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
                     .addComponent(fromSequenceRadioButton)
                     .addComponent(fromAlignmentRadioButton)
                     .addComponent(embeddSequenceRadioButton)
+                    .addComponent(addMappingAlignmentAsOverlayCheckBox)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(21, 21, 21)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(sequenceTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 386, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jLabel4)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -164,8 +175,7 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jLabel5)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jButton2))
-                            .addComponent(sequenceTextField))))
+                                .addComponent(jButton2)))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -181,10 +191,12 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
                     .addComponent(alignmentComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5)
                     .addComponent(jButton2))
-                .addGap(12, 12, 12)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(fromSequenceRadioButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(sequenceTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(10, 10, 10)
+                .addComponent(addMappingAlignmentAsOverlayCheckBox)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -195,8 +207,6 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
         jLabel7.setText("Max. substructure length");
 
         jCheckBox1.setText("Force substructures to be non-overlapping");
-
-        jButton3.setText("Test settings");
 
         substructureGroup.add(jRadioButton1);
         jRadioButton1.setSelected(true);
@@ -215,10 +225,7 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGap(21, 21, 21)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(jCheckBox1)
-                                .addGap(18, 18, 18)
-                                .addComponent(jButton3))
+                            .addComponent(jCheckBox1)
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addComponent(jLabel6)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -234,7 +241,7 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jRadioButton1)
                 .addGap(6, 6, 6)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -243,12 +250,9 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
                     .addComponent(jLabel7)
                     .addComponent(maxSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jCheckBox1)
-                    .addComponent(jButton3))
+                .addComponent(jCheckBox1)
                 .addGap(18, 18, 18)
-                .addComponent(jRadioButton2)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jRadioButton2))
         );
 
         conformationGroup.add(linearRadioButton);
@@ -308,8 +312,8 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
                     .addComponent(circularRadioButton))
                 .addGap(8, 8, 8)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -318,6 +322,7 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
         // TODO add your handling code here:
     }//GEN-LAST:event_fromAlignmentRadioButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox addMappingAlignmentAsOverlayCheckBox;
     private javax.swing.JComboBox alignmentComboBox;
     private javax.swing.JRadioButton circularRadioButton;
     private javax.swing.ButtonGroup conformationGroup;
@@ -326,7 +331,6 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
     private javax.swing.JRadioButton fromSequenceRadioButton;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -370,10 +374,13 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
         if (this.embeddSequenceRadioButton.isSelected()) {
             mappingSource = new MappingSource(data.sequence);
         } else if (this.fromAlignmentRadioButton.isSelected()) {
-            mappingSource = new MappingSource((Alignment) alignmentComboBox.getSelectedItem());
+            Alignment alignment = (Alignment) alignmentComboBox.getSelectedItem();
+            mappingSource = new MappingSource(alignment);
         } else if (this.fromSequenceRadioButton.isSelected()) {
             mappingSource = new MappingSource(sequenceTextField.getText());
         }
+        
+        
         structureSource = new StructureSource(structure, mappingSource);
         structureSource.minStructureSize = (Integer) this.minSpinnerModel.getValue();
         structureSource.maxStructureSize = (Integer) this.maxSpinnerModel.getValue();
@@ -386,6 +393,8 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
         } else if (this.fromSequenceRadioButton.isSelected()) {
             structureSource.mappingSourceOption = MappingSourceOption.STRING;
         }
+        
+        structureSource.addMappingSourceAsNucleotideOverlay = addMappingAlignmentAsOverlayCheckBox.isSelected();
 
         if (this.circularRadioButton.isSelected()) {
             structureSource.circular = true;

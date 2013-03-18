@@ -7,6 +7,7 @@ package nava.ui;
 //import nava.data.types.DataSource;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -28,10 +29,11 @@ import nava.tasks.applications.ApplicationOutput;
  */
 public class ProjectController implements ListDataListener {
 
-    ArrayList<ProjectView> projectViews = new ArrayList<ProjectView>();
+    public transient ArrayList<ProjectView> projectViews = new ArrayList<>();
     public ProjectModel projectModel;
 
     public ProjectController() {
+      projectViews = new ArrayList<>();
         /*
          * this.projectModel = projectModel;
          *
@@ -39,7 +41,7 @@ public class ProjectController implements ListDataListener {
          */
     }
 
-    public void importDataSourceFromFile(File dataFile, DataType dataType) {
+    public DataSource importDataSourceFromFile(File dataFile, DataType dataType) {
         Path sourcePath = Paths.get(dataFile.getAbsolutePath());
 
         DataSource dataSource = null;
@@ -165,6 +167,7 @@ public class ProjectController implements ListDataListener {
         }
 
         projectModel.dataSources.addElement(dataSource);
+        return dataSource;
     }
 
     public void importDataSourceFromOutputFile(ApplicationOutput outputFile) {
@@ -276,6 +279,7 @@ public class ProjectController implements ListDataListener {
             projectModel.navigatorTreeModel.removeTreeModelListener(treeListeners[i]);
         }
 
+        System.out.println("X"+ projectModel.navigatorTreeModel.getTreeModelListeners().length);
         projectModel.saveProject(projectModel.getProjectPath().resolve(Paths.get("project.data")).toFile());
 
         // re-add the listeners, this is only necessary if the application stays open

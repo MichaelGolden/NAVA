@@ -26,7 +26,7 @@ public class NucleotideCompositionPanel extends javax.swing.JPanel {
     ProjectModel projectModel;
     DefaultComboBoxModel<Alignment> nucleotideAlignmentComboBoxModel = new DefaultComboBoxModel<>();
     Alignment selectedAlignment;
-    
+
     /**
      * Creates new form NucleotideCompositionPanel
      */
@@ -35,8 +35,8 @@ public class NucleotideCompositionPanel extends javax.swing.JPanel {
         this.projectModel = projectModel;
 
         this.nucleotideAlignmentComboBox.setModel(nucleotideAlignmentComboBoxModel);
-        
-        populateNucleotideAlignmentComboBox(Collections.list(projectModel.dataSources.elements()));
+
+        populateNucleotideAlignmentComboBox(projectModel.dataSources.getArrayListShallowCopy());
     }
 
     public void populateNucleotideAlignmentComboBox(List<DataSource> dataSources) {
@@ -52,21 +52,22 @@ public class NucleotideCompositionPanel extends javax.swing.JPanel {
             }
         }
     }
-    
-    public void setNucleotideSource(NucleotideComposition nucleotideComposition)
-    {
+
+    public void setNucleotideSource(NucleotideComposition nucleotideComposition) {
         this.nucleotideAlignmentComboBoxModel.setSelectedItem(nucleotideComposition.alignment);
     }
 
-    public NucleotideComposition getNucleotideSource() {
-        selectedAlignment = (Alignment) nucleotideAlignmentComboBoxModel.getSelectedItem();
-        if(selectedAlignment != null)
-        {
-            NucleotideComposition nuc = new NucleotideComposition(selectedAlignment);
-            nuc.title = selectedAlignment.title;
+    public static NucleotideComposition getNucleotideSource(Alignment alignment) {
+        if (alignment != null) {
+            NucleotideComposition nuc = new NucleotideComposition(alignment);
+            nuc.title = alignment.title;
             return nuc;
         }
         return null;
+    }
+
+    public NucleotideComposition getNucleotideSource() {
+        return getNucleotideSource((Alignment) nucleotideAlignmentComboBoxModel.getSelectedItem());
     }
 
     /**
@@ -126,6 +127,4 @@ public class NucleotideCompositionPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JComboBox nucleotideAlignmentComboBox;
     // End of variables declaration//GEN-END:variables
-
-
 }

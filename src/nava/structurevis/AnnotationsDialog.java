@@ -83,14 +83,14 @@ public class AnnotationsDialog extends javax.swing.JDialog {
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
         AnnotationSource annotationSource = annotationsPanel.getAnnotationsSource();
         //structureVisController.addAnnotationsSource(annotationSource);
-        if (structureVisController.substructureModel.getAnnotationSource() == null) {
+        if (structureVisController.structureVisModel.substructureModel.getAnnotationSource() == null) {
             structureVisController.addAnnotationsSource(annotationSource);
-            structureVisController.substructureModel.setAnnotationSource(annotationSource);
+            structureVisController.structureVisModel.substructureModel.setAnnotationSource(annotationSource);
         } else {
             //structureVisController.addAnnotationsSource(annotationSource);
             //structureVisController.substructureModel.setAnnotationSource(annotationSource);
-            structureVisController.substructureModel.getAnnotationSource().addAnnotations(annotationSource);
-            structureVisController.substructureModel.setAnnotationSource( structureVisController.substructureModel.getAnnotationSource());
+            structureVisController.structureVisModel.substructureModel.getAnnotationSource().addAnnotations(annotationSource);
+            structureVisController.structureVisModel.substructureModel.setAnnotationSource( structureVisController.structureVisModel.substructureModel.getAnnotationSource());
         }
 
         this.dispose();

@@ -22,11 +22,21 @@ import nava.ui.navigator.NavigationListener;
 public class SafeListModel<T> implements ListModel, Serializable {
 
     ArrayList<T> data = new ArrayList<>();
-    transient EventListenerList listenerList;
+    transient EventListenerList listenerList = new EventListenerList();
+    
+    public SafeListModel()
+    {
+        listenerList = new EventListenerList();
+    }
     
     public T get(int index)
     {
         return data.get(index);
+    }
+    
+    public boolean contains(T element)
+    {
+        return data.contains(element);
     }
 
     public void add(int index, T element) {
@@ -62,10 +72,18 @@ public class SafeListModel<T> implements ListModel, Serializable {
     
     public ArrayList<T> getArrayListShallowCopy()
     {
-        return (ArrayList<T>)data.clone();
+        ArrayList<T> newList = new ArrayList<>();
+        for(T elem : data){
+            newList.add(elem);
+        }
+        System.out.println("getArrayListShallowCopy()"+newList.size());
+        return newList;
     }
     
-    protected EventListenerList listeners = new EventListenerList();
+    public int size()
+    {
+        return data.size();
+    }
 
     @Override
     public int getSize() {
@@ -79,16 +97,20 @@ public class SafeListModel<T> implements ListModel, Serializable {
 
     @Override
     public void addListDataListener(ListDataListener l) {
-        listeners.add(ListDataListener.class, l);
+        if(listenerList == null)
+        {
+            listenerList = new EventListenerList();
+        }
+        listenerList.add(ListDataListener.class, l);
     }
 
     @Override
     public void removeListDataListener(ListDataListener l) {
-        listeners.remove(ListDataListener.class, l);
+        listenerList.remove(ListDataListener.class, l);
     }
 
     public void fireListDataEvent(Object source, int type, int index0, int index1) {
-        Object[] listeners = this.listeners.getListenerList();
+        Object[] listeners = this.listenerList.getListenerList();
         // Each listener occupies two elements - the first is the listener class
         // and the second is the listener instance
         for (int i = 0; i < listeners.length; i += 2) {

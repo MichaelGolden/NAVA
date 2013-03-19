@@ -52,7 +52,17 @@ public class TaskManager extends Thread {
             @Override
             public void run() {
                 task.setStatus(Status.RUNNING);
-                task.task();
+                try
+                {
+                    task.task();
+                }
+                catch(Exception ex)
+                {
+                    ex.printStackTrace();
+                    //System.out.println("CONSOLE STATUS"+task.consoleErrorBuffer);
+                    task.combinedBuffer.bufferedWrite("Finished with error:\n"+ex.getMessage(), task.taskInstanceId, "standard_err");
+                    task.setStatus(Status.FINISHED);
+                }
                 if(task instanceof Application)
                 {                    
                     Application app = (Application) task;
@@ -66,8 +76,6 @@ public class TaskManager extends Thread {
                         List<ApplicationOutput> outputFiles = app.getOutputFiles();
                         for(ApplicationOutput outputFile : outputFiles)
                         {
-                            System.out.println("importing "+outputFile.dataSource.title);
-                            System.out.println("importing "+outputFile.file);
                             projectController.importDataSourceFromOutputFile(outputFile);
                         }
                     }
@@ -90,6 +98,10 @@ public class TaskManager extends Thread {
             uiTaskQueue.remove((UITask) task);
         }
         generalTaskQueue.remove(task);
+        
+        usedSlots -= task.slotUsage;
+        availableSlots = totalSlots - usedSlots;
+        
     }
 
     public void queueTask(Task task) {
@@ -124,6 +136,7 @@ public class TaskManager extends Thread {
     @Override
     public void run() {
         while (true) {
+            
             if (availableSlots > 0 && uiTaskQueue.size() > 0) {
                 UITask task = uiTaskQueue.removeFirst();
                 runTask(task);

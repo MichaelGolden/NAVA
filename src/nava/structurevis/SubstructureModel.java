@@ -43,16 +43,17 @@ public class SubstructureModel implements Serializable {
     double thresholdMax1D;
     double thresholdMin2D;
     double thresholdMax2D;
-    StructureVisController structureVisController;
-    public DataOverlayTreeModel overlayNavigatorTreeModel = null;
+    transient StructureVisController structureVisController;
+    public DataOverlayTreeModel overlayNavigatorTreeModel;
 
     public SubstructureModel(StructureVisController structureVisController) {
         this.structureVisController = structureVisController;
     }
     protected transient EventListenerList listeners = new EventListenerList();
 
-    public void initialise() {
+    public void initialise(StructureVisController structureVisController) {
         listeners = new EventListenerList();
+        this.structureVisController = structureVisController;
     }
 
     public void loadData() {
@@ -77,11 +78,11 @@ public class SubstructureModel implements Serializable {
         }
 
         // set selection state
-        for (int i = 0; i < structureVisController.structureVisDataOverlays1D.size(); i++) {
-            if (structureVisController.structureVisDataOverlays1D.get(i).equals(data1D)) {
-                structureVisController.structureVisDataOverlays1D.get(i).setState(Overlay.OverlayState.PRIMARY_SELECTED);
+        for (int i = 0; i < structureVisController.structureVisModel.structureVisDataOverlays1D.size(); i++) {
+            if (structureVisController.structureVisModel.structureVisDataOverlays1D.get(i).equals(data1D)) {
+                structureVisController.structureVisModel.structureVisDataOverlays1D.get(i).setState(Overlay.OverlayState.PRIMARY_SELECTED);
             } else {
-                structureVisController.structureVisDataOverlays1D.get(i).setState(Overlay.OverlayState.UNSELECTED);
+                structureVisController.structureVisModel.structureVisDataOverlays1D.get(i).setState(Overlay.OverlayState.UNSELECTED);
             }
         }
         fireDataSource1DChanged(dataSource1D);
@@ -97,11 +98,11 @@ public class SubstructureModel implements Serializable {
         }
 
         // set selection state
-        for (int i = 0; i < structureVisController.structureVisDataOverlays2D.size(); i++) {
-            if (structureVisController.structureVisDataOverlays2D.get(i).equals(data2D)) {
-                structureVisController.structureVisDataOverlays2D.get(i).setState(Overlay.OverlayState.PRIMARY_SELECTED);
+        for (int i = 0; i < structureVisController.structureVisModel.structureVisDataOverlays2D.size(); i++) {
+            if (structureVisController.structureVisModel.structureVisDataOverlays2D.get(i).equals(data2D)) {
+                structureVisController.structureVisModel.structureVisDataOverlays2D.get(i).setState(Overlay.OverlayState.PRIMARY_SELECTED);
             } else {
-                structureVisController.structureVisDataOverlays2D.get(i).setState(Overlay.OverlayState.UNSELECTED);
+                structureVisController.structureVisModel.structureVisDataOverlays2D.get(i).setState(Overlay.OverlayState.UNSELECTED);
             }
         }
         fireDataSource2DChanged(dataSource2D);
@@ -126,11 +127,11 @@ public class SubstructureModel implements Serializable {
             }
         }
 
-        for (int i = 0; i < structureVisController.structureSources.size(); i++) {
-            if (structureVisController.structureSources.get(i).equals(structureSource)) {
-                structureVisController.structureSources.get(i).setState(Overlay.OverlayState.PRIMARY_SELECTED);
+        for (int i = 0; i < structureVisController.structureVisModel.structureSources.size(); i++) {
+            if (structureVisController.structureVisModel.structureSources.get(i).equals(structureSource)) {
+                structureVisController.structureVisModel.structureSources.get(i).setState(Overlay.OverlayState.PRIMARY_SELECTED);
             } else {
-                structureVisController.structureSources.get(i).setState(Overlay.OverlayState.UNSELECTED);
+                structureVisController.structureVisModel.structureSources.get(i).setState(Overlay.OverlayState.UNSELECTED);
             }
         }
         fireStructureSourceChanged(structureSource);
@@ -141,11 +142,11 @@ public class SubstructureModel implements Serializable {
         if (nucleotideSource != null && nucleotideSource.mappingSource != null && structureSource != null) {
             nucleotideMapping = structureVisController.getMapping(nucleotideSource.mappingSource, structureSource.mappingSource);
         }
-        for (int i = 0; i < structureVisController.nucleotideSources.size(); i++) {
-            if (structureVisController.nucleotideSources.get(i).equals(nucleotideSource)) {
-                structureVisController.nucleotideSources.get(i).setState(Overlay.OverlayState.PRIMARY_SELECTED);
+        for (int i = 0; i < structureVisController.structureVisModel.nucleotideSources.size(); i++) {
+            if (structureVisController.structureVisModel.nucleotideSources.get(i).equals(nucleotideSource)) {
+                structureVisController.structureVisModel.nucleotideSources.get(i).setState(Overlay.OverlayState.PRIMARY_SELECTED);
             } else {
-                structureVisController.nucleotideSources.get(i).setState(Overlay.OverlayState.UNSELECTED);
+                structureVisController.structureVisModel.nucleotideSources.get(i).setState(Overlay.OverlayState.UNSELECTED);
             }
         }
         fireNucleotideSourceChanged(nucleotideSource);

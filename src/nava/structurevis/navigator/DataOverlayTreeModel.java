@@ -14,14 +14,17 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import nava.data.types.DataSource;
 import nava.structurevis.StructureVisController;
+import nava.structurevis.StructureVisModel;
+import nava.structurevis.StructureVisView;
 import nava.structurevis.data.*;
 import nava.ui.ProjectView;
+import nava.utils.SafeListModel;
 
 /**
  *
  * @author Michael
  */
-public class DataOverlayTreeModel extends DefaultTreeModel implements Serializable, ProjectView, ListDataListener {
+public class DataOverlayTreeModel extends DefaultTreeModel implements Serializable, ProjectView, StructureVisView {
     //DefaultMutableTreeNode origDataNode = null;
     //DefaultMutableTreeNode dataNode = null;
 
@@ -29,12 +32,14 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
     DefaultMutableTreeNode twoDimensionalData = null;
     DefaultMutableTreeNode nucleotideData = null;
     DefaultMutableTreeNode structureData = null;
-    StructureVisController structureVisController;
+    StructureVisModel structureVisModel;
+    transient StructureVisController structureVisController;
     //ProjectModel projectModel;
 
     public DataOverlayTreeModel(DefaultMutableTreeNode root, StructureVisController structureVisController) {
         super(root);
         this.structureVisController = structureVisController;
+        this.structureVisModel = structureVisController.structureVisModel;
         //this.projectModel = projectModel;
 
         //origDataNode = NavigatorTreeNode.createFolderNode("Original data sources");
@@ -55,26 +60,28 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
         structureData = DataOverlayTreeNode.createFolderNode("Structures");
         root.add(structureData);
 
-        for (int i = 0; i < structureVisController.structureVisDataOverlays1D.size(); i++) {
-            oneDimensionalData.add(new DataOverlayTreeNode(structureVisController.structureVisDataOverlays1D.get(i)));
+        for (int i = 0; i < structureVisModel.structureVisDataOverlays1D.size(); i++) {
+            oneDimensionalData.add(new DataOverlayTreeNode(structureVisModel.structureVisDataOverlays1D.get(i)));
         }
-        for (int i = 0; i < structureVisController.structureVisDataOverlays2D.size(); i++) {
-            twoDimensionalData.add(new DataOverlayTreeNode(structureVisController.structureVisDataOverlays2D.get(i)));
+        for (int i = 0; i < structureVisModel.structureVisDataOverlays2D.size(); i++) {
+            twoDimensionalData.add(new DataOverlayTreeNode(structureVisModel.structureVisDataOverlays2D.get(i)));
         }
-        for (int i = 0; i < structureVisController.nucleotideSources.size(); i++) {
-            nucleotideData.add(new DataOverlayTreeNode(structureVisController.nucleotideSources.get(i)));
+        for (int i = 0; i < structureVisModel.nucleotideSources.size(); i++) {
+            nucleotideData.add(new DataOverlayTreeNode(structureVisModel.nucleotideSources.get(i)));
         }
-        for (int i = 0; i < structureVisController.structureSources.size(); i++) {
-            System.out.println(i + "[]\t" + structureVisController.structureSources.get(i).title);
-            structureData.add(new DataOverlayTreeNode(structureVisController.structureSources.get(i)));
+        for (int i = 0; i < structureVisModel.structureSources.size(); i++) {
+            System.out.println(i + "[]\t" + structureVisModel.structureSources.get(i).title);
+            structureData.add(new DataOverlayTreeNode(structureVisModel.structureSources.get(i)));
         }
+    }
 
+    /*
+    public void addListDataListeners() {
         structureVisController.structureVisDataOverlays1D.addListDataListener(this);
         structureVisController.structureVisDataOverlays2D.addListDataListener(this);
         structureVisController.nucleotideSources.addListDataListener(this);
         structureVisController.structureSources.addListDataListener(this);
-
-    }
+    }*/
 
     public DataOverlayTreeNode findNode(DataSource dataSource) {
         Enumeration<DefaultMutableTreeNode> en = ((DefaultMutableTreeNode) getRoot()).breadthFirstEnumeration();
@@ -92,11 +99,11 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
 
     public void addDataOverlay(Overlay dataOverlay) {
         if (dataOverlay instanceof DataOverlay1D) {
-             insertNodeInto(new DataOverlayTreeNode(dataOverlay), oneDimensionalData, oneDimensionalData.getChildCount());
+            insertNodeInto(new DataOverlayTreeNode(dataOverlay), oneDimensionalData, oneDimensionalData.getChildCount());
         }
 
         if (dataOverlay instanceof DataOverlay2D) {
-            insertNodeInto(new DataOverlayTreeNode(dataOverlay), twoDimensionalData, twoDimensionalData.getChildCount());            
+            insertNodeInto(new DataOverlayTreeNode(dataOverlay), twoDimensionalData, twoDimensionalData.getChildCount());
         }
 
         if (dataOverlay instanceof NucleotideComposition) {
@@ -156,11 +163,12 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
         //throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    /*
     @Override
     public void intervalAdded(ListDataEvent e) {
         System.out.println("StructureVis source added");
         for (int i = e.getIndex0(); i < e.getIndex1() + 1; i++) {
-            addDataOverlay(((DefaultListModel<Overlay>)e.getSource()).get(i));
+            addDataOverlay(((SafeListModel<Overlay>) e.getSource()).get(i));
         }
     }
 
@@ -170,5 +178,20 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
 
     @Override
     public void contentsChanged(ListDataEvent e) {
+    }*/
+
+    @Override
+    public void dataOverlayAdded(Overlay overlay) {
+        addDataOverlay(overlay);
+    }
+
+    @Override
+    public void dataOverlayRemoved(Overlay overlay) {
+        //throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void dataOverlayChanged(Overlay overlay) {
+       // throw new UnsupportedOperationException("Not supported yet.");
     }
 }

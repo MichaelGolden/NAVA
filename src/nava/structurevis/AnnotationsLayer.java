@@ -141,11 +141,12 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
     };
 
     public void setAnnotationData(AnnotationSource annotationData, boolean map) {
-
-        if (map) {
-            MainFrame.taskManager.queueUITask(new AnnotationMappingTask(annotationData, structureVisController.substructureModel.structureSource, structureVisController, this));
-        } else {
-            setAnnotationData(annotationData);
+        if (annotationData != null) {
+            if (map) {
+                MainFrame.taskManager.queueUITask(new AnnotationMappingTask(annotationData, structureVisController.structureVisModel.substructureModel.structureSource, structureVisController, this));
+            } else {
+                setAnnotationData(annotationData);
+            }
         }
     }
     boolean showLoading = true;

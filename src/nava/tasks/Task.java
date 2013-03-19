@@ -19,14 +19,17 @@ public abstract class Task<T> {
     public static ConsoleDatabase consoleDatabase = new ConsoleDatabase();
     protected String taskInstanceId;
     TaskManager taskManager;
-    public ConsoleBuffer combinedBuffer;
+    
+    
+    public ConsoleBuffer combinedBuffer; // the actively used buffer
+    
+    // these buffered used if combined buffer not available
     public ConsoleBuffer consoleInputBuffer;
     public ConsoleBuffer consoleErrorBuffer;
 
     public Task() {
         taskInstanceCount++;
         taskInstanceId = taskRuntimeID + "_" + taskInstanceCount + "";
-
 
         combinedBuffer = new ConsoleBuffer(consoleDatabase, taskInstanceId, null);
     }

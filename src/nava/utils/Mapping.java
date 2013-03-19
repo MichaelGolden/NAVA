@@ -371,7 +371,12 @@ public class Mapping implements Serializable {
 
         Mapping mapping = createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, select, false, "mappingforward.fas");
         Mapping reverseMapping = createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, select, true, "mappingreverse.fas");
-
+        
+        if(mapping == null || reverseMapping == null)
+        {
+            return null;
+        }
+        
         double m1 = 0;
         double t1 = 0;
         for (int i = 0; i < mapping.alignedA0.length(); i++) {
@@ -398,6 +403,11 @@ public class Mapping implements Serializable {
     }
 
     public static Mapping getMappingFromAlignedStrings(String alignedA0, String alignedB0, boolean bReversedComplemented) {
+        if(alignedA0 == null || alignedB0 == null)
+        {
+            return null;
+        }
+        
         if (alignedA0.length() != alignedB0.length()) {
             throw new Error("Aligned sequences are not of equal length.");
         }

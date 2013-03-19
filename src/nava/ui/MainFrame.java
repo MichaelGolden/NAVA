@@ -186,9 +186,9 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
     public void windowClosing(WindowEvent e) {
         projectController.saveProject();
         
-        if(structureVisPanel.structureVisController.structureVisModelFile != null)
+        if(structureVisPanel.structureVisController.structureVisModel.structureVisModelFile != null)
         {
-            structureVisPanel.structureVisController.saveStructureVisModel(structureVisPanel.structureVisController.structureVisModelFile);
+            structureVisPanel.structureVisController.structureVisModel.saveStructureVisModel(structureVisPanel.structureVisController.structureVisModel.structureVisModelFile);
         }
     }
 

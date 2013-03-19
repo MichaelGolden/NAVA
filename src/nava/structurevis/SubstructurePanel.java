@@ -31,7 +31,7 @@ import nava.utils.CustomItem;
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class SubstructurePanel extends javax.swing.JPanel implements ChangeListener, ItemListener, ListDataListener, SubstructureModelListener {
+public class SubstructurePanel extends javax.swing.JPanel implements ChangeListener, ItemListener, ListDataListener, SubstructureModelListener, StructureVisView {
 
     DefaultComboBoxModel<StructureSource> structureComboBoxModel = new DefaultComboBoxModel<>();
     DefaultComboBoxModel<CustomItem> substructureComboBoxModel = new DefaultComboBoxModel<>();
@@ -49,8 +49,8 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         this.structureVisController = structureVisController;
         this.projectController = projectController;
 
-        structureDrawPanel = new SubstructureDrawPanel(structureVisController.substructureModel);
-        structureVisController.substructureModel.addSubstructureModelListener(this);
+        structureDrawPanel = new SubstructureDrawPanel(structureVisController.structureVisModel.substructureModel);
+        structureVisController.structureVisModel.substructureModel.addSubstructureModelListener(this);
         topScrollPane.setViewportView(structureDrawPanel);
 
         structureComboBox.setModel(structureComboBoxModel);
@@ -59,7 +59,8 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         substructureComboBox.setModel(substructureComboBoxModel);
         substructureComboBox.addItemListener(this);
 
-        structureVisController.structureSources.addListDataListener(this);
+        structureVisController.addView(this);
+//        structureVisController.structureSources.addListDataListener(this);
 
         treePanel.add(new DataOverlayTreePanel(projectController,structureVisController), BorderLayout.CENTER);
 
@@ -89,7 +90,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
      */
     public void populateSubtructureComboBox() {
         substructureComboBoxModel.removeAllElements();
-        ArrayList<Substructure> list = structureVisController.substructureModel.getSubstructures();
+        ArrayList<Substructure> list = structureVisController.structureVisModel.substructureModel.getSubstructures();
         for (int i = 0; i < list.size(); i++) {
             CustomItem<Substructure> item = new CustomItem<>(list.get(i), i + "");
             substructureComboBoxModel.addElement(item);
@@ -250,7 +251,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
             StructureSource structureSource = (StructureSource) structureComboBox.getSelectedItem();
 
             if (structureSource != null && structureSource.mappingSource != null) {
-                structureVisController.substructureModel.setStructureSource(structureSource);
+                structureVisController.structureVisModel.substructureModel.setStructureSource(structureSource);
             }
 
             /*
@@ -274,7 +275,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
 
     public void populateStructureSourceComboBox() {
         structureComboBoxModel.removeAllElements();
-        ArrayList<StructureSource> list = Collections.list(structureVisController.structureSources.elements());
+        ArrayList<StructureSource> list = structureVisController.structureVisModel.structureSources.getArrayListShallowCopy();
         for (int i = 0; i < list.size(); i++) {
             //ComboBoxItem<StructureSource> item = new ComboBoxItem<>(list.get(i), list.get(i).structure.toString());
             structureComboBoxModel.addElement(list.get(i));
@@ -283,17 +284,17 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
 
     @Override
     public void intervalAdded(ListDataEvent e) {
-        populateStructureSourceComboBox();
+        //populateStructureSourceComboBox();
     }
 
     @Override
     public void intervalRemoved(ListDataEvent e) {
-        populateStructureSourceComboBox();
+       // populateStructureSourceComboBox();
     }
 
     @Override
     public void contentsChanged(ListDataEvent e) {
-        populateStructureSourceComboBox();
+       // populateStructureSourceComboBox();
     }
 
     @Override
@@ -361,5 +362,20 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
             structureDrawPanel.model.useUpperThreshold2D = !dataLegend2D.upSliderOpen;
             structureDrawPanel.redraw();
         }
+    }
+
+    @Override
+    public void dataOverlayAdded(Overlay overlay) {
+        populateStructureSourceComboBox();
+    }
+
+    @Override
+    public void dataOverlayRemoved(Overlay overlay) {
+        //throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void dataOverlayChanged(Overlay overlay) {
+        //throw new UnsupportedOperationException("Not supported yet.");
     }
 }

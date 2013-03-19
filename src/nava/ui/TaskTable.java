@@ -62,9 +62,6 @@ public class TaskTable extends JPanel implements TaskListener {
         add(scrollPane);
 
         taskManager.addTaskListener(this);
-
-        taskManager.queueTask(new TestTask());
-        taskManager.queueTask(new TestTask());
     }
 
     @Override

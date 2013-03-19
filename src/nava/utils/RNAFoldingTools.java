@@ -82,7 +82,7 @@ public class RNAFoldingTools {
         return getPosteriorDecodingConsensusStructure(getDoubleMatrix(basePairProb));
     }
 
-    public static int[] getPosteriorDecodingConsensusStructure(double[][] basePairProb) {
+    public static int[] getPosteriorDecodingConsensusStructure(double[][] basePairProb){
         double[] singleBaseProb = new double[basePairProb.length];
         for (int i = 0; i < basePairProb.length; i++) {
             singleBaseProb[i] = 1;
@@ -90,6 +90,9 @@ public class RNAFoldingTools {
                 singleBaseProb[i] -= basePairProb[i][j];
             }
         }
+        
+     //   Double.parseDouble("ssfafa_C");
+        
         return getPosteriorDecodingConsensusStructure(basePairProb, singleBaseProb);
     }
 
@@ -104,6 +107,7 @@ public class RNAFoldingTools {
      * then (i+1) is unpaired.
      */
     public static int[] getPosteriorDecodingConsensusStructure(double[][] basePairProb, double[] singleBaseProb) {
+        System.out.println("MxM"+basePairProb.length+"\t"+basePairProb[0].length);
         double[][] eMatrix = new double[basePairProb.length][basePairProb[0].length];
         for (int i = 0; i < eMatrix.length; i++) {
             for (int j = 0; j < eMatrix.length; j++) {

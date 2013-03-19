@@ -50,17 +50,17 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         System.out.println(structureVisModelFile.exists());
         if (structureVisModelFile.exists()) {
             try {
-                this.structureVisController = StructureVisController.loadProject(structureVisModelFile);
+                this.structureVisController = new StructureVisController(projectController, projectController.projectModel, projectController.projectModel.getProjectPath().toFile());
+                this.structureVisController.structureVisModel = StructureVisModel.loadProject(structureVisModelFile, structureVisController);
 
             } catch (Exception ex) {
-                this.structureVisController = new StructureVisController(projectController, projectController.projectModel, projectController.projectModel.getProjectPath().toFile());
-                System.out.println("AHADA1");
+                this.structureVisController = new StructureVisController(projectController, projectController.projectModel, projectController.projectModel.getProjectPath().toFile());               
                 ex.printStackTrace();
-                System.out.println("AHADA2");
                 // TODO - handle this better.
             }
         } else {
             this.structureVisController = new StructureVisController(projectController, projectController.projectModel, projectController.projectModel.getProjectPath().toFile());
+            this.structureVisController.structureVisModel.initialise(structureVisController);
         }
         this.projectController = projectController;
 
@@ -93,12 +93,12 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
 
         substructurePanel.refresh();
 
-        if (structureVisController.substructureModel.getAnnotationSource() == null) {
+        if (structureVisController.structureVisModel.substructureModel.getAnnotationSource() == null) {
             try {
                 AnnotationSource annotationData = AnnotationSource.stackFeatures(AnnotationSource.readAnnotations(new File("examples/annotations/refseq.gb")));
 
-                structureVisController.substructureModel.setAnnotationSource(annotationData);
-                annotationsLayerRight.setAnnotationData(structureVisController.substructureModel.getAnnotationSource(), true);
+                structureVisController.structureVisModel.substructureModel.setAnnotationSource(annotationData);
+                annotationsLayerRight.setAnnotationData(structureVisController.structureVisModel.substructureModel.getAnnotationSource(), true);
                 layerPanel.updatePanel();
             } catch (BioException ex) {
                 Logger.getLogger(StructureVisPanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -106,15 +106,15 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
                 Logger.getLogger(StructureVisPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else {
-            annotationsLayerRight.setAnnotationData(structureVisController.substructureModel.getAnnotationSource(), true);
+            annotationsLayerRight.setAnnotationData(structureVisController.structureVisModel.substructureModel.getAnnotationSource(), true);
             layerPanel.updatePanel();
         }
-        structureVisController.substructureModel.addSubstructureModelListener(this);
+        structureVisController.structureVisModel.substructureModel.addSubstructureModelListener(this);
     }
 
     public void populateDataSource1DComboBox() {
         data1DComboBoxModel.removeAllElements();
-        ArrayList<DataOverlay1D> list = Collections.list(structureVisController.structureVisDataOverlays1D.elements());
+        ArrayList<DataOverlay1D> list = structureVisController.structureVisModel.structureVisDataOverlays1D.getArrayListShallowCopy();
         for (int i = 0; i < list.size(); i++) {
             //ComboBoxItem<Substructure> item = new ComboBoxItem<>(list.get(i), i + "");
             data1DComboBoxModel.addElement(list.get(i));
@@ -123,7 +123,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
 
     public void populateDataSource2DComboBox() {
         data1DComboBoxModel.removeAllElements();
-        ArrayList<DataOverlay2D> list = Collections.list(structureVisController.structureVisDataOverlays2D.elements());
+        ArrayList<DataOverlay2D> list = structureVisController.structureVisModel.structureVisDataOverlays2D.getArrayListShallowCopy();
         for (int i = 0; i < list.size(); i++) {
             //ComboBoxItem<Substructure> item = new ComboBoxItem<>(list.get(i), i + "");
             data2DComboBoxModel.addElement(list.get(i));
@@ -132,7 +132,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
 
     public void populateNucleotideComboBox() {
         nucleotideComboBoxModel.removeAllElements();
-        ArrayList<NucleotideComposition> list = Collections.list(structureVisController.nucleotideSources.elements());
+        ArrayList<NucleotideComposition> list = structureVisController.structureVisModel.nucleotideSources.getArrayListShallowCopy();
         for (int i = 0; i < list.size(); i++) {
             nucleotideComboBoxModel.addElement(list.get(i));
         }
@@ -280,8 +280,8 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
 
     @Override
     public void structureSourceChanged(StructureSource structureSource) {
-        if (structureVisController.substructureModel != null && structureVisController.substructureModel.getAnnotationSource() != null) {
-            annotationsLayerRight.setAnnotationData(structureVisController.substructureModel.getAnnotationSource(), true);
+        if (structureVisController.structureVisModel.substructureModel != null && structureVisController.structureVisModel.substructureModel.getAnnotationSource() != null) {
+            annotationsLayerRight.setAnnotationData(structureVisController.structureVisModel.substructureModel.getAnnotationSource(), true);
         }
     }
 

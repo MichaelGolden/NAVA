@@ -37,10 +37,7 @@ public class NavigatorPanel extends javax.swing.JPanel implements TreeSelectionL
         {
             projectController.projectModel.navigatorTreeModel = new NavigatorTreeModel(root, projectController.projectModel);
         }
-        else
-        {
-            
-        }
+        
         projectController.projectModel.navigatorTreeModel.addTreeModelListener(this);
         projectController.addView(projectController.projectModel.navigatorTreeModel);
         

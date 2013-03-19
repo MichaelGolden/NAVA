@@ -49,18 +49,16 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
         this.projectController = projectController;
         this.structureVisController = structureVisController;
 
-
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode();
-        if (structureVisController.substructureModel.overlayNavigatorTreeModel == null) {
-            structureVisController.substructureModel.overlayNavigatorTreeModel = new DataOverlayTreeModel(root, structureVisController);
-        } else {
+        if (structureVisController.structureVisModel.substructureModel.overlayNavigatorTreeModel == null) {
+            structureVisController.structureVisModel.substructureModel.overlayNavigatorTreeModel = new DataOverlayTreeModel(new DefaultMutableTreeNode(), structureVisController);
         }
         
-        structureVisController.substructureModel.overlayNavigatorTreeModel.addTreeModelListener(this);
+        System.out.println("Adding tree listenr"+structureVisController.structureVisModel.substructureModel.overlayNavigatorTreeModel);
+        structureVisController.structureVisModel.substructureModel.overlayNavigatorTreeModel.addTreeModelListener(this);
 
         DataOverlayTreeRenderer navigatorRenderer = new DataOverlayTreeRenderer();
         navigationTree.setRootVisible(false);
-        navigationTree.setModel(structureVisController.substructureModel.overlayNavigatorTreeModel);
+        navigationTree.setModel(structureVisController.structureVisModel.substructureModel.overlayNavigatorTreeModel);
         navigationTree.setCellRenderer(navigatorRenderer);
         navigationTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         navigationTree.addTreeSelectionListener(this);
@@ -219,33 +217,33 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
 
             if (overlay instanceof DataOverlay1D) {
                 if (overlay.getState() == Overlay.OverlayState.PRIMARY_SELECTED) {
-                    structureVisController.substructureModel.setDataSource1D(null);
+                    structureVisController.structureVisModel.substructureModel.setDataSource1D(null);
                 } else {
-                    structureVisController.substructureModel.setDataSource1D((DataOverlay1D) overlay);
+                    structureVisController.structureVisModel.substructureModel.setDataSource1D((DataOverlay1D) overlay);
                 }
             } else if (overlay instanceof DataOverlay2D) {
                 if (overlay.getState() == Overlay.OverlayState.PRIMARY_SELECTED) {
-                    structureVisController.substructureModel.setDataSource2D(null);
+                    structureVisController.structureVisModel.substructureModel.setDataSource2D(null);
                 } else {
-                    structureVisController.substructureModel.setDataSource2D((DataOverlay2D) overlay);
+                    structureVisController.structureVisModel.substructureModel.setDataSource2D((DataOverlay2D) overlay);
                 }
             } else if (overlay instanceof NucleotideComposition) {
                 if (overlay.getState() == Overlay.OverlayState.PRIMARY_SELECTED) {
-                    structureVisController.substructureModel.setNucleotideSource(null);
+                    structureVisController.structureVisModel.substructureModel.setNucleotideSource(null);
                 } else {
-                    structureVisController.substructureModel.setNucleotideSource((NucleotideComposition) overlay);
+                    structureVisController.structureVisModel.substructureModel.setNucleotideSource((NucleotideComposition) overlay);
                 }
             } else if (overlay instanceof StructureSource) {
                 if (overlay.getState() == Overlay.OverlayState.PRIMARY_SELECTED) {
-                    structureVisController.substructureModel.setStructureSource(null);
+                    structureVisController.structureVisModel.substructureModel.setStructureSource(null);
                 } else {
-                    structureVisController.substructureModel.setStructureSource((StructureSource) overlay);
+                    structureVisController.structureVisModel.substructureModel.setStructureSource((StructureSource) overlay);
                 }
 
             }
 
             // update node icons on tree
-            structureVisController.substructureModel.overlayNavigatorTreeModel.valueForPathChanged(navigationTree.getSelectionPath(), overlay);
+            structureVisController.structureVisModel.substructureModel.overlayNavigatorTreeModel.valueForPathChanged(navigationTree.getSelectionPath(), overlay);
         } else if (e.getSource().equals(editItem)) {
             Overlay overlay = ((DataOverlayTreeNode) navigationTree.getSelectionPath().getLastPathComponent()).overlay;
 
@@ -263,7 +261,7 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
             }
 
             // update node icons on tree
-            structureVisController.substructureModel.overlayNavigatorTreeModel.valueForPathChanged(navigationTree.getSelectionPath(), overlay);
+            structureVisController.structureVisModel.substructureModel.overlayNavigatorTreeModel.valueForPathChanged(navigationTree.getSelectionPath(), overlay);
         }
     }
 }

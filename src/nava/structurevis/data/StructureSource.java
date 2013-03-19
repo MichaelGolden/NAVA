@@ -40,7 +40,6 @@ public class StructureSource extends Overlay implements Serializable {
         this.structure = structure;
         this.mappingSource = mappingSource;
         this.title = structure.title;
-        System.out.println("SecondaryStructure.title"+this.title);
     }
     
     public void loadData ()
@@ -175,5 +174,11 @@ public class StructureSource extends Overlay implements Serializable {
     @Override
     public Icon getIcon() {
         return new ImageIcon(ClassLoader.getSystemResource("resources/icons/structure-16x16.png"));
+    }
+    
+    public String details()
+    {
+        String ret =  "details:"+mappingSource.mappingType+" - " +structure.getObject(MainFrame.dataSourceCache).sequence+"";
+        return ret;
     }
 }

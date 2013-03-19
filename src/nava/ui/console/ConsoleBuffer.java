@@ -122,7 +122,11 @@ public class ConsoleBuffer extends Thread {
     
     public void bufferedWrite(String line, String className, String typeName)
     {
-        bufferedWrite(line, className, typeName, false);
+        String [] split = line.split("\n");
+        for(String s : split)
+        {
+            bufferedWrite(s, className, typeName, false);
+        }
     }
 
     

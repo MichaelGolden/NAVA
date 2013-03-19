@@ -59,7 +59,7 @@ public class PosteriorDecodingApplication extends Application {
             }
             catch(Exception ex)
             {
-                this.consoleErrorBuffer.bufferedWrite("An error occured:\n"+ex.getMessage(), taskInstanceId, "standard_err");
+                this.combinedBuffer.bufferedWrite("An error occured:\n"+ex.getMessage(), taskInstanceId, "standard_err");
             }
             System.out.println("Started decoding");
             RNAFoldingTools.getPosteriorDecodingConsensusStructure(matrixData.matrix);

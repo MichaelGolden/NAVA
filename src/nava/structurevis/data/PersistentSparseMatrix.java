@@ -63,7 +63,7 @@ public class PersistentSparseMatrix implements Serializable {
         this.n = rowCounts.length;
         this.m = 0;
         for (int i = 0; i < maxColIndexInRow.length; i++) {
-            m = Math.max(m, maxColIndexInRow[i]);
+            m = Math.max(m, maxColIndexInRow[i]+1);
         }
     }
     
@@ -445,6 +445,8 @@ public class PersistentSparseMatrix implements Serializable {
             }
         }
         
+        System.out.println("CREATING PERSISTENT FROM COORDINATE LIST"+maxRowIndex);
+        
         DataOutputStream outBuffer = new DataOutputStream(new FileOutputStream(tempFile));
         outBuffer.writeDouble(DEFAULT_EMPTY_VALUE); // write empty value
         outBuffer.writeInt(maxRowIndex); // write max rows
@@ -453,6 +455,7 @@ public class PersistentSparseMatrix implements Serializable {
         for (int i = 0; i < rowCounts.length; i++) {
             outBuffer.writeInt(rowCounts[i]);
             outBuffer.writeInt(maxColIndexInRow[i]);
+             System.out.println("CREATING PERSISTENT FROM COORDINATE LIST maxcol "+i+"  -  "+maxColIndexInRow[i]);
         }
         outBuffer.close();
         

@@ -12,6 +12,7 @@ import nava.data.types.Alignment;
 import nava.data.types.Matrix;
 import nava.data.types.TabularField;
 import nava.ui.MainFrame;
+import nava.ui.ProjectModel;
 import nava.utils.ColorGradient;
 import nava.utils.Mapping;
 import nava.utils.Utils;
@@ -46,7 +47,7 @@ public class DataOverlay2D extends Overlay implements Serializable {
     MatrixRegion matrixRegion = MatrixRegion.FULL;
     
     public void loadData() {
-        dataMatrix = matrix.getObject(MainFrame.dataSourceCache);
+        dataMatrix = matrix.getObject(ProjectModel.path,MainFrame.dataSourceCache);
         if(dataMatrix != null)
         {
             emptyValue = dataMatrix.getEmptyValue();

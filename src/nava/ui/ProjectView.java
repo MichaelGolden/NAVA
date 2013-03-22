@@ -13,6 +13,7 @@ import javax.swing.event.ListDataEvent;
  */
 public interface ProjectView 
 {
+    public void projectModelChanged(ProjectModel newProjectModel);
     public void dataSourcesLoaded();
     
     public void dataSourcesIntervalAdded(ListDataEvent e);

@@ -15,12 +15,14 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import nava.ui.ProjectController;
+import nava.ui.ProjectModel;
+import nava.ui.ProjectView;
 
 /**
  *
  * @author Michael
  */
-public class NavigatorPanel extends javax.swing.JPanel implements TreeSelectionListener, TreeModelListener {
+public class NavigatorPanel extends javax.swing.JPanel implements TreeSelectionListener, TreeModelListener, ProjectView  {
 
     ProjectController projectController;   
     /**
@@ -35,11 +37,12 @@ public class NavigatorPanel extends javax.swing.JPanel implements TreeSelectionL
         DefaultMutableTreeNode root = new DefaultMutableTreeNode();
         if(projectController.projectModel.navigatorTreeModel == null)
         {
-            projectController.projectModel.navigatorTreeModel = new NavigatorTreeModel(root, projectController.projectModel);
+            projectController.projectModel.navigatorTreeModel = new NavigatorTreeModel(root, this.projectController.projectModel);
         }
         
+        projectController.addView(projectController.projectModel.navigatorTreeModel);        
+        projectController.addView(this);        
         projectController.projectModel.navigatorTreeModel.addTreeModelListener(this);
-        projectController.addView(projectController.projectModel.navigatorTreeModel);
         
         NavigatorTreeRenderer navigatorRenderer = new NavigatorTreeRenderer();
         navigationTree.setRootVisible(false);
@@ -146,5 +149,33 @@ public class NavigatorPanel extends javax.swing.JPanel implements TreeSelectionL
     @Override
     public void treeStructureChanged(TreeModelEvent e) {
         //throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void projectModelChanged(ProjectModel newProjectModel) {
+        this.navigationTree.setModel(projectController.projectModel.navigatorTreeModel);
+        newProjectModel.navigatorTreeModel.addTreeModelListener(this);
+        System.out.println("PROJECTMODELCHNGED");
+        System.out.println(newProjectModel.navigatorTreeModel.getChildCount(newProjectModel.navigatorTreeModel.getRoot()));
+    }
+
+    @Override
+    public void dataSourcesLoaded() {
+        
+    }
+
+    @Override
+    public void dataSourcesIntervalAdded(ListDataEvent e) {        
+        
+    }
+
+    @Override
+    public void dataSourcesIntervalRemoved(ListDataEvent e) {
+        
+    }
+
+    @Override
+    public void dataSourcesContentsChanged(ListDataEvent e) {
+        
     }
 }

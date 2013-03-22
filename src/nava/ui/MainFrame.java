@@ -20,6 +20,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import nava.tasks.applications.ApplicationController;
 import nava.data.types.DataSourceCache;
+import nava.structurevis.StructureVisModel;
 import nava.structurevis.StructureVisPanel;
 import nava.tasks.TaskManager;
 import nava.ui.navigator.NavigatorPanel;
@@ -33,21 +34,17 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
     public static PropertyResourceBundle resources = (PropertyResourceBundle) ResourceBundle.getBundle("resources.text.text");
     public static TaskManager taskManager;
     public static DataSourceCache dataSourceCache = new DataSourceCache();
-    
     ProjectController projectController;
     ApplicationController appController;
     NavigatorPanel navigatorPanel;
     //ApplicationPanel applicationPanel;
-    
     public static Font fontLiberationSans = new Font("Sans", Font.PLAIN, 12);
     public static Font fontDroidSansMono = new Font("Sans", Font.PLAIN, 12);
-    
     StructureVisPanel structureVisPanel;
-    
     public static JFileChooser browseDialog = new JFileChooser();
-    
-    public void startup()
-    {        
+    public JFileChooser projectDialog = new JFileChooser();
+
+    public void startup() {
         try {
             fontLiberationSans = Font.createFont(Font.PLAIN, ClassLoader.getSystemResourceAsStream("resources/fonts/LiberationSans-Regular.ttf")).deriveFont(12.0f);
             fontDroidSansMono = Font.createFont(Font.PLAIN, ClassLoader.getSystemResourceAsStream("resources/fonts/DroidSansMono.ttf")).deriveFont(12.0f);
@@ -66,7 +63,7 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
         startup();
 
         ProjectModel model = new ProjectModel();
-        File projectFile = new File("workspace/test_project/project.data");
+        File projectFile = new File("workspace/test_project_open/project.data");
         if (projectFile.exists()) {
             try {
                 model = ProjectModel.loadProject(projectFile);
@@ -76,18 +73,21 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
                 Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
+
         projectController = new ProjectController();
-        projectController.openProject(model);    
-        taskManager =  new TaskManager(projectController);
+        projectController.openProject(model);
+        taskManager = new TaskManager(projectController);
         appController = new ApplicationController(MainFrame.taskManager);
-        
+
         DataPanel dataPanel = new DataPanel(projectController, appController);
         jPanel1.add(dataPanel, BorderLayout.CENTER);
         structureVisPanel = new StructureVisPanel(projectController);
         jPanel2.add(structureVisPanel, BorderLayout.CENTER);
-        
-        
+
+        //projectDialog.setFileFilter(new ProjectFileFilter());
+        projectDialog.setFileView(new ProjectFileView());
+        projectDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
         this.setIconImage(new ImageIcon(ClassLoader.getSystemResource("resources/icons/icon-32x32.png")).getImage());
         this.addWindowListener(this);
     }
@@ -104,6 +104,13 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
+        jMenu2 = new javax.swing.JMenu();
+        jMenu3 = new javax.swing.JMenu();
+        jMenuItem3 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Nucleic Acid Visualisation and Analysis");
@@ -124,12 +131,56 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
 
         getContentPane().add(jTabbedPane1, java.awt.BorderLayout.CENTER);
 
+        jMenu1.setText("File");
+
+        jMenuItem1.setText("Open project");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem1);
+
+        jMenuItem2.setText("Exit");
+        jMenu1.add(jMenuItem2);
+
+        jMenuBar1.add(jMenu1);
+
+        jMenu2.setText("Edit");
+        jMenuBar1.add(jMenu2);
+
+        jMenu3.setText("Help");
+
+        jMenuItem3.setText("About");
+        jMenu3.add(jMenuItem3);
+
+        jMenuBar1.add(jMenu3);
+
+        setJMenuBar(jMenuBar1);
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         projectController.saveProject();
     }//GEN-LAST:event_formWindowClosing
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        int ret = projectDialog.showOpenDialog(this);
+        if (ret == JFileChooser.APPROVE_OPTION) {
+            File projectFile = new File(projectDialog.getSelectedFile().getAbsoluteFile() + File.separator + "project.data");
+            try {
+                projectController.openProject(ProjectModel.loadProject(projectFile));
+                System.out.println("OPENING PROJECT");
+                File structureVisModelFile = new File(projectDialog.getSelectedFile().getAbsolutePath() + File.separatorChar + "structurevis.model");
+                structureVisPanel.structureVisController.openStructureVisModel(StructureVisModel.loadProject(structureVisModelFile, structureVisPanel.structureVisController));
+            } catch (IOException ex) {
+                Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -173,6 +224,13 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JTabbedPane jTabbedPane1;
@@ -185,11 +243,9 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
     @Override
     public void windowClosing(WindowEvent e) {
         projectController.saveProject();
-        
-        if(structureVisPanel.structureVisController.structureVisModel.structureVisModelFile != null)
-        {
-            structureVisPanel.structureVisController.structureVisModel.saveStructureVisModel(structureVisPanel.structureVisController.structureVisModel.structureVisModelFile);
-        }
+
+
+        structureVisPanel.structureVisController.structureVisModel.saveStructureVisModel(new File(structureVisPanel.structureVisController.structureVisModel.getStructureVisModelPathString(structureVisPanel.structureVisController)));
     }
 
     @Override

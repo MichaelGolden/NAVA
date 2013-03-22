@@ -34,17 +34,17 @@ public class Tabular extends DataSource {
     }
 
     @Override
-    public Object getObject() {
+    public Object getObject(String projectDir) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
         
     @Override
-    public Object getObject(DataSourceCache cache) {
+    public Object getObject(String projectDir, DataSourceCache cache) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public void persistObject(Object object) {
+    public void persistObject(String projectDir, Object object) {
         //ExcelIO.saveAsCSV(this.originalDataSourcePath, originalFile);
         // TODO
     }

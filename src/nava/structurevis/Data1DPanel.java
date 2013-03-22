@@ -176,7 +176,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
     public void updateLegend() {
         if (selectedField != null) {
             if (!selectedField.equals(dataLoadedForField)) {
-                values = (ArrayList<Double>) selectedField.getObject(MainFrame.dataSourceCache).getNumericValues();
+                values = (ArrayList<Double>) selectedField.getObject(projectModel.getProjectPathString(),MainFrame.dataSourceCache).getNumericValues();
                 dataLoadedForField = selectedField;
             }
 
@@ -644,8 +644,8 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
 
     private void restMinMaxButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_restMinMaxButtonActionPerformed
         if (selectedField != null) {
-            this.dataMinField.setValue(selectedField.getMinimum());
-            this.dataMaxField.setValue(selectedField.getMaximum());
+            this.dataMinField.setValue(selectedField.getMinimum(projectModel.getProjectPathString()));
+            this.dataMaxField.setValue(selectedField.getMaximum(projectModel.getProjectPathString()));
             this.update();
         }
     }//GEN-LAST:event_restMinMaxButtonActionPerformed
@@ -717,8 +717,8 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
             TabularField field = (TabularField) dataFieldComboBox.getSelectedItem();
             if (field != null) {
                 this.dataTitleField.setText(field.getTitle());
-                this.dataMinField.setValue(field.getMinimum());
-                this.dataMaxField.setValue(field.getMaximum());
+                this.dataMinField.setValue(field.getMinimum(projectModel.getProjectPathString()));
+                this.dataMaxField.setValue(field.getMaximum(projectModel.getProjectPathString()));
                 this.selectedField = field;
             }
         } else if (e.getSource().equals(this.naturalRadioButton) || e.getSource().equals(this.fromFieldRadioButton)) {

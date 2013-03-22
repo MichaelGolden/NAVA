@@ -35,19 +35,21 @@ public class Annotations extends DataSource {
     }
 
     @Override
-    public Object getObject() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public Object getObject(String projectDir) {
+        //throw new UnsupportedOperationException("Not supported yet.");
+        return null;
     }
 
     @Override
-    public Object getObject(DataSourceCache cache) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public Object getObject(String projectDir, DataSourceCache cache) {
+        //throw new UnsupportedOperationException("Not supported yet.");
+        return null;
     }
 
     @Override
-    public void persistObject(Object object) {
+    public void persistObject(String projectDir, Object object) {
         try {
-            Files.copy(Paths.get(originalFile.getAbsolutePath()), Paths.get(importedDataSourcePath));
+            Files.copy(Paths.get(originalFile.getAbsolutePath()), Paths.get(getImportedDataSourcePath(projectDir)));
         } catch (IOException ex) {
             Logger.getLogger(Annotations.class.getName()).log(Level.SEVERE, null, ex);
         }

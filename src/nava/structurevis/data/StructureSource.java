@@ -12,6 +12,7 @@ import javax.swing.ImageIcon;
 import nava.data.types.SecondaryStructure;
 import nava.data.types.SecondaryStructureData;
 import nava.ui.MainFrame;
+import nava.ui.ProjectModel;
 
 /**
  *
@@ -44,7 +45,7 @@ public class StructureSource extends Overlay implements Serializable {
     
     public void loadData ()
     {
-        this.data = structure.getObject(MainFrame.dataSourceCache);
+        this.data = structure.getObject(ProjectModel.path,MainFrame.dataSourceCache);
         this.pairedSites = this.data.pairedSites;
     }
     
@@ -178,7 +179,7 @@ public class StructureSource extends Overlay implements Serializable {
     
     public String details()
     {
-        String ret =  "details:"+mappingSource.mappingType+" - " +structure.getObject(MainFrame.dataSourceCache).sequence+"";
+        String ret =  "details:"+mappingSource.mappingType+" - " +structure.getObject(ProjectModel.path,MainFrame.dataSourceCache).sequence+"";
         return ret;
     }
 }

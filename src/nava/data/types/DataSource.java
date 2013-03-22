@@ -82,6 +82,16 @@ public abstract class DataSource implements Serializable
         return title;
     }
     
+    public String getOriginalDataSourcePath(String projectDir)
+    {
+        return projectDir+File.separator+originalDataSourcePath;
+    }
+    
+     public String getImportedDataSourcePath(String projectDir)
+    {
+        return projectDir+File.separator+importedDataSourcePath;
+    }
+    
     
     @Override
     public String toString()
@@ -91,8 +101,9 @@ public abstract class DataSource implements Serializable
     
     public abstract Icon getIcon();
     public abstract<T extends DataSource> ArrayList<T> getChildren();
-    public abstract Object getObject();
-    public abstract Object getObject(DataSourceCache cache);
-    public abstract void persistObject(Object object);
+    public abstract Object getObject(String projectDir);
+    public abstract Object getObject(String projectDir, DataSourceCache cache);
+    public abstract void persistObject(String projectDir, Object object);
     public abstract String getTypeName();
+    
 }

@@ -13,6 +13,7 @@ import nava.data.types.Tabular;
 import nava.data.types.TabularData;
 import nava.data.types.TabularField;
 import nava.ui.MainFrame;
+import nava.ui.ProjectModel;
 import nava.utils.ColorGradient;
 import nava.utils.Utils;
 
@@ -43,7 +44,7 @@ public class DataOverlay1D extends Overlay implements Serializable {
     public int dataOffsetCorrected = 0;
 
     public void loadData() {
-        ArrayList<String> values = dataField.getObject(MainFrame.dataSourceCache).values;
+        ArrayList<String> values = dataField.getObject(ProjectModel.path,MainFrame.dataSourceCache).values;
 
         dataOffsetCorrected = dataOffset;
         if (codonPositions) {
@@ -90,7 +91,7 @@ public class DataOverlay1D extends Overlay implements Serializable {
             }
         } else {
             if (positionField != null) {
-                ArrayList<String> positionValues = positionField.getObject(MainFrame.dataSourceCache).values;
+                ArrayList<String> positionValues = positionField.getObject(ProjectModel.path,MainFrame.dataSourceCache).values;
                 ArrayList<Integer> positions = new ArrayList<>();
                 int length = 0;
                 for (int i = 0; i < positionValues.size(); i++) {

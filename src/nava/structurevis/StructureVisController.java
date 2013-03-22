@@ -30,24 +30,35 @@ import nava.utils.SafeListModel;
 public class StructureVisController implements ListDataListener {
 
     public StructureVisModel structureVisModel;
-   
     transient ProjectController projectController;
     transient ProjectModel projectModel;
+    
 
-    public StructureVisController(ProjectController projectController, ProjectModel projectModel, File workingDirectory) {
+    public StructureVisController(ProjectController projectController, ProjectModel projectModel) {
         this.projectController = projectController;
         this.projectModel = projectModel;
         
-        structureVisModel = new StructureVisModel();
+        openStructureVisModel(new StructureVisModel());
+    }
+
+    public void openStructureVisModel(StructureVisModel structureVisModel) {
+        this.structureVisModel = structureVisModel;
         structureVisModel.substructureModel = new SubstructureModel(this);
-        structureVisModel.structureVisModelFile = new File(workingDirectory.getAbsolutePath() + File.separatorChar + "structurevis.model");
+        //structureVisModel.structureVisModelFile = new File(getWorkingDirectory().getAbsolutePath() + File.separatorChar + "structurevis.model");
 
         structureVisModel.substructureModel.loadData();
+        
     }
+    
+    public File getWorkingDirectory()
+    {
+        return projectController.projectModel.getProjectPath().toFile();
+    }
+    
     ArrayList<StructureVisView> structureVisViews = new ArrayList<>();
 
     public void addView(StructureVisView view) {
-        System.out.println("addView:"+view);
+        System.out.println("addView:" + view);
         structureVisViews.add(view);
     }
 
@@ -183,11 +194,11 @@ public class StructureVisController implements ListDataListener {
         int maxSequencesToLoad = Math.max(Mapping.select, 100); // to ensure fast loading limit the number of sequences to be loaded
 
         if (a.alignmentSource != null) {
-            IO.loadFastaSequences(Paths.get(a.alignmentSource.importedDataSourcePath).toFile(), sequencesA, sequencesNamesA, maxSequencesToLoad);
+            IO.loadFastaSequences(Paths.get(a.alignmentSource.getImportedDataSourcePath(projectModel.getProjectPathString())).toFile(), sequencesA, sequencesNamesA, maxSequencesToLoad);
         }
 
         if (b.alignmentSource != null) {
-            IO.loadFastaSequences(Paths.get(b.alignmentSource.importedDataSourcePath).toFile(), sequencesB, sequencesNamesB, maxSequencesToLoad);
+            IO.loadFastaSequences(Paths.get(b.alignmentSource.getImportedDataSourcePath(projectModel.getProjectPathString())).toFile(), sequencesB, sequencesNamesB, maxSequencesToLoad);
         }
 
         if (a.sequence != null) {
@@ -210,8 +221,7 @@ public class StructureVisController implements ListDataListener {
          */
 
         Mapping mapping = Mapping.createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, select);
-        if(mapping != null)
-        {
+        if (mapping != null) {
             structureVisModel.mappings.put(new Pair(a, b), mapping);
         }
         return mapping;
@@ -230,12 +240,12 @@ public class StructureVisController implements ListDataListener {
         //nucleotideSourcesPersistent = Collections.list(nucleotideSources.elements());
 
 
-        System.out.println(structureVisModel.substructureModel.overlayNavigatorTreeModel.getTreeModelListeners().length);
+        System.out.println(structureVisModel.overlayNavigatorTreeModel.getTreeModelListeners().length);
         ArrayList<TreeModelListener> treeListenersList = new ArrayList<>();
-        TreeModelListener[] overlayTreeListeners = structureVisModel.substructureModel.overlayNavigatorTreeModel.getTreeModelListeners();
+        TreeModelListener[] overlayTreeListeners = structureVisModel.overlayNavigatorTreeModel.getTreeModelListeners();
         for (int i = 0; i < overlayTreeListeners.length; i++) {
             treeListenersList.add(overlayTreeListeners[i]);
-            structureVisModel.substructureModel.overlayNavigatorTreeModel.removeTreeModelListener(overlayTreeListeners[i]);
+            structureVisModel.overlayNavigatorTreeModel.removeTreeModelListener(overlayTreeListeners[i]);
         }
 
         TreeModelListener[] navigatorTreeListeners = projectModel.navigatorTreeModel.getTreeModelListeners();
@@ -253,7 +263,7 @@ public class StructureVisController implements ListDataListener {
          * }
          */
 
-        System.out.println(structureVisModel.substructureModel.overlayNavigatorTreeModel.getTreeModelListeners().length);
+        System.out.println(structureVisModel.overlayNavigatorTreeModel.getTreeModelListeners().length);
 
         try {
             ObjectOutput out = new ObjectOutputStream(new FileOutputStream(outFile));
@@ -265,10 +275,8 @@ public class StructureVisController implements ListDataListener {
 
         // re-add the listeners, this is only necessary if the application stays open
         for (int i = 0; i < overlayTreeListeners.length; i++) {
-            structureVisModel.substructureModel.overlayNavigatorTreeModel.addTreeModelListener(treeListenersList.get(i));
+            structureVisModel.overlayNavigatorTreeModel.addTreeModelListener(treeListenersList.get(i));
         }
-        System.out.println(structureVisModel.substructureModel.overlayNavigatorTreeModel.getTreeModelListeners().length);
-        System.out.println("StructureVis project saved");
     }
 
     public static StructureVisController loadProject2(File inFile, ProjectController projectController) throws IOException, ClassNotFoundException {
@@ -316,17 +324,12 @@ public class StructureVisController implements ListDataListener {
 
     @Override
     public void intervalAdded(ListDataEvent e) {
-        System.out.println("intervalAdded 1 " + e.getSource());
         if (e.getSource() instanceof SafeListModel) {
             SafeListModel list = (SafeListModel) e.getSource();
-            System.out.println("intervalAdded 2");
             for (int i = 0; i < structureVisViews.size(); i++) {
-                for (int j = e.getIndex0() ; j <= e.getIndex1() ; j++) {
+                for (int j = e.getIndex0(); j <= e.getIndex1(); j++) {
                     Object o = list.get(j);
-                    System.out.println("intervalAdded 3");
                     if (o instanceof Overlay) {
-                        System.out.println("intervalAdded 4");
-                        System.out.println("intervalAdded 5"+ structureVisViews.get(i));
                         structureVisViews.get(i).dataOverlayAdded((Overlay) o);
                     }
                 }
@@ -339,7 +342,7 @@ public class StructureVisController implements ListDataListener {
         if (e.getSource() instanceof SafeListModel) {
             SafeListModel list = (SafeListModel) e.getSource();
             for (int i = 0; i < structureVisViews.size(); i++) {
-                for (int j = e.getIndex0() ; j <= e.getIndex1() ; j++) {
+                for (int j = e.getIndex0(); j <= e.getIndex1(); j++) {
                     Object o = list.get(j);
                     if (o instanceof Overlay) {
                         structureVisViews.get(i).dataOverlayRemoved((Overlay) o);
@@ -354,7 +357,7 @@ public class StructureVisController implements ListDataListener {
         if (e.getSource() instanceof SafeListModel) {
             SafeListModel list = (SafeListModel) e.getSource();
             for (int i = 0; i < structureVisViews.size(); i++) {
-                for (int j = e.getIndex0() ; j <= e.getIndex1() ; j++) {
+                for (int j = e.getIndex0(); j <= e.getIndex1(); j++) {
                     Object o = list.get(j);
                     if (o instanceof Overlay) {
                         structureVisViews.get(i).dataOverlayChanged((Overlay) o);

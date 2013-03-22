@@ -207,18 +207,10 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         );
     }// </editor-fold>//GEN-END:initComponents
 
-     public static void showEditDialog(StructureSource structureSource, Frame parent, ProjectController projectController, StructureVisController structureVisController) {
-        StructureDataDialog d = new StructureDataDialog(parent, true, projectController, structureVisController);
-        if (structureSource != null) {            
-            d.setEditMode(true);
-            d.structureDataPanel.setStructureSource(structureSource);
-            d.setSize(640, 580);
-            d.setVisible(true);
-        }
-    }
+
     
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        StructureDataDialog d = new StructureDataDialog(null, true, projectController, structureVisController);
+        StructureDataDialog d = new StructureDataDialog(null, true, projectController.projectModel, structureVisController);
         d.setSize(640, 580);
         d.setEditMode(false);
         d.setVisible(true);
@@ -350,8 +342,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        if (e.getSource().equals(dataLegend1D) || e.getSource().equals(dataLegend2D)) {
-            System.out.println(dataLegend1D.getMinValue() + "\t" + dataLegend1D.getMaxValue() + "\t" + dataLegend2D.getMinValue() + "\t" + dataLegend2D.getMaxValue());
+        if (e.getSource().equals(dataLegend1D) || e.getSource().equals(dataLegend2D)) {            
             structureDrawPanel.model.thresholdMin1D = dataLegend1D.getMinValue();
             structureDrawPanel.model.thresholdMax1D = dataLegend1D.getMaxValue();
             structureDrawPanel.model.thresholdMin2D = dataLegend2D.getMinValue();

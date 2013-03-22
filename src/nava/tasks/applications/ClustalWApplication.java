@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import nava.data.types.Alignment;
 import nava.data.types.DataSource;
+import nava.ui.ProjectModel;
 
 /**
  *
@@ -28,7 +29,7 @@ public class ClustalWApplication extends Application {
     protected void start() {
         File tempDir = createTemporaryDirectory();
         
-        File inFastaFile = new File(inputDataSource.importedDataSourcePath);
+        File inFastaFile = new File(inputDataSource.getImportedDataSourcePath(ProjectModel.path));
         File outFastaFile = new File(tempDir.getAbsolutePath() + File.separator + "temp.fas");
         
         try {

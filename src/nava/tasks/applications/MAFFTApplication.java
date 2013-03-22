@@ -14,6 +14,7 @@ import nava.data.types.Alignment;
 import nava.data.types.DataSource;
 import nava.data.types.SecondaryStructure;
 import nava.data.types.SecondaryStructureData;
+import nava.ui.ProjectModel;
 
 /**
  *
@@ -47,9 +48,8 @@ public class MAFFTApplication extends Application {
 
             BufferedReader buffer = new BufferedReader(new InputStreamReader(process.getErrorStream()));
             String textline = null;
-            System.out.println("Standard:");
             while ((textline = buffer.readLine()) != null) {
-                System.out.println(textline);
+                
             }
             buffer.close();
         } catch (IOException ex) {
@@ -83,9 +83,8 @@ public class MAFFTApplication extends Application {
     @Override
     protected void start() {
         File tempDir = createTemporaryDirectory();
-        System.out.println(tempDir);
 
-        File inFastaFile = new File(inputDataSource.importedDataSourcePath);
+        File inFastaFile = new File(inputDataSource.getImportedDataSourcePath(ProjectModel.path));
         File outFastaFile = new File(tempDir.getAbsolutePath() + File.separator + "temp.fas");
 
         try {
@@ -104,7 +103,6 @@ public class MAFFTApplication extends Application {
                 alignment.title = inputDataSource.title + "_mafft_aligned";
                 alignment.originalFile = outFastaFile;
                 outputFile1.dataSource = alignment;
-                System.out.println("Finalising");
                 outputFiles.add(outputFile1);
             } else {
             }

@@ -192,10 +192,6 @@ public class DataPreviewTable extends JPanel {
                 boolean isSelected, boolean hasFocus,
                 int row, int column) {
             
-            if(column == 0)
-            {
-                System.out.println(((Integer)object).intValue());
-            }
             
             if(table.getValueAt(row, 0) == null || ((Integer)table.getValueAt(row, 0)).intValue() == -1)
             {

@@ -21,17 +21,23 @@ import javax.swing.event.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
+import nava.data.types.DataSource;
+import nava.data.types.DataType;
+import nava.data.types.Tabular;
 import nava.structurevis.StructureVisController;
 import nava.structurevis.StructureVisPanel;
 import nava.structurevis.SubstructurePanel;
 import nava.structurevis.data.*;
 import nava.ui.ProjectController;
+import nava.ui.ProjectModel;
+import nava.ui.ProjectView;
+import nava.utils.Pair;
 
 /**
  *
  * @author Michael
  */
-public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionListener, MouseListener, TreeSelectionListener, TreeModelListener {
+public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionListener, MouseListener, TreeSelectionListener, TreeModelListener, ProjectView {
 
     ProjectController projectController;
     StructureVisController structureVisController;
@@ -48,33 +54,33 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
 
         this.projectController = projectController;
         this.structureVisController = structureVisController;
+        
+        projectController.addView(this);
 
-        if (structureVisController.structureVisModel.substructureModel.overlayNavigatorTreeModel == null) {
-            structureVisController.structureVisModel.substructureModel.overlayNavigatorTreeModel = new DataOverlayTreeModel(new DefaultMutableTreeNode(), structureVisController);
+        if (structureVisController.structureVisModel.overlayNavigatorTreeModel == null) {
+            structureVisController.structureVisModel.overlayNavigatorTreeModel = new DataOverlayTreeModel(new DefaultMutableTreeNode(), structureVisController);
         }
         
-        System.out.println("Adding tree listenr"+structureVisController.structureVisModel.substructureModel.overlayNavigatorTreeModel);
-        structureVisController.structureVisModel.substructureModel.overlayNavigatorTreeModel.addTreeModelListener(this);
+        System.out.println("Adding tree listenr"+structureVisController.structureVisModel.overlayNavigatorTreeModel);
+        structureVisController.structureVisModel.overlayNavigatorTreeModel.addTreeModelListener(this);
 
         DataOverlayTreeRenderer navigatorRenderer = new DataOverlayTreeRenderer();
-        navigationTree.setRootVisible(false);
-        navigationTree.setModel(structureVisController.structureVisModel.substructureModel.overlayNavigatorTreeModel);
-        navigationTree.setCellRenderer(navigatorRenderer);
-        navigationTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        navigationTree.addTreeSelectionListener(this);
-        navigationTree.setDropTarget(new DropTarget() {
+        overlayTree.setRootVisible(false);
+        overlayTree.setModel(structureVisController.structureVisModel.overlayNavigatorTreeModel);
+        overlayTree.setCellRenderer(navigatorRenderer);
+        overlayTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        overlayTree.addTreeSelectionListener(this);
+        overlayTree.setDropTarget(new DropTarget() {
 
             public synchronized void drop(DropTargetDropEvent evt) {
                 try {
                     evt.acceptDrop(DnDConstants.ACTION_COPY);
                     List<File> droppedFiles = (List<File>) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
-                    for (int i = 0; i < droppedFiles.size(); i++) {
-                        /*
-                         * NavigatorPanel.this.projectController.autoAddDataSource(droppedFiles.get(i));
-                         * if (droppedFiles.get(i).isDirectory()) {
-                         * System.err.println("TODO this file is a folder. How
-                         * should we handle this?"); }
-                         */
+                    if(droppedFiles.size() == 1)
+                    {
+                        Pair<DataType, DataSource> dataTypeAndSource = DataOverlayTreePanel.this.projectController.autoAddDataSource(droppedFiles.get(0));
+                        DataSource dataSource = dataTypeAndSource.getRight();
+                        StructureVisPanel.showAddDialog(null,DataOverlayTreePanel.this.projectController.projectModel, DataOverlayTreePanel.this.structureVisController, dataSource);
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -89,7 +95,7 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
         deleteItem.addActionListener(this);
         popupMenu.add(deleteItem);
 
-        navigationTree.addMouseListener(this);
+        overlayTree.addMouseListener(this);
     }
 
     /**
@@ -102,17 +108,17 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        navigationTree = new javax.swing.JTree();
+        overlayTree = new javax.swing.JTree();
 
         setLayout(new java.awt.BorderLayout());
 
-        jScrollPane1.setViewportView(navigationTree);
+        jScrollPane1.setViewportView(overlayTree);
 
         add(jScrollPane1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTree navigationTree;
+    private javax.swing.JTree overlayTree;
     // End of variables declaration//GEN-END:variables
     protected EventListenerList listeners = new EventListenerList();
 
@@ -138,7 +144,7 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
     @Override
     public void valueChanged(TreeSelectionEvent e) {
         DataOverlayTreeEvent navigationEvent = new DataOverlayTreeEvent();
-        TreePath[] paths = navigationTree.getSelectionPaths();
+        TreePath[] paths = overlayTree.getSelectionPaths();
         if (paths != null) {
             for (TreePath path : paths) {
                 DataOverlayTreeNode node = (DataOverlayTreeNode) path.getLastPathComponent();
@@ -158,7 +164,7 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
 
     @Override
     public void treeNodesInserted(TreeModelEvent e) {
-        navigationTree.expandPath(e.getTreePath());
+        overlayTree.expandPath(e.getTreePath());
     }
 
     @Override
@@ -174,11 +180,11 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
     @Override
     public void mouseClicked(MouseEvent e) {
         if (SwingUtilities.isRightMouseButton(e)) {
-            TreePath tp = navigationTree.getClosestPathForLocation(e.getX(), e.getY());
+            TreePath tp = overlayTree.getClosestPathForLocation(e.getX(), e.getY());
             Overlay selectedOverlay = ((DataOverlayTreeNode) tp.getLastPathComponent()).overlay;
             if (selectedOverlay != null) {
                 if (tp != null) {
-                    navigationTree.setSelectionPath(tp);
+                    overlayTree.setSelectionPath(tp);
                 }
                 popupMenu.show(e.getComponent(), e.getX(), e.getY());
                 switch (selectedOverlay.getState()) {
@@ -213,7 +219,7 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(setAsOverlayItem)) {
-            Overlay overlay = ((DataOverlayTreeNode) navigationTree.getSelectionPath().getLastPathComponent()).overlay;
+            Overlay overlay = ((DataOverlayTreeNode) overlayTree.getSelectionPath().getLastPathComponent()).overlay;
 
             if (overlay instanceof DataOverlay1D) {
                 if (overlay.getState() == Overlay.OverlayState.PRIMARY_SELECTED) {
@@ -243,9 +249,9 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
             }
 
             // update node icons on tree
-            structureVisController.structureVisModel.substructureModel.overlayNavigatorTreeModel.valueForPathChanged(navigationTree.getSelectionPath(), overlay);
+            structureVisController.structureVisModel.overlayNavigatorTreeModel.valueForPathChanged(overlayTree.getSelectionPath(), overlay);
         } else if (e.getSource().equals(editItem)) {
-            Overlay overlay = ((DataOverlayTreeNode) navigationTree.getSelectionPath().getLastPathComponent()).overlay;
+            Overlay overlay = ((DataOverlayTreeNode) overlayTree.getSelectionPath().getLastPathComponent()).overlay;
 
             if (overlay instanceof DataOverlay1D) {
                 StructureVisPanel.showEditDialog((DataOverlay1D) overlay, null, projectController.projectModel, structureVisController);
@@ -256,12 +262,37 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
                 StructureVisPanel.showEditDialog((NucleotideComposition) overlay, null, projectController.projectModel, structureVisController);
 
             } else if (overlay instanceof StructureSource) {
-
-                SubstructurePanel.showEditDialog((StructureSource) overlay, null, projectController, structureVisController);
+                StructureVisPanel.showEditDialog((StructureSource) overlay, null, projectController.projectModel, structureVisController);
             }
 
             // update node icons on tree
-            structureVisController.structureVisModel.substructureModel.overlayNavigatorTreeModel.valueForPathChanged(navigationTree.getSelectionPath(), overlay);
+            structureVisController.structureVisModel.overlayNavigatorTreeModel.valueForPathChanged(overlayTree.getSelectionPath(), overlay);
         }
+    }
+
+    @Override
+    public void projectModelChanged(ProjectModel newProjectModel) {
+        this.overlayTree.setModel(structureVisController.structureVisModel.overlayNavigatorTreeModel);
+        structureVisController.structureVisModel.overlayNavigatorTreeModel.addTreeModelListener(this);
+    }
+
+    @Override
+    public void dataSourcesLoaded() {
+        
+    }
+
+    @Override
+    public void dataSourcesIntervalAdded(ListDataEvent e) {
+        
+    }
+
+    @Override
+    public void dataSourcesIntervalRemoved(ListDataEvent e) {
+        
+    }
+
+    @Override
+    public void dataSourcesContentsChanged(ListDataEvent e) {
+        
     }
 }

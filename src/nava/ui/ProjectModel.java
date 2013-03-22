@@ -18,11 +18,15 @@ import nava.utils.SafeListModel;
  */
 public class ProjectModel implements Serializable {
     
+    private static final long serialVersionUID = 8638624765882567070L;    
+    
     public SafeListModel<DataSource> dataSources = new SafeListModel();
     
     public NavigatorTreeModel navigatorTreeModel;
     public long dataSourceCounter = 0;
     public long importCounter = 0;
+    
+    public static String path = "workspace/test_project/";
 
     public void saveProject(File outFile) {
         try {
@@ -37,13 +41,20 @@ public class ProjectModel implements Serializable {
     public static ProjectModel loadProject(File inFile) throws IOException, ClassNotFoundException {
         ObjectInputStream in = new ObjectInputStream(new FileInputStream(inFile));
         ProjectModel ret = (ProjectModel) in.readObject();
+        ret.path = inFile.getParentFile().getAbsolutePath();
         in.close();
         return ret;        
     }
     
+    public String getProjectPathString()
+    {
+        return path;
+    }
+    
     public Path getProjectPath()
     {
-        new File("workspace/test_project/").mkdirs();
-        return Paths.get("workspace/test_project/");
+        return Paths.get(path);
+        //new File("workspace/test_project/").mkdirs();
+        //return Paths.get("workspace/test_project/");
     }
 }

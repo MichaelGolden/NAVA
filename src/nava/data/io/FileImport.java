@@ -129,21 +129,18 @@ public class FileImport {
         if (CsvReader.isCsvFormat(inFile)) {
             possibleDataTypes.add(new DataType(DataType.Primary.TABULAR_DATA, DataType.FileFormat.CSV));
         }
-        
+
         ArrayList<MatrixFormat> matrixFormats = FileImport.parsableMatrixFormats(inFile);
-        for(MatrixFormat matrixFormat : matrixFormats)
-        {
-            if(matrixFormat == MatrixFormat.COORDINATE_LIST_MATRIX)
-            {
+        for (MatrixFormat matrixFormat : matrixFormats) {
+            if (matrixFormat == MatrixFormat.COORDINATE_LIST_MATRIX) {
                 possibleDataTypes.add(new DataType(DataType.Primary.MATRIX, DataType.FileFormat.COORDINATE_LIST_MATRIX));
             }
-            
-            if(matrixFormat == MatrixFormat.DENSE_MATRIX)
-            {
+
+            if (matrixFormat == MatrixFormat.DENSE_MATRIX) {
                 possibleDataTypes.add(new DataType(DataType.Primary.MATRIX, DataType.FileFormat.DENSE_MATRIX));
             }
         }
-        
+
         if (ReadseqTools.isKnownFormat(inFile)) {
             possibleDataTypes.add(new DataType(DataType.Primary.ALIGNMENT, DataType.FileFormat.UNKNOWN));
         }
@@ -342,7 +339,8 @@ public class FileImport {
                 s.pairedSites[b - 1 - j] = a + j;
             }
         }
-        ArrayList<SecondaryStructureData> structures = new ArrayList<SecondaryStructureData>();
+        s.sequence = "";
+        ArrayList<SecondaryStructureData> structures = new ArrayList<>();
         structures.add(s);
         return structures;
     }
@@ -364,6 +362,9 @@ public class FileImport {
                     String[] split2 = textline.trim().split("(\\s)+");
                     if (!(isInteger(split2[0]) && isInteger(split2[2]))) {
                         throw new ParserException("Bpseq format expects integer positions in columns 1 and 3.");
+                    }
+                    if (isInteger(split2[1])) {
+                        throw new ParserException("Bpseq format expects a nucleotide character in column 2.");
                     }
                 }
             }
@@ -391,7 +392,7 @@ public class FileImport {
             for (int i = start; i < textlines.size(); i++) {
                 String[] split2 = textlines.get(i).trim().split("(\\s)+");
                 if (split2.length == 3) {
-                    if (split2[1].length() == 1) {
+                    if (split2[1].length() == 1 && !isInteger(split2[1])) {
                         s.sequence += split2[1];
                     } else {
                         throw new ParserException("Bpseq format expects 1 base character in 2nd column position.");
@@ -401,6 +402,12 @@ public class FileImport {
                     } else {
                         throw new ParserException("Bpseq format expects integer positions in columns 1 and 3.");
                     }
+                    
+                    if(isInteger(split2[1]))
+                    {
+                        throw new ParserException("Bpseq format expects a base character in column 2.");
+                    }
+                            
                 } else {
                     throw new ParserException("Bpseq format expects exactly 3 columns, " + split2.length + " were found.");
                 }

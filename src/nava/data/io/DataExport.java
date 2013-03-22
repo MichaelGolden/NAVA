@@ -12,6 +12,7 @@ import java.util.List;
 import nava.data.types.*;
 import nava.data.types.DataType.FileFormat;
 import nava.ui.MainFrame;
+import nava.ui.ProjectModel;
 import nava.utils.RNAFoldingTools;
 
 /**
@@ -40,7 +41,6 @@ public class DataExport {
     public ArrayList<ExportableFormat> getExportableFormats(DataSource dataSource) {
         ArrayList<ExportableFormat> exportableFormatsForDataSource = new ArrayList<>();
         for (int i = 0; i < exportableFormats.size(); i++) {
-            System.out.println(exportableFormats.get(i));
             if (dataSource.getClass().equals(exportableFormats.get(i).dataSourceClass)) {
                 exportableFormatsForDataSource.add(exportableFormats.get(i));
             }
@@ -51,25 +51,25 @@ public class DataExport {
     public void export(DataSource dataSource, FileFormat format, File outputFile) throws Exception {
         switch (format) {
             case FASTA:
-                ReadseqTools.convertToFormat(8, new File(dataSource.importedDataSourcePath), outputFile);
+                ReadseqTools.convertToFormat(8, new File(dataSource.getImportedDataSourcePath(ProjectModel.path)), outputFile);
                 break;
             case PHYLIP4:
-                ReadseqTools.convertToFormat(12, new File(dataSource.importedDataSourcePath), outputFile);
+                ReadseqTools.convertToFormat(12, new File(dataSource.getImportedDataSourcePath(ProjectModel.path)), outputFile);
                 break;
             case NEXUS:
-                ReadseqTools.convertToFormat(17, new File(dataSource.importedDataSourcePath), outputFile);
+                ReadseqTools.convertToFormat(17, new File(dataSource.getImportedDataSourcePath(ProjectModel.path)), outputFile);
                 break;
             case CLUSTAL:
-                ReadseqTools.convertToFormat(22, new File(dataSource.importedDataSourcePath), outputFile);
+                ReadseqTools.convertToFormat(22, new File(dataSource.getImportedDataSourcePath(ProjectModel.path)), outputFile);
                 break;
             case CSV:
-                Files.copy(Paths.get(dataSource.importedDataSourcePath), Paths.get(outputFile.getAbsolutePath()));
+                Files.copy(Paths.get(dataSource.getImportedDataSourcePath(ProjectModel.path)), Paths.get(outputFile.getAbsolutePath()));
             case VIENNA_DOT_BRACKET:
-                SecondaryStructureData s = FileImport.readDotBracketFile(new File(dataSource.importedDataSourcePath)).get(0);
+                SecondaryStructureData s = FileImport.readDotBracketFile(new File(dataSource.getImportedDataSourcePath(ProjectModel.path))).get(0);
                 RNAFoldingTools.saveDotBracketFile(outputFile, s.pairedSites, s.title, s.sequence);
                 break;
             case CONNECT_FILE:
-                SecondaryStructureData s2 = FileImport.readDotBracketFile(new File(dataSource.importedDataSourcePath)).get(0);
+                SecondaryStructureData s2 = FileImport.readDotBracketFile(new File(dataSource.getImportedDataSourcePath(ProjectModel.path))).get(0);
                 RNAFoldingTools.saveCtFile(outputFile, s2.pairedSites, s2.title, s2.sequence);
                 break;
             //case BPSEQ:
@@ -77,13 +77,13 @@ public class DataExport {
             case COORDINATE_LIST_MATRIX:
                 if(dataSource instanceof Matrix)
                 {
-                    ((Matrix)dataSource).getObject(MainFrame.dataSourceCache).saveAsCoordinateListMatrix(outputFile);
+                    ((Matrix)dataSource).getObject(ProjectModel.path,MainFrame.dataSourceCache).saveAsCoordinateListMatrix(outputFile);
                 }
                 break;
              case DENSE_MATRIX:
                 if(dataSource instanceof Matrix)
                 {
-                    ((Matrix)dataSource).getObject(MainFrame.dataSourceCache).saveAsDenseMatrix(outputFile);
+                    ((Matrix)dataSource).getObject(ProjectModel.path,MainFrame.dataSourceCache).saveAsDenseMatrix(outputFile);
                 }
                 break;
         }

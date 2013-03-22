@@ -52,18 +52,18 @@ public class Alignment extends DataSource {
     }
 
     @Override
-    public AlignmentData getObject() {
+    public AlignmentData getObject(String projectDir) {
         AlignmentData alignmentData = new AlignmentData();
-        IO.loadFastaSequences(Paths.get(importedDataSourcePath).toFile(), alignmentData.sequences, alignmentData.sequenceNames);
+        IO.loadFastaSequences(Paths.get(getImportedDataSourcePath(projectDir)).toFile(), alignmentData.sequences, alignmentData.sequenceNames);
         return alignmentData;
     }
 
     @Override
-    public AlignmentData getObject(DataSourceCache cache) {
+    public AlignmentData getObject(String projectDir, DataSourceCache cache) {
        AlignmentData cachedObject = (AlignmentData) cache.getObject(this);
        if(cachedObject == null)
        {
-           return (AlignmentData) cache.cache(this, getObject());
+           return (AlignmentData) cache.cache(this, getObject(projectDir));
        }
        return cachedObject;
     }
@@ -73,10 +73,10 @@ public class Alignment extends DataSource {
     }*/
 
     @Override
-    public void persistObject(Object object) {
+    public void persistObject(String projectDir, Object object) {
         if (object instanceof AlignmentData) {
             AlignmentData alignmentData = (AlignmentData) object;
-            IO.saveToFASTAfile(alignmentData.sequences, alignmentData.sequenceNames, Paths.get(importedDataSourcePath).toFile());
+            IO.saveToFASTAfile(alignmentData.sequences, alignmentData.sequenceNames, Paths.get(getImportedDataSourcePath(projectDir)).toFile());
         }
     }
 }

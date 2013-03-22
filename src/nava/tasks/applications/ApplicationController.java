@@ -24,7 +24,7 @@ public class ApplicationController implements TaskListener {
         taskManager.addTaskListener(this);
     }
 
-    private ArrayList<Application> applications = new ArrayList<Application>();
+    private ArrayList<Application> applications = new ArrayList<>();
 
     public void registerApplication(Application application) {
         if (!applications.contains(application)) {

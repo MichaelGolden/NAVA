@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import nava.data.types.*;
 import nava.ui.MainFrame;
+import nava.ui.ProjectModel;
 import nava.ui.console.ConsoleInputHandler;
 import nava.utils.RNAFoldingTools;
 
@@ -167,7 +168,6 @@ public class RNAalifoldApplication extends Application {
 
                 ApplicationOutput outputFile2 = new ApplicationOutput();
                 outputFile2.file = matrixFile;
-                System.out.println(matrixFile);
                 Matrix matrix = new Matrix();
                 matrix.title = inputDataSource.title;
                 matrix.parentSource = inputDataSource;
@@ -277,7 +277,7 @@ public class RNAalifoldApplication extends Application {
         } else {
             started = true;
             running = true;
-            AlignmentData alignmentData = inputDataSource.getObject(MainFrame.dataSourceCache);
+            AlignmentData alignmentData = inputDataSource.getObject(ProjectModel.path, MainFrame.dataSourceCache);
 
             try {
                 ArrayList<String> sequenceNames = new ArrayList<String>();

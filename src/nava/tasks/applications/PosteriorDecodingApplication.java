@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import nava.data.types.*;
 import nava.ui.MainFrame;
+import nava.ui.ProjectModel;
 import nava.utils.RNAFoldingTools;
 
 /**
@@ -36,7 +37,7 @@ public class PosteriorDecodingApplication extends Application {
             DenseMatrixData matrixData = null;
             try
             {    
-                matrixData =  matrix.getObject(MainFrame.dataSourceCache).getDenseMatrixData(0);
+                matrixData =  matrix.getObject(ProjectModel.path, MainFrame.dataSourceCache).getDenseMatrixData(0);
                /*
                 try
                 {

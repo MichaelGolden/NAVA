@@ -10,6 +10,7 @@ import javax.swing.ImageIcon;
 import nava.data.io.IO;
 import nava.data.types.Alignment;
 import nava.data.types.AlignmentData;
+import nava.ui.ProjectModel;
 import nava.utils.Mapping;
 
 /**
@@ -37,7 +38,7 @@ public class NucleotideComposition extends Overlay implements Serializable {
 
     public NucleotideComposition(Alignment alignmentSource) {
         this.alignment = alignmentSource;
-        AlignmentData data = alignment.getObject();
+        AlignmentData data = alignment.getObject(ProjectModel.path);
         mappingSource = new MappingSource(alignmentSource);
         calculateFrequencies(data.sequences, data.sequenceNames);
     }

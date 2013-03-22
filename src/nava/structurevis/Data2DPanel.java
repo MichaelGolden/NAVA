@@ -158,7 +158,7 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
             if (!selectedMatrix.equals(dataLoadedForMatrix)) {
                 try
                 {
-                    values = (ArrayList<Double>) selectedMatrix.getObject(MainFrame.dataSourceCache).getSample(10000);
+                    values = (ArrayList<Double>) selectedMatrix.getObject(projectModel.getProjectPathString(),MainFrame.dataSourceCache).getSample(10000);
                 }
                 catch(Exception ex)
                 {
@@ -688,7 +688,7 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
     public void itemStateChanged(ItemEvent e) {
         if (e.getSource().equals(this.dataMatrixComboBox)) {
             selectedMatrix = (Matrix) this.dataMatrixComboBox.getSelectedItem();
-            matrixData = selectedMatrix.getObject(MainFrame.dataSourceCache);
+            matrixData = selectedMatrix.getObject(projectModel.getProjectPathString(),MainFrame.dataSourceCache);
             this.dataTitleField.setText(selectedMatrix.title);
             this.dataMinField.setValue(matrixData.getMinValue());
             this.dataMaxField.setValue(matrixData.getMaxValue());

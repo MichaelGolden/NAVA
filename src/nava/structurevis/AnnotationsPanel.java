@@ -58,7 +58,7 @@ public class AnnotationsPanel extends javax.swing.JPanel implements ItemListener
         if(annotations != null)
         {
             try {
-                return AnnotationSource.readAnnotations(new File(annotations.importedDataSourcePath));
+                return AnnotationSource.readAnnotations(new File(annotations.getImportedDataSourcePath(projectModel.getProjectPathString())));
             } catch (BioException ex) {
                 Logger.getLogger(AnnotationsPanel.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {

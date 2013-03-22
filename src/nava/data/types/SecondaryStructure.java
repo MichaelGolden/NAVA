@@ -37,9 +37,9 @@ public class SecondaryStructure extends DataSource {
     }
 
     @Override
-    public SecondaryStructureData getObject() {
+    public SecondaryStructureData getObject(String projectDir) {
         try {
-            return FileImport.readDotBracketFile(Paths.get(importedDataSourcePath).toFile()).get(0);
+            return FileImport.readDotBracketFile(Paths.get(getImportedDataSourcePath(projectDir)).toFile()).get(0);
         } catch (IOException ex) {
             Logger.getLogger(SecondaryStructure.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ParserException ex) {
@@ -51,19 +51,19 @@ public class SecondaryStructure extends DataSource {
     }
 
     @Override
-    public SecondaryStructureData getObject(DataSourceCache cache) {
+    public SecondaryStructureData getObject(String projectDir, DataSourceCache cache) {
         SecondaryStructureData cachedObject = (SecondaryStructureData) cache.getObject(this);
         if (cachedObject == null) {
-            return (SecondaryStructureData) cache.cache(this, getObject());
+            return (SecondaryStructureData) cache.cache(this, getObject(projectDir));
         }
         return cachedObject;
     }
 
     @Override
-    public void persistObject(Object object) {
+    public void persistObject(String projectDir, Object object) {
         if (object instanceof SecondaryStructureData) {
             SecondaryStructureData structure = (SecondaryStructureData) object;
-            RNAFoldingTools.saveDotBracketFile(Paths.get(importedDataSourcePath).toFile(), structure.pairedSites, structure.title, structure.sequence);
+            RNAFoldingTools.saveDotBracketFile(Paths.get(getImportedDataSourcePath(projectDir)).toFile(), structure.pairedSites, structure.title, structure.sequence);
         }
     }
 }

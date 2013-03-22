@@ -73,7 +73,7 @@ public class ConsoleBuffer extends Thread {
             upper = lower + length;
             ArrayList<ConsoleRecord> records = db.getConsoleRecordsFromDB(className, typeName, lower, length);
             for (int i = lower; i < upper && i - lower < records.size(); i++) {
-                System.out.println("Inserting " + i);
+                //System.out.println("Inserting " + i);
                 rows.put(new Long(i), records.get(i - lower));
             }
 
@@ -88,7 +88,7 @@ public class ConsoleBuffer extends Thread {
                 }
             }
             for (Long removeKey : removeKeys) {
-                System.out.println("Removing " + removeKey);
+                //System.out.println("Removing " + removeKey);
                 rows.remove(removeKey);
             }
         }
@@ -134,7 +134,7 @@ public class ConsoleBuffer extends Thread {
         synchronized (lock) {
             this.immediateWrite = immediateWrite;
             writeBuffer.add(new ConsoleRecord(className, typeName, line, System.currentTimeMillis()));
-            System.out.println("Line: "+line);
+            //System.out.println("Line: "+line);
         }
     }
     boolean running = true;

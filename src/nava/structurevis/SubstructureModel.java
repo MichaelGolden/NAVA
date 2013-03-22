@@ -44,7 +44,6 @@ public class SubstructureModel implements Serializable {
     double thresholdMin2D;
     double thresholdMax2D;
     transient StructureVisController structureVisController;
-    public DataOverlayTreeModel overlayNavigatorTreeModel;
 
     public SubstructureModel(StructureVisController structureVisController) {
         this.structureVisController = structureVisController;

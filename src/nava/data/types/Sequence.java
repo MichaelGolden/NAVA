@@ -46,18 +46,18 @@ public class Sequence extends DataSource {
     }
 
     @Override
-    public Object getObject() {
+    public Object getObject(String projectDir) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
     
     @Override
-    public Object getObject(DataSourceCache cache) {
+    public Object getObject(String projectDir, DataSourceCache cache) {
         throw new UnsupportedOperationException("Not supported yet.");
     }    
 
     @Override
-    public void persistObject(Object object) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void persistObject(String projectDir, Object object) {
+            throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

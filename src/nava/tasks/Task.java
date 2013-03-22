@@ -134,7 +134,7 @@ public abstract class Task<T> {
             return finishTime - startTime;
         }
 
-        System.out.println(this.getName() + "getTimeRunning()" + System.currentTimeMillis() + "\t" + startTime);
+        
         return System.currentTimeMillis() - startTime;
     }
 
@@ -154,7 +154,7 @@ public abstract class Task<T> {
             return startTime - queueTime;
         }
 
-        System.out.println(this.getName() + "getTimeQueued()" + System.currentTimeMillis() + "\t" + queueTime);
+        
         return System.currentTimeMillis() - queueTime;
     }
 

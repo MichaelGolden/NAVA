@@ -53,9 +53,9 @@ public class TabularField extends DataSource {
     }
 
     @Override
-    public TabularFieldData getObject() {
+    public TabularFieldData getObject(String projectDir) {
         try {
-            return TabularFieldData.getColumn(Paths.get(parent.importedDataSourcePath).toFile(), index);
+            return TabularFieldData.getColumn(Paths.get(parent.getImportedDataSourcePath(projectDir)).toFile(), index);
         } catch (IOException ex) {
             Logger.getLogger(TabularField.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -63,24 +63,24 @@ public class TabularField extends DataSource {
     }
         
     @Override
-    public TabularFieldData getObject(DataSourceCache cache) {
+    public TabularFieldData getObject(String projectDir, DataSourceCache cache) {
        TabularFieldData cachedObject = (TabularFieldData) cache.getObject(this);
        if(cachedObject == null)
        {
-           return (TabularFieldData) cache.cache(this, getObject());
+           return (TabularFieldData) cache.cache(this, getObject(projectDir));
        }
        return cachedObject;
     }
 
     @Override
-    public void persistObject(Object object) {
+    public void persistObject(String projectDir, Object object) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    private void determineMinAndMax() {
+    private void determineMinAndMax(String projectDir) {
         double min = Double.MAX_VALUE;
         double max = Double.MIN_VALUE;
-        ArrayList<String> values = this.getObject().values;
+        ArrayList<String> values = this.getObject(projectDir).values;
         for (int i = 0; i < values.size(); i++) {
             if (Utils.isNumeric(values.get(i).trim())) {
                 double val = Double.parseDouble(values.get(i).trim());
@@ -104,9 +104,9 @@ public class TabularField extends DataSource {
      *
      * @return the minimum value in the field.
      */
-    public double getMinimum() {
+    public double getMinimum(String projectDir) {
         if (!isMinAndMaxDetermined) {
-            determineMinAndMax();
+            determineMinAndMax(projectDir);
         }
         return minimum;
     }
@@ -116,9 +116,9 @@ public class TabularField extends DataSource {
      *
      * @return the maximum value in the field.
      */
-    public double getMaximum() {
+    public double getMaximum(String projectDir) {
         if (!isMinAndMaxDetermined) {
-            determineMinAndMax();
+            determineMinAndMax(projectDir);
         }
         return maximum;
     }

@@ -20,6 +20,7 @@ import nava.ui.navigator.NavigationListener;
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
 public class SafeListModel<T> implements ListModel, Serializable {
+    private static final long serialVersionUID = -6447941655821501722L;
 
     ArrayList<T> data = new ArrayList<>();
     transient EventListenerList listenerList = new EventListenerList();
@@ -76,7 +77,6 @@ public class SafeListModel<T> implements ListModel, Serializable {
         for(T elem : data){
             newList.add(elem);
         }
-        System.out.println("getArrayListShallowCopy()"+newList.size());
         return newList;
     }
     
@@ -118,5 +118,11 @@ public class SafeListModel<T> implements ListModel, Serializable {
                 ((ListDataListener) listeners[i + 1]).intervalAdded(new ListDataEvent(source, type, index0, index1));
             }
         }
+    }
+    
+    @Override
+    public String toString()
+    {
+        return data.toString();
     }
 }

@@ -204,7 +204,7 @@ public class PersistentSparseMatrix implements Serializable {
                 CachedLineKey removeKey = this.keyQueue.remove(0);
                 elementsCached -= this.lineCache.remove(removeKey).cache.size();
             }
-            System.out.println("elements cached " + elementsCached);
+            //System.out.println("elements cached " + elementsCached);
         }
         return cachedLine;
     }
@@ -360,7 +360,7 @@ public class PersistentSparseMatrix implements Serializable {
         maxRowIndex = dataBuffer.readInt();
         dataBuffer.readDouble();
         dataBuffer.readDouble();
-        System.out.println(maxRowIndex);
+        
         rowCounts = new int[maxRowIndex + 1];
         for (int i = 0; i < rowCounts.length; i++) {
             rowCounts[i] = dataBuffer.readInt();
@@ -444,9 +444,7 @@ public class PersistentSparseMatrix implements Serializable {
                 rowCountsSum[i] = rowCounts[i];
             }
         }
-        
-        System.out.println("CREATING PERSISTENT FROM COORDINATE LIST"+maxRowIndex);
-        
+                
         DataOutputStream outBuffer = new DataOutputStream(new FileOutputStream(tempFile));
         outBuffer.writeDouble(DEFAULT_EMPTY_VALUE); // write empty value
         outBuffer.writeInt(maxRowIndex); // write max rows
@@ -454,8 +452,7 @@ public class PersistentSparseMatrix implements Serializable {
         outBuffer.writeDouble(maxValue);
         for (int i = 0; i < rowCounts.length; i++) {
             outBuffer.writeInt(rowCounts[i]);
-            outBuffer.writeInt(maxColIndexInRow[i]);
-             System.out.println("CREATING PERSISTENT FROM COORDINATE LIST maxcol "+i+"  -  "+maxColIndexInRow[i]);
+            outBuffer.writeInt(maxColIndexInRow[i]);             
         }
         outBuffer.close();
         
@@ -558,7 +555,6 @@ public class PersistentSparseMatrix implements Serializable {
         Iterator<Element> it = iterator();
         while (it.hasNext()) {
             Element e = it.next();
-            System.out.println(e.i + "," + e.j + "," + e.value + "\n");
             buffer.write(e.i + "," + e.j + "," + e.value + "\n");
         }
         buffer.close();

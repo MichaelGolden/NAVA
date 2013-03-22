@@ -11,6 +11,7 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import nava.data.types.*;
+import nava.ui.ProjectController;
 import nava.ui.ProjectModel;
 import nava.ui.ProjectView;
 
@@ -19,7 +20,10 @@ import nava.ui.ProjectView;
  * @author Michael
  */
 public class NavigatorTreeModel extends DefaultTreeModel implements Serializable, ProjectView {
-
+    
+    private static final long serialVersionUID = 3401100959200439819L;
+    
+    
     DefaultMutableTreeNode origDataNode = null;
     DefaultMutableTreeNode dataNode = null;
     DefaultMutableTreeNode alignmentsNode = null;
@@ -27,18 +31,59 @@ public class NavigatorTreeModel extends DefaultTreeModel implements Serializable
     DefaultMutableTreeNode matricesNode = null;
     DefaultMutableTreeNode structuresNode = null;
     DefaultMutableTreeNode tabularNode = null;
-    
     ProjectModel projectModel;
 
     public NavigatorTreeModel(DefaultMutableTreeNode root, ProjectModel projectModel) {
         super(root);
         this.projectModel = projectModel;
+        setup();
+    }
+
+    public NavigatorTreeNode findNode(DataSource dataSource) {
+        Enumeration<DefaultMutableTreeNode> en = ((DefaultMutableTreeNode) getRoot()).breadthFirstEnumeration();
+        while (en.hasMoreElements()) {
+            DefaultMutableTreeNode node = en.nextElement();
+            if (node instanceof NavigatorTreeNode) {
+                NavigatorTreeNode nnode = (NavigatorTreeNode) node;
+                if (Objects.equals(nnode.dataSource, dataSource)) {
+                    return nnode;
+                }
+            }
+        }
+        return null;
+    }
+
+    public void addDataSource(DataSource dataSource) {
+        if (dataSource instanceof Alignment) {
+            insertNodeInto(new NavigatorTreeNode(dataSource), alignmentsNode, alignmentsNode.getChildCount());
+        }
+
+        if (dataSource instanceof Annotations) {
+            insertNodeInto(new NavigatorTreeNode(dataSource), annotationsNode, annotationsNode.getChildCount());
+        }
+
+        if (dataSource instanceof Matrix) {
+            insertNodeInto(new NavigatorTreeNode(dataSource), matricesNode, matricesNode.getChildCount());
+        }
+
+        if (dataSource instanceof SecondaryStructure || dataSource instanceof StructureList) {
+            insertNodeInto(new NavigatorTreeNode(dataSource), structuresNode, structuresNode.getChildCount());
+        }
+
+        if (dataSource instanceof Tabular || dataSource instanceof TabularField) {
+            insertNodeInto(new NavigatorTreeNode(dataSource), tabularNode, tabularNode.getChildCount());
+        }
+    }
+
+    public void setup() {
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode) this.getRoot();
+        root.removeAllChildren();
 
         origDataNode = NavigatorTreeNode.createFolderNode("Original data sources");
         dataNode = NavigatorTreeNode.createFolderNode("Imported data sources");
         root.add(origDataNode);
         root.add(dataNode);
-        
+
         alignmentsNode = NavigatorTreeNode.createFolderNode("Alignments");
         dataNode.add(alignmentsNode);
 
@@ -53,63 +98,25 @@ public class NavigatorTreeModel extends DefaultTreeModel implements Serializable
 
         tabularNode = NavigatorTreeNode.createFolderNode("Tabular data");
         dataNode.add(tabularNode);
-    }
-    
-    public NavigatorTreeNode findNode(DataSource dataSource)
-    {
-        Enumeration<DefaultMutableTreeNode> en = ((DefaultMutableTreeNode) getRoot()).breadthFirstEnumeration();
-        while(en.hasMoreElements())
-        {
-            DefaultMutableTreeNode node = en.nextElement();
-            if(node instanceof NavigatorTreeNode)
-            {
-                NavigatorTreeNode nnode = (NavigatorTreeNode)node;
-                if(Objects.equals(nnode.dataSource, dataSource))
-                {
-                    return nnode;
-                }
-            }
-        }
-        return null;
-    }
-
-    public void addDataSource(DataSource dataSource) {
-        if(dataSource instanceof Alignment)
-        {
-            insertNodeInto(new NavigatorTreeNode(dataSource), alignmentsNode, alignmentsNode.getChildCount());
-        }
         
-        if(dataSource instanceof Annotations)
-        {
-            insertNodeInto(new NavigatorTreeNode(dataSource), annotationsNode, annotationsNode.getChildCount());
-        }
-        
-        if(dataSource instanceof Matrix)
-        {
-             insertNodeInto(new NavigatorTreeNode(dataSource), matricesNode, matricesNode.getChildCount());
-        }
-        
-        if(dataSource instanceof SecondaryStructure || dataSource instanceof StructureList)
-        {
-            insertNodeInto(new NavigatorTreeNode(dataSource), structuresNode, structuresNode.getChildCount());
-        }
-        
-        if(dataSource instanceof Tabular || dataSource instanceof TabularField)
-        {
-            insertNodeInto(new NavigatorTreeNode(dataSource), tabularNode, tabularNode.getChildCount());
-        }
+        this.projectModel = projectModel;
     }
 
     @Override
     public void dataSourcesLoaded() {
-        // do nothing
+        /*setup();
+        System.out.println("Data sources loaded!!"+projectModel.dataSources.size());
+        for (int i = 0; i < projectModel.dataSources.size(); i++) {
+             System.out.println(projectModel.dataSources.get(i));
+            addDataSource(projectModel.dataSources.get(i));
+        }
+        * 
+        */
     }
 
     @Override
     public void dataSourcesIntervalAdded(ListDataEvent e) {
-        System.out.println("NavigatorTreeModel dataSourcesIntervalAdded");
-        for(int i = e.getIndex0() ; i < e.getIndex1() + 1 ; i++)
-        {
+        for (int i = e.getIndex0(); i < e.getIndex1() + 1; i++) {
             addDataSource(projectModel.dataSources.get(i));
         }
         //throw new UnsupportedOperationException("Not supported yet.");
@@ -117,13 +124,18 @@ public class NavigatorTreeModel extends DefaultTreeModel implements Serializable
 
     @Override
     public void dataSourcesIntervalRemoved(ListDataEvent e) {
-         System.out.println("dataSourcesIntervalRemoved");
+        System.out.println("dataSourcesIntervalRemoved");
         //throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public void dataSourcesContentsChanged(ListDataEvent e) {
-         System.out.println("dataSourcesContentsChanged");
+        System.out.println("dataSourcesContentsChanged");
         //throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void projectModelChanged(ProjectModel projectModel) {
+        this.projectModel = projectModel;
     }
 }

@@ -183,7 +183,6 @@ public class TaskTable extends JPanel implements TaskListener {
                 rows.set(index, row);
                 this.fireTableRowsUpdated(index, index);
             } else {
-                System.out.println("Adding task " + task);
                 addTask(task, tasks.size() + 1);
             }
         }

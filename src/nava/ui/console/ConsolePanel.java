@@ -67,7 +67,6 @@ public class ConsolePanel extends JPanel implements ConsoleListener {
 
         this.setPreferredSize(new Dimension(width, height));
         if (resize && this.getParent() != null) {
-            System.out.println("revalidating..");
             this.getParent().revalidate();
         }
 

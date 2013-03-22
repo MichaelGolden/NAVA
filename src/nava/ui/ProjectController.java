@@ -22,6 +22,7 @@ import nava.data.io.*;
 import nava.data.types.*;
 import nava.structurevis.data.PersistentSparseMatrix;
 import nava.tasks.applications.ApplicationOutput;
+import nava.utils.Pair;
 
 /**
  *
@@ -56,7 +57,7 @@ public class ProjectController implements ListDataListener {
                         dataSource.originalFile = dataFile;
                         dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                         dataSource.dataType = dataType;
-                        dataSource.persistObject(structures.get(0));
+                        dataSource.persistObject(projectModel.getProjectPathString(),structures.get(0));
                         dataSource.fileSize = new FileSize(dataFile.length());
                     } else {
                         dataSource = new StructureList(dataFile.getName());
@@ -64,7 +65,7 @@ public class ProjectController implements ListDataListener {
                         dataSource.originalFile = dataFile;
                         dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                         dataSource.dataType = dataType;
-                        dataSource.persistObject(structures);
+                        dataSource.persistObject(projectModel.getProjectPathString(), structures);
                         dataSource.fileSize = new FileSize(dataFile.length());
                     }
                 } catch (ParserException ex) {
@@ -83,18 +84,18 @@ public class ProjectController implements ListDataListener {
                         dataSource.originalFile = dataFile;
                         dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                         dataSource.dataType = dataType;
-                        dataSource.persistObject(dataSource);
+                        dataSource.persistObject(projectModel.getProjectPathString(),dataSource);
                         dataSource.fileSize = new FileSize(dataFile.length());
-                        ExcelIO.saveAsCSV(dataFile, Paths.get(dataSource.importedDataSourcePath).toFile());
+                        ExcelIO.saveAsCSV(dataFile, Paths.get(dataSource.getImportedDataSourcePath(projectModel.getProjectPathString())).toFile());
                     } else if (dataType.fileFormat.equals(DataType.FileFormat.CSV)) {
                         dataSource = CsvReader.getTabularRepresentation(dataFile);
                         createPath(dataSource, dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1), "csv");
                         dataSource.originalFile = dataFile;
                         dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                         dataSource.dataType = dataType;
-                        dataSource.persistObject(dataSource);
+                        dataSource.persistObject(projectModel.getProjectPathString(), dataSource);
                         dataSource.fileSize = new FileSize(dataFile.length());
-                        Files.copy(Paths.get(dataFile.getAbsolutePath()), Paths.get(dataSource.importedDataSourcePath));
+                        Files.copy(Paths.get(dataFile.getAbsolutePath()), Paths.get(dataSource.getImportedDataSourcePath(projectModel.getProjectPathString())));
                     }
                 } catch (IOException ex) {
                     Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
@@ -111,7 +112,7 @@ public class ProjectController implements ListDataListener {
                     dataSource.dataType = dataType;
                     //dataSource.persistObject(dataSource);
                     dataSource.fileSize = new FileSize(dataFile.length());
-                    Files.copy(Paths.get(dataFile.getAbsolutePath()), Paths.get(dataSource.importedDataSourcePath));
+                    Files.copy(Paths.get(dataFile.getAbsolutePath()), Paths.get(dataSource.getImportedDataSourcePath(projectModel.getProjectPathString())));
                 } catch (IOException ex) {
                     Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (Exception ex) {
@@ -128,13 +129,13 @@ public class ProjectController implements ListDataListener {
 
                 if (dataType.fileFormat == DataType.FileFormat.DENSE_MATRIX) {
                     try {
-                        PersistentSparseMatrix.createMatrixFromDenseMatrixFile(dataFile, "[\\s,;]+", new File(dataSource.importedDataSourcePath));
+                        PersistentSparseMatrix.createMatrixFromDenseMatrixFile(dataFile, "[\\s,;]+", new File(dataSource.getImportedDataSourcePath(projectModel.getProjectPathString())));
                     } catch (IOException ex) {
                         Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 } else if (dataType.fileFormat == DataType.FileFormat.COORDINATE_LIST_MATRIX) {
                     try {
-                        PersistentSparseMatrix.createMatrixFromCoordinateListMatrixFile(dataFile, "[\\s,;]+", new File(dataSource.importedDataSourcePath));
+                        PersistentSparseMatrix.createMatrixFromCoordinateListMatrixFile(dataFile, "[\\s,;]+", new File(dataSource.getImportedDataSourcePath(projectModel.getProjectPathString())));
                     } catch (IOException ex) {
                         Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -148,8 +149,8 @@ public class ProjectController implements ListDataListener {
                 al.fileSize = new FileSize(dataFile.length());
 
                 try {
-                    ReadseqTools.saveAsFASTA(dataFile, Paths.get(al.importedDataSourcePath).toFile());
-                    al.numSequences = IO.countFastaSequences(Paths.get(al.importedDataSourcePath).toFile());
+                    ReadseqTools.saveAsFASTA(dataFile, Paths.get(al.getImportedDataSourcePath(projectModel.getProjectPathString())).toFile());
+                    al.numSequences = IO.countFastaSequences(Paths.get(al.getImportedDataSourcePath(projectModel.getProjectPathString())).toFile());
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
@@ -159,9 +160,7 @@ public class ProjectController implements ListDataListener {
 
         // place a copy of the original data source in the workspace
         try {
-            System.out.println(sourcePath);
-            System.out.println(dataSource.originalDataSourcePath);
-            Files.copy(sourcePath, Paths.get(dataSource.originalDataSourcePath));
+            Files.copy(sourcePath, Paths.get(dataSource.getOriginalDataSourcePath(projectModel.getProjectPathString())));
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -178,10 +177,10 @@ public class ProjectController implements ListDataListener {
                 structure.originalDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "dbn").toString();
                 structure.importedDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "dbn").toString();
                 structure.title = outputFile.dataSource.title;
-                structure.persistObject(outputFile.object);
+                structure.persistObject(projectModel.getProjectPathString(),outputFile.object);
 
                 //dataSource.dataType = DataType.Primary.SECONDARY_STRUCTURE;
-                structure.fileSize = new FileSize(Paths.get(structure.originalDataSourcePath).toFile().length());
+                structure.fileSize = new FileSize(Paths.get(structure.getImportedDataSourcePath(projectModel.getProjectPathString())).toFile().length());
                 projectModel.dataSources.addElement(structure);
             }
         } else if (outputFile.dataSource instanceof Matrix) {
@@ -191,14 +190,13 @@ public class ProjectController implements ListDataListener {
                 matrix.originalDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "matrix").toString();
                 matrix.importedDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "matrix").toString();
                 matrix.title = outputFile.dataSource.title;
-                System.out.println("OVJER "+outputFile.file);
                 try {
-                    PersistentSparseMatrix.createMatrixFromCoordinateListMatrixFile(outputFile.file, "[\\s,;]+", new File(matrix.importedDataSourcePath));
+                    PersistentSparseMatrix.createMatrixFromCoordinateListMatrixFile(outputFile.file, "[\\s,;]+", new File(matrix.getImportedDataSourcePath(projectModel.getProjectPathString())));
                 } catch (IOException ex) {
                     Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
-                matrix.fileSize = new FileSize(Paths.get(matrix.originalDataSourcePath).toFile().length());
+                matrix.fileSize = new FileSize(Paths.get(matrix.getImportedDataSourcePath(projectModel.getProjectPathString())).toFile().length());
                 projectModel.dataSources.addElement(matrix);
             }
         } else if (outputFile.dataSource instanceof Alignment) {
@@ -211,9 +209,9 @@ public class ProjectController implements ListDataListener {
             ArrayList<String> sequences = new ArrayList<>();
             ArrayList<String> sequenceNames = new ArrayList<>();
             IO.loadFastaSequences(alignment.originalFile, sequences, sequenceNames);
-            IO.saveToFASTAfile(sequences, sequenceNames, new File(alignment.originalDataSourcePath));
-            IO.saveToFASTAfile(sequences, sequenceNames, new File(alignment.importedDataSourcePath));
-            alignment.fileSize = new FileSize(Paths.get(alignment.originalDataSourcePath).toFile().length());
+            IO.saveToFASTAfile(sequences, sequenceNames, new File(alignment.getOriginalDataSourcePath(projectModel.getProjectPathString())));
+            IO.saveToFASTAfile(sequences, sequenceNames, new File(alignment.getImportedDataSourcePath(projectModel.getProjectPathString())));
+            alignment.fileSize = new FileSize(Paths.get(alignment.getImportedDataSourcePath(projectModel.getProjectPathString())).toFile().length());
 
             projectModel.dataSources.addElement(alignment);
         }
@@ -232,19 +230,22 @@ public class ProjectController implements ListDataListener {
     }
 
     public Path generatePath(long id, String extension) {
-        Path p = projectModel.getProjectPath().resolve(Paths.get(id + "." + extension));
+        Path p = Paths.get(id + "." + extension);
         
         return p;
     }
 
-    public void autoAddDataSource(File dataFile) {
+    public Pair<DataType, DataSource> autoAddDataSource(File dataFile) {
         ArrayList<DataType> possibleDataTypes = null;
         if (dataFile.isFile()) {
             possibleDataTypes = FileImport.getPossibleDataTypes(dataFile);
         }
         if (possibleDataTypes != null && possibleDataTypes.size() > 0) {
-            importDataSourceFromFile(dataFile, possibleDataTypes.get(0));
+            DataSource dataSource = importDataSourceFromFile(dataFile, possibleDataTypes.get(0));
+            return new Pair(possibleDataTypes.get(0), dataSource);
         }
+        
+        return null;
     }
 
     public void addView(ProjectView view) {
@@ -264,7 +265,10 @@ public class ProjectController implements ListDataListener {
         this.projectModel.dataSources.addListDataListener(this);
 
         for (int i = 0; i < projectViews.size(); i++) {
+            System.out.println("Firing to view " + projectViews.get(i));
+            System.out.println(projectModel.dataSources);
             projectViews.get(i).dataSourcesLoaded();
+            projectViews.get(i).projectModelChanged(this.projectModel);
         }
     }
 
@@ -278,8 +282,7 @@ public class ProjectController implements ListDataListener {
             treeListenersList.add(treeListeners[i]);
             projectModel.navigatorTreeModel.removeTreeModelListener(treeListeners[i]);
         }
-
-        System.out.println("X"+ projectModel.navigatorTreeModel.getTreeModelListeners().length);
+        
         projectModel.saveProject(projectModel.getProjectPath().resolve(Paths.get("project.data")).toFile());
 
         // re-add the listeners, this is only necessary if the application stays open

@@ -46,9 +46,9 @@ public class StructureList extends DataSource {
     }
 
     @Override
-    public ArrayList<SecondaryStructureData> getObject() {
+    public ArrayList<SecondaryStructureData> getObject(String projectDir) {
         try {
-            return FileImport.readDotBracketFile(Paths.get(importedDataSourcePath).toFile());
+            return FileImport.readDotBracketFile(Paths.get(getImportedDataSourcePath(projectDir)).toFile());
         } catch (IOException ex) {
             Logger.getLogger(StructureList.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ParserException ex) {
@@ -61,16 +61,16 @@ public class StructureList extends DataSource {
     }
 
     @Override
-    public ArrayList<SecondaryStructureData> getObject(DataSourceCache cache) {
+    public ArrayList<SecondaryStructureData> getObject(String projectDir, DataSourceCache cache) {
         ArrayList<SecondaryStructureData> cachedObject = (ArrayList<SecondaryStructureData>) cache.getObject(this);
         if (cachedObject == null) {
-            return getObject();
+            return getObject(projectDir);
         }
         return cachedObject;
     }
 
     @Override
-    public void persistObject(Object object) {
+    public void persistObject(String projectDir, Object object) {
         //throw new UnsupportedOperationException("Not supported yet.");
     }
 }

@@ -17,6 +17,7 @@ import nava.structurevis.StructureVisController;
 import nava.structurevis.StructureVisModel;
 import nava.structurevis.StructureVisView;
 import nava.structurevis.data.*;
+import nava.ui.ProjectModel;
 import nava.ui.ProjectView;
 import nava.utils.SafeListModel;
 
@@ -25,8 +26,7 @@ import nava.utils.SafeListModel;
  * @author Michael
  */
 public class DataOverlayTreeModel extends DefaultTreeModel implements Serializable, ProjectView, StructureVisView {
-    //DefaultMutableTreeNode origDataNode = null;
-    //DefaultMutableTreeNode dataNode = null;
+    private static final long serialVersionUID = -1625375843157333064L;
 
     DefaultMutableTreeNode oneDimensionalData = null;
     DefaultMutableTreeNode twoDimensionalData = null;
@@ -34,20 +34,20 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
     DefaultMutableTreeNode structureData = null;
     StructureVisModel structureVisModel;
     transient StructureVisController structureVisController;
-    //ProjectModel projectModel;
 
     public DataOverlayTreeModel(DefaultMutableTreeNode root, StructureVisController structureVisController) {
         super(root);
         this.structureVisController = structureVisController;
         this.structureVisModel = structureVisController.structureVisModel;
-        //this.projectModel = projectModel;
-
-        //origDataNode = NavigatorTreeNode.createFolderNode("Original data sources");
-        // dataNode = DataOverlayTreeNode.createFolderNode("Data overlays");
-        //root.add(origDataNode);
-        //root.add(dataNode);
-        // root.add(dataNode);
-
+        
+        setup();        
+    }
+    
+    public void setup()
+    {
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode)this.getRoot();
+        root.removeAllChildren();
+        
         oneDimensionalData = DataOverlayTreeNode.createFolderNode("1D overlays");
         root.add(oneDimensionalData);
 
@@ -70,7 +70,6 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
             nucleotideData.add(new DataOverlayTreeNode(structureVisModel.nucleotideSources.get(i)));
         }
         for (int i = 0; i < structureVisModel.structureSources.size(); i++) {
-            System.out.println(i + "[]\t" + structureVisModel.structureSources.get(i).title);
             structureData.add(new DataOverlayTreeNode(structureVisModel.structureSources.get(i)));
         }
     }
@@ -139,7 +138,8 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
 
     @Override
     public void dataSourcesLoaded() {
-        // do nothing
+         System.out.println("Datasources loaded");
+        setup();
     }
 
     @Override
@@ -193,5 +193,8 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
     @Override
     public void dataOverlayChanged(Overlay overlay) {
        // throw new UnsupportedOperationException("Not supported yet.");
+    }
+    @Override
+    public void projectModelChanged(ProjectModel newProjectModel) {
     }
 }

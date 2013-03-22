@@ -7,6 +7,7 @@ package nava.structurevis;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import javax.swing.event.EventListenerList;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import nava.structurevis.data.*;
@@ -27,17 +28,20 @@ public class StructureVisModel implements Serializable {
     public SafeListModel<AnnotationSource> annotationSources = new SafeListModel<>();
     public SafeListModel<NucleotideComposition> nucleotideSources = new SafeListModel<>();
     
+    public DataOverlayTreeModel overlayNavigatorTreeModel;
+    
+   // protected transient EventListenerList listeners = new EventListenerList();
     
     public SubstructureModel substructureModel = null;
     Hashtable<Pair<MappingSource, MappingSource>, Mapping> mappings = new Hashtable<>();
-    public File structureVisModelFile = null;
+    //public File structureVisModelFile = null;
     
     public void saveStructureVisModel(File outFile) {      
         ArrayList<TreeModelListener> treeListenersList = new ArrayList<>();
-        TreeModelListener[] overlayTreeListeners = substructureModel.overlayNavigatorTreeModel.getTreeModelListeners();
+        TreeModelListener[] overlayTreeListeners = overlayNavigatorTreeModel.getTreeModelListeners();
         for (int i = 0; i < overlayTreeListeners.length; i++) {
             treeListenersList.add(overlayTreeListeners[i]);
-            substructureModel.overlayNavigatorTreeModel.removeTreeModelListener(overlayTreeListeners[i]);
+            overlayNavigatorTreeModel.removeTreeModelListener(overlayTreeListeners[i]);
         }
         try {
             ObjectOutput out = new ObjectOutputStream(new FileOutputStream(outFile));
@@ -64,20 +68,20 @@ public class StructureVisModel implements Serializable {
         return ret;
     }
      
+     public String getStructureVisModelPathString(StructureVisController structureVisController)
+     {
+         return  structureVisController.getWorkingDirectory()+File.separator+"structurevis.model";
+     }
+     
     
      public void initialise(StructureVisController structureVisController)
-     {
+     {         
         substructureModel.initialise(structureVisController);
-        if(substructureModel.overlayNavigatorTreeModel == null)
+        if(overlayNavigatorTreeModel == null)
         {            
-            substructureModel.overlayNavigatorTreeModel = new DataOverlayTreeModel(new DefaultMutableTreeNode(),structureVisController);
-            System.out.println("overlayNavigatorTreeModel non "+substructureModel.overlayNavigatorTreeModel);
+            overlayNavigatorTreeModel = new DataOverlayTreeModel(new DefaultMutableTreeNode(),structureVisController);
         }
-        else
-        {
-            System.out.println("overlayNavigatorTreeModel exists"+substructureModel.overlayNavigatorTreeModel.getTreeModelListeners().length);
-        }
-        structureVisController.addView(substructureModel.overlayNavigatorTreeModel);  
+        structureVisController.addView(overlayNavigatorTreeModel);  
         structureVisDataOverlays1D.addListDataListener(structureVisController);
         structureVisDataOverlays2D.addListDataListener(structureVisController);
         nucleotideSources.addListDataListener(structureVisController);

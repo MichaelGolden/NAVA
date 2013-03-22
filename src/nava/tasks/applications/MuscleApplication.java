@@ -14,6 +14,7 @@ import nava.data.types.Alignment;
 import nava.data.types.DataSource;
 import nava.data.types.SecondaryStructure;
 import nava.data.types.SecondaryStructureData;
+import nava.ui.ProjectModel;
 
 /**
  *
@@ -29,9 +30,8 @@ public class MuscleApplication extends Application {
     @Override
     protected void start() {
         File tempDir = createTemporaryDirectory();
-        System.out.println(tempDir);
 
-        File inFastaFile = new File(inputDataSource.importedDataSourcePath);
+        File inFastaFile = new File(inputDataSource.getImportedDataSourcePath(ProjectModel.path));
         File outFastaFile = new File(tempDir.getAbsolutePath() + File.separator + "temp.fas");
 
         try {

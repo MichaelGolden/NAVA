@@ -263,7 +263,6 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
         computeStructureToBeDrawn(model.structure);
         repaint = true;
         repaint();
-        System.out.println("Repainted");
     }
 
     public void redraw() {

@@ -731,7 +731,6 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
             repaint();
         } else if (e.getSource().equals(useDefaultItem)) {
             colorGradient = defaultColorGradient.clone();
-            System.out.println("Using default");
             repaint();
         }/*
          * else if (e.getSource().equals(saveAsPNGItem)) { String name =

@@ -46,7 +46,7 @@ public class ConsoleInputHandler extends Thread {
                 synchronized(consoleBuffer)
                 {
                     consoleBuffer.bufferedWrite(textline, className, typeName);
-                    System.out.println(className+"\t"+typeName+"\t"+textline);
+                    //System.out.println(className+"\t"+typeName+"\t"+textline);
                 }
             }
             consoleBuffer.close();

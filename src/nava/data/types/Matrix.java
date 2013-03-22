@@ -33,9 +33,9 @@ public class Matrix extends DataSource {
     }
 
     @Override
-    public PersistentSparseMatrix getObject() {
+    public PersistentSparseMatrix getObject(String projectDir) {
         try {
-            return new PersistentSparseMatrix(Paths.get(importedDataSourcePath).toFile());
+            return new PersistentSparseMatrix(Paths.get(getImportedDataSourcePath(projectDir)).toFile());
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
@@ -43,11 +43,11 @@ public class Matrix extends DataSource {
     }
 
     @Override
-    public PersistentSparseMatrix getObject(DataSourceCache cache) {
+    public PersistentSparseMatrix getObject(String projectDir, DataSourceCache cache) {
         PersistentSparseMatrix cachedObject = (PersistentSparseMatrix) cache.getObject(this);
         if (cachedObject == null) {
             try {
-                return (PersistentSparseMatrix) cache.cache(this, new PersistentSparseMatrix(Paths.get(importedDataSourcePath).toFile()));
+                return (PersistentSparseMatrix) cache.cache(this, new PersistentSparseMatrix(Paths.get(getImportedDataSourcePath(projectDir)).toFile()));
             } catch (Exception ex) {
                 ex.printStackTrace();
                 return null;
@@ -58,6 +58,6 @@ public class Matrix extends DataSource {
     }
 
     @Override
-    public void persistObject(Object object) {
+    public void persistObject(String projectDir, Object object) {
     }
 }

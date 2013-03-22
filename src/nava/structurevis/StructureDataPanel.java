@@ -13,6 +13,7 @@ import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.ListDataEvent;
 import nava.data.types.*;
 import nava.structurevis.data.MappingSource;
 import nava.structurevis.data.StructureSource;
@@ -20,6 +21,7 @@ import nava.structurevis.data.StructureSource.MappingSourceOption;
 import nava.ui.MainFrame;
 import nava.ui.ProjectController;
 import nava.ui.ProjectModel;
+import nava.ui.ProjectView;
 
 /**
  *
@@ -27,7 +29,7 @@ import nava.ui.ProjectModel;
  */
 public class StructureDataPanel extends javax.swing.JPanel implements ChangeListener, ItemListener {
 
-    ProjectController projectController;
+    //ProjectController projectController;
     ProjectModel projectModel;
     DefaultComboBoxModel<SecondaryStructure> structureComboBoxModel = new DefaultComboBoxModel<>();
     DefaultComboBoxModel<Alignment> alignmentComboBoxModel = new DefaultComboBoxModel<>();
@@ -38,11 +40,10 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
     /**
      * Creates new form StructureDataPanel
      */
-    public StructureDataPanel(ProjectController projectController) {
+    public StructureDataPanel(ProjectModel projectModel) {
         initComponents();
-        
-        this.projectController = projectController;
-        this.projectModel = projectController.projectModel;
+
+        this.projectModel = projectModel;
 
         this.structureComboBox.setModel(structureComboBoxModel);
         this.structureComboBox.addItemListener(this);
@@ -55,8 +56,11 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
         this.maxSpinner.setModel(this.maxSpinnerModel);
         this.maxSpinner.addChangeListener(this);
 
+        System.out.println("HERExx" + projectModel.dataSources);
+        System.out.println("HEREyy" +projectModel.dataSources.getArrayListShallowCopy());
         populateStructureComboBox(projectModel.dataSources.getArrayListShallowCopy());
         populateAlignmentComboBox(projectModel.dataSources.getArrayListShallowCopy());
+        System.out.println("HEREzz" +structureComboBoxModel.getSize());
     }
 
     public void populateStructureComboBox(List<DataSource> dataSources) {
@@ -359,45 +363,47 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
 
     public void update() {
         SecondaryStructure structure = (SecondaryStructure) structureComboBox.getSelectedItem();
-        MappingSource mappingSource = null;
+        if (structure != null) {
+            MappingSource mappingSource = null;
 
-        SecondaryStructureData data = (SecondaryStructureData) structure.getObject(MainFrame.dataSourceCache);
-        if (data.sequence.length() == 0) {
-            embeddSequenceRadioButton.setEnabled(false);
-            if (embeddSequenceRadioButton.isSelected()) {
-                fromAlignmentRadioButton.setSelected(true);
+            SecondaryStructureData data = (SecondaryStructureData) structure.getObject(projectModel.getProjectPathString(), MainFrame.dataSourceCache);
+            if (data.sequence.length() == 0) {
+                embeddSequenceRadioButton.setEnabled(false);
+                if (embeddSequenceRadioButton.isSelected()) {
+                    fromAlignmentRadioButton.setSelected(true);
+                }
+            } else {
+                embeddSequenceRadioButton.setEnabled(true);
             }
-        } else {
-            embeddSequenceRadioButton.setEnabled(true);
-        }
 
-        if (this.embeddSequenceRadioButton.isSelected()) {
-            mappingSource = new MappingSource(data.sequence);
-        } else if (this.fromAlignmentRadioButton.isSelected()) {
-            Alignment alignment = (Alignment) alignmentComboBox.getSelectedItem();
-            mappingSource = new MappingSource(alignment);
-        } else if (this.fromSequenceRadioButton.isSelected()) {
-            mappingSource = new MappingSource(sequenceTextField.getText());
-        }
-        
-        
-        structureSource = new StructureSource(structure, mappingSource);
-        structureSource.minStructureSize = (Integer) this.minSpinnerModel.getValue();
-        structureSource.maxStructureSize = (Integer) this.maxSpinnerModel.getValue();
-        structureSource.nonOverlappingSubstructures = this.jCheckBox1.isSelected();
+            if (this.embeddSequenceRadioButton.isSelected()) {
+                mappingSource = new MappingSource(data.sequence);
+            } else if (this.fromAlignmentRadioButton.isSelected()) {
+                Alignment alignment = (Alignment) alignmentComboBox.getSelectedItem();
+                mappingSource = new MappingSource(alignment);
+            } else if (this.fromSequenceRadioButton.isSelected()) {
+                mappingSource = new MappingSource(sequenceTextField.getText());
+            }
 
-        if (this.embeddSequenceRadioButton.isSelected()) {
-            structureSource.mappingSourceOption = MappingSourceOption.EMBEDDED;
-        } else if (this.fromAlignmentRadioButton.isSelected()) {
-            structureSource.mappingSourceOption = MappingSourceOption.ALIGNMENT;
-        } else if (this.fromSequenceRadioButton.isSelected()) {
-            structureSource.mappingSourceOption = MappingSourceOption.STRING;
-        }
-        
-        structureSource.addMappingSourceAsNucleotideOverlay = addMappingAlignmentAsOverlayCheckBox.isSelected();
 
-        if (this.circularRadioButton.isSelected()) {
-            structureSource.circular = true;
+            structureSource = new StructureSource(structure, mappingSource);
+            structureSource.minStructureSize = (Integer) this.minSpinnerModel.getValue();
+            structureSource.maxStructureSize = (Integer) this.maxSpinnerModel.getValue();
+            structureSource.nonOverlappingSubstructures = this.jCheckBox1.isSelected();
+
+            if (this.embeddSequenceRadioButton.isSelected()) {
+                structureSource.mappingSourceOption = MappingSourceOption.EMBEDDED;
+            } else if (this.fromAlignmentRadioButton.isSelected()) {
+                structureSource.mappingSourceOption = MappingSourceOption.ALIGNMENT;
+            } else if (this.fromSequenceRadioButton.isSelected()) {
+                structureSource.mappingSourceOption = MappingSourceOption.STRING;
+            }
+
+            structureSource.addMappingSourceAsNucleotideOverlay = addMappingAlignmentAsOverlayCheckBox.isSelected();
+
+            if (this.circularRadioButton.isSelected()) {
+                structureSource.circular = true;
+            }
         }
     }
 

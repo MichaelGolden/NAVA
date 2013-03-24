@@ -14,5 +14,5 @@ import nava.structurevis.data.Overlay;
 public interface StructureVisView {
     public void dataOverlayAdded(Overlay overlay);
     public void dataOverlayRemoved(Overlay overlay);
-    public void dataOverlayChanged(Overlay overlay);
+    public void dataOverlayChanged(Overlay oldOverlay, Overlay newOverlay);
 }

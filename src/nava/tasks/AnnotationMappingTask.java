@@ -8,7 +8,7 @@ import java.util.Objects;
 import nava.structurevis.AnnotationsLayer;
 import nava.structurevis.StructureVisController;
 import nava.structurevis.data.AnnotationSource;
-import nava.structurevis.data.StructureSource;
+import nava.structurevis.data.StructureOverlay;
 
 /**
  *
@@ -18,11 +18,11 @@ public class AnnotationMappingTask extends UITask {
     
     AnnotationSource annotationSource;
     AnnotationSource mappedAnnotationSource;
-    StructureSource structureSource;
+    StructureOverlay structureSource;
     StructureVisController structureVisController;
     AnnotationsLayer annotationsLayer;
     
-    public AnnotationMappingTask(AnnotationSource annotationSource, StructureSource structureSource, StructureVisController structureVisController, AnnotationsLayer annotationsLayer)
+    public AnnotationMappingTask(AnnotationSource annotationSource, StructureOverlay structureSource, StructureVisController structureVisController, AnnotationsLayer annotationsLayer)
     {
         this.annotationSource = annotationSource;
         this.structureSource = structureSource;

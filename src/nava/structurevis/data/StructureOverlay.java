@@ -18,7 +18,7 @@ import nava.ui.ProjectModel;
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class StructureSource extends Overlay implements Serializable {
+public class StructureOverlay extends Overlay implements Serializable {
     
     public SecondaryStructure structure;
     public MappingSource mappingSource;
@@ -36,7 +36,7 @@ public class StructureSource extends Overlay implements Serializable {
     public ArrayList<Substructure> substructures = new ArrayList<>();
     public boolean circular = false;
     
-    public StructureSource(SecondaryStructure structure, MappingSource mappingSource)
+    public StructureOverlay(SecondaryStructure structure, MappingSource mappingSource)
     {
         this.structure = structure;
         this.mappingSource = mappingSource;

@@ -228,6 +228,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
      */
     public void openSubstructure(Substructure s) {
 
+        System.out.println("openSubstructure "+s);
         if (s == null) {
             this.noStructure = true;
             repaint();
@@ -789,7 +790,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             g.setColor(Color.white);
             Color nucleotideBackgroundColor = model.missingDataColor;
             if (oneDimensionalData == SHOW && model.data1D != null && pos >= 0 && model.data1D.used[pos]) {
-                double p = model.data1D.data[pos];
+                 double p = model.data1D.data[pos];
                 if (model.data1D.used[pos] && ((!model.useLowerThreshold1D || p >= model.thresholdMin1D) && (!model.useUpperThreshold1D || p <= model.thresholdMax1D))) {
                     nucleotideBackgroundColor = model.data1D.colorGradient.getColor(model.data1D.dataTransform.transform((float) p));
                 } else if (!((!model.useLowerThreshold1D || p >= model.thresholdMin1D) && (!model.useUpperThreshold1D || p <= model.thresholdMax1D))) {

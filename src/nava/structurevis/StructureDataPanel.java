@@ -16,8 +16,8 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListDataEvent;
 import nava.data.types.*;
 import nava.structurevis.data.MappingSource;
-import nava.structurevis.data.StructureSource;
-import nava.structurevis.data.StructureSource.MappingSourceOption;
+import nava.structurevis.data.StructureOverlay;
+import nava.structurevis.data.StructureOverlay.MappingSourceOption;
 import nava.ui.MainFrame;
 import nava.ui.ProjectController;
 import nava.ui.ProjectModel;
@@ -33,7 +33,7 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
     ProjectModel projectModel;
     DefaultComboBoxModel<SecondaryStructure> structureComboBoxModel = new DefaultComboBoxModel<>();
     DefaultComboBoxModel<Alignment> alignmentComboBoxModel = new DefaultComboBoxModel<>();
-    StructureSource structureSource;
+    StructureOverlay structureSource;
     SpinnerNumberModel minSpinnerModel = new SpinnerNumberModel(10, 1, Integer.MAX_VALUE, 1);
     SpinnerNumberModel maxSpinnerModel = new SpinnerNumberModel(250, 0, Integer.MAX_VALUE, 1);
 
@@ -386,7 +386,7 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
             }
 
 
-            structureSource = new StructureSource(structure, mappingSource);
+            structureSource = new StructureOverlay(structure, mappingSource);
             structureSource.minStructureSize = (Integer) this.minSpinnerModel.getValue();
             structureSource.maxStructureSize = (Integer) this.maxSpinnerModel.getValue();
             structureSource.nonOverlappingSubstructures = this.jCheckBox1.isSelected();
@@ -411,12 +411,12 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
         update();
         structureSource.loadData();
         if (structureSource != null && structureSource.pairedSites != null) {
-            structureSource.substructures = StructureSource.enumerateAdjacentSubstructures(structureSource.pairedSites, 10, 250, false);
+            structureSource.substructures = StructureOverlay.enumerateAdjacentSubstructures(structureSource.pairedSites, 10, 250, false);
             //System.out.println(structureSource.substructures);
         }
     }
 
-    public void setStructureSource(StructureSource structureSource) {
+    public void setStructureSource(StructureOverlay structureSource) {
         // TODO
         this.structureComboBoxModel.setSelectedItem(structureSource.structure);
         this.circularRadioButton.setSelected(structureSource.circular);
@@ -437,7 +437,8 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
         this.jCheckBox1.setSelected(structureSource.nonOverlappingSubstructures);
     }
 
-    public StructureSource getStructureSource() {
+    public StructureOverlay getStructureSource() {
+        post();
         return structureSource;
     }
 

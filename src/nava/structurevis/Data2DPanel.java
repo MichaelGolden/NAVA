@@ -699,6 +699,7 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
     }
 
     public DataOverlay2D getDataSource2D() {
+        update();
         return dataSource2D;
     }
 

@@ -124,6 +124,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
 
         this.dataLegendPanel.add(dataLegend, BorderLayout.CENTER);
         dataLegend.setLegend("Example", new DataTransform(0, 1, DataTransform.TransformType.LINEAR), new ColorGradient(Color.white, Color.red), new ColorGradient(Color.white, Color.red));
+        dataLegend.showEditMode();
 
         this.naturalRadioButton.addItemListener(this);
         this.fromFieldRadioButton.addItemListener(this);
@@ -214,11 +215,11 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
         this.codonCheckButton.setSelected(dataSource1D.codonPositions);
         this.dataMinField.setValue(dataSource1D.minValue);
         this.dataMaxField.setValue(dataSource1D.maxValue);
-        this.fromFieldRadioButton.setSelected(dataSource1D.positionField != null);
+        this.fromFieldRadioButton.setSelected(!dataSource1D.naturalPositions && dataSource1D.positionField != null);
         this.missingDataRadioButton.setSelected(dataSource1D.excludeValuesOutOfRange);
         this.clampedRadioButton.setSelected(!dataSource1D.excludeValuesOutOfRange);
         this.transformComboBoxModel.setSelectedItem(dataSource1D.dataTransform.type);
-        this.dataLegend.setLegend(dataSource1D.title, dataSource1D.dataTransform, dataSource1D.colorGradient, dataSource1D.defaultColorGradient);
+        this.dataLegend.setLegend(dataSource1D.title, dataSource1D.dataTransform, dataSource1D.colorGradient, dataSource1D.defaultColorGradient);       
         this.mappingSourceComboBoxModel.setSelectedItem(dataSource1D.mappingSequence == null ? null : dataSource1D.mappingSource.alignmentSource);
     }
 
@@ -735,6 +736,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
     }
 
     public DataOverlay1D getDataSource1D() {
+        update();
         return dataSource1D;
     }
 

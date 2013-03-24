@@ -16,6 +16,7 @@ import nava.data.io.IO;
 public class Mapping implements Serializable {
 
     public static String MUSCLE_EXECUTABLE = "muscle3.8.31_i86win32.exe";
+    private static final long serialVersionUID = 1L;
 
     public static void setMuscleExecutable(String muscleExecutable) {
         Mapping.MUSCLE_EXECUTABLE = muscleExecutable;
@@ -30,10 +31,10 @@ public class Mapping implements Serializable {
     public String alignedB0;
     public File mappingFile;
     public boolean bReversedComplemented = false;
-    Hashtable<Integer, Integer> aToReference = new Hashtable<>();
-    Hashtable<Integer, Integer> bToReference = new Hashtable<>();
-    Hashtable<Integer, Integer> referenceToA = new Hashtable<>();
-    Hashtable<Integer, Integer> referenceToB = new Hashtable<>();
+    int [] aToRefList = {};
+    int [] bToRefList = {};
+    int [] refToAList = {};
+    int [] refToBList = {};
     int refLen;
 
     public static void setAlignmentParameters(double gapOpen, double gapExtend, int s) {
@@ -46,35 +47,31 @@ public class Mapping implements Serializable {
     }
 
     public int aToRef(int i) {
-        Integer coordinate = aToReference.get(i);
-        if (coordinate == null) {
-            return -1;
+        if (i >= 0 && i < aToRefList.length) {
+            return aToRefList[i];
         }
-        return coordinate.intValue();
+        return -1;
     }
 
     public int bToRef(int i) {
-        Integer coordinate = bToReference.get(i);
-        if (coordinate == null) {
-            return -1;
+        if (i >= 0 && i < bToRefList.length) {
+            return bToRefList[i];
         }
-        return coordinate.intValue();
+        return -1;
     }
 
     public int refToA(int i) {
-        Integer coordinate = referenceToA.get(i);
-        if (coordinate == null) {
-            return -1;
+        if (i >= 0 && i < refToAList.length) {
+            return refToAList[i];
         }
-        return coordinate.intValue();
+        return -1;
     }
 
     public int refToB(int i) {
-        Integer coordinate = referenceToB.get(i);
-        if (coordinate == null) {
-            return -1;
+        if (i >= 0 && i < refToBList.length) {
+            return refToBList[i];
         }
-        return coordinate.intValue();
+        return -1;
     }
 
     public int aToB(int i) {
@@ -371,12 +368,11 @@ public class Mapping implements Serializable {
 
         Mapping mapping = createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, select, false, "mappingforward.fas");
         Mapping reverseMapping = createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, select, true, "mappingreverse.fas");
-        
-        if(mapping == null || reverseMapping == null)
-        {
+
+        if (mapping == null || reverseMapping == null) {
             return null;
         }
-        
+
         double m1 = 0;
         double t1 = 0;
         for (int i = 0; i < mapping.alignedA0.length(); i++) {
@@ -403,11 +399,10 @@ public class Mapping implements Serializable {
     }
 
     public static Mapping getMappingFromAlignedStrings(String alignedA0, String alignedB0, boolean bReversedComplemented) {
-        if(alignedA0 == null || alignedB0 == null)
-        {
+        if (alignedA0 == null || alignedB0 == null) {
             return null;
         }
-        
+
         if (alignedA0.length() != alignedB0.length()) {
             throw new Error("Aligned sequences are not of equal length.");
         }
@@ -418,14 +413,24 @@ public class Mapping implements Serializable {
         mapping.alignedB0 = alignedB0;
         mapping.bReversedComplemented = bReversedComplemented;
 
+        mapping.refToAList = new int[alignedA0.length()];
+        mapping.refToBList = new int[alignedA0.length()];
+        mapping.aToRefList = new int[alignedA0.length()];
+        mapping.bToRefList = new int[alignedA0.length()];
+        
         for (int i = 0; i < alignedA0.length(); i++) {
             int ref = i;
             int refToA = getUngappedPosition(alignedA0, ref);
             if (alignedA0.charAt(ref) != '-') {
-                mapping.referenceToA.put(ref, refToA);
-                if (!mapping.aToReference.containsKey(refToA)) {
-                    mapping.aToReference.put(refToA, ref);
+                //mapping.referenceToA.put(ref, refToA);
+                mapping.refToAList[ref] = refToA;
+                /*
+                 * if (!mapping.aToReference.containsKey(refToA)) {
+                 * mapping.aToReference.put(refToA, ref);
                 }
+                 */
+            } else {
+                mapping.refToAList[ref] = -1;
             }
         }
 
@@ -435,10 +440,15 @@ public class Mapping implements Serializable {
                 int ref = i;
                 int refToB = bLength - getUngappedPosition(alignedB0, ref) - 1;
                 if (alignedB0.charAt(ref) != '-') {
-                    mapping.referenceToB.put(ref, refToB);
-                    if (!mapping.bToReference.containsKey(refToB)) {
-                        mapping.bToReference.put(refToB, ref);
+                    //mapping.referenceToB.put(ref, refToB);
+                    mapping.refToBList[ref] = refToB;
+                    /*
+                     * if (!mapping.bToReference.containsKey(refToB)) {
+                     * mapping.bToReference.put(refToB, ref);
                     }
+                     */
+                } else {
+                    mapping.refToBList[ref] = -1;
                 }
             }
         } else {
@@ -446,11 +456,28 @@ public class Mapping implements Serializable {
                 int ref = i;
                 int refToB = getUngappedPosition(alignedB0, ref);
                 if (alignedB0.charAt(ref) != '-') {
-                    mapping.referenceToB.put(ref, refToB);
-                    if (!mapping.bToReference.containsKey(refToB)) {
-                        mapping.bToReference.put(refToB, ref);
+                    //mapping.referenceToB.put(ref, refToB);
+                    mapping.refToBList[ref] = refToB;
+                    /*
+                     * if (!mapping.bToReference.containsKey(refToB)) {
+                     * mapping.bToReference.put(refToB, ref);
                     }
+                     */
+                } else {
+                    mapping.refToBList[ref] = -1;
                 }
+            }
+        }
+
+        for (int i = 0; i < mapping.refToAList.length ; i++) {
+            if (mapping.refToAList[i] > -1) {
+                mapping.aToRefList[mapping.refToAList[i]] = i;
+            }
+        }
+
+        for (int i = 0; i < mapping.refToBList.length ; i++) {
+            if (mapping.refToBList[i] > -1) {
+                mapping.bToRefList[mapping.refToBList[i]] = i;
             }
         }
 

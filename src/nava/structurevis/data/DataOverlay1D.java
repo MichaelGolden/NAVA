@@ -48,7 +48,7 @@ public class DataOverlay1D extends Overlay implements Serializable {
 
         dataOffsetCorrected = dataOffset;
         if (codonPositions) {
-            dataOffsetCorrected *= 3;
+         //   dataOffsetCorrected *= 3;
         }
 
         /*
@@ -61,28 +61,37 @@ public class DataOverlay1D extends Overlay implements Serializable {
 
         if (naturalPositions) {
             if (!codonPositions) {
-                data = new double[values.size()];
+                data = new double[values.size()-dataOffsetCorrected];
                 stringData = new String[values.size()];
-                used = new boolean[values.size()];
+                used = new boolean[values.size()-dataOffsetCorrected];
+                for(int i = 0 ; i < values.size() ; i++)
+                {
+                    stringData[i] = values.get(i);
+                }
                 for (int i = 0; i < data.length; i++) {
                     stringData[i] = values.get(i);
-                    if (Utils.isNumeric(values.get(i))) {
-                        data[i] = Double.parseDouble(values.get(i));
+                    if (Utils.isNumeric(values.get(i+dataOffsetCorrected))) {
+                        data[i] = Double.parseDouble(values.get(i+dataOffsetCorrected));
                         used[i] = true;
                     }
                 }
             } else {
-                data = new double[values.size() * 3];
+                data = new double[(values.size()-dataOffsetCorrected) * 3];
                 stringData = new String[values.size() * 3];
-                used = new boolean[values.size() * 3];
-                for (int i = 0; i < values.size(); i++) {
+                used = new boolean[(values.size()-dataOffsetCorrected) * 3];
+                
+                for(int i = 0 ; i < values.size() ; i++)
+                {
                     stringData[i * 3] = values.get(i);
                     stringData[i * 3 + 1] = values.get(i);
                     stringData[i * 3 + 2] = values.get(i);
-                    if (Utils.isNumeric(values.get(i))) {
-                        data[i * 3] = Double.parseDouble(values.get(i));
-                        data[i * 3 + 1] = Double.parseDouble(values.get(i));
-                        data[i * 3 + 2] = Double.parseDouble(values.get(i));
+                }
+                    
+                for (int i = 0; i < values.size()-dataOffset; i++) {
+                    if (Utils.isNumeric(values.get(i+dataOffsetCorrected))) {
+                        data[i * 3] = Double.parseDouble(values.get(i+dataOffsetCorrected));
+                        data[i * 3 + 1] = Double.parseDouble(values.get(i+dataOffsetCorrected));
+                        data[i * 3 + 2] = Double.parseDouble(values.get(i+dataOffsetCorrected));
                         used[i * 3] = true;
                         used[i * 3 + 1] = true;
                         used[i * 3 + 2] = true;
@@ -151,7 +160,7 @@ public class DataOverlay1D extends Overlay implements Serializable {
             }
         }
 
-        for (int i = 0; i < dataOffsetCorrected; i++) {
+        for (int i = 0; i < dataOffsetCorrected && i < used.length; i++) {
             used[i] = false;
         }
     }

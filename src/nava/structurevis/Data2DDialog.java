@@ -6,6 +6,7 @@ package nava.structurevis;
 
 import java.awt.BorderLayout;
 import javax.swing.ImageIcon;
+import nava.structurevis.data.Overlay;
 import nava.ui.ProjectModel;
 
 /**
@@ -18,24 +19,25 @@ public class Data2DDialog extends javax.swing.JDialog {
     ProjectModel projectModel;
     Data2DPanel data2DPanel;
     boolean editMode = false;
-    
+
     /**
      * Creates new form Data1DDialog
      */
     public Data2DDialog(java.awt.Frame parent, boolean modal, ProjectModel projectModel, StructureVisController structureVisController) {
         super(parent, modal);
         initComponents();
-        
+
         this.projectModel = projectModel;
         this.structureVisController = structureVisController;
         data2DPanel = new Data2DPanel(projectModel);
         this.jPanel1.add(data2DPanel, BorderLayout.CENTER);
         this.setIconImage(new ImageIcon(ClassLoader.getSystemResource("resources/icons/icon-32x32.png")).getImage());
     }
-    
-    
-    public void setEditMode(boolean editMode) {
-        this.editMode = editMode;
+    Overlay editOverlay = null;
+
+    public void setEditMode(Overlay overlay) {
+        this.editMode = overlay != null;
+        this.editOverlay = overlay;
         if (editMode) {
             this.addButton.setText("Save");
         } else {
@@ -102,7 +104,14 @@ public class Data2DDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
-        structureVisController.addStructureVisDataSource2D(data2DPanel.getDataSource2D());
+        if(editOverlay == null)
+        {
+            structureVisController.addStructureVisDataSource2D(data2DPanel.getDataSource2D());
+        }
+        else
+        {
+            structureVisController.setStructureVisDataSource2D(editOverlay, data2DPanel.getDataSource2D());
+        }
         this.dispose();
     }//GEN-LAST:event_addButtonActionPerformed
 

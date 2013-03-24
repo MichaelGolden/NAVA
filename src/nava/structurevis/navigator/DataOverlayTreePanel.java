@@ -223,27 +223,27 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
 
             if (overlay instanceof DataOverlay1D) {
                 if (overlay.getState() == Overlay.OverlayState.PRIMARY_SELECTED) {
-                    structureVisController.structureVisModel.substructureModel.setDataSource1D(null);
+                    structureVisController.structureVisModel.substructureModel.setOverlay1D(null);
                 } else {
-                    structureVisController.structureVisModel.substructureModel.setDataSource1D((DataOverlay1D) overlay);
+                    structureVisController.structureVisModel.substructureModel.setOverlay1D((DataOverlay1D) overlay);
                 }
             } else if (overlay instanceof DataOverlay2D) {
                 if (overlay.getState() == Overlay.OverlayState.PRIMARY_SELECTED) {
-                    structureVisController.structureVisModel.substructureModel.setDataSource2D(null);
+                    structureVisController.structureVisModel.substructureModel.setOverlay2D(null);
                 } else {
-                    structureVisController.structureVisModel.substructureModel.setDataSource2D((DataOverlay2D) overlay);
+                    structureVisController.structureVisModel.substructureModel.setOverlay2D((DataOverlay2D) overlay);
                 }
             } else if (overlay instanceof NucleotideComposition) {
                 if (overlay.getState() == Overlay.OverlayState.PRIMARY_SELECTED) {
-                    structureVisController.structureVisModel.substructureModel.setNucleotideSource(null);
+                    structureVisController.structureVisModel.substructureModel.setNucleotideOverlay(null);
                 } else {
-                    structureVisController.structureVisModel.substructureModel.setNucleotideSource((NucleotideComposition) overlay);
+                    structureVisController.structureVisModel.substructureModel.setNucleotideOverlay((NucleotideComposition) overlay);
                 }
-            } else if (overlay instanceof StructureSource) {
+            } else if (overlay instanceof StructureOverlay) {
                 if (overlay.getState() == Overlay.OverlayState.PRIMARY_SELECTED) {
-                    structureVisController.structureVisModel.substructureModel.setStructureSource(null);
+                    structureVisController.structureVisModel.substructureModel.setStructureOverlay(null);
                 } else {
-                    structureVisController.structureVisModel.substructureModel.setStructureSource((StructureSource) overlay);
+                    structureVisController.structureVisModel.substructureModel.setStructureOverlay((StructureOverlay) overlay);
                 }
 
             }
@@ -261,8 +261,8 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
             } else if (overlay instanceof NucleotideComposition) {
                 StructureVisPanel.showEditDialog((NucleotideComposition) overlay, null, projectController.projectModel, structureVisController);
 
-            } else if (overlay instanceof StructureSource) {
-                StructureVisPanel.showEditDialog((StructureSource) overlay, null, projectController.projectModel, structureVisController);
+            } else if (overlay instanceof StructureOverlay) {
+                StructureVisPanel.showEditDialog((StructureOverlay) overlay, null, projectController.projectModel, structureVisController);
             }
 
             // update node icons on tree

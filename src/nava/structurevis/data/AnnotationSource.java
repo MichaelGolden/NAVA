@@ -208,7 +208,7 @@ public class AnnotationSource implements Serializable {
         return annotationData;
     }
 
-    public static AnnotationSource getMappedAnnotations(AnnotationSource annotationSource, StructureSource structureSource, StructureVisController structureVisController) {
+    public static AnnotationSource getMappedAnnotations(AnnotationSource annotationSource, StructureOverlay structureSource, StructureVisController structureVisController) {
         if(annotationSource == null)
         {
             annotationSource = new AnnotationSource();

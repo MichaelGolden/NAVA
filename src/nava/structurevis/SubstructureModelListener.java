@@ -18,7 +18,7 @@ public interface SubstructureModelListener extends EventListener {
 
     public void dataSource2DChanged(DataOverlay2D dataSource2D);
 
-    public void structureSourceChanged(StructureSource structureSource);
+    public void structureSourceChanged(StructureOverlay structureSource);
 
     public void annotationSourceChanged(AnnotationSource annotationSource);
 

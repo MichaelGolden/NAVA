@@ -153,10 +153,9 @@ public class NavigatorPanel extends javax.swing.JPanel implements TreeSelectionL
 
     @Override
     public void projectModelChanged(ProjectModel newProjectModel) {
+        System.out.println("projectModelChanged "+newProjectModel.dataSources );
         this.navigationTree.setModel(projectController.projectModel.navigatorTreeModel);
         newProjectModel.navigatorTreeModel.addTreeModelListener(this);
-        System.out.println("PROJECTMODELCHNGED");
-        System.out.println(newProjectModel.navigatorTreeModel.getChildCount(newProjectModel.navigatorTreeModel.getRoot()));
     }
 
     @Override

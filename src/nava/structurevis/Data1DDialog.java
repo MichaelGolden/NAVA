@@ -6,6 +6,7 @@ package nava.structurevis;
 
 import java.awt.BorderLayout;
 import javax.swing.ImageIcon;
+import nava.structurevis.data.Overlay;
 import nava.ui.ProjectModel;
 
 /**
@@ -18,6 +19,7 @@ public class Data1DDialog extends javax.swing.JDialog {
     ProjectModel projectModel;
     Data1DPanel data1DPanel;
     boolean editMode = false;
+    
     
     /**
      * Creates new form Data1DDialog
@@ -34,9 +36,10 @@ public class Data1DDialog extends javax.swing.JDialog {
         this.setIconImage(new ImageIcon(ClassLoader.getSystemResource("resources/icons/icon-32x32.png")).getImage());
     }
     
-    
-    public void setEditMode(boolean editMode) {
-        this.editMode = editMode;
+    Overlay editOverlay = null;
+    public void setEditMode(Overlay overlay) {
+        this.editMode = overlay != null;
+        this.editOverlay = overlay;
         if (editMode) {
             this.addButton.setText("Save");
         } else {
@@ -103,7 +106,14 @@ public class Data1DDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
-        structureVisController.addStructureVisDataSource1D(data1DPanel.getDataSource1D());
+        if(editOverlay == null)
+        {
+            structureVisController.addStructureVisDataSource1D(data1DPanel.getDataSource1D());
+        }
+        else
+        {
+            structureVisController.setStructureVisDataSource1D(editOverlay, data1DPanel.getDataSource1D());
+        }
         this.dispose();
     }//GEN-LAST:event_addButtonActionPerformed
 

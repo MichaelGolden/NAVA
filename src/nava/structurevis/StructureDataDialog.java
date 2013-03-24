@@ -5,6 +5,7 @@
 package nava.structurevis;
 
 import java.awt.BorderLayout;
+import nava.structurevis.data.Overlay;
 import nava.ui.ProjectController;
 import nava.ui.ProjectModel;
 
@@ -18,6 +19,7 @@ public class StructureDataDialog extends javax.swing.JDialog {
     StructureVisController structureVisController;
     public StructureDataPanel structureDataPanel;
     boolean editMode = false;
+
     /**
      * Creates new form StructureDataDialog
      */
@@ -25,16 +27,16 @@ public class StructureDataDialog extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         this.projectModel = projectModel;
-        
+
         this.structureVisController = structureVisController;
         structureDataPanel = new StructureDataPanel(projectModel);
         this.jPanel1.add(structureDataPanel, BorderLayout.CENTER);
     }
-    
-    
-    
-    public void setEditMode(boolean editMode) {
-        this.editMode = editMode;
+    Overlay editOverlay = null;
+
+    public void setEditMode(Overlay overlay) {
+        this.editMode = overlay != null;
+        this.editOverlay = overlay;
         if (editMode) {
             this.addButton.setText("Save");
         } else {
@@ -93,9 +95,11 @@ public class StructureDataDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
-        structureDataPanel.post();
-        structureVisController.addStructureSource(structureDataPanel.getStructureSource());
-        
+        if (editOverlay == null) {
+            structureVisController.addStructureSource(structureDataPanel.getStructureSource());
+        } else {
+            structureVisController.setStructureSource(editOverlay, structureDataPanel.getStructureSource());
+        }
         this.dispose();
     }//GEN-LAST:event_addButtonActionPerformed
 

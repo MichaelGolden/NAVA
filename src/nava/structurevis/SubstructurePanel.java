@@ -33,7 +33,7 @@ import nava.utils.CustomItem;
  */
 public class SubstructurePanel extends javax.swing.JPanel implements ChangeListener, ItemListener, ListDataListener, SubstructureModelListener, StructureVisView {
 
-    DefaultComboBoxModel<StructureSource> structureComboBoxModel = new DefaultComboBoxModel<>();
+    DefaultComboBoxModel<StructureOverlay> structureComboBoxModel = new DefaultComboBoxModel<>();
     DefaultComboBoxModel<CustomItem> substructureComboBoxModel = new DefaultComboBoxModel<>();
     StructureVisController structureVisController;
     ProjectController projectController;
@@ -212,7 +212,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         StructureDataDialog d = new StructureDataDialog(null, true, projectController.projectModel, structureVisController);
         d.setSize(640, 580);
-        d.setEditMode(false);
+        d.setEditMode(null);
         d.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -240,10 +240,10 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
     @Override
     public void itemStateChanged(ItemEvent e) {
         if (e.getSource().equals(structureComboBox)) {
-            StructureSource structureSource = (StructureSource) structureComboBox.getSelectedItem();
+            StructureOverlay structureSource = (StructureOverlay) structureComboBox.getSelectedItem();
 
             if (structureSource != null && structureSource.mappingSource != null) {
-                structureVisController.structureVisModel.substructureModel.setStructureSource(structureSource);
+                structureVisController.structureVisModel.substructureModel.setStructureOverlay(structureSource);
             }
 
             /*
@@ -267,7 +267,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
 
     public void populateStructureSourceComboBox() {
         structureComboBoxModel.removeAllElements();
-        ArrayList<StructureSource> list = structureVisController.structureVisModel.structureSources.getArrayListShallowCopy();
+        ArrayList<StructureOverlay> list = structureVisController.structureVisModel.structureSources.getArrayListShallowCopy();
         for (int i = 0; i < list.size(); i++) {
             //ComboBoxItem<StructureSource> item = new ComboBoxItem<>(list.get(i), list.get(i).structure.toString());
             structureComboBoxModel.addElement(list.get(i));
@@ -313,13 +313,19 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
     }
 
     @Override
-    public void structureSourceChanged(StructureSource structureSource) {
+    public void structureSourceChanged(StructureOverlay structureSource) {
+        System.out.println("structureSourceChanged\t"+structureSource+"\t"+structureSource.mappingSource);
         if (structureSource != null && structureSource.mappingSource != null) {
             //structureVisController.addStructureSource(structureSource);
             structureSource.loadData();
+            System.out.println("structureSource.substructures.size() = "+structureSource.substructures.size());
             if (structureSource.substructures.size() > 0) {
                 System.out.println(structureSource.substructures.get(0));
                 structureDrawPanel.openSubstructure(structureSource.substructures.get(0));
+            }
+            else
+            {                
+                structureDrawPanel.openSubstructure(null);
             }
             populateSubtructureComboBox();
         }
@@ -347,10 +353,10 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
             structureDrawPanel.model.thresholdMax1D = dataLegend1D.getMaxValue();
             structureDrawPanel.model.thresholdMin2D = dataLegend2D.getMinValue();
             structureDrawPanel.model.thresholdMax2D = dataLegend2D.getMaxValue();
-            structureDrawPanel.model.useLowerThreshold1D = !dataLegend1D.downSliderOpen;
-            structureDrawPanel.model.useUpperThreshold1D = !dataLegend1D.upSliderOpen;
-            structureDrawPanel.model.useLowerThreshold2D = !dataLegend2D.downSliderOpen;
-            structureDrawPanel.model.useUpperThreshold2D = !dataLegend2D.upSliderOpen;
+            structureDrawPanel.model.useUpperThreshold1D = !dataLegend1D.downSliderOpen;
+            structureDrawPanel.model.useLowerThreshold1D = !dataLegend1D.upSliderOpen;
+            structureDrawPanel.model.useUpperThreshold2D = !dataLegend2D.downSliderOpen;
+            structureDrawPanel.model.useLowerThreshold2D = !dataLegend2D.upSliderOpen;
             structureDrawPanel.redraw();
         }
     }
@@ -366,7 +372,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
     }
 
     @Override
-    public void dataOverlayChanged(Overlay overlay) {
+    public void dataOverlayChanged(Overlay oldOverlay, Overlay newOverlay) {
         //throw new UnsupportedOperationException("Not supported yet.");
     }
 }

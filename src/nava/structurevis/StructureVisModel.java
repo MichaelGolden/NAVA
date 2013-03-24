@@ -22,21 +22,20 @@ import nava.utils.SafeListModel;
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
 public class StructureVisModel implements Serializable {
-    public SafeListModel<StructureSource> structureSources = new SafeListModel<>();
+
+    private static final long serialVersionUID = 3003041061712657008L;
+    public SafeListModel<StructureOverlay> structureSources = new SafeListModel<>();
     public SafeListModel<DataOverlay1D> structureVisDataOverlays1D = new SafeListModel<>();
     public SafeListModel<DataOverlay2D> structureVisDataOverlays2D = new SafeListModel<>();
     public SafeListModel<AnnotationSource> annotationSources = new SafeListModel<>();
     public SafeListModel<NucleotideComposition> nucleotideSources = new SafeListModel<>();
-    
     public DataOverlayTreeModel overlayNavigatorTreeModel;
-    
-   // protected transient EventListenerList listeners = new EventListenerList();
-    
-    public SubstructureModel substructureModel = null;
+    // protected transient EventListenerList listeners = new EventListenerList();
+    public  SubstructureModel substructureModel = null;
     Hashtable<Pair<MappingSource, MappingSource>, Mapping> mappings = new Hashtable<>();
     //public File structureVisModelFile = null;
-    
-    public void saveStructureVisModel(File outFile) {      
+
+    public void saveStructureVisModel(File outFile) {
         ArrayList<TreeModelListener> treeListenersList = new ArrayList<>();
         TreeModelListener[] overlayTreeListeners = overlayNavigatorTreeModel.getTreeModelListeners();
         for (int i = 0; i < overlayTreeListeners.length; i++) {
@@ -52,39 +51,35 @@ public class StructureVisModel implements Serializable {
         }
 
         // re-add the listeners, this is only necessary if the application stays open
-        
+
         System.out.println("StructureVis project saved");
     }
-    
-     public static StructureVisModel loadProject(File inFile, StructureVisController structureVisController) throws IOException, ClassNotFoundException {
+
+    public static StructureVisModel loadProject(File inFile, StructureVisController structureVisController) throws IOException, ClassNotFoundException {
         ObjectInputStream in = new ObjectInputStream(new FileInputStream(inFile));
 
         StructureVisModel ret = (StructureVisModel) in.readObject();
         ret.initialise(structureVisController);
         in.close();
-        
+
 
         System.out.println("StructureVis project loaded");
         return ret;
     }
-     
-     public String getStructureVisModelPathString(StructureVisController structureVisController)
-     {
-         return  structureVisController.getWorkingDirectory()+File.separator+"structurevis.model";
-     }
-     
-    
-     public void initialise(StructureVisController structureVisController)
-     {         
+
+    public String getStructureVisModelPathString(StructureVisController structureVisController) {
+        return structureVisController.getWorkingDirectory() + File.separator + "structurevis.model";
+    }
+
+    public void initialise(StructureVisController structureVisController) {
         substructureModel.initialise(structureVisController);
-        if(overlayNavigatorTreeModel == null)
-        {            
-            overlayNavigatorTreeModel = new DataOverlayTreeModel(new DefaultMutableTreeNode(),structureVisController);
+        if (overlayNavigatorTreeModel == null) {
+            overlayNavigatorTreeModel = new DataOverlayTreeModel(new DefaultMutableTreeNode(), structureVisController);
         }
-        structureVisController.addView(overlayNavigatorTreeModel);  
-        structureVisDataOverlays1D.addListDataListener(structureVisController);
-        structureVisDataOverlays2D.addListDataListener(structureVisController);
-        nucleotideSources.addListDataListener(structureVisController);
-        structureSources.addListDataListener(structureVisController);
-     }
+        structureVisController.addView(overlayNavigatorTreeModel);
+        structureVisDataOverlays1D.addSafeListListener(structureVisController);
+        structureVisDataOverlays2D.addSafeListListener(structureVisController);
+        nucleotideSources.addSafeListListener(structureVisController);
+        structureSources.addSafeListListener(structureVisController);
+    }
 }

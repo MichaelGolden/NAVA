@@ -38,6 +38,9 @@ import net.hanjava.svg.SVG2EMF;
  */
 public class DataLegend extends JPanel implements ActionListener, MouseListener, MouseMotionListener {
 
+    public static final String EDIT_MODE_STRING = "Change color gradient";
+    public static final String RANGE_MODE_STRING = "Set numeric range";
+    
     protected javax.swing.event.EventListenerList listenerList = new javax.swing.event.EventListenerList();
     //public JColorChooser colorChooser = new JColorChooser();
     public static final int HORIZONTAL = 0;
@@ -79,7 +82,7 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
     int mousePosX = 0;
     int mousePosY = 0;
     JPopupMenu editPopupMenu = new JPopupMenu();
-    JMenuItem modeItem = new JMenuItem("Edit gradient");
+    JMenuItem modeItem = new JMenuItem(EDIT_MODE_STRING);
     JMenu colorPresetsMenu = new JMenu("Use preset gradient");
     JMenuItem blueWhiteGreenItem = new JMenuItem("Blue-white-green");
     JMenuItem orangeRedItem = new JMenuItem("Orange-red");
@@ -135,13 +138,13 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
 
     public void showEditMode() {
         edit = true;
-        modeItem.setText("Set range");
+        modeItem.setText(RANGE_MODE_STRING);
         repaint();
     }
 
     public void showRangeMode() {
         edit = false;
-        modeItem.setText("Change colour gradient");
+        modeItem.setText(EDIT_MODE_STRING);
         repaint();
     }
 
@@ -357,13 +360,15 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
             double min = transform.transform(transform.min);
             double max = transform.transform(transform.max);
             for (int i = 0; i < barHeight; i++) {
-                double h = (double) i / (barHeight - 1);
+                double h = ((double) i / (barHeight - 1));
+                
                 double x = min + h * (max - min);
-                Rectangle2D.Double rect = new Rectangle2D.Double(barOffsetX, barOffsetY + h * barHeight, barWidth, 2);
+                Rectangle2D.Double rect = new Rectangle2D.Double(barOffsetX, barOffsetY + (1-h) * barHeight, barWidth, 2);
                 g.setColor(colorGradient.getColor((float) x));
                 g.fill(rect);
             }
 
+            // draw labels
             double greatestLabelX = 0;
             g.setColor(Color.black);
             for (int i = 0; i < barHeight; i++) {
@@ -374,7 +379,7 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
                     if (edit) {
                         xpos += arrowWidth;
                     }
-                    int ypos = (int) (barOffsetY + h * barHeight);
+                    int ypos = (int) (barOffsetY + (1-h) * barHeight);
                     if (!edit) {
                         g.drawLine(xpos - 2, ypos, xpos + 1, ypos);
                     }
@@ -416,12 +421,12 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
                     if (i != hideColorSlider) {
                         //Rectangle2D.Double rect = new Rectangle2D.Double(barOffsetX, barOffsetY + h * barHeight, barWidth, 2);
                         g.setColor(Color.black);
-                        double ypos = colorGradient.positions[i] * barHeight;
+                        double ypos = (1-colorGradient.positions[i]) * barHeight;
                         //System.out.println((barOffsetX+width) + " : " (barOffsetY+ypos));
                         fillHorizontalArrow(g, barOffsetX + barWidth, barOffsetY + ypos, 10, 10, 1, colorGradient.colours[i]);
                     } else {
                         g.setColor(Color.black);
-                        double ypos = colorGradient.positions[i] * barHeight;
+                        double ypos = (1-colorGradient.positions[i]) * barHeight;
                         //System.out.println((barOffsetX+width) + " : " (barOffsetY+ypos));
                         fillHorizontalArrow(g, mousePosX - (arrowWidth / 2), mousePosY, 10, 10, 1, colorGradient.colours[i]);
                     }
@@ -443,7 +448,7 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
                 double xpos = Math.max(barOffsetX + barWidth + 20, greatestLabelX + 10);
                 for (int i = 0; i < histogram.nbins; i++) {
                     double ypos = barOffsetY + (((double) i / (histogram.nbins)) * (barHeight + 1));
-                    double w = histogram.getProportionOfMax(i) * (getWidth() - xpos - 10);
+                    double w = histogram.getProportionOfMax(histogram.nbins - i - 1) * (getWidth() - xpos - 10);
                     double h = barHeight / ((double) histogram.nbins) - 1;
 
 
@@ -540,22 +545,22 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
                     Color[] colors = new Color[colorGradient.colours.length + 1];
                     float[] positions = new float[colorGradient.colours.length + 1];
                     int r = 0;
-                    float ypos = Math.max(Math.min((float) ((e.getY() - barOffsetY) / barHeight), 1), 0);
+                    float f = 1-Math.max(Math.min((float) ((e.getY() - barOffsetY) / barHeight), 1), 0);
                     for (int i = 0; i < colorGradient.colours.length; i++) {
-                        if (ypos < colorGradient.positions[i]) {
-                            colors[r] = colorGradient.getColor(ypos);
-                            positions[r] = ypos;
+                        if (f < colorGradient.positions[i]) {
+                            colors[r] = colorGradient.getColor(f);
+                            positions[r] = f;
                             r++;
-                            ypos = Float.MAX_VALUE;
+                            f = Float.MAX_VALUE;
                         }
                         colors[r] = colorGradient.colours[i];
                         positions[r] = colorGradient.positions[i];
                         r++;
                     }
 
-                    if (ypos != Float.MAX_VALUE) {
-                        colors[r] = colorGradient.getColor(ypos);
-                        positions[r] = ypos;
+                    if (f != Float.MAX_VALUE) {
+                        colors[r] = colorGradient.getColor(f);
+                        positions[r] = f;
                     }
                     colorGradient.colours = colors;
                     colorGradient.positions = positions;
@@ -577,9 +582,10 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
                 }
             } else {
                 colorSliderSelected = -1;
+                // find selected color slider
                 for (int i = 0; i < colorGradient.positions.length; i++) {
                     double x = barOffsetX + barWidth;
-                    double y = barOffsetY + (colorGradient.positions[i] * barHeight);
+                    double y = barOffsetY + (barHeight - (colorGradient.positions[i] * barHeight));
                     if (e.getY() >= y - (0.5 * colorArrowHeight) && e.getY() < y + (0.5 * colorArrowHeight)) {
                         colorSliderSelected = i;
                     }
@@ -634,7 +640,7 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
                 sliderIndicatorPosY = e.getY();
                 double min = transform.transform(transform.min);
                 double max = transform.transform(transform.max);
-                double x = transform.inverseTransform(min + downSliderPercentY * (max - min));
+                double x = 1-transform.inverseTransform(min + downSliderPercentY * (max - min));
                 if (transform.type == TransformType.LINEAR) {
                     sliderIndicatorText = decimalFormat.format(x);
                 } else if (transform.type == TransformType.EXPLOG) {
@@ -650,7 +656,7 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
                 sliderIndicatorPosY = e.getY();
                 double min = transform.transform(transform.min);
                 double max = transform.transform(transform.max);
-                double x = transform.inverseTransform(min + upSliderPercentY * (max - min));
+                double x = 1-transform.inverseTransform(min + upSliderPercentY * (max - min));
                 if (transform.type == TransformType.LINEAR) {
                     sliderIndicatorText = decimalFormat.format(x);
                 } else if (transform.type == TransformType.EXPLOG) {
@@ -661,7 +667,7 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
             }
             downSliderPosY = barOffsetY + downSliderPercentY * barHeight - arrowHeight;
             upSliderPosY = barOffsetY + upSliderPercentY * barHeight + arrowHeight;
-        } else {
+        } else { // if color slider selected
             if (colorSliderSelected != -1) {
                 if (colorGradient.colours.length > 2 && e.getX() > barOffsetX + barWidth + arrowWidth * 1.5) {
                     hideColorSlider = colorSliderSelected;
@@ -672,7 +678,7 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
                         double lower = colorSliderSelected > 0 ? colorGradient.positions[colorSliderSelected - 1] : 0;
                         double upper = colorSliderSelected < colorGradient.positions.length - 1 ? colorGradient.positions[colorSliderSelected + 1] : 1;
                         double f = (e.getY() - barOffsetY) / barHeight;
-                        f = Math.max(Math.min(upper, f), lower);
+                        f = Math.max(Math.min(upper, 1-f), lower);
                         colorGradient.positions[colorSliderSelected] = (float) f;
                     } else {
                         hideColorSlider = -1;
@@ -782,8 +788,12 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
     public void calculateThresholds() {
         double min = transform.transform(transform.min);
         double max = transform.transform(transform.max);
-        thresholdMax = transform.inverseTransform(min + upSliderPercentY * (max - min));
-        thresholdMin = transform.inverseTransform(min + downSliderPercentY * (max - min));
+        
+        thresholdMax = transform.inverseTransform(min + (1-downSliderPercentY) * (max - min));
+        thresholdMin = transform.inverseTransform(min + (1-upSliderPercentY) * (max - min));
+        
+        
+        System.out.println("calculateThresholds()\t"+thresholdMin+" : "+thresholdMax);
     }
 
     public double getMinValue() {

@@ -136,7 +136,7 @@ public class AddDataOverlayDialog extends javax.swing.JDialog {
         this.dispose();
         NucleotideCompositionDialog d = new NucleotideCompositionDialog(null, true, projectController.projectModel, structureVisController);
         d.setSize(600, 150);
-        d.setEditMode(false);
+        d.setEditMode(null);
         d.setVisible(true);
     }//GEN-LAST:event_addNucleotideButtonActionPerformed
 
@@ -144,7 +144,7 @@ public class AddDataOverlayDialog extends javax.swing.JDialog {
         this.dispose();
         Data1DDialog d = new Data1DDialog(null, true, projectController.projectModel, structureVisController);
         d.setSize(920, 690);
-        d.setEditMode(false);
+        d.setEditMode(null);
         d.setVisible(true);
     }//GEN-LAST:event_add1DButtonActionPerformed
 
@@ -152,7 +152,7 @@ public class AddDataOverlayDialog extends javax.swing.JDialog {
         this.dispose();
         Data2DDialog d = new Data2DDialog(null, true, projectController.projectModel, structureVisController);
         d.setSize(750, 690);
-        d.setEditMode(false);
+        d.setEditMode(null);
         d.setVisible(true);
     }//GEN-LAST:event_add2DButtonActionPerformed
 
@@ -160,7 +160,7 @@ public class AddDataOverlayDialog extends javax.swing.JDialog {
         this.dispose();
         StructureDataDialog d = new StructureDataDialog(null, true, projectController.projectModel, structureVisController);
         d.setSize(640, 580);
-        d.setEditMode(false);
+        d.setEditMode(null);
         d.setVisible(true);
     }//GEN-LAST:event_addStructureButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -7,14 +7,15 @@ import java.io.Serializable;
  * @author Michael Golden
  */
 public class DataTransform implements Serializable {
+    private static final long serialVersionUID = -7745486856947485491L;
 
     public enum TransformType implements Serializable {
 
         LINEAR, // transform data between 0 and 1
         EXPLOG, // transform data using e^(logx), useful for p-values
         SQRT, // tranform by square root
-        SQUARED, // transform by squaring
-        IDENTITY; // 
+        SQUARED; // transform by squaring
+        //IDENTITY;;/ 
 
         @Override
         public String toString() {
@@ -23,8 +24,8 @@ public class DataTransform implements Serializable {
                     return "Linear";
                 case EXPLOG:
                     return "Exponential logarithm";
-                case IDENTITY:
-                    return "Identity";
+                //case IDENTITY:
+                    //return "Identity";
                 case SQRT:
                     return "Square root";
                 case SQUARED:
@@ -50,8 +51,8 @@ public class DataTransform implements Serializable {
 
     public double transform(double x) {
         switch (type) {
-            case IDENTITY:
-                return x;
+            //case IDENTITY:
+                //return x;
             case LINEAR:
                 return (x - min) / (max - min);
             case EXPLOG:
@@ -70,8 +71,8 @@ public class DataTransform implements Serializable {
 
     public double inverseTransform(double y) {
         switch (type) {
-            case IDENTITY:
-                return y;
+            //case IDENTITY:
+                //return y;
             case LINEAR:
                 return (y * (max - min)) + min;
             case EXPLOG:

@@ -19,25 +19,22 @@ import nava.tasks.MappingTask;
 import nava.ui.MainFrame;
 import nava.ui.ProjectController;
 import nava.ui.ProjectModel;
-import nava.utils.Mapping;
-import nava.utils.Pair;
-import nava.utils.SafeListModel;
+import nava.utils.*;
 
 /**
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class StructureVisController implements ListDataListener {
+public class StructureVisController implements SafeListListener {
 
     public StructureVisModel structureVisModel;
     transient ProjectController projectController;
     transient ProjectModel projectModel;
-    
 
     public StructureVisController(ProjectController projectController, ProjectModel projectModel) {
         this.projectController = projectController;
         this.projectModel = projectModel;
-        
+
         openStructureVisModel(new StructureVisModel());
     }
 
@@ -47,14 +44,12 @@ public class StructureVisController implements ListDataListener {
         //structureVisModel.structureVisModelFile = new File(getWorkingDirectory().getAbsolutePath() + File.separatorChar + "structurevis.model");
 
         structureVisModel.substructureModel.loadData();
-        
+
     }
-    
-    public File getWorkingDirectory()
-    {
+
+    public File getWorkingDirectory() {
         return projectController.projectModel.getProjectPath().toFile();
     }
-    
     ArrayList<StructureVisView> structureVisViews = new ArrayList<>();
 
     public void addView(StructureVisView view) {
@@ -68,7 +63,7 @@ public class StructureVisController implements ListDataListener {
 
     public void refreshMappings() {
         for (int i = 0; i < structureVisModel.structureSources.size(); i++) {
-            StructureSource s = structureVisModel.structureSources.get(i);
+            StructureOverlay s = structureVisModel.structureSources.get(i);
 
             for (int j = 0; j < structureVisModel.structureVisDataOverlays1D.size(); j++) {
                 DataOverlay1D dataSource = structureVisModel.structureVisDataOverlays1D.get(j);
@@ -106,44 +101,100 @@ public class StructureVisController implements ListDataListener {
         }
     }
 
-    public void addStructureSource(StructureSource structureSource) {
+    public void addStructureSource(StructureOverlay structureSource) {
         if (!structureVisModel.structureSources.contains(structureSource)) {
             if (structureSource.addMappingSourceAsNucleotideOverlay) {
-                System.out.println(structureSource.details());
-                switch (structureSource.mappingSourceOption) {
-                    case ALIGNMENT:
-                        addNucleotideCompositionSource(NucleotideCompositionPanel.getNucleotideSource(structureSource.mappingSource.alignmentSource));
-                        break;
-                    case EMBEDDED:
-                        if (structureSource.structure != null && structureSource.structure.parentSource != null && structureSource.structure.parentSource instanceof Alignment) {
-                            addNucleotideCompositionSource(NucleotideCompositionPanel.getNucleotideSource((Alignment) structureSource.structure.parentSource));
-                            break;
-                        }
-                    case STRING:
-                        try {
-                            File dir = new File(System.getProperty("java.io.tmpdir") + File.separator + System.currentTimeMillis() + File.separator);
-                            dir.mkdirs();
-                            File fastaFile = new File(dir.getAbsolutePath() + File.separator + "sequence.fas");
-                            BufferedWriter buffer = new BufferedWriter(new FileWriter(fastaFile));
-                            buffer.write(">seq");
-                            buffer.newLine();
-                            buffer.write(structureSource.mappingSource.sequence);
-                            buffer.newLine();
-                            buffer.close();
-
-                            DataSource dataSource = projectController.importDataSourceFromFile(fastaFile, new DataType(DataType.Primary.ALIGNMENT, DataType.FileFormat.FASTA));
-                            dataSource.title = structureSource.title;
-                            if (dataSource instanceof Alignment) {
-                                addNucleotideCompositionSource(NucleotideCompositionPanel.getNucleotideSource((Alignment) dataSource));
-                            }
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
-                }
+                addAssociatedStructureMappingSource(structureSource);
             }
             structureVisModel.structureSources.addElement(structureSource);
             refreshMappings();
         }
+    }
+
+    public void addAssociatedStructureMappingSource(StructureOverlay structureSource) {
+        switch (structureSource.mappingSourceOption) {
+            case ALIGNMENT:
+                addNucleotideCompositionSource(NucleotideCompositionPanel.getNucleotideSource(structureSource.mappingSource.alignmentSource));
+                break;
+            case EMBEDDED:
+                if (structureSource.structure != null && structureSource.structure.parentSource != null && structureSource.structure.parentSource instanceof Alignment) {
+                    addNucleotideCompositionSource(NucleotideCompositionPanel.getNucleotideSource((Alignment) structureSource.structure.parentSource));
+                    break;
+                }
+            case STRING:
+                try {
+                    File dir = new File(System.getProperty("java.io.tmpdir") + File.separator + System.currentTimeMillis() + File.separator);
+                    dir.mkdirs();
+                    File fastaFile = new File(dir.getAbsolutePath() + File.separator + "sequence.fas");
+                    BufferedWriter buffer = new BufferedWriter(new FileWriter(fastaFile));
+                    buffer.write(">seq");
+                    buffer.newLine();
+                    buffer.write(structureSource.mappingSource.sequence);
+                    buffer.newLine();
+                    buffer.close();
+
+                    DataSource dataSource = projectController.importDataSourceFromFile(fastaFile, new DataType(DataType.Primary.ALIGNMENT, DataType.FileFormat.FASTA));
+                    dataSource.title = structureSource.title;
+                    if (dataSource instanceof Alignment) {
+                        addNucleotideCompositionSource(NucleotideCompositionPanel.getNucleotideSource((Alignment) dataSource));
+                    }
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+        }
+    }
+
+    public void setStructureSource(Overlay currentOverlay, StructureOverlay structureSource) {
+        int index = structureVisModel.structureSources.indexOf(currentOverlay);
+        if (index >= 0) {
+            structureVisModel.structureSources.set(index, structureSource);
+            if (structureSource.addMappingSourceAsNucleotideOverlay) {
+                addAssociatedStructureMappingSource(structureSource);
+            }
+        } else {
+            System.err.println("ERR");
+        }
+        refreshMappings();
+    }
+
+    public void setStructureVisDataSource1D(Overlay currentOverlay, DataOverlay1D dataSource) {
+        int index = structureVisModel.structureVisDataOverlays1D.indexOf(currentOverlay);
+        if (index >= 0) {
+            structureVisModel.structureVisDataOverlays1D.set(index, dataSource);
+        } else {
+            System.err.println("ERR");
+        }
+        refreshMappings();
+    }
+
+    public void setStructureVisDataSource2D(Overlay currentOverlay, DataOverlay2D dataSource) {
+        int index = structureVisModel.structureVisDataOverlays2D.indexOf(currentOverlay);
+        if (index >= 0) {
+            structureVisModel.structureVisDataOverlays2D.set(index, dataSource);
+        } else {
+            System.err.println("ERR");
+        }
+        refreshMappings();
+    }
+
+    public void setAnnotationsSource(Overlay currentOverlay, AnnotationSource annotationSource) {
+        int index = structureVisModel.annotationSources.indexOf(currentOverlay);
+        if (index >= 0) {
+            structureVisModel.annotationSources.set(index, annotationSource);
+        } else {
+            System.err.println("ERR");
+        }
+        refreshMappings();
+    }
+
+    public void setNucleotideCompositionSource(Overlay currentOverlay, NucleotideComposition nucleotideComposition) {
+        int index = structureVisModel.nucleotideSources.indexOf(currentOverlay);
+        if (index >= 0) {
+            structureVisModel.nucleotideSources.set(index, nucleotideComposition);
+        } else {
+            System.err.println("ERR");
+        }
+        refreshMappings();
     }
 
     public void addStructureVisDataSource1D(DataOverlay1D dataSource) {
@@ -180,7 +231,11 @@ public class StructureVisController implements ListDataListener {
         Mapping m = structureVisModel.mappings.get(p);
         if (m == null) {
             m = createMapping(a, b, select);
-            structureVisModel.mappings.put(p, m);
+            if (m != null) {
+                structureVisModel.mappings.put(p, m);
+            } else {
+                // throw new Error("Mapping was null");
+            }
         }
         return m;
     }
@@ -323,13 +378,14 @@ public class StructureVisController implements ListDataListener {
     }
 
     @Override
-    public void intervalAdded(ListDataEvent e) {
+    public void intervalAdded(SafeListEvent e) {
         if (e.getSource() instanceof SafeListModel) {
             SafeListModel list = (SafeListModel) e.getSource();
             for (int i = 0; i < structureVisViews.size(); i++) {
                 for (int j = e.getIndex0(); j <= e.getIndex1(); j++) {
                     Object o = list.get(j);
                     if (o instanceof Overlay) {
+                        System.out.println("Overlay added " + o);
                         structureVisViews.get(i).dataOverlayAdded((Overlay) o);
                     }
                 }
@@ -338,13 +394,14 @@ public class StructureVisController implements ListDataListener {
     }
 
     @Override
-    public void intervalRemoved(ListDataEvent e) {
+    public void intervalRemoved(SafeListEvent e) {
         if (e.getSource() instanceof SafeListModel) {
             SafeListModel list = (SafeListModel) e.getSource();
             for (int i = 0; i < structureVisViews.size(); i++) {
                 for (int j = e.getIndex0(); j <= e.getIndex1(); j++) {
                     Object o = list.get(j);
                     if (o instanceof Overlay) {
+                        System.out.println("Overlay removed " + o);
                         structureVisViews.get(i).dataOverlayRemoved((Overlay) o);
                     }
                 }
@@ -353,14 +410,15 @@ public class StructureVisController implements ListDataListener {
     }
 
     @Override
-    public void contentsChanged(ListDataEvent e) {
+    public void contentsChanged(SafeListEvent e) {
         if (e.getSource() instanceof SafeListModel) {
             SafeListModel list = (SafeListModel) e.getSource();
             for (int i = 0; i < structureVisViews.size(); i++) {
                 for (int j = e.getIndex0(); j <= e.getIndex1(); j++) {
                     Object o = list.get(j);
                     if (o instanceof Overlay) {
-                        structureVisViews.get(i).dataOverlayChanged((Overlay) o);
+                        System.out.println("CONENTS CHANGEDxxx" +e.getOldElement().toString()+"\t"+e.getNewElement().toString());
+                        structureVisViews.get(i).dataOverlayChanged((Overlay)e.getOldElement(), (Overlay)e.getNewElement());
                     }
                 }
             }

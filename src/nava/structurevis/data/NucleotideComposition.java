@@ -18,9 +18,12 @@ import nava.utils.Mapping;
  * @author Michael Golden
  */
 public class NucleotideComposition extends Overlay implements Serializable {
+    private static final long serialVersionUID = -1872288313127430061L;
 
     double[] weights;
     public int[] nonGapCount;
+    
+    // TODO these two fields use an unusual amount of memory when serializing??
     public double[][] frequencyComposition = null;
     public double[][] shannonComposition = null;
     public String consensus;
@@ -36,10 +39,10 @@ public class NucleotideComposition extends Overlay implements Serializable {
     public NucleotideComposition() {
     }
 
-    public NucleotideComposition(Alignment alignmentSource) {
-        this.alignment = alignmentSource;
+    public NucleotideComposition(Alignment alignment) {
+        this.alignment = alignment;
         AlignmentData data = alignment.getObject(ProjectModel.path);
-        mappingSource = new MappingSource(alignmentSource);
+        mappingSource = new MappingSource(alignment);
         calculateFrequencies(data.sequences, data.sequenceNames);
     }
 

@@ -23,12 +23,14 @@ import nava.data.types.*;
 import nava.structurevis.data.PersistentSparseMatrix;
 import nava.tasks.applications.ApplicationOutput;
 import nava.utils.Pair;
+import nava.utils.SafeListEvent;
+import nava.utils.SafeListListener;
 
 /**
  *
  * @author Michael
  */
-public class ProjectController implements ListDataListener {
+public class ProjectController implements SafeListListener {
 
     public transient ArrayList<ProjectView> projectViews = new ArrayList<>();
     public ProjectModel projectModel;
@@ -262,7 +264,7 @@ public class ProjectController implements ListDataListener {
         DataSource.setCount(projectModel.dataSourceCounter);
 
         // re-register listeners
-        this.projectModel.dataSources.addListDataListener(this);
+        this.projectModel.dataSources.addSafeListListener(this);
 
         for (int i = 0; i < projectViews.size(); i++) {
             System.out.println("Firing to view " + projectViews.get(i));
@@ -292,7 +294,7 @@ public class ProjectController implements ListDataListener {
     }
 
     @Override
-    public void intervalAdded(ListDataEvent e) {
+    public void intervalAdded(SafeListEvent e) {
         System.out.println("intervalAdded: " + e);
         if (e.getSource().equals(this.projectModel.dataSources)) {
             for (int i = 0; i < projectViews.size(); i++) {
@@ -302,7 +304,7 @@ public class ProjectController implements ListDataListener {
     }
 
     @Override
-    public void intervalRemoved(ListDataEvent e) {
+    public void intervalRemoved(SafeListEvent e) {
         System.out.println("intervalRemoved: " + e);
         if (e.getSource().equals(this.projectModel.dataSources)) {
             for (int i = 0; i < projectViews.size(); i++) {
@@ -312,7 +314,7 @@ public class ProjectController implements ListDataListener {
     }
 
     @Override
-    public void contentsChanged(ListDataEvent e) {
+    public void contentsChanged(SafeListEvent e) {
         System.out.println("contentsChanged: " + e);
         if (e.getSource().equals(this.projectModel.dataSources)) {
             for (int i = 0; i < projectViews.size(); i++) {

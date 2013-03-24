@@ -30,7 +30,7 @@ import nava.ui.navigator.NavigatorPanel;
  * @author Michael
  */
 public class MainFrame extends javax.swing.JFrame implements WindowListener {
-
+    
     public static PropertyResourceBundle resources = (PropertyResourceBundle) ResourceBundle.getBundle("resources.text.text");
     public static TaskManager taskManager;
     public static DataSourceCache dataSourceCache = new DataSourceCache();
@@ -43,7 +43,7 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
     StructureVisPanel structureVisPanel;
     public static JFileChooser browseDialog = new JFileChooser();
     public JFileChooser projectDialog = new JFileChooser();
-
+    
     public void startup() {
         try {
             fontLiberationSans = Font.createFont(Font.PLAIN, ClassLoader.getSystemResourceAsStream("resources/fonts/LiberationSans-Regular.ttf")).deriveFont(12.0f);
@@ -61,9 +61,9 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
     public MainFrame() {
         initComponents();
         startup();
-
+        
         ProjectModel model = new ProjectModel();
-        File projectFile = new File("workspace/test_project_open/project.data");
+        File projectFile = new File("workspace/test_project/project.data");
         if (projectFile.exists()) {
             try {
                 model = ProjectModel.loadProject(projectFile);
@@ -73,12 +73,12 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
                 Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-
+        
         projectController = new ProjectController();
         projectController.openProject(model);
         taskManager = new TaskManager(projectController);
         appController = new ApplicationController(MainFrame.taskManager);
-
+        
         DataPanel dataPanel = new DataPanel(projectController, appController);
         jPanel1.add(dataPanel, BorderLayout.CENTER);
         structureVisPanel = new StructureVisPanel(projectController);
@@ -87,7 +87,7 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
         //projectDialog.setFileFilter(new ProjectFileFilter());
         projectDialog.setFileView(new ProjectFileView());
         projectDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-
+        
         this.setIconImage(new ImageIcon(ClassLoader.getSystemResource("resources/icons/icon-32x32.png")).getImage());
         this.addWindowListener(this);
     }
@@ -142,6 +142,11 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
         jMenu1.add(jMenuItem1);
 
         jMenuItem2.setText("Exit");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
         jMenu1.add(jMenuItem2);
 
         jMenuBar1.add(jMenu1);
@@ -164,14 +169,13 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         projectController.saveProject();
     }//GEN-LAST:event_formWindowClosing
-
+    
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         int ret = projectDialog.showOpenDialog(this);
         if (ret == JFileChooser.APPROVE_OPTION) {
             File projectFile = new File(projectDialog.getSelectedFile().getAbsoluteFile() + File.separator + "project.data");
             try {
                 projectController.openProject(ProjectModel.loadProject(projectFile));
-                System.out.println("OPENING PROJECT");
                 File structureVisModelFile = new File(projectDialog.getSelectedFile().getAbsolutePath() + File.separatorChar + "structurevis.model");
                 structureVisPanel.structureVisController.openStructureVisModel(StructureVisModel.loadProject(structureVisModelFile, structureVisPanel.structureVisController));
             } catch (IOException ex) {
@@ -181,6 +185,16 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
             }
         }
     }//GEN-LAST:event_jMenuItem1ActionPerformed
+    
+    public void close() {
+        projectController.saveProject();
+        structureVisPanel.structureVisController.structureVisModel.saveStructureVisModel(new File(structureVisPanel.structureVisController.structureVisModel.getStructureVisModelPathString(structureVisPanel.structureVisController)));
+        System.exit(0);
+    }
+    
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        close();
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -217,7 +231,7 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
          * Create and display the form
          */
         java.awt.EventQueue.invokeLater(new Runnable() {
-
+            
             public void run() {
                 new MainFrame().setVisible(true);
             }
@@ -239,31 +253,28 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
     @Override
     public void windowOpened(WindowEvent e) {
     }
-
+    
     @Override
     public void windowClosing(WindowEvent e) {
-        projectController.saveProject();
-
-
-        structureVisPanel.structureVisController.structureVisModel.saveStructureVisModel(new File(structureVisPanel.structureVisController.structureVisModel.getStructureVisModelPathString(structureVisPanel.structureVisController)));
+        close();
     }
-
+    
     @Override
     public void windowClosed(WindowEvent e) {
     }
-
+    
     @Override
     public void windowIconified(WindowEvent e) {
     }
-
+    
     @Override
     public void windowDeiconified(WindowEvent e) {
     }
-
+    
     @Override
     public void windowActivated(WindowEvent e) {
     }
-
+    
     @Override
     public void windowDeactivated(WindowEvent e) {
     }

@@ -149,26 +149,26 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         if (selectedDataSource instanceof Tabular) {
             Data1DDialog d = new Data1DDialog(parent, true, projectModel, structureVisController);
             d.data1DPanel.dataSourceComboBoxModel.setSelectedItem(selectedDataSource);
-            d.setEditMode(false);
+            d.setEditMode(null);
             d.setSize(920, 690);
             d.setVisible(true);
         } else if (selectedDataSource instanceof Matrix) {
             Data2DDialog d = new Data2DDialog(null, true, projectModel, structureVisController);
             d.data2DPanel.dataMatrixComboBoxModel.setSelectedItem(selectedDataSource);
             d.setSize(750, 690);
-            d.setEditMode(false);
+            d.setEditMode(null);
             d.setVisible(true);
         } else if (selectedDataSource instanceof SecondaryStructure) {
             StructureDataDialog d = new StructureDataDialog(null, true, projectModel, structureVisController);
             d.structureDataPanel.structureComboBoxModel.setSelectedItem(selectedDataSource);
             d.setSize(640, 580);
-            d.setEditMode(false);
+            d.setEditMode(null);
             d.setVisible(true);
         } else if (selectedDataSource instanceof Alignment) {
             NucleotideCompositionDialog d = new NucleotideCompositionDialog(null, true, projectModel, structureVisController);
             d.nucleotidePanel.nucleotideAlignmentComboBoxModel.setSelectedItem(selectedDataSource);
             d.setSize(600, 150);
-            d.setEditMode(false);
+            d.setEditMode(null);
             d.setVisible(true);
         }
     }
@@ -178,25 +178,25 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
             if (overlay instanceof DataOverlay1D) {
                 Data1DDialog d = new Data1DDialog(parent, true, projectModel, structureVisController);
                 d.data1DPanel.setDataSource1D((DataOverlay1D) overlay);
-                d.setEditMode(true);
+                d.setEditMode(overlay);
                 d.setSize(920, 690);
                 d.setVisible(true);
             } else if (overlay instanceof DataOverlay2D) {
                 Data2DDialog d = new Data2DDialog(parent, true, projectModel, structureVisController);
                 d.data2DPanel.setDataSource2D((DataOverlay2D) overlay);
-                d.setEditMode(true);
+                d.setEditMode(overlay);
                 d.setSize(750, 690);
                 d.setVisible(true);
             } else if (overlay instanceof NucleotideComposition) {
                 NucleotideCompositionDialog d = new NucleotideCompositionDialog(parent, true, projectModel, structureVisController);
-                d.setEditMode(true);
+                d.setEditMode(overlay);
                 d.nucleotidePanel.setNucleotideSource((NucleotideComposition) overlay);
                 d.setSize(600, 150);
                 d.setVisible(true);
-            } else if (overlay instanceof StructureSource) {
+            } else if (overlay instanceof StructureOverlay) {
                 StructureDataDialog d = new StructureDataDialog(parent, true, projectModel, structureVisController);
-                d.setEditMode(true);
-                d.structureDataPanel.setStructureSource((StructureSource) overlay);
+                d.setEditMode(overlay);
+                d.structureDataPanel.setStructureSource((StructureOverlay) overlay);
                 d.setSize(640, 580);
                 d.setVisible(true);
             }
@@ -338,7 +338,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
     }
 
     @Override
-    public void structureSourceChanged(StructureSource structureSource) {
+    public void structureSourceChanged(StructureOverlay structureSource) {
         if (structureVisController.structureVisModel.substructureModel != null && structureVisController.structureVisModel.substructureModel.getAnnotationSource() != null) {
             annotationsLayerRight.setAnnotationData(structureVisController.structureVisModel.substructureModel.getAnnotationSource(), true);
         }

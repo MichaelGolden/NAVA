@@ -75,8 +75,12 @@ public class ColorGradient implements Serializable {
         this.colours = colours;
         this.positions = positions;
     }
+    
+    
 
-    public Color getColor(float val) {
+    public Color getColor(float f) {
+        float val = f;
+        
         if (val > 1) {
             return colours[colours.length - 1];
         } else if (val < 0) {

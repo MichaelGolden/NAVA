@@ -28,11 +28,11 @@ import nava.utils.SafeListModel;
 public class DataOverlayTreeModel extends DefaultTreeModel implements Serializable, ProjectView, StructureVisView {
     private static final long serialVersionUID = -1625375843157333064L;
 
-    DefaultMutableTreeNode oneDimensionalData = null;
-    DefaultMutableTreeNode twoDimensionalData = null;
+     DefaultMutableTreeNode oneDimensionalData = null;
+     DefaultMutableTreeNode twoDimensionalData = null;
     DefaultMutableTreeNode nucleotideData = null;
     DefaultMutableTreeNode structureData = null;
-    StructureVisModel structureVisModel;
+    transient StructureVisModel structureVisModel;
     transient StructureVisController structureVisController;
 
     public DataOverlayTreeModel(DefaultMutableTreeNode root, StructureVisController structureVisController) {
@@ -82,13 +82,13 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
         structureVisController.structureSources.addListDataListener(this);
     }*/
 
-    public DataOverlayTreeNode findNode(DataSource dataSource) {
+    public DataOverlayTreeNode findNode(Overlay overlay) {
         Enumeration<DefaultMutableTreeNode> en = ((DefaultMutableTreeNode) getRoot()).breadthFirstEnumeration();
         while (en.hasMoreElements()) {
             DefaultMutableTreeNode node = en.nextElement();
             if (node instanceof DataOverlayTreeNode) {
                 DataOverlayTreeNode nnode = (DataOverlayTreeNode) node;
-                if (Objects.equals(nnode.overlay, dataSource)) {
+                if (Objects.equals(nnode.overlay, overlay)) {
                     return nnode;
                 }
             }
@@ -109,7 +109,7 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
             insertNodeInto(new DataOverlayTreeNode(dataOverlay), nucleotideData, nucleotideData.getChildCount());
         }
 
-        if (dataOverlay instanceof StructureSource) {
+        if (dataOverlay instanceof StructureOverlay) {
             insertNodeInto(new DataOverlayTreeNode(dataOverlay), structureData, structureData.getChildCount());
         }
 
@@ -182,6 +182,7 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
 
     @Override
     public void dataOverlayAdded(Overlay overlay) {
+        System.out.println("dataOverlayAdded"+overlay);
         addDataOverlay(overlay);
     }
 
@@ -191,8 +192,17 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
     }
 
     @Override
-    public void dataOverlayChanged(Overlay overlay) {
-       // throw new UnsupportedOperationException("Not supported yet.");
+    public void dataOverlayChanged(Overlay oldOverlay, Overlay newOverlay) {
+        DataOverlayTreeNode node = this.findNode(oldOverlay);
+        node.overlay = newOverlay;
+        DataOverlayTreeNode parent = (DataOverlayTreeNode)node.getParent();
+        int [] indices = { parent.getIndex(node)};
+        Object [] children = {node};
+        if(oldOverlay.getState() == Overlay.OverlayState.PRIMARY_SELECTED)
+        {
+            structureVisController.structureVisModel.substructureModel.setAsPrimaryOverlay(newOverlay);
+        }
+        this.fireTreeNodesChanged(this, parent.getPath(), indices, children);
     }
     @Override
     public void projectModelChanged(ProjectModel newProjectModel) {

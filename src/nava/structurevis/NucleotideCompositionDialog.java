@@ -8,6 +8,7 @@ import java.awt.BorderLayout;
 import javax.swing.ImageIcon;
 import nava.structurevis.data.AnnotationSource;
 import nava.structurevis.data.NucleotideComposition;
+import nava.structurevis.data.Overlay;
 import nava.ui.ProjectModel;
 
 /**
@@ -35,9 +36,11 @@ public class NucleotideCompositionDialog extends javax.swing.JDialog {
 
         this.setIconImage(new ImageIcon(ClassLoader.getSystemResource("resources/icons/icon-32x32.png")).getImage());
     }
+    Overlay editOverlay = null;
 
-    public void setEditMode(boolean editMode) {
-        this.editMode = editMode;
+    public void setEditMode(Overlay overlay) {
+        this.editMode = overlay != null;
+        this.editOverlay = overlay;
         if (editMode) {
             this.addButton.setText("Save");
         } else {
@@ -102,7 +105,14 @@ public class NucleotideCompositionDialog extends javax.swing.JDialog {
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
         NucleotideComposition nucleotideComposition = nucleotidePanel.getNucleotideSource();
-        structureVisController.addNucleotideCompositionSource(nucleotideComposition);
+        if(editOverlay == null)
+        {
+            structureVisController.addNucleotideCompositionSource(nucleotideComposition);
+        }
+        else
+        {
+            structureVisController.setNucleotideCompositionSource(editOverlay, nucleotideComposition);
+        }
         this.dispose();
     }//GEN-LAST:event_addButtonActionPerformed
 

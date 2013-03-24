@@ -4,6 +4,7 @@
  */
 package nava.ui;
 
+import nava.utils.TableSorter;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;

@@ -23,6 +23,13 @@ public class Substructure implements Serializable {
         this.length = length;
         this.pairedSites = new int[length];
     }
+    
+    public Substructure(int startPosition, int [] pairedSites)
+    {
+        this.startPosition = startPosition;
+        this.length = pairedSites.length;
+        this.pairedSites = new int[length];
+    }
 
     public String getDotBracketString() {
         String pairString = "";

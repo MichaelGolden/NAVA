@@ -31,7 +31,7 @@ public class SubstructureModel implements Serializable {
     NucleotideComposition nucleotideSource = null;
     Mapping nucleotideMapping = null;
     NucleotideComposition.Type nucleotideCompositionType = NucleotideComposition.Type.FREQUENCY;
-    StructureOverlay structureSource = null;
+    public StructureOverlay structureOverlay = null;
     int numbering = 0;
     Substructure structure = null;
     transient DistanceMatrix distanceMatrix = null;
@@ -65,8 +65,8 @@ public class SubstructureModel implements Serializable {
         if (data2D != null) {
             data2D.loadData();
         }
-        if (structureSource != null) {
-            structureSource.loadData();
+        if (structureOverlay != null) {
+            structureOverlay.loadData();
         }
     }
 
@@ -88,8 +88,8 @@ public class SubstructureModel implements Serializable {
             dataSource1D.loadData();
         }
         this.data1D = dataSource1D;
-        if (data1D != null && data1D.mappingSource != null && structureSource != null && structureSource.mappingSource != null) {
-            mapping1D = structureVisController.getMapping(data1D.mappingSource, structureSource.mappingSource);
+        if (data1D != null && data1D.mappingSource != null && structureOverlay != null && structureOverlay.mappingSource != null) {
+            mapping1D = structureVisController.getMapping(data1D.mappingSource, structureOverlay.mappingSource);
         }
 
         // set selection state
@@ -108,8 +108,8 @@ public class SubstructureModel implements Serializable {
             dataSource2D.loadData();
         }
         this.data2D = dataSource2D;
-        if (data2D != null && data2D.mappingSource != null && structureSource != null && structureSource.mappingSource != null) {
-            mapping2D = structureVisController.getMapping(data2D.mappingSource, structureSource.mappingSource);
+        if (data2D != null && data2D.mappingSource != null && structureOverlay != null && structureOverlay.mappingSource != null) {
+            mapping2D = structureVisController.getMapping(data2D.mappingSource, structureOverlay.mappingSource);
         }
 
         // set selection state
@@ -128,7 +128,7 @@ public class SubstructureModel implements Serializable {
         if (structureOverlay != null) {
             structureOverlay.loadData();
         }
-        this.structureSource = structureOverlay;
+        this.structureOverlay = structureOverlay;
         if (structureOverlay != null) {
 
             this.sequenceLength = structureOverlay.pairedSites.length;
@@ -155,8 +155,8 @@ public class SubstructureModel implements Serializable {
 
     public void setNucleotideOverlay(NucleotideComposition nucleotideOverlay) {
         this.nucleotideSource = nucleotideOverlay;
-        if (nucleotideOverlay != null && nucleotideOverlay.mappingSource != null && structureSource != null) {
-            nucleotideMapping = structureVisController.getMapping(nucleotideOverlay.mappingSource, structureSource.mappingSource);
+        if (nucleotideOverlay != null && nucleotideOverlay.mappingSource != null && structureOverlay != null) {
+            nucleotideMapping = structureVisController.getMapping(nucleotideOverlay.mappingSource, structureOverlay.mappingSource);
         }
         for (int i = 0; i < structureVisController.structureVisModel.nucleotideSources.size(); i++) {
             if (structureVisController.structureVisModel.nucleotideSources.get(i).equals(nucleotideOverlay)) {
@@ -178,8 +178,8 @@ public class SubstructureModel implements Serializable {
     }
 
     public ArrayList<Substructure> getSubstructures() {
-        if (structureSource != null) {
-            return structureSource.substructures;
+        if (structureOverlay != null) {
+            return structureOverlay.substructures;
         }
 
         return new ArrayList<>();

@@ -19,7 +19,7 @@ public class PersistentSparseMatrix implements Serializable {
     public static double DEFAULT_EMPTY_VALUE = Double.MIN_VALUE;
     public static final int ELEMENT_SIZE = 12;
     private File matrixFile;
-    private double emptyValue;
+    public double emptyValue;
     private int maxRowIndex;
     private int[] rowCounts;
     private int[] rowCountsSum;
@@ -665,7 +665,7 @@ public class PersistentSparseMatrix implements Serializable {
         }
     }
     
-    static class Element {
+    public static class Element {
         
         public int i;
         public int j;

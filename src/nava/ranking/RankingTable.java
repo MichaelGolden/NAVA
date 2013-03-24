@@ -2,96 +2,84 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package nava.structurevis;
+package nava.ranking;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import javax.swing.*;
-import javax.swing.border.Border;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableCellRenderer;
-import nava.structurevis.data.DataOverlay1D;
+import nava.utils.Mapping;
 import nava.utils.TableSorter;
 
 /**
  *
- * @author Michael Golden <michaelgolden0@gmail.com>
+ * @author Michael
  */
-public class DataPreviewTable extends JPanel {
+public class RankingTable extends JPanel {
 
-    public TableDataModel tableDataModel;
+    TableDataModel tableDataModel;
     final JTable table;
-    JScrollPane scrollPane;
+    public JScrollPane scrollPane;
 
-    public DataPreviewTable() {
+    public RankingTable() {
         super(new BorderLayout());
 
         tableDataModel = new TableDataModel();
         TableSorter sorter = new TableSorter(tableDataModel);
         table = new JTable(sorter);
-        table.setDefaultRenderer(Object.class, new ColorRenderer(true));
         sorter.setTableHeader(table.getTableHeader());
-        // sorter.sortOnColumn(table.getTableHeader(),table.getColumnCount()-1,-1);
+        sorter.sortOnColumn(table.getTableHeader(),table.getColumnCount()-1,1);
         table.setFillsViewportHeight(true);
         table.addMouseListener(new MouseAdapter() {
-
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
+                    JTable target = (JTable) e.getSource();
+                    int row = target.getSelectedRow();
+                    int column = target.getSelectedColumn();
+
+                    int s = ((Integer) table.getModel().getValueAt(row, 0)).intValue() - 1;
+                    // TODO fire an event here to open substructure
                 }
             }
         });
 
+
+        /*
+         * table.setDefaultRenderer(Boolean.class, new
+         * structurevis.ui.datacreation.GenomeOrganizationTable.CheckBoxRenderer(true));
+         * table.setDefaultRenderer(Color.class, new
+         * structurevis.ui.datacreation.GenomeOrganizationTable.ColorRenderer(true));
+         * table.setDefaultEditor(Color.class, new
+         * structurevis.ui.datacreation.GenomeOrganizationTable.ColorEditor());
+         * table.setRowHeight(20);
+         *
+         * table.getColumnModel().getColumn(8).setCellEditor(new
+         * structurevis.ui.datacreation.GenomeOrganizationTable.SpinnerEditor(0,
+         * Integer.MAX_VALUE));
+         */
         scrollPane = new JScrollPane(table);
         add(scrollPane);
     }
 
     class TableDataModel extends AbstractTableModel {
 
-        String[] columnNames = {"Position", "Sequence", "Value"};
-        Class[] columnClasses = {Integer.class, String.class, String.class};
+        String[] columnNames = {"Structure #", "Structure ID", "Location", "Structure Length", "Structure N", "Genome N", "Structure Mean", "Genome Mean", "Structure Median", "Genome Median", "Mann-Whitney U stat.", "p-value", "z-score"};
+        Class[] columnClasses = {Integer.class, String.class, Location.class, Integer.class, Integer.class, Integer.class, Double.class, Double.class, Double.class, Double.class, Double.class, Double.class, Double.class};
         public ArrayList<Object[]> rows = new ArrayList<>();
+        public ArrayList<Mapping> mappings = new ArrayList<>();
+        public ArrayList<File> mappingFiles = new ArrayList<>();
 
-        public void setDataSource1D(DataOverlay1D dataSource1D) {
-            if (dataSource1D != null) {
-                ArrayList<Object[]> rows = new ArrayList<>();
-                int j = 1;
-
-                for (int i = 0; i < dataSource1D.dataOffsetCorrected; i++) {
-                    if (!dataSource1D.codonPositions || i % 3 == 0) {
-                        Object[] row = {-1, "?", dataSource1D.stringData[i] == null ? "" : dataSource1D.stringData[i]};
-                        if (dataSource1D.mappingSequence != null && i < dataSource1D.mappingSequence.length()) {
-                            row[1] = dataSource1D.mappingSequence.charAt(i) + "";
-                        }
-                        rows.add(row);
-                    }
-                }
-
-                for (int i = dataSource1D.dataOffsetCorrected; i < dataSource1D.data.length; i++) {
-                    Object[] row = {j, "?", dataSource1D.stringData[i] == null ? "" : dataSource1D.stringData[i]};
-                    if (dataSource1D.mappingSequence != null && i < dataSource1D.mappingSequence.length()) {
-                        row[1] = dataSource1D.mappingSequence.charAt(i) + "";
-                    }
-
-                    //addRow(row);
-                    rows.add(row);
-                    j++;
-                }
-                clear();
-                addRows(rows);
-            }
-        }
-
-        @Override
         public int getColumnCount() {
             return columnNames.length;
         }
 
-        @Override
         public int getRowCount() {
             return rows.size();
         }
@@ -101,10 +89,10 @@ public class DataPreviewTable extends JPanel {
             return columnNames[col];
         }
 
-        @Override
         public Object getValueAt(int row, int col) {
             return rows.get(row)[col];
         }
+        boolean hasMappedData = false;
 
         public void clear() {
             rows.clear();
@@ -154,7 +142,6 @@ public class DataPreviewTable extends JPanel {
          * each cell. If we didn't implement this method, then the last column
          * would contain text ("true"/"false"), rather than a check box.
          */
-        @Override
         public Class getColumnClass(int c) {
             return columnClasses[c];
         }
@@ -176,42 +163,29 @@ public class DataPreviewTable extends JPanel {
         }
     }
 
-    public class ColorRenderer extends JLabel
-            implements TableCellRenderer {
+    private static void createAndShowGUI() {
+        //Create and set up the window.
+        JFrame frame = new JFrame("SimpleTableDemo");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        Border unselectedBorder = null;
-        Border selectedBorder = null;
-        boolean isBordered = true;
+        //Create and set up the content pane.
+        RankingTable newContentPane = new RankingTable();
+        newContentPane.setOpaque(true); //content panes must be opaque
+        frame.setContentPane(newContentPane);
 
-        public ColorRenderer(boolean isBordered) {
-            this.isBordered = isBordered;
-            setOpaque(true); //MUST do this for background to show up.
-        }
+        //Display the window.
+        frame.pack();
+        frame.setVisible(true);
+    }
 
-        public Component getTableCellRendererComponent(
-                JTable table, Object object,
-                boolean isSelected, boolean hasFocus,
-                int row, int column) {
-            
-            
-            if(table.getValueAt(row, 0) == null || ((Integer)table.getValueAt(row, 0)).intValue() == -1)
-            {
-               // System.out.println("HERE"+((Integer)object).intValue());
-                this.setBackground(new Color(255,230,230));
+    public static void main(String[] args) {
+        //Schedule a job for the event-dispatching thread:
+        //creating and showing this application's GUI.
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                createAndShowGUI();
             }
-            else            
-            if(row % 2 == 0)
-            {
-                this.setBackground(Color.white);
-            }
-            else
-            {
-                this.setBackground(new Color(240,240,240));                
-            }
-            //this.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.white));
-                 
-            this.setText(object.toString());
-            return this;
-        }
+        });
     }
 }

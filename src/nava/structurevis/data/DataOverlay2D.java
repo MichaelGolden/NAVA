@@ -22,6 +22,7 @@ import nava.utils.Utils;
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
 public class DataOverlay2D extends Overlay implements Serializable {
+    private static final long serialVersionUID = 923970269971431138L;
 
     public ColorGradient defaultColorGradient;
     public ColorGradient colorGradient;

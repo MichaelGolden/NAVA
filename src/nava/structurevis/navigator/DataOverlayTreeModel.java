@@ -32,12 +32,10 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
      DefaultMutableTreeNode twoDimensionalData = null;
     DefaultMutableTreeNode nucleotideData = null;
     DefaultMutableTreeNode structureData = null;
-    transient StructureVisModel structureVisModel;
-    transient StructureVisController structureVisController;
+    StructureVisModel structureVisModel;
 
     public DataOverlayTreeModel(DefaultMutableTreeNode root, StructureVisController structureVisController) {
         super(root);
-        this.structureVisController = structureVisController;
         this.structureVisModel = structureVisController.structureVisModel;
         
         setup();        
@@ -200,7 +198,7 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
         Object [] children = {node};
         if(oldOverlay.getState() == Overlay.OverlayState.PRIMARY_SELECTED)
         {
-            structureVisController.structureVisModel.substructureModel.setAsPrimaryOverlay(newOverlay);
+            structureVisModel.substructureModel.setAsPrimaryOverlay(newOverlay);
         }
         this.fireTreeNodesChanged(this, parent.getPath(), indices, children);
     }

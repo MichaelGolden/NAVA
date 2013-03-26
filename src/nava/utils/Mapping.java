@@ -2,6 +2,7 @@ package nava.utils;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Random;
@@ -417,6 +418,10 @@ public class Mapping implements Serializable {
         mapping.refToBList = new int[alignedA0.length()];
         mapping.aToRefList = new int[alignedA0.length()];
         mapping.bToRefList = new int[alignedA0.length()];
+        Arrays.fill(mapping.refToAList, -1);
+        Arrays.fill(mapping.refToBList, -1);
+        Arrays.fill(mapping.aToRefList, -1);
+        Arrays.fill(mapping.bToRefList, -1);
         
         for (int i = 0; i < alignedA0.length(); i++) {
             int ref = i;
@@ -429,8 +434,6 @@ public class Mapping implements Serializable {
                  * mapping.aToReference.put(refToA, ref);
                 }
                  */
-            } else {
-                mapping.refToAList[ref] = -1;
             }
         }
 
@@ -447,8 +450,6 @@ public class Mapping implements Serializable {
                      * mapping.bToReference.put(refToB, ref);
                     }
                      */
-                } else {
-                    mapping.refToBList[ref] = -1;
                 }
             }
         } else {
@@ -463,8 +464,6 @@ public class Mapping implements Serializable {
                      * mapping.bToReference.put(refToB, ref);
                     }
                      */
-                } else {
-                    mapping.refToBList[ref] = -1;
                 }
             }
         }

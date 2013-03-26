@@ -29,7 +29,7 @@ public class RankingAnalyses {
         return values;
     }
 
-    public static ArrayList<Double> getValues(DataOverlay1D dataOverlay1D, Mapping mapping, Substructure substructure, int [] pairedSites, boolean paired, boolean unpaired, int genomeLength) {
+    public static ArrayList<Double> getValues(DataOverlay1D dataOverlay1D, Mapping mapping, Substructure substructure, int[] pairedSites, boolean paired, boolean unpaired, int genomeLength) {
         ArrayList<Double> values = new ArrayList<>();
         boolean codon = dataOverlay1D.codonPositions;
         if (codon) {
@@ -54,11 +54,12 @@ public class RankingAnalyses {
     }
 
     public static Ranking rankSequenceData1D(DataOverlay1D dataOverlay1D, Mapping mapping, Substructure substructure, int[] pairedSites, boolean paired, boolean unpaired) {
-        ArrayList<Double> fullGenomeList = getValues(dataOverlay1D, mapping, new Substructure(0, pairedSites),pairedSites, paired, unpaired, pairedSites.length);
-        ArrayList<Double> substructureList = getValues(dataOverlay1D, mapping, substructure,pairedSites, paired, unpaired, pairedSites.length);
+        ArrayList<Double> fullGenomeList = getValues(dataOverlay1D, mapping, new Substructure(0, pairedSites), pairedSites, paired, unpaired, pairedSites.length);
+        ArrayList<Double> substructureList = getValues(dataOverlay1D, mapping, substructure, pairedSites, paired, unpaired, pairedSites.length);
 
-        double[] fullGenomeValues = toDoubleArray(fullGenomeList);
+
         double[] substructureValues = toDoubleArray(substructureList);
+        double[] fullGenomeValues = toDoubleArray(fullGenomeList);
 
         double substructureMedian = Double.NaN;
         double fullGenomeMedian = Double.NaN;
@@ -92,7 +93,7 @@ public class RankingAnalyses {
         if (codon) {
             for (int i = substructure.startPosition; i < substructure.startPosition + substructure.length; i = i + 3) {
                 int x = mapping.aToB(i % length);
-                int y = mapping.aToB(substructure.pairedSites[i % length] - 1);
+                int y = mapping.aToB(pairedSites[i % length] - 1);
                 if (x != -1 && y != -1) {
                     double val = matrix.getValue(x, y);
                     if (val != matrix.emptyValue) {
@@ -104,7 +105,7 @@ public class RankingAnalyses {
             if (paired && !unpaired) {
                 for (int i = substructure.startPosition; i < substructure.startPosition + substructure.length; i = i + 1) {
                     int x = mapping.aToB(i % length);
-                    int y = mapping.aToB(substructure.pairedSites[i % length] - 1);
+                    int y = mapping.aToB(pairedSites[i % length] - 1);
                     if (x != -1 && y != -1) {
                         double val = matrix.getValue(x, y);
                         if (val != matrix.emptyValue) {
@@ -113,27 +114,38 @@ public class RankingAnalyses {
                     }
                 }
             } else {
-                Iterator<Element> iterator = matrix.iterator();
+                int start = mapping.aToB(substructure.startPosition);
+                int end = mapping.aToB(substructure.startPosition + substructure.length);
+
+                start = start < 0 ? 0 : start;
+                end = end < 0 ? matrix.n : end;
+                //Iterator<Element> iterator = matrix.iterator(substructure.startPosition,substructure.startPosition+substructure.length,substructure.startPosition,substructure.startPosition+substructure.length);
+                Iterator<Element> iterator = matrix.unorderedIterator(start, end, start, end);
+                // Iterator<Element> iterator = matrix.iterator(-1, -1, -1, -1);
+                System.out.println("OOOO:" + substructure.startPosition + "," + (substructure.startPosition + substructure.length) + "," + start + "," + end);
+                //System.out.println("loc:"+substructure.startPosition+","+substructure.startPosition+substructure.length+","+substructure.startPosition+","+substructure.startPosition+substructure.length);
                 Element element = null;
                 while (iterator.hasNext()) {
                     element = iterator.next();
-
-                    int x = mapping.bToA(element.i);
-                    int y = mapping.bToA(element.j);
-                    if (x >= 0 && y >= 0) {
-                        if (x >= substructure.startPosition && x < substructure.startPosition + substructure.length && y >= substructure.startPosition && y < substructure.startPosition + substructure.length) {
-                            // if in sub-matrix
-                            if (paired && pairedSites[x] == y + 1) {
-                                values.add(matrix.getValue(element.i, element.j));
-                            } else if (unpaired && pairedSites[x] != y + 1) {
-                                values.add(matrix.getValue(element.i, element.j));
-                            }
-                        } else // deal with wrap around
-                        if (x >= substructure.startPosition && (x + length < substructure.startPosition + substructure.length || x < substructure.startPosition + substructure.length) && y >= substructure.startPosition && (y + length < substructure.startPosition + substructure.length || y < substructure.startPosition + substructure.length)) {
-                            if (paired && (pairedSites[x % length] == y + 1 || pairedSites[x % length] == y % length + 1)) {
-                                values.add(matrix.getValue(element.i, element.j));
-                            } else if (paired && (pairedSites[x % length] != y + 1 && pairedSites[x % length] != y % length + 1)) {
-                                values.add(matrix.getValue(element.i, element.j));
+                    // System.out.println(start + "\t" + end);
+                    if (element.value != matrix.emptyValue) {
+                        int x = mapping.bToA(element.i);
+                        int y = mapping.bToA(element.j);
+                        if (x >= 0 && y >= 0) {
+                            if (x >= substructure.startPosition && x < substructure.startPosition + substructure.length && y >= substructure.startPosition && y < substructure.startPosition + substructure.length) {
+                                // if in sub-matrix
+                                if (paired && pairedSites[x] == y + 1) {
+                                    values.add(element.value);
+                                } else if (unpaired && pairedSites[x] != y + 1) {
+                                    values.add(element.value);
+                                }
+                            } else // deal with wrap around
+                            if (x >= substructure.startPosition && (x + length < substructure.startPosition + substructure.length || x < substructure.startPosition + substructure.length) && y >= substructure.startPosition && (y + length < substructure.startPosition + substructure.length || y < substructure.startPosition + substructure.length)) {
+                                if (paired && (pairedSites[x % length] == y + 1 || pairedSites[x % length] == y % length + 1)) {
+                                    values.add(element.value);
+                                } else if (paired && (pairedSites[x % length] != y + 1 && pairedSites[x % length] != y % length + 1)) {
+                                    values.add(element.value);
+                                }
                             }
                         }
                     }
@@ -146,8 +158,7 @@ public class RankingAnalyses {
     double[] fullGenomeValuesPaired = null;
     double[] fullGenomeValuesUnparedaired = null;
 
-    public static Ranking rankSequenceData2D(DataOverlay2D dataOverlay2D, Mapping mapping, Substructure substructure, int[] pairedSites, boolean paired, boolean unpaired) throws IOException {
-        ArrayList<Double> fullGenomeList = getValues(dataOverlay2D, mapping, new Substructure(0, pairedSites), pairedSites, paired, unpaired);
+    public static Ranking rankSequenceData2D(DataOverlay2D dataOverlay2D, Mapping mapping, Substructure substructure, int[] pairedSites, boolean paired, boolean unpaired, ArrayList<Double> fullGenomeList) throws IOException {
         ArrayList<Double> substructureList = getValues(dataOverlay2D, mapping, substructure, pairedSites, paired, unpaired);
 
         /*
@@ -157,13 +168,56 @@ public class RankingAnalyses {
          * fullStructure, paired, unpaired);
          * substructureList.addAll(getValues(sequenceData2D, 0,
          * (substructure.startPosition + substructure.length - 1) %
-         * genomeLength, codonData, fullStructure, paired, unpaired));
-        }
+         * genomeLength, codonData, fullStructure, paired, unpaired)); }
          */
 
 
-        double[] fullGenomeValues = toDoubleArray(fullGenomeList);
         double[] substructureValues = toDoubleArray(substructureList);
+        double[] fullGenomeValues = toDoubleArray(fullGenomeList);
+
+        double substructureMedian = Double.NaN;
+        double fullGenomeMedian = Double.NaN;
+        if (substructureList.size() > 0) {
+            substructureMedian = getMedian(substructureList);
+        }
+        if (fullGenomeList.size() > 0) {
+            fullGenomeMedian = getMedian(fullGenomeList);
+        }
+        // System.out.println("Medians: " + substructureMedian + "\t" + fullGenomeMedian + "\t" + getMedian2(substructureList)+"\t"+getMedian2(fullGenomeList));
+
+        MyMannWhitney mw = new MyMannWhitney(substructureValues, fullGenomeValues);
+
+        Ranking r = new Ranking();
+        r.mannWhitneyU = mw.getTestStatistic();
+        r.zScore = mw.getZ();
+        r.xN = substructureList.size();
+        r.yN = fullGenomeList.size();
+        r.xMean = getAverage(substructureList);
+        r.yMean = getAverage(fullGenomeList);
+        r.xMedian = substructureMedian;
+        r.yMedian = fullGenomeMedian;
+
+        return r;
+    }
+
+    public static Ranking rankSequenceData2D(DataOverlay2D dataOverlay2D, Mapping mapping, Substructure substructure, int[] pairedSites, boolean paired, boolean unpaired) throws IOException {
+        ArrayList<Double> substructureList = getValues(dataOverlay2D, mapping, substructure, pairedSites, paired, unpaired);
+        ArrayList<Double> fullGenomeList = getValues(dataOverlay2D, mapping, new Substructure(0, pairedSites), pairedSites, paired, unpaired);
+
+
+        /*
+         * if (substructure.startPosition + substructure.length - 1 >=
+         * genomeLength) { substructureList = getValues(sequenceData2D,
+         * substructure.startPosition - 1, genomeLength, codonData,
+         * fullStructure, paired, unpaired);
+         * substructureList.addAll(getValues(sequenceData2D, 0,
+         * (substructure.startPosition + substructure.length - 1) %
+         * genomeLength, codonData, fullStructure, paired, unpaired)); }
+         */
+
+
+        double[] substructureValues = toDoubleArray(substructureList);
+        double[] fullGenomeValues = toDoubleArray(fullGenomeList);
 
         double substructureMedian = Double.NaN;
         double fullGenomeMedian = Double.NaN;

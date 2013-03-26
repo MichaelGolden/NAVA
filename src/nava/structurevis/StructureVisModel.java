@@ -31,7 +31,7 @@ public class StructureVisModel implements Serializable {
     public SafeListModel<NucleotideComposition> nucleotideSources = new SafeListModel<>();
     public DataOverlayTreeModel overlayNavigatorTreeModel;
     // protected transient EventListenerList listeners = new EventListenerList();
-    public  SubstructureModel substructureModel = null;
+    public  SubstructureModel substructureModel;
     Hashtable<Pair<MappingSource, MappingSource>, Mapping> mappings = new Hashtable<>();
     //public File structureVisModelFile = null;
 

@@ -5,17 +5,13 @@
 package nava.structurevis.data;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import nava.data.types.Alignment;
 import nava.data.types.Matrix;
-import nava.data.types.TabularField;
 import nava.ui.MainFrame;
 import nava.ui.ProjectModel;
 import nava.utils.ColorGradient;
 import nava.utils.Mapping;
-import nava.utils.Utils;
 
 /**
  *
@@ -29,11 +25,11 @@ public class DataOverlay2D extends Overlay implements Serializable {
     public DataTransform dataTransform;
     //public Matrix dataMatrix;
     public Matrix matrix;
-    public PersistentSparseMatrix dataMatrix;
+    public transient PersistentSparseMatrix dataMatrix;
     public MappingSource mappingSource;
-    public String mappingSequence;
+    //public String mappingSequence;
     public boolean naturalPositions;
-    public boolean oneOffset;
+    public int dataOffset;
     public boolean codonPositions;
     public boolean excludeValuesOutOfRange = false;
     public double minValue;
@@ -55,13 +51,13 @@ public class DataOverlay2D extends Overlay implements Serializable {
         }
     }
 
-    public static DataOverlay2D getDataOverlay2D(Matrix matrix, String title,boolean naturalPositions, boolean oneOffset, boolean codonPositions, double min, double max, boolean excludeValuesOutOfRange, DataTransform dataTransform, ColorGradient colorGradient, MappingSource mappingSource, MatrixRegion matrixRegion) {
+    public static DataOverlay2D getDataOverlay2D(Matrix matrix, String title,boolean naturalPositions, int dataOffset, boolean codonPositions, double min, double max, boolean excludeValuesOutOfRange, DataTransform dataTransform, ColorGradient colorGradient, MappingSource mappingSource, MatrixRegion matrixRegion) {
         DataOverlay2D dataOverlay = new DataOverlay2D();
         dataOverlay.matrix = matrix;
         dataOverlay.title = title;
         dataOverlay.naturalPositions = naturalPositions;
         dataOverlay.mappingSource = mappingSource;
-        dataOverlay.oneOffset = oneOffset;
+        dataOverlay.dataOffset = dataOffset;
         dataOverlay.codonPositions = codonPositions;
         dataOverlay.minValue = min;
         dataOverlay.maxValue = max;
@@ -78,8 +74,18 @@ public class DataOverlay2D extends Overlay implements Serializable {
     
     public double get(int i, int j, Mapping mapping)
     {
-        int x = mapping.aToB(i);
-        int y = mapping.aToB(j);
+        int x = i-dataOffset;
+        int y = j-dataOffset;
+        if(codonPositions)
+        {
+           x = x/3;
+           y = y/3;
+        }
+        if(mapping != null)
+        { 
+            x = mapping.aToB(i-dataOffset);
+            y = mapping.aToB(j-dataOffset);
+        }
         try
         {
             switch(matrixRegion)

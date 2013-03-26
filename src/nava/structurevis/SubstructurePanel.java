@@ -60,7 +60,6 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         substructureComboBox.addItemListener(this);
 
         structureVisController.addView(this);
-//        structureVisController.structureSources.addListDataListener(this);
 
         treePanel.add(new DataOverlayTreePanel(projectController,structureVisController), BorderLayout.CENTER);
 

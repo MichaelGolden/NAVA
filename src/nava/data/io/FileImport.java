@@ -80,17 +80,17 @@ public class FileImport {
     }
 
     public static ArrayList<MatrixFormat> parsableMatrixFormats(File inFile) {
-
         ArrayList<MatrixFormat> parsableMatrixFormats = new ArrayList<>();
+        
+        try {
+            MatrixReader.parseCoordinateListMatrix(inFile, "[,\t]+");
+            parsableMatrixFormats.add(DataType.MatrixFormat.COORDINATE_LIST_MATRIX);
+        } catch (Exception ex) {
+        }
+        
         try {
             MatrixReader.parseDenseFloatMatrix(inFile);
             parsableMatrixFormats.add(DataType.MatrixFormat.DENSE_MATRIX);
-        } catch (Exception ex) {
-        }
-
-        try {
-            MatrixReader.parseCoordinateListMatrix(inFile, ",");
-            parsableMatrixFormats.add(DataType.MatrixFormat.COORDINATE_LIST_MATRIX);
         } catch (Exception ex) {
         }
         return parsableMatrixFormats;

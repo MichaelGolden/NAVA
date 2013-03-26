@@ -127,13 +127,21 @@ public class RankingPanel extends javax.swing.JPanel {
                 ArrayList rows = getListFromCache(cacheKey);
                 rankingTable.tableDataModel.addRows(rows);
                 ArrayList<Substructure> structures = structureOverlay.substructures;
+                ArrayList<Double> fullGenomeList = null;
+                if (running && rows.size() < structures.size()) {
+                    try {
+                        fullGenomeList = RankingAnalyses.getValues(dataOverlay2D, structureVisController.getMapping(structureOverlay.mappingSource, dataOverlay2D.mappingSource), new Substructure(0, structureOverlay.pairedSites), structureOverlay.pairedSites, paired, unpaired);
+                    } catch (IOException ex) {
+                        Logger.getLogger(RankingPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
                 for (int i = rows.size(); running && i < structures.size(); i++) {
                     statusLabel.setText("Ranking (" + (i + 1) + " of " + structures.size() + ")");
                     Substructure structure = structures.get(i);
 
                     Ranking ranking;
                     try {
-                        ranking = RankingAnalyses.rankSequenceData2D(dataOverlay2D, structureVisController.getMapping(structureOverlay.mappingSource, dataOverlay2D.mappingSource), structure, structureOverlay.pairedSites, paired, unpaired);                       
+                        ranking = RankingAnalyses.rankSequenceData2D(dataOverlay2D, structureVisController.getMapping(structureOverlay.mappingSource, dataOverlay2D.mappingSource), structure, structureOverlay.pairedSites, paired, unpaired, fullGenomeList);
 
                         Object[] row = {new Integer(i + 1), structure.name, new Location(structure.startPosition, structure.startPosition + structure.length), new Integer(structure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore)};
                         rankingTable.tableDataModel.addRow(row);

@@ -4,6 +4,9 @@
  */
 package nava.ranking;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -121,14 +124,12 @@ public class RankingAnalyses {
                 end = end < 0 ? matrix.n : end;
                 //Iterator<Element> iterator = matrix.iterator(substructure.startPosition,substructure.startPosition+substructure.length,substructure.startPosition,substructure.startPosition+substructure.length);
                 Iterator<Element> iterator = matrix.unorderedIterator(start, end, start, end);
-                // Iterator<Element> iterator = matrix.iterator(-1, -1, -1, -1);
-                System.out.println("OOOO:" + substructure.startPosition + "," + (substructure.startPosition + substructure.length) + "," + start + "," + end);
-                //System.out.println("loc:"+substructure.startPosition+","+substructure.startPosition+substructure.length+","+substructure.startPosition+","+substructure.startPosition+substructure.length);
+                
+           
                 Element element = null;
                 while (iterator.hasNext()) {
                     element = iterator.next();
-                    // System.out.println(start + "\t" + end);
-                    if (element.value != matrix.emptyValue) {
+                    if (element.value != matrix.emptyValue) {                        
                         int x = mapping.bToA(element.i);
                         int y = mapping.bToA(element.j);
                         if (x >= 0 && y >= 0) {

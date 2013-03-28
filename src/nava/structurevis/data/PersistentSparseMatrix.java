@@ -9,7 +9,6 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import nava.data.types.DenseMatrixData;
-import nava.utils.Pair;
 
 /**
  *
@@ -27,7 +26,8 @@ public class PersistentSparseMatrix implements Serializable {
     private int[] maxColIndexInRow;
     private long headerLength;
     private transient HashMap<CachedLineKey, CachedLine> lineCache = new HashMap<>();
-    private transient ArrayList<CachedLineKey> keyQueue = new ArrayList<>();
+    //private transient ArrayList<CachedLineKey> keyQueue = new ArrayList<>();
+    private transient LinkedHashSet<CachedLineKey> keyQueue = new LinkedHashSet<>();
     private static int cacheLineSize = 512; // number of consecutive elements in cache line
     private int maxCachedLines = 10000; // max number of lines to cache
     private int maxCachedElements = 100000;
@@ -143,55 +143,83 @@ public class PersistentSparseMatrix implements Serializable {
 
     public CachedLine getCachedLineForPosition(int i, int j) throws IOException {
         CachedLineKey cachedLineKey = new CachedLineKey(i, j / cacheLineSize);
+        //System.out.println("cachedlined" + i + "\t" + (j / cacheLineSize));
         CachedLine cachedLine = lineCache.get(cachedLineKey);
         if (cachedLine == null) {
+            //if()
+
             RandomAccessFile randomAccessFile = new RandomAccessFile(matrixFile, "r");
             cachedLine = new CachedLine(i, j);
-            int min = cachedLine.line * cacheLineSize;
-            int max = Math.min(min + cacheLineSize, maxColIndexInRow[i]);
+            //System.out.println("XmaxColIndexInRow" + maxColIndexInRow[i]);
+            int lbound = (j / cacheLineSize) * cacheLineSize;
+            int ubound = ((j / cacheLineSize) + 1) * cacheLineSize;
+            if (i < maxColIndexInRow.length && maxColIndexInRow[i] != -1 && lbound <= maxColIndexInRow[i]) {
+                int min = cachedLine.lineCol * cacheLineSize;
+                int max = Math.min(min + cacheLineSize - 1, maxColIndexInRow[i]);
 
-            // binary search for min position
-            int low = 0;
-            int high = rowCounts[i];
-            int key = min;
-            RowElement minElem = null;
-            while (low <= high) {
-                int mid = low + (high - low) / 2;
-                minElem = getRowElementUnsafe(randomAccessFile, i, mid);
-                if (key < minElem.index) {
-                    high = mid - 1;
-                } else if (key > minElem.index) {
-                    low = mid + 1;
-                } else {
-                    break;
+                // binary search for min position
+                int low = 0;
+                int high = rowCounts[i];
+                int key = min;
+                int mid = -1;
+                RowElement minElem = null;
+                while (low <= high) {
+                    mid = low + (high - low) / 2;
+                    minElem = getRowElementUnsafe(randomAccessFile, i, mid);
+                    //System.out.println(low + "," + mid + "," + high + "," + minElem);
+                    if (key < minElem.index) {
+                        high = mid - 1;
+                    } else if (key > minElem.index) {
+                        low = mid + 1;
+                    } else {
+                        // element found
+                        break;
+                    }
                 }
-            }
-            int startPos = 0;
-            if (minElem != null) {
-                startPos = low;
-            }
-            // System.out.println("low " + low);
-            //System.out.println("mins\t" + minElem.index + "\t" + key + "\t" + minElem);
-            //System.out.println("startPos"+startPos);
-            long seekPos = headerLength;
-            if (i > 0) {
-                seekPos += rowCountsSum[i - 1] * ELEMENT_SIZE;
-            }
-            seekPos += startPos * ELEMENT_SIZE;
-            long upperSeekPos = seekPos + rowCounts[i] * ELEMENT_SIZE;
-            if (maxColIndexInRow[i] != -1 && startPos <= max) {
-                // load entire cache line
+
+                int startPos = low;
+                if (mid != -1) {
+                    startPos = mid;
+                }
+
+                //System.out.println("spos " + startPos+"\t"+mid+"\t"+ getRowElementUnsafe(randomAccessFile, i, mid));
+                long seekPos = headerLength;
+                if (i > 0) {
+                    seekPos += rowCountsSum[i - 1] * ELEMENT_SIZE;
+                }
+                long lowerSeekPos = seekPos;
+                long upperSeekPos = seekPos + rowCounts[i] * ELEMENT_SIZE;
+                seekPos += startPos * ELEMENT_SIZE;
+                // System.out.println("up\t"+seekPos+"\t"+upperSeekPos);
+                /*
+                 * long seekPos = headerLength; if (i > 0) { seekPos +=
+                 * rowCountsSum[i - 1] * ELEMENT_SIZE; } seekPos += offset *
+                 * ELEMENT_SIZE; randomAccessFile.seek(seekPos); int index =
+                 * randomAccessFile.readInt();
+                 */
+                // System.out.println("i="+i+", "+"j="+j);
                 while (seekPos < upperSeekPos) {
                     randomAccessFile.seek(seekPos);
                     int k = randomAccessFile.readInt();
                     seekPos += 4;
                     randomAccessFile.seek(seekPos);
                     double value = randomAccessFile.readDouble();
-                    cachedLine.put(k, value);
                     seekPos += 8;
+
+                    if (k >= lbound && k < ubound) {
+                        cachedLine.put(k, value);
+                    } else if (k >= ubound) {
+                        break;
+                    }
+                    /*
+                     * if(k < lbound) { System.out.println("out of range " + i +
+                     * "\t" + j + ",\t" + k + "\t" + min + "\t" + max + "\t = "
+                     * + lbound + "\t" + ubound + " -> " + startPos);
+                     * System.out.println("MASSIVE ERROR"); break; }
+                     */
                 }
+                randomAccessFile.close();
             }
-            randomAccessFile.close();
 
             this.lineCache.put(cachedLineKey, cachedLine);
             if (keyQueue.contains(cachedLineKey)) {
@@ -200,19 +228,23 @@ public class PersistentSparseMatrix implements Serializable {
                 elementsCached += cachedLine.cache.size();
             }
             keyQueue.add(cachedLineKey);
-            //System.out.println("S:" + keyQueue.size());
+
             while (elementsCached > maxCachedElements || keyQueue.size() > maxCachedLines) {
-                CachedLineKey removeKey = this.keyQueue.remove(0);
+                CachedLineKey removeKey = this.keyQueue.iterator().next();
+                this.keyQueue.remove(removeKey);
                 CachedLine removedLine = this.lineCache.remove(removeKey);
                 if (removedLine != null && removedLine.cache != null) {
                     elementsCached -= removedLine.cache.size();
                 }
             }
-            //System.out.println("elements cached " + elementsCached);
+
         }
         return cachedLine;
     }
 
+    /*
+     * Does not check whether the indexed element is in the current row
+     */
     public RowElement getRowElementUnsafe(RandomAccessFile randomAccessFile, int i, int offset) throws IOException {
         long seekPos = headerLength;
         if (i > 0) {
@@ -582,7 +614,7 @@ public class PersistentSparseMatrix implements Serializable {
     public Iterator<Element> iterator() {
         return iterator(-1, -1, -1, -1);
     }
-
+    
     public Iterator<Element> unorderedIterator(final int startXInclusive, final int endXExclusive, final int startYInclusive, final int endYExclusive) {
         Iterator<Element> it = new Iterator<Element>() {
 
@@ -592,53 +624,53 @@ public class PersistentSparseMatrix implements Serializable {
             final int endYExc = endYExclusive < 0 ? m : endYExclusive;
             private int i = startXInc;
             private int j = startYInc;
-            CachedLine current = null;
-            Iterator<Integer> currentPos = null;
+            //Iterator<CachedLineKey> lineIterator = lineCache.keySet().iterator();
+            CachedLine currentLine = null;
+            Iterator<Integer> colIterator = null;
 
             @Override
             public boolean hasNext() {
-
                 try {
-                    if (currentPos != null) {
-                        if (currentPos.hasNext()) {
-                            return true;
+                    if (colIterator != null) {
+                        while (colIterator.hasNext()) {
+                            j = colIterator.next();
+                            if (j < endYExc) {
+                                return true;
+                            }
                         }
+                        //else
+                        j = ((j + cacheLineSize) / cacheLineSize) * cacheLineSize;
                     }
 
-                    for (int x = i; x < endXExc; x++) {
-                        if (rowCounts[x] > 0) {
-                            int upper = Math.min(maxColIndexInRow[x]+1, endYExc);
-                            for (int y = j; y < upper; y += cacheLineSize) {
-                                int cachedLinePos = (y / cacheLineSize) * cacheLineSize;
-                                current = getCachedLineForPosition(x, cachedLinePos);
-                                currentPos = current.cache.keySet().iterator();
-                                if (currentPos.hasNext()) {
-                                    i = x;
-                                    j = cachedLinePos;
+                    for (; i < endXExc; i++) {
+                        int upper = Math.min(maxColIndexInRow[i] + 1, endYExc);
+                        //System.out.println("upper"+upper);
+                        for (; j < upper; j += cacheLineSize) {
+                            currentLine = getCachedLineForPosition(i, j);
+                            //System.out.println(i+"\t"+j+"\t"+currentLine.cache);
+                            colIterator = currentLine.cache.keySet().iterator();
+                            while (colIterator.hasNext()) {
+                                j = colIterator.next();
+                                if (j < endYExc) {
                                     return true;
                                 }
                             }
                         }
                         j = startYInc;
                     }
-                } catch (Exception ex) {
+                } catch (IOException ex) {
                     ex.printStackTrace();
                 }
-                current = null;
-                currentPos = null;
+
                 return false;
             }
 
             @Override
             public Element next() {
-                if (currentPos != null) {
-                    Integer jindex = currentPos.next();
-
-                    j = jindex + cacheLineSize;
-                   
-                    return new Element(i, jindex, current.cache.get(jindex));
+                if (i % 100 == 0) {
+                    System.out.println(i + "\t" + j + "\t" + currentLine.cache.get(j));
                 }
-                return null;
+                return new Element(i, j, currentLine.cache.get(j));
             }
 
             @Override
@@ -663,12 +695,12 @@ public class PersistentSparseMatrix implements Serializable {
                 try {
                     for (int x = i; x < endXExc; x++) {
                         if (rowCounts[x] > 0) {
-                            int upper = Math.min(maxColIndexInRow[x]+1, endYExc);
+                            int upper = Math.min(maxColIndexInRow[x] + 1, endYExc);
                             for (int y = j; y < upper; y++) {
                                 int cachedLinePos = (y / cacheLineSize) * cacheLineSize;
                                 CachedLine cachedLine = getCachedLineForPosition(x, cachedLinePos);
-                                for (int y2 = Math.max(j, cachedLinePos); y2 < cachedLinePos + cacheLineSize; y2++) {
-                                    if (cachedLine.cache.size() > 0) {
+                                if (cachedLine.cache.size() > 0) {
+                                    for (int y2 = Math.max(j, cachedLinePos); y2 < cachedLinePos + cacheLineSize; y2++) {
                                         i = x;
                                         j = y2;
                                         return true;
@@ -689,7 +721,7 @@ public class PersistentSparseMatrix implements Serializable {
                 try {
                     for (int x = i; x < endXExc; x++) {
                         if (rowCounts[x] > 0) {
-                            int upper = Math.min(maxColIndexInRow[x]+1, endYExc);
+                            int upper = Math.min(maxColIndexInRow[x] + 1, endYExc);
                             for (int y = j; y < upper; y++) {
                                 int cachedLinePos = (y / cacheLineSize) * cacheLineSize;
                                 CachedLine cachedLine = getCachedLineForPosition(x, cachedLinePos);
@@ -699,7 +731,7 @@ public class PersistentSparseMatrix implements Serializable {
                                         j = y2;
                                         j++;
                                         Double val = cachedLine.cache.get(y2);
-                                        
+
                                         return new Element(x, y2, val == null ? emptyValue : val);
                                     }
                                 }
@@ -767,13 +799,13 @@ public class PersistentSparseMatrix implements Serializable {
     public class CachedLine {
 
         int row;
-        int line;
-        private HashMap<Integer, Double> cache = new HashMap<>();
+        int lineCol;
+        public HashMap<Integer, Double> cache = new HashMap<>();
         //double [] cache = new double[cacheLineSize];
 
         public CachedLine(int row, int j) {
             this.row = row;
-            this.line = j / cacheLineSize;
+            this.lineCol = j / cacheLineSize;
             //Arrays.fill(cache, emptyValue);
         }
 
@@ -785,6 +817,35 @@ public class PersistentSparseMatrix implements Serializable {
         public double get(int j) {
             //return cache[j%cacheLineSize];
             return cache.get(j);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final CachedLine other = (CachedLine) obj;
+            if (this.row != other.row) {
+                return false;
+            }
+            if (this.lineCol != other.lineCol) {
+                return false;
+            }
+            if (!Objects.equals(this.cache, other.cache)) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 3;
+            hash = 37 * hash + this.row;
+            hash = 37 * hash + this.lineCol;
+            return hash;
         }
     }
 
@@ -822,11 +883,11 @@ public class PersistentSparseMatrix implements Serializable {
     static class CachedLineKey {
 
         int i;
-        int j;
+        int jDividedByLineSize;
 
         public CachedLineKey(int i, int j) {
             this.i = i;
-            this.j = j;
+            this.jDividedByLineSize = j;
         }
 
         @Override
@@ -841,7 +902,7 @@ public class PersistentSparseMatrix implements Serializable {
             if (this.i != other.i) {
                 return false;
             }
-            if (this.j != other.j) {
+            if (this.jDividedByLineSize != other.jDividedByLineSize) {
                 return false;
             }
             return true;
@@ -851,7 +912,7 @@ public class PersistentSparseMatrix implements Serializable {
         public int hashCode() {
             int hash = 3;
             hash = 37 * hash + this.i;
-            hash = 37 * hash + this.j;
+            hash = 37 * hash + this.jDividedByLineSize;
             return hash;
         }
     }

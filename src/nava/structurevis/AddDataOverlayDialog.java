@@ -158,7 +158,7 @@ public class AddDataOverlayDialog extends javax.swing.JDialog {
 
     private void addStructureButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addStructureButtonActionPerformed
         this.dispose();
-        StructureDataDialog d = new StructureDataDialog(null, true, projectController.projectModel, structureVisController);
+        StructureOverlayDialog d = new StructureOverlayDialog(null, true, projectController.projectModel, structureVisController);
         d.setSize(640, 580);
         d.setEditMode(null);
         d.setVisible(true);

@@ -49,21 +49,7 @@ public class RankingTable extends JPanel {
                 }
             }
         });
-
-
-        /*
-         * table.setDefaultRenderer(Boolean.class, new
-         * structurevis.ui.datacreation.GenomeOrganizationTable.CheckBoxRenderer(true));
-         * table.setDefaultRenderer(Color.class, new
-         * structurevis.ui.datacreation.GenomeOrganizationTable.ColorRenderer(true));
-         * table.setDefaultEditor(Color.class, new
-         * structurevis.ui.datacreation.GenomeOrganizationTable.ColorEditor());
-         * table.setRowHeight(20);
-         *
-         * table.getColumnModel().getColumn(8).setCellEditor(new
-         * structurevis.ui.datacreation.GenomeOrganizationTable.SpinnerEditor(0,
-         * Integer.MAX_VALUE));
-         */
+        
         scrollPane = new JScrollPane(table);
         add(scrollPane);
     }

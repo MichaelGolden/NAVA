@@ -667,9 +667,6 @@ public class PersistentSparseMatrix implements Serializable {
 
             @Override
             public Element next() {
-                if (i % 100 == 0) {
-                    System.out.println(i + "\t" + j + "\t" + currentLine.cache.get(j));
-                }
                 return new Element(i, j, currentLine.cache.get(j));
             }
 

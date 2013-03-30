@@ -423,7 +423,6 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
         jLabel8.setText("How should values out of this range be treated? ");
 
         valueGroup.add(missingDataRadioButton);
-        missingDataRadioButton.setSelected(true);
         missingDataRadioButton.setText("As missing data");
         missingDataRadioButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -432,6 +431,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
         });
 
         valueGroup.add(clampedRadioButton);
+        clampedRadioButton.setSelected(true);
         clampedRadioButton.setText("Clamped");
         clampedRadioButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

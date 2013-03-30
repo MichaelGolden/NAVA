@@ -18,6 +18,7 @@ import nava.data.types.*;
 import nava.structurevis.data.MappingSource;
 import nava.structurevis.data.StructureOverlay;
 import nava.structurevis.data.StructureOverlay.MappingSourceOption;
+import nava.structurevis.data.SubstructureList;
 import nava.ui.MainFrame;
 import nava.ui.ProjectController;
 import nava.ui.ProjectModel;
@@ -27,20 +28,20 @@ import nava.ui.ProjectView;
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class StructureDataPanel extends javax.swing.JPanel implements ChangeListener, ItemListener {
+public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeListener, ItemListener {
 
     //ProjectController projectController;
     ProjectModel projectModel;
     DefaultComboBoxModel<SecondaryStructure> structureComboBoxModel = new DefaultComboBoxModel<>();
     DefaultComboBoxModel<Alignment> alignmentComboBoxModel = new DefaultComboBoxModel<>();
-    StructureOverlay structureSource;
-    SpinnerNumberModel minSpinnerModel = new SpinnerNumberModel(10, 1, Integer.MAX_VALUE, 1);
-    SpinnerNumberModel maxSpinnerModel = new SpinnerNumberModel(250, 0, Integer.MAX_VALUE, 1);
+    StructureOverlay structureOverlay = new StructureOverlay();
+    //SpinnerNumberModel minSpinnerModel = new SpinnerNumberModel(10, 1, Integer.MAX_VALUE, 1);
+    //SpinnerNumberModel maxSpinnerModel = new SpinnerNumberModel(250, 0, Integer.MAX_VALUE, 1);
 
     /**
      * Creates new form StructureDataPanel
      */
-    public StructureDataPanel(ProjectModel projectModel) {
+    public StructureOverlayPanel(ProjectModel projectModel) {
         initComponents();
 
         this.projectModel = projectModel;
@@ -51,16 +52,14 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
         this.alignmentComboBox.setModel(alignmentComboBoxModel);
         this.alignmentComboBox.addItemListener(this);
 
-        this.minSpinner.setModel(this.minSpinnerModel);
-        this.minSpinner.addChangeListener(this);
-        this.maxSpinner.setModel(this.maxSpinnerModel);
-        this.maxSpinner.addChangeListener(this);
-
-        System.out.println("HERExx" + projectModel.dataSources);
-        System.out.println("HEREyy" +projectModel.dataSources.getArrayListShallowCopy());
+        //this.minSpinner.setModel(this.minSpinnerModel);
+        //this.minSpinner.addChangeListener(this);
+        //this.maxSpinner.setModel(this.maxSpinnerModel);
+        //this.maxSpinner.addChangeListener(this);
+        circularRadioButton.addItemListener(this);
+        
         populateStructureComboBox(projectModel.dataSources.getArrayListShallowCopy());
         populateAlignmentComboBox(projectModel.dataSources.getArrayListShallowCopy());
-        System.out.println("HEREzz" +structureComboBoxModel.getSize());
     }
 
     public void populateStructureComboBox(List<DataSource> dataSources) {
@@ -108,13 +107,8 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
         sequenceTextField = new javax.swing.JTextField();
         addMappingAlignmentAsOverlayCheckBox = new javax.swing.JCheckBox();
         jPanel2 = new javax.swing.JPanel();
-        minSpinner = new javax.swing.JSpinner();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        maxSpinner = new javax.swing.JSpinner();
-        jCheckBox1 = new javax.swing.JCheckBox();
-        jRadioButton1 = new javax.swing.JRadioButton();
-        jRadioButton2 = new javax.swing.JRadioButton();
+        jButton3 = new javax.swing.JButton();
+        jLabel8 = new javax.swing.JLabel();
         linearRadioButton = new javax.swing.JRadioButton();
         jLabel2 = new javax.swing.JLabel();
         circularRadioButton = new javax.swing.JRadioButton();
@@ -180,7 +174,7 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
                                 .addComponent(jLabel5)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jButton2)))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -206,57 +200,34 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Create a list of substructures"));
 
-        jLabel6.setText("Min. substructure length");
+        jButton3.setText("Edit list");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
-        jLabel7.setText("Max. substructure length");
-
-        jCheckBox1.setText("Force substructures to be non-overlapping");
-
-        substructureGroup.add(jRadioButton1);
-        jRadioButton1.setSelected(true);
-        jRadioButton1.setText("Automatically generate a list of substructures");
-
-        substructureGroup.add(jRadioButton2);
-        jRadioButton2.setText("From a file");
-        jRadioButton2.setEnabled(false);
+        jLabel8.setText("A list has already been generated");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(21, 21, 21)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jCheckBox1)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(jLabel6)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(minSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(jLabel7)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(maxSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addComponent(jRadioButton1)
-                    .addComponent(jRadioButton2))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel8)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButton3)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jRadioButton1)
-                .addGap(6, 6, 6)
+                .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(minSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel6)
-                    .addComponent(jLabel7)
-                    .addComponent(maxSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(jCheckBox1)
-                .addGap(18, 18, 18)
-                .addComponent(jRadioButton2))
+                    .addComponent(jLabel8)
+                    .addComponent(jButton3))
+                .addGap(0, 113, Short.MAX_VALUE))
         );
 
         conformationGroup.add(linearRadioButton);
@@ -317,7 +288,7 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
                 .addGap(8, 8, 8)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -325,6 +296,25 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
     private void fromAlignmentRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fromAlignmentRadioButtonActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_fromAlignmentRadioButtonActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        if(structureOverlay != null && structureOverlay.structure != null)
+        {
+            if(structureOverlay.substructureList == null)
+            {
+                structureOverlay.substructureList = new SubstructureList(structureOverlay);
+            }
+            SubstructureListDialog dialog = new SubstructureListDialog(new javax.swing.JFrame(), true, structureOverlay.substructureList.clone());        
+            dialog.setVisible(true);
+            if(dialog.save)
+            {
+                structureOverlay.substructureList = dialog.substructureList;
+                jLabel8.setText("You have defined a list. Click to edit.");
+            }
+            
+        }
+        System.out.println(structureOverlay.substructureList);
+    }//GEN-LAST:event_jButton3ActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox addMappingAlignmentAsOverlayCheckBox;
     private javax.swing.JComboBox alignmentComboBox;
@@ -335,22 +325,17 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
     private javax.swing.JRadioButton fromSequenceRadioButton;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JCheckBox jCheckBox1;
+    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JRadioButton jRadioButton1;
-    private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JRadioButton linearRadioButton;
     private javax.swing.ButtonGroup mappingGroup;
-    private javax.swing.JSpinner maxSpinner;
-    private javax.swing.JSpinner minSpinner;
     private javax.swing.JTextField sequenceTextField;
     private javax.swing.JComboBox structureComboBox;
     private javax.swing.ButtonGroup substructureGroup;
@@ -386,41 +371,55 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
             }
 
 
-            structureSource = new StructureOverlay(structure, mappingSource);
-            structureSource.minStructureSize = (Integer) this.minSpinnerModel.getValue();
-            structureSource.maxStructureSize = (Integer) this.maxSpinnerModel.getValue();
-            structureSource.nonOverlappingSubstructures = this.jCheckBox1.isSelected();
+            // = new StructureOverlay(structure, mappingSource);
+            if(structureOverlay != null && structureOverlay.structure != null)
+            {
+                
+                if(this.circularRadioButton.isSelected() != structureOverlay.circular  || !structureOverlay.structure.equals(structure))
+                {
+                    // if either parameter has changed need to regenerate list
+                    structureOverlay.substructureList = new SubstructureList(structureOverlay);
+                    jLabel8.setText("A new list has been generated.");
+                }
+            }
+            structureOverlay.setStructureAndMapping(structure, mappingSource);
+            System.out.println("CDFAVA"+structureOverlay.substructureList);
+           // structureOverlay.minStructureSize = (Integer) this.minSpinnerModel.getValue();
+           // structureOverlay.maxStructureSize = (Integer) this.maxSpinnerModel.getValue();
+            //structureOverlay.nonOverlappingSubstructures = this.jCheckBox1.isSelected();
 
             if (this.embeddSequenceRadioButton.isSelected()) {
-                structureSource.mappingSourceOption = MappingSourceOption.EMBEDDED;
+                structureOverlay.mappingSourceOption = MappingSourceOption.EMBEDDED;
             } else if (this.fromAlignmentRadioButton.isSelected()) {
-                structureSource.mappingSourceOption = MappingSourceOption.ALIGNMENT;
+                structureOverlay.mappingSourceOption = MappingSourceOption.ALIGNMENT;
             } else if (this.fromSequenceRadioButton.isSelected()) {
-                structureSource.mappingSourceOption = MappingSourceOption.STRING;
+                structureOverlay.mappingSourceOption = MappingSourceOption.STRING;
             }
 
-            structureSource.addMappingSourceAsNucleotideOverlay = addMappingAlignmentAsOverlayCheckBox.isSelected();
+            structureOverlay.addMappingSourceAsNucleotideOverlay = addMappingAlignmentAsOverlayCheckBox.isSelected();
 
             if (this.circularRadioButton.isSelected()) {
-                structureSource.circular = true;
+                structureOverlay.circular = true;
             }
         }
     }
 
     public void post() {
         update();
-        structureSource.loadData();
-        if (structureSource != null && structureSource.pairedSites != null) {
-            structureSource.substructures = StructureOverlay.enumerateAdjacentSubstructures(structureSource.pairedSites, 10, 250, false);
-            //System.out.println(structureSource.substructures);
+        structureOverlay.loadData();
+        if (structureOverlay != null && structureOverlay.pairedSites != null) {
+           if(structureOverlay.substructureList == null)
+           {
+               structureOverlay.substructureList = new SubstructureList(structureOverlay);
+           }
         }
     }
 
-    public void setStructureSource(StructureOverlay structureSource) {
+    public void setStructureSource(StructureOverlay structureOverlay) {
         // TODO
-        this.structureComboBoxModel.setSelectedItem(structureSource.structure);
-        this.circularRadioButton.setSelected(structureSource.circular);
-        switch (structureSource.mappingSourceOption) {
+        this.structureComboBoxModel.setSelectedItem(structureOverlay.structure);
+        this.circularRadioButton.setSelected(structureOverlay.circular);
+        switch (structureOverlay.mappingSourceOption) {
             case EMBEDDED:
                 this.embeddSequenceRadioButton.setSelected(true);
                 break;
@@ -429,21 +428,24 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
                 break;
             case STRING:
                 this.fromSequenceRadioButton.setSelected(true);
-                sequenceTextField.setText(structureSource.mappingSource.sequence);
+                sequenceTextField.setText(structureOverlay.mappingSource.sequence);
                 break;
         }
-        this.minSpinnerModel.setValue(structureSource.minStructureSize);
-        this.maxSpinnerModel.setValue(structureSource.maxStructureSize);
-        this.jCheckBox1.setSelected(structureSource.nonOverlappingSubstructures);
+        this.structureOverlay.substructureList = structureOverlay.substructureList;
+        //this.minSpinnerModel.setValue(structureSource.minStructureSize);
+        //this.maxSpinnerModel.setValue(structureSource.maxStructureSize);
+        //this.jCheckBox1.setSelected(structureSource.nonOverlappingSubstructures);
     }
 
     public StructureOverlay getStructureSource() {
         post();
-        return structureSource;
+        return structureOverlay;
     }
 
     @Override
     public void stateChanged(ChangeEvent e) {
+        update();
+        /*
         int min = (Integer) minSpinner.getValue();
         int max = (Integer) maxSpinner.getValue();
         if (e.getSource().equals(minSpinner)) {
@@ -456,5 +458,7 @@ public class StructureDataPanel extends javax.swing.JPanel implements ChangeList
                 minSpinnerModel.setValue(max);
             }
         }
+        * 
+        */
     }
 }

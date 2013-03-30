@@ -154,8 +154,9 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
         this.iIndexTextField.addKeyListener(this);
         this.jIndexTextField.addKeyListener(this);
 
-        this.dataLegendPanel.add(dataLegend, BorderLayout.CENTER);
+        this.dataLegendPanel.add(dataLegend, BorderLayout.CENTER);        
         dataLegend.setLegend("Example", new DataTransform(0, 1, DataTransform.TransformType.LINEAR), new ColorGradient(Color.white, Color.red), new ColorGradient(Color.white, Color.red));
+        dataLegend.showEditMode();
 
         this.naturalRadioButtonOneOffset.addItemListener(this);
         this.codonCheckButton.addItemListener(this);
@@ -413,7 +414,6 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
         jLabel8.setText("How should values out of this range be treated? ");
 
         valueGroup.add(missingDataRadioButton);
-        missingDataRadioButton.setSelected(true);
         missingDataRadioButton.setText("As missing data");
         missingDataRadioButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -422,6 +422,7 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
         });
 
         valueGroup.add(clampedRadioButton);
+        clampedRadioButton.setSelected(true);
         clampedRadioButton.setText("Clamped");
         clampedRadioButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

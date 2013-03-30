@@ -159,7 +159,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
             d.setEditMode(null);
             d.setVisible(true);
         } else if (selectedDataSource instanceof SecondaryStructure) {
-            StructureDataDialog d = new StructureDataDialog(null, true, projectModel, structureVisController);
+            StructureOverlayDialog d = new StructureOverlayDialog(null, true, projectModel, structureVisController);
             d.structureDataPanel.structureComboBoxModel.setSelectedItem(selectedDataSource);
             d.setSize(640, 580);
             d.setEditMode(null);
@@ -194,7 +194,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
                 d.setSize(600, 150);
                 d.setVisible(true);
             } else if (overlay instanceof StructureOverlay) {
-                StructureDataDialog d = new StructureDataDialog(parent, true, projectModel, structureVisController);
+                StructureOverlayDialog d = new StructureOverlayDialog(parent, true, projectModel, structureVisController);
                 d.setEditMode(overlay);
                 d.structureDataPanel.setStructureSource((StructureOverlay) overlay);
                 d.setSize(640, 580);

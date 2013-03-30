@@ -5,6 +5,7 @@
 package nava.structurevis;
 
 import java.awt.BorderLayout;
+import javax.swing.ImageIcon;
 import nava.structurevis.data.Overlay;
 import nava.ui.ProjectController;
 import nava.ui.ProjectModel;
@@ -13,24 +14,26 @@ import nava.ui.ProjectModel;
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class StructureDataDialog extends javax.swing.JDialog {
+public class StructureOverlayDialog extends javax.swing.JDialog {
 
     ProjectModel projectModel;
     StructureVisController structureVisController;
-    public StructureDataPanel structureDataPanel;
+    public StructureOverlayPanel structureDataPanel;
     boolean editMode = false;
 
     /**
      * Creates new form StructureDataDialog
      */
-    public StructureDataDialog(java.awt.Frame parent, boolean modal, ProjectModel projectModel, StructureVisController structureVisController) {
+    public StructureOverlayDialog(java.awt.Frame parent, boolean modal, ProjectModel projectModel, StructureVisController structureVisController) {
         super(parent, modal);
         initComponents();
         this.projectModel = projectModel;
 
         this.structureVisController = structureVisController;
-        structureDataPanel = new StructureDataPanel(projectModel);
+        structureDataPanel = new StructureOverlayPanel(projectModel);
         this.jPanel1.add(structureDataPanel, BorderLayout.CENTER);
+        
+        this.setIconImage(new ImageIcon(ClassLoader.getSystemResource("resources/icons/icon-32x32.png")).getImage());
     }
     Overlay editOverlay = null;
 
@@ -59,6 +62,7 @@ public class StructureDataDialog extends javax.swing.JDialog {
         addButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Add a structure");
 
         jPanel1.setPreferredSize(new java.awt.Dimension(461, 433));
         jPanel1.setLayout(new java.awt.BorderLayout());
@@ -66,6 +70,11 @@ public class StructureDataDialog extends javax.swing.JDialog {
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         cancelButton.setText("Cancel");
+        cancelButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelButtonActionPerformed(evt);
+            }
+        });
         jPanel2.add(cancelButton);
 
         addButton.setText("Add structure");
@@ -103,6 +112,10 @@ public class StructureDataDialog extends javax.swing.JDialog {
         this.dispose();
     }//GEN-LAST:event_addButtonActionPerformed
 
+    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+        this.dispose();
+    }//GEN-LAST:event_cancelButtonActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -124,13 +137,13 @@ public class StructureDataDialog extends javax.swing.JDialog {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(StructureDataDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(StructureOverlayDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(StructureDataDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(StructureOverlayDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(StructureDataDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(StructureOverlayDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(StructureDataDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(StructureOverlayDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
@@ -140,7 +153,7 @@ public class StructureDataDialog extends javax.swing.JDialog {
         java.awt.EventQueue.invokeLater(new Runnable() {
 
             public void run() {
-                StructureDataDialog dialog = new StructureDataDialog(new javax.swing.JFrame(), true, null, null);
+                StructureOverlayDialog dialog = new StructureOverlayDialog(new javax.swing.JFrame(), true, null, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
 
                     @Override

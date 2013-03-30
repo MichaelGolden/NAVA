@@ -179,7 +179,7 @@ public class SubstructureModel implements Serializable {
 
     public ArrayList<Substructure> getSubstructures() {
         if (structureOverlay != null) {
-            return structureOverlay.substructures;
+            return structureOverlay.substructureList.substructures;
         }
 
         return new ArrayList<>();

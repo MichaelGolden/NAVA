@@ -8,7 +8,7 @@ package nava.ranking;
  *
  * @author Michael
  */
-class Location implements Comparable {
+public class Location implements Comparable {
 
     int start;
     int end;

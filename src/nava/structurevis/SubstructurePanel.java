@@ -209,7 +209,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
 
     
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        StructureDataDialog d = new StructureDataDialog(null, true, projectController.projectModel, structureVisController);
+        StructureOverlayDialog d = new StructureOverlayDialog(null, true, projectController.projectModel, structureVisController);
         d.setSize(640, 580);
         d.setEditMode(null);
         d.setVisible(true);
@@ -313,14 +313,12 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
 
     @Override
     public void structureSourceChanged(StructureOverlay structureSource) {
-        System.out.println("structureSourceChanged\t"+structureSource+"\t"+structureSource.mappingSource);
         if (structureSource != null && structureSource.mappingSource != null) {
             //structureVisController.addStructureSource(structureSource);
             structureSource.loadData();
-            System.out.println("structureSource.substructures.size() = "+structureSource.substructures.size());
-            if (structureSource.substructures.size() > 0) {
-                System.out.println(structureSource.substructures.get(0));
-                structureDrawPanel.openSubstructure(structureSource.substructures.get(0));
+            //System.out.println("structureSource.substructures.size() = "+structureSource.substructures.size());
+            if (structureSource.substructureList.substructures.size() > 0) {
+                structureDrawPanel.openSubstructure(structureSource.substructureList.substructures.get(0));
             }
             else
             {                

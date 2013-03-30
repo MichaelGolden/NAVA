@@ -223,9 +223,11 @@ public class ProjectController implements SafeListListener {
     public void createPath(DataSource dataSource, String origExtension, String newExtension) {
         dataSource.setImportId(getNextImportId());
         Path p = generatePath(dataSource.getImportId(),newExtension);
-        while (Files.exists(p)) {
+        System.out.println("here"+projectModel.getProjectPath().resolve(p));
+        while (Files.exists(projectModel.getProjectPath().resolve(p))) {
             dataSource.setImportId(getNextImportId());
             p = generatePath(dataSource.getImportId(), newExtension);
+            System.out.println("q"+projectModel.getProjectPath().resolve(p));
         }
         dataSource.originalDataSourcePath = generatePath(dataSource.getImportId(), "orig." + origExtension).toString();
         dataSource.importedDataSourcePath = generatePath(dataSource.getImportId(), newExtension).toString();

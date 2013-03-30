@@ -28,10 +28,11 @@ import nava.utils.Pair;
 public class RankingPanel extends javax.swing.JPanel {
 
     ArrayList<Overlay> dataOverlays = new ArrayList();
+    ArrayList<StructureOverlay> structureOverlays = new ArrayList();
     RankingTable rankingTable = null;
     public RankingThread currentThread = null;
     StructureVisController structureVisController;
-    StructureOverlay structureOverlay;
+    //StructureOverlay structureOverlay;
 
     /**
      * Creates new form AnalysesPanel
@@ -45,14 +46,21 @@ public class RankingPanel extends javax.swing.JPanel {
 
         dataOverlays.addAll(structureVisController.structureVisModel.structureVisDataOverlays1D.getArrayListShallowCopy());
         dataOverlays.addAll(structureVisController.structureVisModel.structureVisDataOverlays2D.getArrayListShallowCopy());
-        structureOverlay = structureVisController.structureVisModel.substructureModel.structureOverlay;
 
-        DefaultComboBoxModel sequenceDataModel = new DefaultComboBoxModel();
-        dataSourceBox.setModel(sequenceDataModel);
+        structureOverlays.addAll(structureVisController.structureVisModel.structureSources.getArrayListShallowCopy());
 
+        DefaultComboBoxModel dataOverlaysModel = new DefaultComboBoxModel();
+        dataOverlayBox.setModel(dataOverlaysModel);
         for (int i = 0; i < dataOverlays.size(); i++) {
-            sequenceDataModel.addElement(dataOverlays.get(i));
+            dataOverlaysModel.addElement(dataOverlays.get(i));
         }
+
+        DefaultComboBoxModel structureOverlaysModel = new DefaultComboBoxModel();
+        structureOverlayComboBox.setModel(structureOverlaysModel);
+        for (int i = 0; i < structureOverlays.size(); i++) {
+            structureOverlaysModel.addElement(structureOverlays.get(i));
+        }
+
     }
     Hashtable<Pair<Overlay, Integer>, ArrayList> rowCache = new Hashtable<>();
 
@@ -67,12 +75,14 @@ public class RankingPanel extends javax.swing.JPanel {
 
     class RankingThread extends Thread {
 
-        Object data;
+        Overlay dataOverlay;
+        StructureOverlay structureOverlay;
         boolean running = false;
         boolean hasStopped = true;
 
-        public RankingThread(Object data) {
-            this.data = data;
+        public RankingThread(Overlay dataOverlay, StructureOverlay structureOverlay) {
+            this.dataOverlay = dataOverlay;
+            this.structureOverlay = structureOverlay;
         }
 
         public void run() {
@@ -98,13 +108,13 @@ public class RankingPanel extends javax.swing.JPanel {
                 PAIR_PARAMETER = 2;
             }
 
-            if (data instanceof DataOverlay1D) {
-                DataOverlay1D dataOverlay1D = (DataOverlay1D) data;
+            if (dataOverlay instanceof DataOverlay1D) {
+                DataOverlay1D dataOverlay1D = (DataOverlay1D) dataOverlay;
                 //String cacheKey = dataOverlay1D.name + "_" + PAIR_PARAMETER;
                 Pair<Overlay, Integer> cacheKey = new Pair((Overlay) dataOverlay1D, new Integer(PAIR_PARAMETER));
                 ArrayList rows = getListFromCache(cacheKey);
                 rankingTable.tableDataModel.addRows(rows);
-                ArrayList<Substructure> structures = structureOverlay.substructures;
+                ArrayList<Substructure> structures = structureOverlay.substructureList.substructures;
                 for (int i = rows.size(); running && i < structures.size(); i++) {
                     statusLabel.setText("Ranking (" + (i + 1) + " of " + structures.size() + ")");
                     Substructure structure = structures.get(i);
@@ -121,12 +131,12 @@ public class RankingPanel extends javax.swing.JPanel {
                     clone.add(rankingTable.tableDataModel.rows.get(i));
                 }
                 rowCache.put(cacheKey, clone);
-            } else if (data instanceof DataOverlay2D) {
-                DataOverlay2D dataOverlay2D = (DataOverlay2D) data;
+            } else if (dataOverlay instanceof DataOverlay2D) {
+                DataOverlay2D dataOverlay2D = (DataOverlay2D) dataOverlay;
                 Pair<Overlay, Integer> cacheKey = new Pair((Overlay) dataOverlay2D, new Integer(PAIR_PARAMETER));
                 ArrayList rows = getListFromCache(cacheKey);
                 rankingTable.tableDataModel.addRows(rows);
-                ArrayList<Substructure> structures = structureOverlay.substructures;
+                ArrayList<Substructure> structures = structureOverlay.substructureList.substructures;
                 ArrayList<Double> fullGenomeList = null;
                 if (running && rows.size() < structures.size()) {
                     try {
@@ -187,11 +197,14 @@ public class RankingPanel extends javax.swing.JPanel {
     public void performRanking() {
         kill();
 
-        if (dataSourceBox.getSelectedIndex() >= 0) {
-            Object data = dataOverlays.get(dataSourceBox.getSelectedIndex());
-            currentThread = new RankingThread(data);
-            currentThread.setPriority(Thread.MIN_PRIORITY);
-            currentThread.start();
+        if (dataOverlayBox.getSelectedIndex() >= 0) {
+            Overlay dataOverlay = dataOverlays.get(dataOverlayBox.getSelectedIndex());
+            StructureOverlay structureOverlay = (StructureOverlay) structureOverlayComboBox.getSelectedItem();
+            if (dataOverlay != null && structureOverlay != null) {
+                currentThread = new RankingThread(dataOverlay, structureOverlay);
+               // currentThread.setPriority(Thread.MIN_PRIORITY);
+                currentThread.start();
+            }
         }
     }
 
@@ -205,7 +218,7 @@ public class RankingPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
-        dataSourceBox = new javax.swing.JComboBox();
+        dataOverlayBox = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         pairedOnlyButton = new javax.swing.JRadioButton();
@@ -214,14 +227,16 @@ public class RankingPanel extends javax.swing.JPanel {
         statusLabel = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         saveAsCSVButton = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        structureOverlayComboBox = new javax.swing.JComboBox();
 
-        dataSourceBox.addActionListener(new java.awt.event.ActionListener() {
+        dataOverlayBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                dataSourceBoxActionPerformed(evt);
+                dataOverlayBoxActionPerformed(evt);
             }
         });
 
-        jLabel1.setText("Data source");
+        jLabel1.setText("Data overlay");
 
         jPanel1.setLayout(new java.awt.BorderLayout());
 
@@ -250,6 +265,7 @@ public class RankingPanel extends javax.swing.JPanel {
             }
         });
 
+        statusLabel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         statusLabel.setText(" ");
 
         jLabel2.setForeground(new java.awt.Color(102, 102, 102));
@@ -263,6 +279,14 @@ public class RankingPanel extends javax.swing.JPanel {
             }
         });
 
+        jLabel3.setText("Structure");
+
+        structureOverlayComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                structureOverlayComboBoxActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -272,18 +296,23 @@ public class RankingPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(dataSourceBox, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(allSitesButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(pairedOnlyButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(unpairedOnlyButton)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel3))
                         .addGap(18, 18, 18)
-                        .addComponent(statusLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(structureOverlayComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(allSitesButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(pairedOnlyButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(unpairedOnlyButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE))
+                            .addComponent(dataOverlayBox, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(saveAsCSVButton))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2)
@@ -294,25 +323,32 @@ public class RankingPanel extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(dataSourceBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1)
-                    .addComponent(pairedOnlyButton)
-                    .addComponent(unpairedOnlyButton)
-                    .addComponent(allSitesButton)
-                    .addComponent(statusLabel)
-                    .addComponent(saveAsCSVButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(statusLabel)
+                        .addComponent(saveAsCSVButton))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel3)
+                            .addComponent(structureOverlayComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(allSitesButton)
+                            .addComponent(unpairedOnlyButton)
+                            .addComponent(pairedOnlyButton))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(dataOverlayBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel1))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 334, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 307, Short.MAX_VALUE)
                 .addGap(22, 22, 22))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void dataSourceBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSourceBoxActionPerformed
+    private void dataOverlayBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataOverlayBoxActionPerformed
         performRanking();
-    }//GEN-LAST:event_dataSourceBoxActionPerformed
+    }//GEN-LAST:event_dataOverlayBoxActionPerformed
 
     private void allSitesButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_allSitesButtonActionPerformed
         performRanking();
@@ -352,6 +388,10 @@ public class RankingPanel extends javax.swing.JPanel {
          *
          */
     }//GEN-LAST:event_saveAsCSVButtonActionPerformed
+
+    private void structureOverlayComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_structureOverlayComboBoxActionPerformed
+        performRanking();
+    }//GEN-LAST:event_structureOverlayComboBoxActionPerformed
 
     public void saveAsCSV(File outFile) {
         try {
@@ -417,13 +457,15 @@ public class RankingPanel extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton allSitesButton;
     private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JComboBox dataSourceBox;
+    private javax.swing.JComboBox dataOverlayBox;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JRadioButton pairedOnlyButton;
     private javax.swing.JButton saveAsCSVButton;
     private javax.swing.JLabel statusLabel;
+    private javax.swing.JComboBox structureOverlayComboBox;
     private javax.swing.JRadioButton unpairedOnlyButton;
     // End of variables declaration//GEN-END:variables
 }

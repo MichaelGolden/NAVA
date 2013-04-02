@@ -102,6 +102,7 @@ public class RankingPanel extends javax.swing.JPanel {
             this.structureOverlay = structureOverlay;
         }
 
+        @Override
         public void run() {
             hasStopped = false;
             running = true;
@@ -135,7 +136,7 @@ public class RankingPanel extends javax.swing.JPanel {
                 for (int i = rows.size(); running && i < structures.size(); i++) {
                     statusLabel.setText("Ranking (" + (i + 1) + " of " + structures.size() + ")");
                     Substructure structure = structures.get(i);
-                    Ranking ranking = RankingAnalyses.rankSequenceData1D(dataOverlay1D, structureVisController.getMapping(structureOverlay.mappingSource, dataOverlay1D.mappingSource), structure, structureOverlay.pairedSites, paired, unpaired);
+                    Ranking ranking = RankingAnalyses.rankSequenceData1D(dataOverlay1D, structureVisController.getMapping(structureOverlay.mappingSource, dataOverlay1D.mappingSource), structure, structureOverlay.pairedSites, paired, unpaired, i + 1);
 
                     //System.out.println(ranking.zScore + "\t" + StatUtil.erf(Math.abs(ranking.zScore/2)) + "\t" + StatUtil.erfc(Math.abs(ranking.zScore))+ "\t" + StatUtil.erfcx(Math.abs(ranking.zScore))+ "\t" + StatUtil.getInvCDF(Math.abs(ranking.zScore), true)+"\t"+RankingAnalyses.NormalZ(Math.abs(ranking.zScore))/2);
                     Object[] row = {new Integer(i + 1), structure.name, new Location(structure.startPosition, structure.startPosition + structure.length), new Integer(structure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore), ranking};
@@ -170,7 +171,7 @@ public class RankingPanel extends javax.swing.JPanel {
 
                     Ranking ranking;
                     try {
-                        ranking = RankingAnalyses.rankSequenceData2D(dataOverlay2D, structureVisController.getMapping(structureOverlay.mappingSource, dataOverlay2D.mappingSource), structure, structureOverlay.pairedSites, paired, unpaired, fullGenomeList, fullHist, i);
+                        ranking = RankingAnalyses.rankSequenceData2D(dataOverlay2D, structureVisController.getMapping(structureOverlay.mappingSource, dataOverlay2D.mappingSource), structure, structureOverlay.pairedSites, paired, unpaired, fullGenomeList, fullHist, i+1);
 
                         Object[] row = {new Integer(i + 1), structure.name, new Location(structure.startPosition, structure.startPosition + structure.length), new Integer(structure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore), ranking};
                         rankingTable.tableDataModel.addRow(row);
@@ -237,28 +238,27 @@ public class RankingPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
-        dataOverlayBox = new javax.swing.JComboBox();
-        jLabel1 = new javax.swing.JLabel();
-        jPanel1 = new javax.swing.JPanel();
-        pairedOnlyButton = new javax.swing.JRadioButton();
-        unpairedOnlyButton = new javax.swing.JRadioButton();
-        allSitesButton = new javax.swing.JRadioButton();
-        statusLabel = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        saveAsCSVButton = new javax.swing.JButton();
-        jLabel3 = new javax.swing.JLabel();
-        structureOverlayComboBox = new javax.swing.JComboBox();
+        jSplitPane1 = new javax.swing.JSplitPane();
         histogramPanel = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        pairedOnlyButton = new javax.swing.JRadioButton();
+        dataOverlayBox = new javax.swing.JComboBox();
+        unpairedOnlyButton = new javax.swing.JRadioButton();
+        saveAsCSVButton = new javax.swing.JButton();
+        allSitesButton = new javax.swing.JRadioButton();
+        jLabel2 = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        structureOverlayComboBox = new javax.swing.JComboBox();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        statusLabel = new javax.swing.JLabel();
 
-        dataOverlayBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                dataOverlayBoxActionPerformed(evt);
-            }
-        });
+        jSplitPane1.setDividerLocation(300);
+        jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jSplitPane1.setResizeWeight(0.8);
 
-        jLabel1.setText("Data overlay");
-
-        jPanel1.setLayout(new java.awt.BorderLayout());
+        histogramPanel.setLayout(new java.awt.BorderLayout());
+        jSplitPane1.setBottomComponent(histogramPanel);
 
         buttonGroup1.add(pairedOnlyButton);
         pairedOnlyButton.setText("Paired only");
@@ -268,11 +268,25 @@ public class RankingPanel extends javax.swing.JPanel {
             }
         });
 
+        dataOverlayBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dataOverlayBoxActionPerformed(evt);
+            }
+        });
+
         buttonGroup1.add(unpairedOnlyButton);
         unpairedOnlyButton.setText("Unpaired only");
         unpairedOnlyButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 unpairedOnlyButtonActionPerformed(evt);
+            }
+        });
+
+        saveAsCSVButton.setText("Save as CSV");
+        saveAsCSVButton.setEnabled(false);
+        saveAsCSVButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveAsCSVButtonActionPerformed(evt);
             }
         });
 
@@ -285,21 +299,10 @@ public class RankingPanel extends javax.swing.JPanel {
             }
         });
 
-        statusLabel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        statusLabel.setText(" ");
-
         jLabel2.setForeground(new java.awt.Color(102, 102, 102));
         jLabel2.setText("Double-click on a row to open the corresponding structure in the viewer.");
 
-        saveAsCSVButton.setText("Save as CSV");
-        saveAsCSVButton.setEnabled(false);
-        saveAsCSVButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                saveAsCSVButtonActionPerformed(evt);
-            }
-        });
-
-        jLabel3.setText("Structure");
+        jPanel1.setLayout(new java.awt.BorderLayout());
 
         structureOverlayComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -307,68 +310,88 @@ public class RankingPanel extends javax.swing.JPanel {
             }
         });
 
-        histogramPanel.setLayout(new java.awt.BorderLayout());
+        jLabel1.setText("Data overlay");
+
+        jLabel3.setText("Structure");
+
+        statusLabel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        statusLabel.setText(" ");
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(626, Short.MAX_VALUE)
+                .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(saveAsCSVButton)
+                .addContainerGap())
+            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel2Layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 922, Short.MAX_VALUE)
+                        .addGroup(jPanel2Layout.createSequentialGroup()
+                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(jPanel2Layout.createSequentialGroup()
+                                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jLabel1)
+                                        .addComponent(jLabel3))
+                                    .addGap(18, 18, 18)
+                                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                            .addComponent(structureOverlayComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addGap(18, 18, 18)
+                                            .addComponent(allSitesButton)
+                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(pairedOnlyButton)
+                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(unpairedOnlyButton))
+                                        .addComponent(dataOverlayBox, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(jLabel2))
+                            .addGap(0, 0, Short.MAX_VALUE)))
+                    .addContainerGap()))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(saveAsCSVButton)
+                    .addComponent(statusLabel))
+                .addGap(265, 265, 265))
+            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel2Layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel3)
+                        .addComponent(structureOverlayComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(allSitesButton)
+                        .addComponent(unpairedOnlyButton)
+                        .addComponent(pairedOnlyButton))
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(dataOverlayBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel1))
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addComponent(jLabel2)
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
+                    .addContainerGap()))
+        );
+
+        jSplitPane1.setLeftComponent(jPanel2);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addComponent(jLabel3))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(structureOverlayComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(allSitesButton)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(pairedOnlyButton)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(unpairedOnlyButton)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE))
-                            .addComponent(dataOverlayBox, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(saveAsCSVButton))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2)
-                            .addComponent(histogramPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 780, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+            .addComponent(jSplitPane1)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(statusLabel)
-                        .addComponent(saveAsCSVButton))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel3)
-                            .addComponent(structureOverlayComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(allSitesButton)
-                            .addComponent(unpairedOnlyButton)
-                            .addComponent(pairedOnlyButton))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(dataOverlayBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel1))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(histogramPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 402, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -489,6 +512,8 @@ public class RankingPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JRadioButton pairedOnlyButton;
     private javax.swing.JButton saveAsCSVButton;
     private javax.swing.JLabel statusLabel;

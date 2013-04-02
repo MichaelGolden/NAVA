@@ -5,11 +5,16 @@
 package nava.structurevis.data;
 
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Random;
 import javax.swing.JPanel;
+import javax.swing.ToolTipManager;
 import nava.ui.MainFrame;
 import nava.utils.GraphicsUtils;
 
@@ -17,7 +22,7 @@ import nava.utils.GraphicsUtils;
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class NHistogramPanel extends JPanel {
+public class NHistogramPanel extends JPanel implements MouseMotionListener {
 
     NHistogram histogram;
     double horizontalSpacing = 4;
@@ -27,6 +32,7 @@ public class NHistogramPanel extends JPanel {
     double topBorder = bottomBorder;
     public static Font normalFont = new Font("Arial", Font.PLAIN, 11);
     public static Font smallFont = new Font("Arial", Font.PLAIN, 10);
+    public static DecimalFormat df = new DecimalFormat("0.00");
 
     public NHistogramPanel() {
         normalFont = MainFrame.fontLiberationSans.deriveFont(11f);
@@ -45,12 +51,17 @@ public class NHistogramPanel extends JPanel {
         histogram.addClass("class 2", Color.red, values2);
         histogram.addClass("class 3", Color.green, values2);
         histogram.calculate();
+
+        addMouseMotionListener(this);
+
+        ToolTipManager.sharedInstance().registerComponent(this);
     }
 
     public void setNHistogram(NHistogram histogram) {
         this.histogram = histogram;
         repaint();
     }
+    ArrayList<ColumnRectangle> columns = new ArrayList<>();
 
     @Override
     public void paintComponent(Graphics graphics) {
@@ -64,6 +75,7 @@ public class NHistogramPanel extends JPanel {
         g.fillRect(0, 0, width, height);
 
         if (histogram != null) {
+            columns.clear();
             g.setFont(normalFont);
 
             double legendItemHeight = 25;
@@ -89,12 +101,35 @@ public class NHistogramPanel extends JPanel {
                     double barHeight = (hist.percs[i] / histogram.maxBinPerc) * graphHeight;
 
                     g.setColor(hist.transparentColor);
-                    g.fill(new Rectangle2D.Double(x + j * individualBarWidth, height - bottomBorder - barHeight, individualBarWidth, barHeight));
+                    Rectangle2D.Double rect = new Rectangle2D.Double(x + j * individualBarWidth, height - bottomBorder - barHeight, individualBarWidth, barHeight);
+                    double min = (double) i / ((double) (histogram.nbins));
+                    double max = (double) (i + 1) / ((double) (histogram.nbins));
+                    String mouseOverString = "";
+                     for (int k = 0; k < histogram.classes.size(); k++) {
+                         mouseOverString += histogram.classes.get(k).bins[i] + " ("+df.format(histogram.classes.get(k).percs[i]*100)+"%)";
+                         if(k != histogram.classes.size()-1)
+                         {
+                             mouseOverString += ", ";
+                         }
+                     }
+                    if (histogram.transform != null)
+                    {
+                        min = histogram.transform.inverseTransform(min);
+                        max = histogram.transform.inverseTransform(max);
+                        mouseOverString += " in range ["+histogram.transform.getFormattedString(min, 2) + ", " + histogram.transform.getFormattedString(max, 2)+")";
+                    }
+                    else
+                    {
+                        mouseOverString += " in range ["+df.format(min) + ", " + df.format(max)+")";
+                    }
+                    ColumnRectangle columnRectangle = new ColumnRectangle(rect, mouseOverString);
+                    columns.add(columnRectangle);
+                    g.fill(rect);
                 }
             }
             for (int j = 0; j < histogram.classes.size(); j++) {
                 NHistogramClass hist = histogram.classes.get(j);
-                g.setColor(hist.color);
+                g.setColor(hist.transparentColor);
                 double y = startY + j * (legendItemHeight);
                 g.fill(new Rectangle2D.Double(leftBorder + graphWidth + legendItemLeftBorder, y + (legendItemHeight / 2) - (legendBlockHeight / 2), legendBlockWidth, legendBlockHeight));
 
@@ -136,24 +171,58 @@ public class NHistogramPanel extends JPanel {
 
             g.setFont(normalFont);
             // draw y-axis
-            GraphicsUtils.drawStringVerticallyCentred(g, leftBorder - 20 - g.getFontMetrics().stringWidth("100%"), topBorder, "100%");
-            GraphicsUtils.drawStringVerticallyCentred(g, leftBorder - 20 - g.getFontMetrics().stringWidth("50%"), topBorder + graphHeight / 2, "50%");
+            double maxPerc = histogram.maxBinPerc;
+            GraphicsUtils.drawStringVerticallyCentred(g, leftBorder - 20 - g.getFontMetrics().stringWidth(df.format(maxPerc*100)+"%"), topBorder, df.format(maxPerc*100)+"%");
+            GraphicsUtils.drawStringVerticallyCentred(g, leftBorder - 20 - g.getFontMetrics().stringWidth(df.format(maxPerc/2*100)+"%"), topBorder + graphHeight / 2, df.format(maxPerc/2*100)+"%");
             GraphicsUtils.drawStringVerticallyCentred(g, leftBorder - 20 - g.getFontMetrics().stringWidth("0%"), topBorder + graphHeight, "0%");
 
             g.draw(new Line2D.Double(leftBorder, height - bottomBorder, leftBorder + graphWidth, height - bottomBorder));
             g.draw(new Line2D.Double(leftBorder, topBorder, leftBorder, height - bottomBorder));
 
-            float dash[] = { 2.0f };
-            g.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash, 0.0f));
+            float dash[] = {2.0f};
             for (int j = 0; j < histogram.classes.size(); j++) {
-                NHistogramClass hist = histogram.classes.get(j);;
+                g.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash, (float) j / (float) histogram.classes.size() * 2.0f));
+                NHistogramClass hist = histogram.classes.get(j);
                 g.setColor(hist.color.darker());
                 if (histogram.transform != null) {
                     double medianx = histogram.transform.transform(hist.median);
-                    System.out.println(j+" median "+medianx);
-                    g.draw(new Line2D.Double(leftBorder+medianx*graphWidth, height - bottomBorder, leftBorder+medianx*graphWidth, topBorder));
+                    g.draw(new Line2D.Double(leftBorder + medianx * graphWidth, height - bottomBorder, leftBorder + medianx * graphWidth, topBorder));
                 }
             }
         }
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+        for (ColumnRectangle col : columns) {
+            if (col.rectangle.contains(e.getX(), e.getY())) {
+            }
+        }
+    }
+
+    @Override
+    public String getToolTipText(MouseEvent event) {
+        Point p = new Point(event.getX(), event.getY());
+        for (ColumnRectangle col : columns) {
+            if (col.rectangle.contains(event.getX(), event.getY())) {
+                return col.mouseOverString;
+            }
+        }
+        return super.getToolTipText(event);
+    }
+}
+
+class ColumnRectangle {
+
+    Rectangle2D.Double rectangle;
+    String mouseOverString;
+
+    public ColumnRectangle(Rectangle2D.Double rectangle, String mouseOverString) {
+        this.rectangle = rectangle;
+        this.mouseOverString = mouseOverString;
     }
 }

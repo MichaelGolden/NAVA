@@ -75,7 +75,6 @@ public class NHistogram {
         
         for (NHistogramClass hist : classes) {
             hist.calculate(min, max, nbins, transform);
-            hist.print();
             for (int i = 0; i < hist.bins.length; i++) {
                 finalbins[i] += hist.bins[i];
                 maxBinCount = Math.max(maxBinCount, hist.bins[i]);

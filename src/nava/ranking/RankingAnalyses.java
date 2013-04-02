@@ -54,7 +54,7 @@ public class RankingAnalyses {
         return values;
     }
 
-    public static Ranking rankSequenceData1D(DataOverlay1D dataOverlay1D, Mapping mapping, Substructure substructure, int[] pairedSites, boolean paired, boolean unpaired) {
+    public static Ranking rankSequenceData1D(DataOverlay1D dataOverlay1D, Mapping mapping, Substructure substructure, int[] pairedSites, boolean paired, boolean unpaired, int structureNo) {
         ArrayList<Double> fullGenomeList = getValues(dataOverlay1D, mapping, new Substructure(0, pairedSites), pairedSites, paired, unpaired, pairedSites.length);
         ArrayList<Double> substructureList = getValues(dataOverlay1D, mapping, substructure, pairedSites, paired, unpaired, pairedSites.length);
 
@@ -74,6 +74,12 @@ public class RankingAnalyses {
         MyMannWhitney mw = new MyMannWhitney(substructureValues, fullGenomeValues);
 
         Ranking r = new Ranking();
+        NHistogramClass substructureHist = new NHistogramClass("Substructure #" + structureNo, Color.green, substructureList);
+        NHistogramClass fullHist = new NHistogramClass("Full sequence", Color.red, fullGenomeList);
+        r.nhist = new NHistogram(dataOverlay1D.minValue, dataOverlay1D.maxValue, 30, dataOverlay1D.dataTransform);
+        r.nhist.add(substructureHist);
+        r.nhist.add(fullHist);        
+        r.nhist.calculate();
         r.mannWhitneyU = mw.getTestStatistic();
         r.zScore = mw.getZ();
         r.xN = substructureList.size();
@@ -82,6 +88,11 @@ public class RankingAnalyses {
         r.yMean = getAverage(fullGenomeList);
         r.xMedian = substructureMedian;
         r.yMedian = fullGenomeMedian;
+
+        fullHist.setName("Full sequence (median = " + r.nhist.transform.getFormattedString(fullGenomeMedian, 2) + ", N = " + fullGenomeList.size() + ")");
+        fullHist.setMedian(fullGenomeMedian);
+        substructureHist.setName("Substructure #" + structureNo + " (median = " + r.nhist.transform.getFormattedString(substructureMedian, 2) + ", N = " + substructureList.size() + ")");
+        substructureHist.setMedian(substructureMedian);
 
         return r;
     }
@@ -188,10 +199,10 @@ public class RankingAnalyses {
         MyMannWhitney mw = new MyMannWhitney(substructureValues, fullGenomeValues);
 
         Ranking r = new Ranking();
-        NHistogramClass substructureHist = new NHistogramClass("Substructure #"+structureNo, Color.green, substructureList);        
-        r.nhist = new NHistogram(dataOverlay2D.minValue, dataOverlay2D.maxValue, 30, dataOverlay2D.dataTransform);        
-        r.nhist.add(fullHist);
+        NHistogramClass substructureHist = new NHistogramClass("Substructure #" + structureNo, Color.green, substructureList);
+        r.nhist = new NHistogram(dataOverlay2D.minValue, dataOverlay2D.maxValue, 30, dataOverlay2D.dataTransform);
         r.nhist.add(substructureHist);
+        r.nhist.add(fullHist);        
         r.nhist.calculate();
         r.mannWhitneyU = mw.getTestStatistic();
         r.zScore = mw.getZ();
@@ -201,9 +212,9 @@ public class RankingAnalyses {
         r.yMean = getAverage(fullGenomeList);
         r.xMedian = substructureMedian;
         r.yMedian = fullGenomeMedian;
-        fullHist.setName("Full sequence (median = "+r.nhist.transform.getFormattedString(fullGenomeMedian, 2) +", N = "+fullGenomeList.size()+")");
+        fullHist.setName("Full sequence (median = " + r.nhist.transform.getFormattedString(fullGenomeMedian, 2) + ", N = " + fullGenomeList.size() + ")");
         fullHist.setMedian(fullGenomeMedian);
-        substructureHist.setName("Substructure #"+structureNo+" (median = "+r.nhist.transform.getFormattedString(substructureMedian, 2)  +", N = "+substructureList.size()+")");
+        substructureHist.setName("Substructure #" + structureNo + " (median = " + r.nhist.transform.getFormattedString(substructureMedian, 2) + ", N = " + substructureList.size() + ")");
         substructureHist.setMedian(substructureMedian);
 
         return r;

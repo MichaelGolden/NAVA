@@ -27,7 +27,6 @@ public class DataOverlay2D extends Overlay implements Serializable {
     public Matrix matrix;
     public transient PersistentSparseMatrix dataMatrix;
     public MappingSource mappingSource;
-    //public String mappingSequence;
     public boolean naturalPositions;
     public int dataOffset;
     public boolean codonPositions;

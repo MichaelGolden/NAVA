@@ -16,8 +16,6 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.text.DecimalFormat;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -25,7 +23,6 @@ import javax.swing.event.ChangeListener;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
-import nava.structurevis.data.DataOverlay1D;
 import nava.structurevis.data.DataTransform;
 import nava.structurevis.data.DataTransform.TransformType;
 import nava.structurevis.data.Histogram;
@@ -51,8 +48,8 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
     public ColorGradient colorGradient;
     public ColorGradient defaultColorGradient;
     public Histogram histogram;
-    static DecimalFormat decimalFormat = new DecimalFormat("0.00");
-    static DecimalFormat exponentialFormat = new DecimalFormat("0.0E0");
+    //static DecimalFormat decimalFormat = new DecimalFormat("0.00");
+    //static DecimalFormat exponentialFormat = new DecimalFormat("0.0E0");
     double barOffsetX = 10;
     double barOffsetY = 10;
     double barWidth = 20;
@@ -307,7 +304,7 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
                 if (!edit) {
                     pw.println("<polyline points=\"" + (xpos - 1) + " " + ypos + " " + (xpos + 1) + " " + ypos + "\" style=\"stroke-width:1;stroke:#000000\"/>");
                 }
-                String text = formatValue(x, transform, 2);
+                String text = transform.getFormattedString(x, 2);
                 pw.println("<text x=\"" + (xpos + 5) + "\" y=\"" + (ypos + 3) + "\" style=\"font-size:10px;stroke:none;fill:black;\" text-anchor=\"start\">");
                 pw.println("<tspan>" + text + "</tspan>");
                 pw.println("</text>");
@@ -383,7 +380,7 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
                     if (!edit) {
                         g.drawLine(xpos - 2, ypos, xpos + 1, ypos);
                     }
-                    String s = formatValue(x, transform, 2);
+                    String s =  transform.getFormattedString(x, 2);
                     g.drawString(s, xpos + 5, ypos + fm.getAscent() / 2);
                     greatestLabelX = Math.max(greatestLabelX, xpos + 5 + g.getFontMetrics().stringWidth(s));
                 }
@@ -478,6 +475,7 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
     public static final int UP = -1;
     public static final int DOWN = 1;
 
+    /*
     public static String formatValue(double value, DataTransform transform, int fractionDigits) {
         if (transform.type == TransformType.LINEAR) {
             decimalFormat.setMaximumFractionDigits(fractionDigits);
@@ -488,7 +486,7 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
         }
         decimalFormat.setMaximumFractionDigits(fractionDigits);
         return decimalFormat.format(value);
-    }
+    }*/
 
     public void fillVerticalArrow(Graphics2D g, double x, double y, double width, double height, int direction, Color fillColor) {
         Path2D.Double arrow = new Path2D.Double();
@@ -641,13 +639,7 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
                 double min = transform.transform(transform.min);
                 double max = transform.transform(transform.max);
                 double x = 1-transform.inverseTransform(min + downSliderPercentY * (max - min));
-                if (transform.type == TransformType.LINEAR) {
-                    sliderIndicatorText = decimalFormat.format(x);
-                } else if (transform.type == TransformType.EXPLOG) {
-                    sliderIndicatorText = exponentialFormat.format(x);
-                } else {
-                    sliderIndicatorText = decimalFormat.format(x);
-                }
+                sliderIndicatorText = transform.getFormattedString(x, 2);
             } else if (sliderSelected == UP) {
                 upSliderPercentY = Math.max(Math.min((float) ((e.getY() - barOffsetY) / barHeight), 1), 0);
                 downSliderPercentY = Math.min(upSliderPercentY, downSliderPercentY);
@@ -657,13 +649,7 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
                 double min = transform.transform(transform.min);
                 double max = transform.transform(transform.max);
                 double x = 1-transform.inverseTransform(min + upSliderPercentY * (max - min));
-                if (transform.type == TransformType.LINEAR) {
-                    sliderIndicatorText = decimalFormat.format(x);
-                } else if (transform.type == TransformType.EXPLOG) {
-                    sliderIndicatorText = exponentialFormat.format(x);
-                } else {
-                    sliderIndicatorText = decimalFormat.format(x);
-                }
+                sliderIndicatorText =  transform.getFormattedString(x, 2);
             }
             downSliderPosY = barOffsetY + downSliderPercentY * barHeight - arrowHeight;
             upSliderPosY = barOffsetY + upSliderPercentY * barHeight + arrowHeight;
@@ -791,9 +777,6 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
         
         thresholdMax = transform.inverseTransform(min + (1-downSliderPercentY) * (max - min));
         thresholdMin = transform.inverseTransform(min + (1-upSliderPercentY) * (max - min));
-        
-        
-        System.out.println("calculateThresholds()\t"+thresholdMin+" : "+thresholdMax);
     }
 
     public double getMinValue() {

@@ -5,6 +5,8 @@
 package nava.ranking;
 
 import java.awt.Color;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -15,6 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFrame;
+import javax.swing.JTable;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import nava.structurevis.StructureVisController;
@@ -32,6 +35,7 @@ public class RankingPanel extends javax.swing.JPanel {
     RankingTable rankingTable = null;
     public RankingThread currentThread = null;
     StructureVisController structureVisController;
+    NHistogramPanel nHistPanel = new NHistogramPanel();
     //StructureOverlay structureOverlay;
 
     /**
@@ -60,6 +64,19 @@ public class RankingPanel extends javax.swing.JPanel {
         for (int i = 0; i < structureOverlays.size(); i++) {
             structureOverlaysModel.addElement(structureOverlays.get(i));
         }
+        
+        rankingTable.table.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                    JTable target = (JTable) e.getSource();
+                    int row = target.getSelectedRow();
+                    int column = target.getSelectedColumn();
+
+                    int s = ((Integer) rankingTable.table.getModel().getValueAt(row, 0)).intValue() - 1;
+                    Ranking ranking = (Ranking) rankingTable.table.getModel().getValueAt(row, 13);
+                    nHistPanel.setNHistogram(ranking.nhist);
+            }
+        });
+        histogramPanel.add(nHistPanel);
 
     }
     Hashtable<Pair<Overlay, Integer>, ArrayList> rowCache = new Hashtable<>();
@@ -121,7 +138,7 @@ public class RankingPanel extends javax.swing.JPanel {
                     Ranking ranking = RankingAnalyses.rankSequenceData1D(dataOverlay1D, structureVisController.getMapping(structureOverlay.mappingSource, dataOverlay1D.mappingSource), structure, structureOverlay.pairedSites, paired, unpaired);
 
                     //System.out.println(ranking.zScore + "\t" + StatUtil.erf(Math.abs(ranking.zScore/2)) + "\t" + StatUtil.erfc(Math.abs(ranking.zScore))+ "\t" + StatUtil.erfcx(Math.abs(ranking.zScore))+ "\t" + StatUtil.getInvCDF(Math.abs(ranking.zScore), true)+"\t"+RankingAnalyses.NormalZ(Math.abs(ranking.zScore))/2);
-                    Object[] row = {new Integer(i + 1), structure.name, new Location(structure.startPosition, structure.startPosition + structure.length), new Integer(structure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore)};
+                    Object[] row = {new Integer(i + 1), structure.name, new Location(structure.startPosition, structure.startPosition + structure.length), new Integer(structure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore), ranking};
                     rankingTable.tableDataModel.addRow(row);
                     rankingTable.repaint();
                 }
@@ -145,15 +162,17 @@ public class RankingPanel extends javax.swing.JPanel {
                         Logger.getLogger(RankingPanel.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
+                NHistogramClass fullHist = new NHistogramClass("Full", Color.red, fullGenomeList);
+                fullHist.calculate(dataOverlay2D.minValue, dataOverlay2D.maxValue, 30, dataOverlay2D.dataTransform);
                 for (int i = rows.size(); running && i < structures.size(); i++) {
                     statusLabel.setText("Ranking (" + (i + 1) + " of " + structures.size() + ")");
                     Substructure structure = structures.get(i);
 
                     Ranking ranking;
                     try {
-                        ranking = RankingAnalyses.rankSequenceData2D(dataOverlay2D, structureVisController.getMapping(structureOverlay.mappingSource, dataOverlay2D.mappingSource), structure, structureOverlay.pairedSites, paired, unpaired, fullGenomeList);
+                        ranking = RankingAnalyses.rankSequenceData2D(dataOverlay2D, structureVisController.getMapping(structureOverlay.mappingSource, dataOverlay2D.mappingSource), structure, structureOverlay.pairedSites, paired, unpaired, fullGenomeList, fullHist, i);
 
-                        Object[] row = {new Integer(i + 1), structure.name, new Location(structure.startPosition, structure.startPosition + structure.length), new Integer(structure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore)};
+                        Object[] row = {new Integer(i + 1), structure.name, new Location(structure.startPosition, structure.startPosition + structure.length), new Integer(structure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore), ranking};
                         rankingTable.tableDataModel.addRow(row);
                         rankingTable.repaint();
                     } catch (IOException ex) {
@@ -229,6 +248,7 @@ public class RankingPanel extends javax.swing.JPanel {
         saveAsCSVButton = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
         structureOverlayComboBox = new javax.swing.JComboBox();
+        histogramPanel = new javax.swing.JPanel();
 
         dataOverlayBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -287,6 +307,8 @@ public class RankingPanel extends javax.swing.JPanel {
             }
         });
 
+        histogramPanel.setLayout(new java.awt.BorderLayout());
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -315,7 +337,9 @@ public class RankingPanel extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(saveAsCSVButton))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel2)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2)
+                            .addComponent(histogramPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 780, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -341,8 +365,10 @@ public class RankingPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 307, Short.MAX_VALUE)
-                .addGap(22, 22, 22))
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(histogramPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -458,6 +484,7 @@ public class RankingPanel extends javax.swing.JPanel {
     private javax.swing.JRadioButton allSitesButton;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JComboBox dataOverlayBox;
+    private javax.swing.JPanel histogramPanel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

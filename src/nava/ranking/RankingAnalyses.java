@@ -4,6 +4,7 @@
  */
 package nava.ranking;
 
+import java.awt.Color;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -11,11 +12,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
-import nava.structurevis.data.DataOverlay1D;
-import nava.structurevis.data.DataOverlay2D;
-import nava.structurevis.data.PersistentSparseMatrix;
+import nava.structurevis.data.*;
 import nava.structurevis.data.PersistentSparseMatrix.Element;
-import nava.structurevis.data.Substructure;
 import nava.utils.Mapping;
 
 /**
@@ -124,12 +122,12 @@ public class RankingAnalyses {
                 end = end < 0 ? matrix.n : end;
                 //Iterator<Element> iterator = matrix.iterator(substructure.startPosition,substructure.startPosition+substructure.length,substructure.startPosition,substructure.startPosition+substructure.length);
                 Iterator<Element> iterator = matrix.unorderedIterator(start, end, start, end);
-                
-           
+
+
                 Element element = null;
                 while (iterator.hasNext()) {
                     element = iterator.next();
-                    if (element.value != matrix.emptyValue) {                        
+                    if (element.value != matrix.emptyValue) {
                         int x = mapping.bToA(element.i);
                         int y = mapping.bToA(element.j);
                         if (x >= 0 && y >= 0) {
@@ -159,7 +157,7 @@ public class RankingAnalyses {
     double[] fullGenomeValuesPaired = null;
     double[] fullGenomeValuesUnparedaired = null;
 
-    public static Ranking rankSequenceData2D(DataOverlay2D dataOverlay2D, Mapping mapping, Substructure substructure, int[] pairedSites, boolean paired, boolean unpaired, ArrayList<Double> fullGenomeList) throws IOException {
+    public static Ranking rankSequenceData2D(DataOverlay2D dataOverlay2D, Mapping mapping, Substructure substructure, int[] pairedSites, boolean paired, boolean unpaired, ArrayList<Double> fullGenomeList, NHistogramClass fullHist, int structureNo) throws IOException {
         ArrayList<Double> substructureList = getValues(dataOverlay2D, mapping, substructure, pairedSites, paired, unpaired);
 
         /*
@@ -184,11 +182,17 @@ public class RankingAnalyses {
         if (fullGenomeList.size() > 0) {
             fullGenomeMedian = getMedian(fullGenomeList);
         }
+
         // System.out.println("Medians: " + substructureMedian + "\t" + fullGenomeMedian + "\t" + getMedian2(substructureList)+"\t"+getMedian2(fullGenomeList));
 
         MyMannWhitney mw = new MyMannWhitney(substructureValues, fullGenomeValues);
 
         Ranking r = new Ranking();
+        NHistogramClass substructureHist = new NHistogramClass("Substructure #"+structureNo, Color.green, substructureList);        
+        r.nhist = new NHistogram(dataOverlay2D.minValue, dataOverlay2D.maxValue, 30, dataOverlay2D.dataTransform);        
+        r.nhist.add(fullHist);
+        r.nhist.add(substructureHist);
+        r.nhist.calculate();
         r.mannWhitneyU = mw.getTestStatistic();
         r.zScore = mw.getZ();
         r.xN = substructureList.size();
@@ -197,6 +201,10 @@ public class RankingAnalyses {
         r.yMean = getAverage(fullGenomeList);
         r.xMedian = substructureMedian;
         r.yMedian = fullGenomeMedian;
+        fullHist.setName("Full sequence (median = "+r.nhist.transform.getFormattedString(fullGenomeMedian, 2) +", N = "+fullGenomeList.size()+")");
+        fullHist.setMedian(fullGenomeMedian);
+        substructureHist.setName("Substructure #"+structureNo+" (median = "+r.nhist.transform.getFormattedString(substructureMedian, 2)  +", N = "+substructureList.size()+")");
+        substructureHist.setMedian(substructureMedian);
 
         return r;
     }

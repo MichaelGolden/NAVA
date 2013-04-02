@@ -21,6 +21,8 @@ import nava.utils.RNAFoldingTools;
  */
 public class SecondaryStructure extends DataSource {
     
+    public int length;
+    
     @Override
     public Icon getIcon() {
         return new ImageIcon(ClassLoader.getSystemResource("resources/icons/structure-16x16.png"));

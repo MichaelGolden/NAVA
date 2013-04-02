@@ -374,16 +374,15 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
             // = new StructureOverlay(structure, mappingSource);
             if(structureOverlay != null && structureOverlay.structure != null)
             {
-                
-                if(this.circularRadioButton.isSelected() != structureOverlay.circular  || !structureOverlay.structure.equals(structure))
-                {
+                structureOverlay.substructureList = new SubstructureList(structureOverlay);
+              //  if(this.circularRadioButton.isSelected() != structureOverlay.circular  || !structureOverlay.structure.equals(structure))
+              //  {
                     // if either parameter has changed need to regenerate list
                     structureOverlay.substructureList = new SubstructureList(structureOverlay);
-                    jLabel8.setText("A new list has been generated.");
-                }
+                 //   jLabel8.setText("A new list has been generated.");
+               // }
             }
             structureOverlay.setStructureAndMapping(structure, mappingSource);
-            System.out.println("CDFAVA"+structureOverlay.substructureList);
            // structureOverlay.minStructureSize = (Integer) this.minSpinnerModel.getValue();
            // structureOverlay.maxStructureSize = (Integer) this.maxSpinnerModel.getValue();
             //structureOverlay.nonOverlappingSubstructures = this.jCheckBox1.isSelected();

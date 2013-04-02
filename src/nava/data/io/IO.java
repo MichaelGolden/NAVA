@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
- 
 package nava.data.io;
 
 import java.io.BufferedInputStream;
@@ -42,11 +41,10 @@ public class IO {
             int n = 0;
             boolean maxReached = false;
             while ((textline = buffer.readLine()) != null) {
-                if(maxReached && textline.startsWith(">"))
-                {
+                if (maxReached && textline.startsWith(">")) {
                     break;
                 }
-                
+
                 if (textline.startsWith(">")) {
                     n++;
                     if (n >= max) {
@@ -71,7 +69,7 @@ public class IO {
             ex.printStackTrace();
         }
     }
-    
+
     public static int countFastaSequences(File file) throws IOException {
         int n = 0;
         BufferedReader buffer = new BufferedReader(new FileReader(file));
@@ -80,24 +78,19 @@ public class IO {
 
         boolean maxReached = false;
         while ((textline = buffer.readLine()) != null) {
-            if(maxReached && textline.startsWith(">"))
-            {
+            if (maxReached && textline.startsWith(">")) {
                 break;
             }
 
             if (textline.startsWith(">")) {
                 n++;
                 /**
-                if (n >= max) {
-                    maxReached = true;
-                }
-
-                sequenceNames.add(textline.substring(1));
-                if (!sequence.equals("")) {
-                    sequences.add(sequence.toUpperCase());
-                    sequence = "";
-                }
-                */
+                 * if (n >= max) { maxReached = true; }
+                 *
+                 * sequenceNames.add(textline.substring(1)); if
+                 * (!sequence.equals("")) {
+                 * sequences.add(sequence.toUpperCase()); sequence = ""; }
+                 */
             } else {
                 sequence += textline.trim();
             }
@@ -105,11 +98,8 @@ public class IO {
         }
         buffer.close();
         /**
-        if (!sequence.equals("")) {
-            sequences.add(sequence);
-        }
-        */
-            
+         * if (!sequence.equals("")) { sequences.add(sequence); }
+         */
         return n;
     }
 
@@ -319,5 +309,32 @@ public class IO {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    public static AlignmentMetadata getAlignmentMetadata(File fastaFile) throws IOException {
+        AlignmentMetadata metadata = new AlignmentMetadata();
+
+        int n = 0;
+        BufferedReader buffer = new BufferedReader(new FileReader(fastaFile));
+        String textline = null;
+
+        String sequence = "";
+        while ((textline = buffer.readLine()) != null) {
+            if (textline.startsWith(">")) {
+                metadata.maxSequenceLength = Math.max(metadata.maxSequenceLength, sequence.length());
+                n++;
+                sequence = "";
+            } else {
+                sequence += textline.trim();
+            }
+
+        }
+
+        metadata.maxSequenceLength = Math.max(metadata.maxSequenceLength, sequence.length());
+        buffer.close();
+
+        metadata.numSequences = n;
+        
+        return metadata;
     }
 }

@@ -25,6 +25,7 @@ public class Alignment extends DataSource {
     public Type type = Type.NUCLEOTIDE;
     public boolean aligned = false;
     public int numSequences = 0;
+    public int length = 0;
 
     @Override
     public Icon getIcon() {

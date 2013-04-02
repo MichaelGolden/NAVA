@@ -40,6 +40,25 @@ public class MappingSource implements Serializable {
         this.sequence = sequence;
         this.mappingType = Type.STRING;
     }
+    
+    public int getLength()
+    {
+        switch(mappingType)
+        {
+            case ALIGNMENT:
+                if(alignmentSource != null)
+                {
+                    return alignmentSource.length;
+                }
+            case SEQUENCE:
+                return -1;
+            case STRING:
+                return sequence.length();
+            default:
+                return -2;
+                
+        }
+    }
 
     @Override
     public boolean equals(Object obj) {

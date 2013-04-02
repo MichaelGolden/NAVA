@@ -4,17 +4,21 @@
  */
 package nava.ranking;
 
+import nava.structurevis.data.NHistogram;
+
 /**
  *
  * @author Michael
  */
 public class Ranking {
-        public double mannWhitneyU;
-        public double zScore;
-        public int xN;
-        public int yN;
-        public double xMean;
-        public double yMean;
-        public double xMedian;
-        public double yMedian;
-    }
+
+    NHistogram nhist;
+    public double mannWhitneyU;
+    public double zScore;
+    public int xN;
+    public int yN;
+    public double xMean;
+    public double yMean;
+    public double xMedian;
+    public double yMedian;
+}

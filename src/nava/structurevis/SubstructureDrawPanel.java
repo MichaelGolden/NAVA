@@ -1421,7 +1421,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
 
             if (model.data1D != null && nucleotide != -1) {
                 double p = model.data1D.data[pos];
-                interactionText += "1D data (" + (pos + 1) + ", " + DataLegend.formatValue(p, model.data1D.dataTransform, 6) + ")     ";
+                interactionText += "1D data (" + (pos + 1) + ", " +  model.data1D.dataTransform.getFormattedString(p, 6) + ")     ";
 
             } else {
                 interactionText += "1D data (none)     ";
@@ -1463,7 +1463,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                 double p = model.data2D.get(interaction.nucleotidei - 1, interaction.nucleotidej - 1, model.mapping2D);
                 //mainapp.data2DLabel.setText(interaction.nucleotidei + " <-> " + interaction.nucleotidej + "  =  " + mainapp.data2D.matrix.get(interaction.nucleotidei - 1, interaction.nucleotidej - 1));
                 //System.out.println("INTERACTION " + covariationInteractions.get(i));
-                interactionText += "2D data (" + interaction.nucleotidei + " <-> " + interaction.nucleotidej + ", " + DataLegend.formatValue(p, model.data2D.dataTransform, 6) + ")";
+                interactionText += "2D data (" + interaction.nucleotidei + " <-> " + interaction.nucleotidej + ", " + model.data2D.dataTransform.getFormattedString(p, 6) + ")";
                 this.selectedNucleotideX = interaction.nucleotidei - 1;
                 this.selectedNucleotideY = interaction.nucleotidej - 1;
             } else {

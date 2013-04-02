@@ -316,6 +316,8 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         if (structureSource != null && structureSource.mappingSource != null) {
             //structureVisController.addStructureSource(structureSource);
             structureSource.loadData();
+            System.out.println(structureSource);
+            System.out.println(structureSource.substructureList.substructures);
             //System.out.println("structureSource.substructures.size() = "+structureSource.substructures.size());
             if (structureSource.substructureList.substructures.size() > 0) {
                 structureDrawPanel.openSubstructure(structureSource.substructureList.substructures.get(0));

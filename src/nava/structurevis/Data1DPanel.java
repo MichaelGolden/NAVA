@@ -141,6 +141,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
         this.transformHelpLabel.setToolTipText(Utils.plainTextToHtml(Utils.wrapText(MainFrame.resources.getString("transformHelpText"), 60)));
         this.rangeHelpLabel.setToolTipText(Utils.plainTextToHtml(Utils.wrapText(MainFrame.resources.getString("rangeHelpText"), 60)));
         this.positionHelpLabel.setToolTipText(Utils.plainTextToHtml(Utils.wrapText(MainFrame.resources.getString("positionHelpText"), 60)));
+        
     }
 
     public void populateDataSourceComboBox(List<DataSource> dataSources) {
@@ -177,7 +178,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
     public void updateLegend() {
         if (selectedField != null) {
             if (!selectedField.equals(dataLoadedForField)) {
-                values = (ArrayList<Double>) selectedField.getObject(projectModel.getProjectPathString(),MainFrame.dataSourceCache).getNumericValues();
+                values = (ArrayList<Double>) selectedField.getObject(projectModel.getProjectPathString(), MainFrame.dataSourceCache).getNumericValues();
                 dataLoadedForField = selectedField;
             }
 
@@ -201,7 +202,18 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
             dataSource1D = DataOverlay1D.getDataOverlay1D((Tabular) dataSourceComboBox.getSelectedItem(), selectedField, dataTitleField.getText(), (TabularField) positionComboBox.getSelectedItem(), naturalRadioButton.isSelected(), onePositionRadioButton.isSelected(), headerCheckButton.isSelected() ? 1 : 0, codonCheckButton.isSelected(), (Double) dataMinField.getValue(), (Double) dataMaxField.getValue(), missingDataRadioButton.isSelected(), selectedTransform, dataLegend.colorGradient, mappingSource);
             dataSource1D.loadData();
             previewTable.tableDataModel.setDataSource1D(dataSource1D);
+
+            if (mappingSource != null && values.size() != mappingSource.getLength()) {
+                mappingSourceTextArea.setForeground(Color.red);
+                mappingSourceTextArea.setText("The length of the mapping source (" + mappingSource.getLength() + ") does not match the length of the data source (" + values.size() + ")");
+            } else {
+                mappingSourceTextArea.setForeground(Color.green);
+                mappingSourceTextArea.setText("The length of the mapping source (" + mappingSource.getLength() + ") matches the length of the data source (" + values.size() + ")");
+            }
+            
         }
+
+
     }
 
     public void setDataSource1D(DataOverlay1D dataSource1D) {
@@ -219,7 +231,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
         this.missingDataRadioButton.setSelected(dataSource1D.excludeValuesOutOfRange);
         this.clampedRadioButton.setSelected(!dataSource1D.excludeValuesOutOfRange);
         this.transformComboBoxModel.setSelectedItem(dataSource1D.dataTransform.type);
-        this.dataLegend.setLegend(dataSource1D.title, dataSource1D.dataTransform, dataSource1D.colorGradient, dataSource1D.defaultColorGradient);       
+        this.dataLegend.setLegend(dataSource1D.title, dataSource1D.dataTransform, dataSource1D.colorGradient, dataSource1D.defaultColorGradient);
         this.mappingSourceComboBoxModel.setSelectedItem(dataSource1D.mappingSequence == null ? null : dataSource1D.mappingSource.alignmentSource);
     }
 
@@ -267,6 +279,9 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
         jLabel4 = new javax.swing.JLabel();
         mappingSourceComboBox = new javax.swing.JComboBox();
         mappingHelpLabel = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        mappingSourceTextArea = new javax.swing.JTextArea();
+        jButton1 = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         transformComboBox = new javax.swing.JComboBox();
@@ -526,30 +541,61 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
         mappingHelpLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         mappingHelpLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/question-24x24.png"))); // NOI18N
 
+        jScrollPane1.setBorder(null);
+        jScrollPane1.setOpaque(false);
+
+        mappingSourceTextArea.setColumns(20);
+        mappingSourceTextArea.setEditable(false);
+        mappingSourceTextArea.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        mappingSourceTextArea.setForeground(new java.awt.Color(255, 0, 0));
+        mappingSourceTextArea.setLineWrap(true);
+        mappingSourceTextArea.setRows(1);
+        mappingSourceTextArea.setText("This length of this mapping source (0) does not match the length of the data source (0).");
+        mappingSourceTextArea.setWrapStyleWord(true);
+        mappingSourceTextArea.setBorder(null);
+        mappingSourceTextArea.setOpaque(false);
+        jScrollPane1.setViewportView(mappingSourceTextArea);
+
+        jButton1.setText("Guess best mapping source (not recommended)");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(mappingSourceComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(mappingHelpLabel)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(mappingSourceComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(mappingHelpLabel)))
                 .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jButton1))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(mappingSourceComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(99, Short.MAX_VALUE))
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addComponent(mappingHelpLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel4)
+                            .addComponent(mappingSourceComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(mappingHelpLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 0, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton1))
         );
 
         jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("5. Choose how the data values are displayed"));
@@ -666,6 +712,11 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
     private void fromFieldRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fromFieldRadioButtonActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_fromFieldRadioButtonActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        selectBestAlignment();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton clampedRadioButton;
     private javax.swing.JCheckBox codonCheckButton;
@@ -679,6 +730,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
     private javax.swing.JLabel firstPositionLabel;
     private javax.swing.JRadioButton fromFieldRadioButton;
     private javax.swing.JCheckBox headerCheckButton;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -693,8 +745,10 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel mappingHelpLabel;
     private javax.swing.JComboBox mappingSourceComboBox;
+    private javax.swing.JTextArea mappingSourceTextArea;
     private javax.swing.JRadioButton missingDataRadioButton;
     private javax.swing.JRadioButton naturalRadioButton;
     private javax.swing.JRadioButton onePositionRadioButton;
@@ -710,6 +764,23 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
     private javax.swing.JRadioButton zeroPositionRadioButton;
     // End of variables declaration//GEN-END:variables
 
+    public void selectBestAlignment()
+    {
+           Alignment bestAlignment = null;
+            int minDifference = Integer.MAX_VALUE;
+            for(int i = 0 ; i < this.mappingSourceComboBoxModel.getSize() ; i++)
+            {
+                Alignment alignment = mappingSourceComboBoxModel.getElementAt(i);
+                int difference = Math.abs(alignment.length - values.size());
+                if(bestAlignment == null || difference < minDifference)
+                {
+                    bestAlignment = alignment;
+                    minDifference = difference;
+                }
+            }
+            mappingSourceComboBox.setSelectedItem(bestAlignment);
+    }
+    
     @Override
     public void itemStateChanged(ItemEvent e) {
         if (e.getSource().equals(this.dataSourceComboBox)) {

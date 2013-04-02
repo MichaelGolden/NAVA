@@ -1,6 +1,7 @@
 package nava.structurevis.data;
 
 import java.io.Serializable;
+import java.text.DecimalFormat;
 
 /**
  *
@@ -86,5 +87,22 @@ public class DataTransform implements Serializable {
                 return Math.sqrt((y * Math.pow(max - min,2)) + Math.pow(min,2));
         }
         return 0;
+    }
+    
+    
+    static DecimalFormat decimalFormat = new DecimalFormat("0.00");
+    static DecimalFormat exponentialFormat = new DecimalFormat("0.00E0");
+    
+    public String getFormattedString(double val, int fractionDigits)
+    {
+        switch(type)
+        {
+            case LINEAR:
+                return decimalFormat.format(val);
+            case EXPLOG:
+                return exponentialFormat.format(val);
+            default:
+                return decimalFormat.format(val);
+        }
     }
 }

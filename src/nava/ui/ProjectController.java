@@ -54,13 +54,15 @@ public class ProjectController implements SafeListListener {
                     ArrayList<SecondaryStructureData> structures = FileImport.loadStructures(dataFile, dataType.fileFormat);
 
                     if (structures.size() == 1) {
-                        dataSource = new SecondaryStructure();
-                        createPath(dataSource, dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1), dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1));
-                        dataSource.originalFile = dataFile;
-                        dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
-                        dataSource.dataType = dataType;
-                        dataSource.persistObject(projectModel.getProjectPathString(),structures.get(0));
-                        dataSource.fileSize = new FileSize(dataFile.length());
+                        SecondaryStructure secondaryStructure = new SecondaryStructure();
+                        createPath(secondaryStructure, dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1), dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1));
+                        secondaryStructure.originalFile = dataFile;
+                        secondaryStructure.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
+                        secondaryStructure.dataType = dataType;
+                        secondaryStructure.persistObject(projectModel.getProjectPathString(),structures.get(0));
+                        secondaryStructure.fileSize = new FileSize(dataFile.length());
+                        secondaryStructure.length = structures.get(0).pairedSites.length;
+                        dataSource = secondaryStructure;
                     } else {
                         dataSource = new StructureList(dataFile.getName());
                         createPath(dataSource, dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1), dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1));
@@ -152,7 +154,9 @@ public class ProjectController implements SafeListListener {
 
                 try {
                     ReadseqTools.saveAsFASTA(dataFile, Paths.get(al.getImportedDataSourcePath(projectModel.getProjectPathString())).toFile());
-                    al.numSequences = IO.countFastaSequences(Paths.get(al.getImportedDataSourcePath(projectModel.getProjectPathString())).toFile());
+                    AlignmentMetadata metadata = IO.getAlignmentMetadata(Paths.get(al.getImportedDataSourcePath(projectModel.getProjectPathString())).toFile());
+                    al.numSequences = metadata.numSequences;
+                    al.length = metadata.maxSequenceLength;
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }

@@ -61,6 +61,7 @@ public class RankingTable extends JPanel {
         public ArrayList<Object[]> rows = new ArrayList<>();
         public ArrayList<Mapping> mappings = new ArrayList<>();
         public ArrayList<File> mappingFiles = new ArrayList<>();
+        public ArrayList<Ranking> rankings = new ArrayList<>();
 
         public int getColumnCount() {
             return columnNames.length;

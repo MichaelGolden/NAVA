@@ -26,7 +26,7 @@ public class NHistogramPanel extends JPanel implements MouseMotionListener {
 
     NHistogram histogram;
     double horizontalSpacing = 4;
-    double rightBorder = 60;
+    double rightBorder = 70;
     double leftBorder = rightBorder;
     double bottomBorder = 15;
     double topBorder = bottomBorder;
@@ -37,20 +37,6 @@ public class NHistogramPanel extends JPanel implements MouseMotionListener {
     public NHistogramPanel() {
         normalFont = MainFrame.fontLiberationSans.deriveFont(11f);
         smallFont = MainFrame.fontLiberationSans.deriveFont(10f);
-
-        Random random = new Random();
-        ArrayList<Double> values1 = new ArrayList<>();
-        ArrayList<Double> values2 = new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
-            values1.add(random.nextDouble() * 0.5);
-            values2.add(random.nextDouble() * 1);
-        }
-
-        histogram = new NHistogram(0, 1, 15, null);
-        histogram.addClass("class 1", Color.blue, values1);
-        histogram.addClass("class 2", Color.red, values2);
-        histogram.addClass("class 3", Color.green, values2);
-        histogram.calculate();
 
         addMouseMotionListener(this);
 
@@ -74,7 +60,12 @@ public class NHistogramPanel extends JPanel implements MouseMotionListener {
         g.setColor(Color.white);
         g.fillRect(0, 0, width, height);
 
-        if (histogram != null) {
+        if(histogram == null)
+        {
+            g.setColor(Color.black);
+            GraphicsUtils.drawStringCentred(g, width/2, height/2, "Click on a substructure to compare it's distribution to that of the full sequence.");
+        }
+        else{
             columns.clear();
             g.setFont(normalFont);
 

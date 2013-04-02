@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package nava.structurevis;
+package nava.structurevis.layerpanel;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -54,5 +54,9 @@ public class Layer {
         right.setMinimumSize(new Dimension(0, layerHeight));
         right.setPreferredSize(new Dimension(100, layerHeight));
         right.setMaximumSize(new Dimension(Integer.MAX_VALUE, layerHeight));
+        
+        left.revalidate();
+        right.revalidate();
     }
 }
+

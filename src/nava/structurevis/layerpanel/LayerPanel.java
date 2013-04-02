@@ -2,90 +2,94 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package nava.structurevis;
+package nava.structurevis.layerpanel;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.JLabel;
 import javax.swing.Scrollable;
+import nava.structurevis.StructureVisController;
+import nava.structurevis.data.AnnotationSource;
+import nava.structurevis.data.DataOverlay1D;
+import nava.structurevis.layerpanel.LayerItem.LayerType;
+import nava.ui.ProjectController;
 
 /**
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class LayerPanel extends javax.swing.JPanel implements Scrollable {
-
+public class LayerPanel extends javax.swing.JPanel implements Scrollable, LayerModelListener {
+    
     int width = 1000;
     boolean trackWidth = true;
     int height = 0;
+    
+    ArrayList<Layer> layers = new ArrayList<>();
+    LayerModel layerModel;
+    StructureVisController structureVisController;
+    ProjectController projectController;
 
     /**
      * Creates new form LayerPanel
      */
-    public LayerPanel() {
+    public LayerPanel(StructureVisController structureVisController, ProjectController projectController) {
         initComponents();
         jSplitPane1.setDividerLocation(150);
     }
-
+    
+    public void setLayerModel(LayerModel layerModel) {
+        if (this.layerModel != null) {
+            this.layerModel.removeLayerModelListener(this);
+        }
+        this.layerModel = layerModel;
+        this.layerModel.addLayerModelListener(this);
+        resetLayerModel();
+    }
+    
     public void updatePanel() {
-        /*removeAllLayers();
-        if (genomeLayer != null) {
-            genomeLayer.canPin = false;
-            addLayer(genomeLayer);
-        }
-        if (graphLayer1D != null) {
-            addLayer(graphLayer1D);
-        }
-        for (int i = 0; i < pinnedLayers.size(); i++) {
-            if (!pinnedLayers.get(i).equals(graphLayer1D)) {
-                if (pinnedLayers.get(i).isPinned) {
-                    addLayer(pinnedLayers.get(i));
-                }
-            }
-        }*/
+        /*
+         * removeAllLayers(); if (genomeLayer != null) { genomeLayer.canPin =
+         * false; addLayer(genomeLayer); } if (graphLayer1D != null) {
+         * addLayer(graphLayer1D); } for (int i = 0; i < pinnedLayers.size();
+         * i++) { if (!pinnedLayers.get(i).equals(graphLayer1D)) { if
+         * (pinnedLayers.get(i).isPinned) { addLayer(pinnedLayers.get(i)); } } }
+         */
         
         refresh();
         revalidate();
         repaint();
-        /*for (int i = 0; i < layers.size(); i++) {
-            layers.get(i).redraw();
-        }*/
+        /*
+         * for (int i = 0; i < layers.size(); i++) { layers.get(i).redraw(); }
+         */
     }
     
-    public void refresh()
-    {        
+    public void refresh() {
         //leftPanel.removeAll();
         //rightPanel.removeAll();
         height = 0;
-        for(Layer layer : layers)
-        {
+        for (Layer layer : layers) {
             layer.refresh();
             //addLayer(layer,false);
-             height += layer.getLeft().getPreferredSize().height;
-             layer.getRight().setPreferredSize(layer.getLeft().getPreferredSize());
+            height += layer.getLeft().getPreferredSize().height;
+            layer.getRight().setPreferredSize(layer.getLeft().getPreferredSize());
         }
         this.setPreferredSize(new Dimension(this.getPreferredSize().width, height));
     }
     
-    ArrayList<Layer> layers = new ArrayList<>();
-    
     public void addLayer(Layer layer, boolean add) {
         layer.parent = this;
         layer.refresh();
-        if(add)
-        {
+        if (add) {
             layers.add(layer);
         }
         layer.getLeft().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
         leftPanel.add(layer.getLeft());
-
+        
         layer.getRight().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
         rightPanel.add(layer.getRight());
-
+        
         height += layer.getLeft().getPreferredSize().height;
         
     }
@@ -123,42 +127,87 @@ public class LayerPanel extends javax.swing.JPanel implements Scrollable {
         return this.getPreferredSize();
         // return new Dimension(1000,100);
     }
-
+    
     public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
         return -1;
     }
-
+    
     public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
         return -1;
     }
-
+    
     public boolean getScrollableTracksViewportWidth() {
         return trackWidth;
     }
-
+    
     public boolean getScrollableTracksViewportHeight() {
         return false;
     }
-
+    
     public void autofitWidth() {
         trackWidth = true;
         this.revalidate();
         width = getWidth();
     }
-
+    
     public void resizeWidth(int width) {
         trackWidth = false;
         this.setPreferredSize(new Dimension(width, height));
         this.revalidate();
     }
-
+    
     public void zoomIn() {
         width = (int) ((double) getWidth() * 1.5);
         resizeWidth(width);
     }
-
+    
     public void zoomOut() {
         width = (int) ((double) getWidth() / 1.5);
         resizeWidth(width);
+    }
+    
+    public void addItems(int index0, int index1) {
+        for (int i = index0; i <= index1; i++) {
+            LayerItem item = layerModel.items.get(i);
+            if (item.type == LayerType.ANNOTATIONS) {
+                AnnotationSource annotationSource = (AnnotationSource) item.object;
+                AnnotationsLayer annotationsLayer = new AnnotationsLayer(null, structureVisController, projectController);
+                Layer layer = new Layer(new LabelLayer("Sequence annotations"), annotationsLayer);
+                annotationsLayer.setAnnotationData(annotationSource, true);
+                annotationsLayer.parent = layer;
+                addLayer(layer, true);
+            } else if (item.type == LayerType.DATAOVERLAY_1D) {
+                DataOverlay1D dataOverlay1D = (DataOverlay1D) item.object;
+                GraphLayer graphLayer = new GraphLayer(null, structureVisController, projectController);
+                graphLayer.setData(dataOverlay1D, 20);
+                Layer layer2 = new Layer(new LabelLayer(item.label), graphLayer);
+                graphLayer.parent = layer2;
+                addLayer(layer2, true);
+            }
+        }
+        refresh();
+    }
+    
+    public void resetLayerModel()
+    {
+         this.leftPanel.removeAll();
+        this.rightPanel.removeAll();
+        height = 0;
+        addItems(0,layerModel.items.size()-1);
+    }
+    
+    @Override
+    public void intervalAdded(int index0, int index1) {
+        addItems(index0, index1);
+    }
+    
+    @Override
+    public void intervalRemoved(int index0, int index1) {
+        //throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
+    @Override
+    public void contentsChanged(int index0, int index1) {
+       resetLayerModel();
     }
 }

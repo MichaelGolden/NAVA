@@ -4,6 +4,7 @@
  */
 package nava.structurevis;
 
+import nava.structurevis.layerpanel.AnnotationsPanel;
 import java.awt.BorderLayout;
 import nava.structurevis.data.AnnotationSource;
 import nava.ui.ProjectModel;
@@ -29,6 +30,7 @@ public class AnnotationsDialog extends javax.swing.JDialog {
 
         annotationsPanel = new AnnotationsPanel(projectModel);
         this.jPanel1.add(annotationsPanel, BorderLayout.CENTER);
+        //this.jPanel1.add(annotationsPanel, BorderLayout.CENTER);
     }
 
     /**

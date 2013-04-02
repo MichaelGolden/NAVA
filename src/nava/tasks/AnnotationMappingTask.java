@@ -5,10 +5,10 @@
 package nava.tasks;
 
 import java.util.Objects;
-import nava.structurevis.AnnotationsLayer;
 import nava.structurevis.StructureVisController;
 import nava.structurevis.data.AnnotationSource;
 import nava.structurevis.data.StructureOverlay;
+import nava.structurevis.layerpanel.AnnotationsLayer;
 
 /**
  *

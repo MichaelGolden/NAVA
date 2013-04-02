@@ -13,11 +13,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFrame;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import nava.structurevis.StructureVisController;
@@ -64,30 +66,74 @@ public class RankingPanel extends javax.swing.JPanel {
         for (int i = 0; i < structureOverlays.size(); i++) {
             structureOverlaysModel.addElement(structureOverlays.get(i));
         }
-        
-        rankingTable.table.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                    JTable target = (JTable) e.getSource();
-                    int row = target.getSelectedRow();
-                    int column = target.getSelectedColumn();
 
-                    int s = ((Integer) rankingTable.table.getModel().getValueAt(row, 0)).intValue() - 1;
-                    Ranking ranking = (Ranking) rankingTable.table.getModel().getValueAt(row, 13);
-                    nHistPanel.setNHistogram(ranking.nhist);
+        rankingTable.table.addMouseListener(new MouseAdapter() {
+
+            public void mouseClicked(MouseEvent e) {
+                JTable target = (JTable) e.getSource();
+                int row = target.getSelectedRow();
+                int column = target.getSelectedColumn();
+
+                int s = ((Integer) rankingTable.table.getModel().getValueAt(row, 0)).intValue() - 1;
+                Ranking ranking = (Ranking) rankingTable.table.getModel().getValueAt(row, 13);
+                nHistPanel.setNHistogram(ranking.nhist);
             }
         });
         histogramPanel.add(nHistPanel);
 
     }
-    Hashtable<Pair<Overlay, Integer>, ArrayList> rowCache = new Hashtable<>();
+    Hashtable<RankingKey, ArrayList> rowCache = new Hashtable<>();
 
-    public ArrayList getListFromCache(Pair<Overlay, Integer> key) {
+    public ArrayList getListFromCache(RankingKey key) {
         ArrayList ret = rowCache.get(key);
         if (ret == null) {
             return new ArrayList();
         }
 
         return ret;
+    }
+
+    class RankingKey {
+
+        Overlay dataOverlay;
+        StructureOverlay structureOverlay;
+        int pairingParamter;
+
+        public RankingKey(Overlay dataOverlay, StructureOverlay structureOverlay, int pairingParamter) {
+            this.dataOverlay = dataOverlay;
+            this.structureOverlay = structureOverlay;
+            this.pairingParamter = pairingParamter;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final RankingKey other = (RankingKey) obj;
+            if (!Objects.equals(this.dataOverlay, other.dataOverlay)) {
+                return false;
+            }
+            if (!Objects.equals(this.structureOverlay, other.structureOverlay)) {
+                return false;
+            }
+            if (this.pairingParamter != other.pairingParamter) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 83 * hash + Objects.hashCode(this.dataOverlay);
+            hash = 83 * hash + Objects.hashCode(this.structureOverlay);
+            hash = 83 * hash + this.pairingParamter;
+            return hash;
+        }
     }
 
     class RankingThread extends Thread {
@@ -129,8 +175,9 @@ public class RankingPanel extends javax.swing.JPanel {
             if (dataOverlay instanceof DataOverlay1D) {
                 DataOverlay1D dataOverlay1D = (DataOverlay1D) dataOverlay;
                 //String cacheKey = dataOverlay1D.name + "_" + PAIR_PARAMETER;
-                Pair<Overlay, Integer> cacheKey = new Pair((Overlay) dataOverlay1D, new Integer(PAIR_PARAMETER));
-                ArrayList rows = getListFromCache(cacheKey);
+                // Pair<Overlay, Integer> cacheKey = new Pair((Overlay) dataOverlay1D, new Integer(PAIR_PARAMETER));
+                RankingKey key = new RankingKey(dataOverlay1D, structureOverlay, PAIR_PARAMETER);
+                ArrayList rows = getListFromCache(key);
                 rankingTable.tableDataModel.addRows(rows);
                 ArrayList<Substructure> structures = structureOverlay.substructureList.substructures;
                 for (int i = rows.size(); running && i < structures.size(); i++) {
@@ -139,20 +186,28 @@ public class RankingPanel extends javax.swing.JPanel {
                     Ranking ranking = RankingAnalyses.rankSequenceData1D(dataOverlay1D, structureVisController.getMapping(structureOverlay.mappingSource, dataOverlay1D.mappingSource), structure, structureOverlay.pairedSites, paired, unpaired, i + 1);
 
                     //System.out.println(ranking.zScore + "\t" + StatUtil.erf(Math.abs(ranking.zScore/2)) + "\t" + StatUtil.erfc(Math.abs(ranking.zScore))+ "\t" + StatUtil.erfcx(Math.abs(ranking.zScore))+ "\t" + StatUtil.getInvCDF(Math.abs(ranking.zScore), true)+"\t"+RankingAnalyses.NormalZ(Math.abs(ranking.zScore))/2);
-                    Object[] row = {new Integer(i + 1), structure.name, new Location(structure.startPosition, structure.startPosition + structure.length), new Integer(structure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore), ranking};
-                    rankingTable.tableDataModel.addRow(row);
-                    rankingTable.repaint();
+                    final Object[] row = {new Integer(i + 1), structure.name, new Location(structure.startPosition, structure.startPosition + structure.length), new Integer(structure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore), ranking};
+                    SwingUtilities.invokeLater(
+                            new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    rankingTable.tableDataModel.addRow(row);
+                                    rankingTable.repaint();
+                                }
+                            });
                 }
 
                 ArrayList<Object[]> clone = new ArrayList<>();
                 for (int i = 0; i < rankingTable.tableDataModel.rows.size(); i++) {
                     clone.add(rankingTable.tableDataModel.rows.get(i));
                 }
-                rowCache.put(cacheKey, clone);
+                rowCache.put(key, clone);
             } else if (dataOverlay instanceof DataOverlay2D) {
                 DataOverlay2D dataOverlay2D = (DataOverlay2D) dataOverlay;
-                Pair<Overlay, Integer> cacheKey = new Pair((Overlay) dataOverlay2D, new Integer(PAIR_PARAMETER));
-                ArrayList rows = getListFromCache(cacheKey);
+                //Pair<Overlay, Integer> cacheKey = new Pair((Overlay) dataOverlay2D, new Integer(PAIR_PARAMETER));
+                RankingKey key = new RankingKey(dataOverlay2D, structureOverlay, PAIR_PARAMETER);
+                ArrayList rows = getListFromCache(key);
                 rankingTable.tableDataModel.addRows(rows);
                 ArrayList<Substructure> structures = structureOverlay.substructureList.substructures;
                 ArrayList<Double> fullGenomeList = null;
@@ -171,11 +226,19 @@ public class RankingPanel extends javax.swing.JPanel {
 
                     Ranking ranking;
                     try {
-                        ranking = RankingAnalyses.rankSequenceData2D(dataOverlay2D, structureVisController.getMapping(structureOverlay.mappingSource, dataOverlay2D.mappingSource), structure, structureOverlay.pairedSites, paired, unpaired, fullGenomeList, fullHist, i+1);
+                        ranking = RankingAnalyses.rankSequenceData2D(dataOverlay2D, structureVisController.getMapping(structureOverlay.mappingSource, dataOverlay2D.mappingSource), structure, structureOverlay.pairedSites, paired, unpaired, fullGenomeList, fullHist, i + 1);
 
-                        Object[] row = {new Integer(i + 1), structure.name, new Location(structure.startPosition, structure.startPosition + structure.length), new Integer(structure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore), ranking};
-                        rankingTable.tableDataModel.addRow(row);
-                        rankingTable.repaint();
+                        final Object[] row = {new Integer(i + 1), structure.name, new Location(structure.startPosition, structure.startPosition + structure.length), new Integer(structure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore), ranking};
+                        SwingUtilities.invokeLater(
+                                new Runnable() {
+
+                                    @Override
+                                    public void run() {
+                                        rankingTable.tableDataModel.addRow(row);
+                                        rankingTable.repaint();
+                                    }
+                                });
+
                     } catch (IOException ex) {
                         Logger.getLogger(RankingPanel.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -185,7 +248,7 @@ public class RankingPanel extends javax.swing.JPanel {
                 for (int i = 0; i < rankingTable.tableDataModel.rows.size(); i++) {
                     clone.add(rankingTable.tableDataModel.rows.get(i));
                 }
-                rowCache.put(cacheKey, clone);
+                rowCache.put(key, clone);
             }
 
             hasStopped = true;
@@ -218,11 +281,13 @@ public class RankingPanel extends javax.swing.JPanel {
         kill();
 
         if (dataOverlayBox.getSelectedIndex() >= 0) {
-            Overlay dataOverlay = dataOverlays.get(dataOverlayBox.getSelectedIndex());
+            Overlay dataOverlay = dataOverlays.get(dataOverlayBox.getSelectedIndex());            
             StructureOverlay structureOverlay = (StructureOverlay) structureOverlayComboBox.getSelectedItem();
-            if (dataOverlay != null && structureOverlay != null) {
+            if (dataOverlay != null && structureOverlay != null) {  
+                nHistPanel.setNHistogram(null);
+                structureOverlay.loadData();
                 currentThread = new RankingThread(dataOverlay, structureOverlay);
-               // currentThread.setPriority(Thread.MIN_PRIORITY);
+                // currentThread.setPriority(Thread.MIN_PRIORITY);
                 currentThread.start();
             }
         }

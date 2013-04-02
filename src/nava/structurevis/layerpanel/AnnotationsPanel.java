@@ -2,20 +2,18 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package nava.structurevis;
+package nava.structurevis.layerpanel;
 
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import nava.data.types.Annotations;
 import nava.data.types.DataSource;
-import nava.data.types.Tabular;
 import nava.structurevis.data.AnnotationSource;
 import nava.ui.ProjectModel;
 import org.biojava.bio.BioException;

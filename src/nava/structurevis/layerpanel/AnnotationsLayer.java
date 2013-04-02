@@ -1,9 +1,11 @@
+package nava.structurevis.layerpanel;
+
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package nava.structurevis;
 
+import nava.structurevis.layerpanel.Layer;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Line2D;
@@ -12,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import javax.swing.*;
+import nava.structurevis.AnnotationsDialog;
+import nava.structurevis.StructureVisController;
 import nava.structurevis.data.AnnotationSource;
 import nava.structurevis.data.Block;
 import nava.structurevis.data.Feature;
@@ -62,7 +66,7 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
      * Structure selected = null; ArrayList<Structure> structures = null;
      * ArrayList<StructureAndMouseoverRegion> structurePositions = null;
      */
-    Layer parent;
+    public Layer parent;
 
     public AnnotationsLayer(Layer parent, StructureVisController structureVisController, ProjectController projectController) {
 

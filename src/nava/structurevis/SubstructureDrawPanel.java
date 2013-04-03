@@ -393,7 +393,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                         double value = model.data2D.get(i, j, model.mapping2D);
                         if (value == model.data2D.emptyValue) {
                             c = null;
-                        } else if (((!model.useLowerThreshold2D || value >= model.thresholdMin2D) && (!model.useUpperThreshold2D || value <= model.thresholdMax2D))) {
+                        } else if (((!model.data2D.useLowerThreshold || value >= model.data2D.thresholdMin) && (!model.data2D.useUpperThreshold || value <= model.data2D.thresholdMax))) {
                             //  Sy
                             if (model.data2D != null) {
                                 //System.out.println(p);
@@ -474,9 +474,9 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             Color nucleotideBackgroundColor = model.missingDataColor;
             if (oneDimensionalData == SHOW && model.data1D != null && model.data1D.used[pos]) {
                 double p = model.data1D.data[pos];
-                if (model.data1D.used[pos] && ((!model.useLowerThreshold1D || p >= model.thresholdMin1D) && (!model.useUpperThreshold1D || p <= model.thresholdMax1D))) {
+                if (model.data1D.used[pos] && ((!model.data1D.useLowerThreshold || p >= model.data1D.thresholdMin) && (!model.data1D.useUpperThreshold || p <= model.data1D.thresholdMax))) {
                     nucleotideBackgroundColor = model.data1D.colorGradient.getColor(model.data1D.dataTransform.transform((float) p));
-                } else if (!((!model.useLowerThreshold1D || p >= model.thresholdMin1D) && (!model.useUpperThreshold1D || p <= model.thresholdMax1D))) {
+                } else if (!((!model.data1D.useLowerThreshold || p >= model.data1D.thresholdMin) && (!model.data1D.useUpperThreshold || p <= model.data1D.thresholdMax))) {
                     nucleotideBackgroundColor = model.filteredDataColor;
                 }
             }
@@ -707,7 +707,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                         //System.out.println("P"+(i-1)+"\t"+(j-1)+"\t"+model.data2D.get(i - 1, j - 1, model.mapping2D));
                         if (p == model.data2D.emptyValue) {
                             c = null;
-                        } else if (((!model.useLowerThreshold2D || p >= model.thresholdMin2D) && (!model.useUpperThreshold2D || p <= model.thresholdMax2D))) {
+                        } else if (((!model.data2D.useLowerThreshold || p >= model.data2D.thresholdMin) && (!model.data2D.useUpperThreshold || p <= model.data2D.thresholdMax))) {
                             if (model.data2D != null) {
                                 //System.out.println(p);
                                 c = model.data2D.colorGradient.getColor((float) model.data2D.dataTransform.transform(p));
@@ -791,9 +791,9 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             Color nucleotideBackgroundColor = model.missingDataColor;
             if (oneDimensionalData == SHOW && model.data1D != null && pos >= 0 && model.data1D.used[pos]) {
                  double p = model.data1D.data[pos];
-                if (model.data1D.used[pos] && ((!model.useLowerThreshold1D || p >= model.thresholdMin1D) && (!model.useUpperThreshold1D || p <= model.thresholdMax1D))) {
+                if (model.data1D.used[pos] && ((!model.data1D.useLowerThreshold || p >= model.data1D.thresholdMin) && (!model.data1D.useUpperThreshold || p <= model.data1D.thresholdMax))) {
                     nucleotideBackgroundColor = model.data1D.colorGradient.getColor(model.data1D.dataTransform.transform((float) p));
-                } else if (!((!model.useLowerThreshold1D || p >= model.thresholdMin1D) && (!model.useUpperThreshold1D || p <= model.thresholdMax1D))) {
+                } else if (!((!model.data1D.useLowerThreshold || p >= model.data1D.thresholdMin) && (!model.data1D.useUpperThreshold || p <= model.data1D.thresholdMax))) {
                     nucleotideBackgroundColor = model.filteredDataColor;
                 }
                 g.setColor(nucleotideBackgroundColor);

@@ -5,26 +5,17 @@
 package nava.structurevis;
 
 import java.awt.BorderLayout;
-import java.awt.Frame;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
-import nava.data.types.Alignment;
-import nava.data.types.DataSource;
-import nava.data.types.SecondaryStructure;
-import nava.data.types.SecondaryStructureData;
 import nava.structurevis.data.*;
 import nava.structurevis.navigator.DataOverlayTreePanel;
-import nava.ui.MainFrame;
 import nava.ui.ProjectController;
-import nava.ui.ProjectModel;
 import nava.utils.CustomItem;
 
 /**
@@ -61,7 +52,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
 
         structureVisController.addView(this);
 
-        treePanel.add(new DataOverlayTreePanel(projectController,structureVisController), BorderLayout.CENTER);
+        treePanel.add(new DataOverlayTreePanel(projectController, structureVisController), BorderLayout.CENTER);
 
         dataLegend1D.addChangeListener(this);
         dataLegend2D.addChangeListener(this);
@@ -206,8 +197,6 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         );
     }// </editor-fold>//GEN-END:initComponents
 
-
-    
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         StructureOverlayDialog d = new StructureOverlayDialog(null, true, projectController.projectModel, structureVisController);
         d.setSize(640, 580);
@@ -219,7 +208,6 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         AddDataOverlayDialog dialog = new AddDataOverlayDialog(null, true, projectController, structureVisController);
         dialog.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
@@ -253,8 +241,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
              * structureVisController.substructureModel.setStructureSource(structureSource);
              * if (structureSource.substructures.size() > 0) {
              * structureDrawPanel.openSubstructure(structureSource.substructures.get(0));
-             * } populateSubtructureComboBox();
-            }
+             * } populateSubtructureComboBox(); }
              */
         } else if (e.getSource().equals(substructureComboBox)) {
             CustomItem<Substructure> comboBoxItem = (CustomItem<Substructure>) substructureComboBoxModel.getSelectedItem();
@@ -280,12 +267,12 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
 
     @Override
     public void intervalRemoved(ListDataEvent e) {
-       // populateStructureSourceComboBox();
+        // populateStructureSourceComboBox();
     }
 
     @Override
     public void contentsChanged(ListDataEvent e) {
-       // populateStructureSourceComboBox();
+        // populateStructureSourceComboBox();
     }
 
     @Override
@@ -294,7 +281,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
             dataLegend1D.setVisible(false);
         } else {
             dataLegend1D.setVisible(true);
-            dataLegend1D.setLegend(dataSource1D.title, dataSource1D.dataTransform, dataSource1D.colorGradient, dataSource1D.defaultColorGradient);
+            dataLegend1D.setLegend(dataSource1D.title, dataSource1D.dataTransform, dataSource1D.colorGradient, dataSource1D.defaultColorGradient, dataSource1D.useLowerThreshold, dataSource1D.useUpperThreshold, dataSource1D.thresholdMin, dataSource1D.thresholdMax, dataSource1D);
         }
         structureDrawPanel.redraw();
     }
@@ -305,7 +292,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
             dataLegend2D.setVisible(false);
         } else {
             dataLegend2D.setVisible(true);
-            dataLegend2D.setLegend(dataSource2D.title, dataSource2D.dataTransform, dataSource2D.colorGradient, dataSource2D.defaultColorGradient);
+            dataLegend2D.setLegend(dataSource2D.title, dataSource2D.dataTransform, dataSource2D.colorGradient, dataSource2D.defaultColorGradient, dataSource2D.useLowerThreshold, dataSource2D.useUpperThreshold, dataSource2D.thresholdMin, dataSource2D.thresholdMax, dataSource2D);
         }
 
         structureDrawPanel.redraw();
@@ -316,20 +303,14 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         if (structureSource != null && structureSource.mappingSource != null) {
             //structureVisController.addStructureSource(structureSource);
             structureSource.loadData();
-            System.out.println(structureSource);
-            System.out.println(structureSource.substructureList.substructures);
             //System.out.println("structureSource.substructures.size() = "+structureSource.substructures.size());
             if (structureSource.substructureList.substructures.size() > 0) {
                 structureDrawPanel.openSubstructure(structureSource.substructureList.substructures.get(0));
-            }
-            else
-            {                
+            } else {
                 structureDrawPanel.openSubstructure(null);
             }
             populateSubtructureComboBox();
-        }
-        else
-        {
+        } else {
             structureDrawPanel.openSubstructure(null);
         }
         structureDrawPanel.redraw();
@@ -341,21 +322,33 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
     }
 
     @Override
-    public void nucleotideSourceChanged(NucleotideComposition nucleotideSource) {        
+    public void nucleotideSourceChanged(NucleotideComposition nucleotideSource) {
         structureDrawPanel.redraw();
     }
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        if (e.getSource().equals(dataLegend1D) || e.getSource().equals(dataLegend2D)) {            
-            structureDrawPanel.model.thresholdMin1D = dataLegend1D.getMinValue();
-            structureDrawPanel.model.thresholdMax1D = dataLegend1D.getMaxValue();
-            structureDrawPanel.model.thresholdMin2D = dataLegend2D.getMinValue();
-            structureDrawPanel.model.thresholdMax2D = dataLegend2D.getMaxValue();
-            structureDrawPanel.model.useUpperThreshold1D = !dataLegend1D.downSliderOpen;
-            structureDrawPanel.model.useLowerThreshold1D = !dataLegend1D.upSliderOpen;
-            structureDrawPanel.model.useUpperThreshold2D = !dataLegend2D.downSliderOpen;
-            structureDrawPanel.model.useLowerThreshold2D = !dataLegend2D.upSliderOpen;
+        if (e.getSource().equals(dataLegend1D)) {
+            /*
+             * structureDrawPanel.model.thresholdMin1D =
+             * dataLegend1D.getMinValue();
+             * structureDrawPanel.model.thresholdMax1D =
+             * dataLegend1D.getMaxValue();
+             * structureDrawPanel.model.thresholdMin2D =
+             * dataLegend2D.getMinValue();
+             * structureDrawPanel.model.thresholdMax2D =
+             * dataLegend2D.getMaxValue();
+             * structureDrawPanel.model.useUpperThreshold1D =
+             * !dataLegend1D.downSliderOpen;
+             * structureDrawPanel.model.useLowerThreshold1D =
+             * !dataLegend1D.upSliderOpen;
+             * structureDrawPanel.model.useUpperThreshold2D =
+             * !dataLegend2D.downSliderOpen;
+             * structureDrawPanel.model.useLowerThreshold2D =
+             * !dataLegend2D.upSliderOpen;
+             */
+            structureDrawPanel.redraw();
+        } else if (e.getSource().equals(dataLegend2D)) {
             structureDrawPanel.redraw();
         }
     }

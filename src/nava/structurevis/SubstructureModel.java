@@ -37,6 +37,7 @@ public class SubstructureModel implements Serializable {
     transient DistanceMatrix distanceMatrix = null;
     transient DistanceMatrix structureDistanceMatrix = null;
     int maxDistance = -1;
+   /* 
     boolean useLowerThreshold1D = false;
     boolean useUpperThreshold1D = false;
     boolean useLowerThreshold2D = false;
@@ -45,6 +46,7 @@ public class SubstructureModel implements Serializable {
     double thresholdMax1D;
     double thresholdMin2D;
     double thresholdMax2D;
+    */
     transient StructureVisController structureVisController;
 
     public SubstructureModel(StructureVisController structureVisController) {

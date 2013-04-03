@@ -136,7 +136,7 @@ public class NHistogramPanel extends JPanel implements MouseMotionListener {
             if (histogram.transform != null) {
                 double swidth = g.getFontMetrics().stringWidth("0.0000");
 
-                int points = Math.max(2, (int) (graphWidth / swidth / 2));
+                int points = Math.max(2, (int) (graphWidth / swidth / 1.7));
                 for (int i = 0; i < points; i++) {
                     double val = 0;
                     double y = 0;

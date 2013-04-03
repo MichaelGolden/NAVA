@@ -42,10 +42,11 @@ public class DataOverlay1D extends Overlay implements Serializable {
     public transient boolean[] used;
     public int dataOffset = 0;
     public int dataOffsetCorrected = 0;
+    
 
     public void loadData() {
         ArrayList<String> values = dataField.getObject(ProjectModel.path,MainFrame.dataSourceCache).values;
-
+        System.out.println("OOO:"+useLowerThreshold+"\t"+useUpperThreshold+"\t"+thresholdMin+"\t"+thresholdMax);
         dataOffsetCorrected = dataOffset;
         if (codonPositions) {
          //   dataOffsetCorrected *= 3;

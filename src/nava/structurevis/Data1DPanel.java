@@ -123,7 +123,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
         this.dataMaxField.addKeyListener(this);
 
         this.dataLegendPanel.add(dataLegend, BorderLayout.CENTER);
-        dataLegend.setLegend("Example", new DataTransform(0, 1, DataTransform.TransformType.LINEAR), new ColorGradient(Color.white, Color.red), new ColorGradient(Color.white, Color.red));
+        dataLegend.setLegend("Example", new DataTransform(0, 1, DataTransform.TransformType.LINEAR), new ColorGradient(Color.white, Color.red), new ColorGradient(Color.white, Color.red),true,true,0,1, null);
         dataLegend.showEditMode();
 
         this.naturalRadioButton.addItemListener(this);
@@ -231,7 +231,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
         this.missingDataRadioButton.setSelected(dataSource1D.excludeValuesOutOfRange);
         this.clampedRadioButton.setSelected(!dataSource1D.excludeValuesOutOfRange);
         this.transformComboBoxModel.setSelectedItem(dataSource1D.dataTransform.type);
-        this.dataLegend.setLegend(dataSource1D.title, dataSource1D.dataTransform, dataSource1D.colorGradient, dataSource1D.defaultColorGradient);
+        this.dataLegend.setLegend(dataSource1D.title, dataSource1D.dataTransform, dataSource1D.colorGradient, dataSource1D.defaultColorGradient, dataSource1D.useLowerThreshold, dataSource1D.useUpperThreshold, dataSource1D.thresholdMin, dataSource1D.thresholdMax, dataSource1D);
         this.mappingSourceComboBoxModel.setSelectedItem(dataSource1D.mappingSequence == null ? null : dataSource1D.mappingSource.alignmentSource);
     }
 

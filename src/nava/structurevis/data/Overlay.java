@@ -16,7 +16,7 @@ public abstract class Overlay implements Serializable {
 
     public String title;
 
-    public enum OverlayState {
+    public enum OverlayState implements Serializable {
 
         UNSELECTED, PRIMARY_SELECTED, SECONDARY_SELECTED
     };

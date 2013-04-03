@@ -24,6 +24,7 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import nava.structurevis.StructureVisController;
 import nava.structurevis.data.*;
+import nava.utils.Mapping;
 import nava.utils.Pair;
 
 /**
@@ -183,7 +184,9 @@ public class RankingPanel extends javax.swing.JPanel {
                 for (int i = rows.size(); running && i < structures.size(); i++) {
                     statusLabel.setText("Ranking (" + (i + 1) + " of " + structures.size() + ")");
                     Substructure structure = structures.get(i);
-                    Ranking ranking = RankingAnalyses.rankSequenceData1D(dataOverlay1D, structureVisController.getMapping(structureOverlay.mappingSource, dataOverlay1D.mappingSource), structure, structureOverlay.pairedSites, paired, unpaired, i + 1);
+                    Mapping mapping = structureVisController.getMapping(structureOverlay.mappingSource, dataOverlay1D.mappingSource);
+                    //System.out.println("Mapping "+(mapping == null));
+                    Ranking ranking = RankingAnalyses.rankSequenceData1D(dataOverlay1D, mapping, structure, structureOverlay.pairedSites, paired, unpaired, i + 1);
 
                     //System.out.println(ranking.zScore + "\t" + StatUtil.erf(Math.abs(ranking.zScore/2)) + "\t" + StatUtil.erfc(Math.abs(ranking.zScore))+ "\t" + StatUtil.erfcx(Math.abs(ranking.zScore))+ "\t" + StatUtil.getInvCDF(Math.abs(ranking.zScore), true)+"\t"+RankingAnalyses.NormalZ(Math.abs(ranking.zScore))/2);
                     final Object[] row = {new Integer(i + 1), structure.name, new Location(structure.startPosition, structure.startPosition + structure.length), new Integer(structure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore), ranking};

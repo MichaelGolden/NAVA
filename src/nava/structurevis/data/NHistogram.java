@@ -43,6 +43,7 @@ public class NHistogram {
     public double maxBinPerc = 0;
     ArrayList<NHistogramClass> classes = new ArrayList<>();
     public DataTransform transform;
+    public String title;
     
     public NHistogram(double min, double max, int nbins, DataTransform transform) {
         this.min = min;

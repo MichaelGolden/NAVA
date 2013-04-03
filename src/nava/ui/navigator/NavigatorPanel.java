@@ -22,9 +22,10 @@ import nava.ui.ProjectView;
  *
  * @author Michael
  */
-public class NavigatorPanel extends javax.swing.JPanel implements TreeSelectionListener, TreeModelListener, ProjectView  {
+public class NavigatorPanel extends javax.swing.JPanel implements TreeSelectionListener, TreeModelListener, ProjectView {
 
-    ProjectController projectController;   
+    ProjectController projectController;
+
     /**
      * Creates new form NavigatorPanel
      */
@@ -34,16 +35,13 @@ public class NavigatorPanel extends javax.swing.JPanel implements TreeSelectionL
         this.projectController = projectController;
 
 
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode();
-        if(projectController.projectModel.navigatorTreeModel == null)
-        {
-            projectController.projectModel.navigatorTreeModel = new NavigatorTreeModel(root, this.projectController.projectModel);
+        if (projectController.projectModel.navigatorTreeModel == null) {
+            projectController.projectModel.navigatorTreeModel = new NavigatorTreeModel(new DefaultMutableTreeNode(), this.projectController.projectModel);
         }
-        
-        projectController.addView(projectController.projectModel.navigatorTreeModel);        
-        projectController.addView(this);        
-        projectController.projectModel.navigatorTreeModel.addTreeModelListener(this);
-        
+
+
+        projectController.addView(this);
+
         NavigatorTreeRenderer navigatorRenderer = new NavigatorTreeRenderer();
         navigationTree.setRootVisible(false);
         navigationTree.setModel(projectController.projectModel.navigatorTreeModel);
@@ -67,9 +65,9 @@ public class NavigatorPanel extends javax.swing.JPanel implements TreeSelectionL
                     ex.printStackTrace();
                 }
             }
-        }); 
-        
-        
+        });
+
+
     }
 
     /**
@@ -117,17 +115,16 @@ public class NavigatorPanel extends javax.swing.JPanel implements TreeSelectionL
 
     @Override
     public void valueChanged(TreeSelectionEvent e) {
-        NavigationEvent navigationEvent = new NavigationEvent();       
+        NavigationEvent navigationEvent = new NavigationEvent();
         TreePath[] paths = navigationTree.getSelectionPaths();
         for (TreePath path : paths) {
             NavigatorTreeNode node = (NavigatorTreeNode) path.getLastPathComponent();
             node.isNew = false;
-            if (node.dataSource != null) 
-            {               
-                navigationEvent.selectedDataSources.add(node.dataSource);                
+            if (node.dataSource != null) {
+                navigationEvent.selectedDataSources.add(node.dataSource);
             }
         }
-        
+
         this.fireDataSourceSelectionChanged(navigationEvent);
     }
 
@@ -138,7 +135,7 @@ public class NavigatorPanel extends javax.swing.JPanel implements TreeSelectionL
 
     @Override
     public void treeNodesInserted(TreeModelEvent e) {
-        navigationTree.expandPath(e.getTreePath());
+         navigationTree.expandPath(e.getTreePath().getParentPath());
     }
 
     @Override
@@ -153,28 +150,29 @@ public class NavigatorPanel extends javax.swing.JPanel implements TreeSelectionL
 
     @Override
     public void projectModelChanged(ProjectModel newProjectModel) {
-        System.out.println("projectModelChanged "+newProjectModel.dataSources );
-        this.navigationTree.setModel(projectController.projectModel.navigatorTreeModel);
+        this.projectController.projectModel.navigatorTreeModel.removeTreeModelListener(this);
+        this.projectController.projectModel = newProjectModel;
+        navigationTree.setModel(newProjectModel.navigatorTreeModel);
         newProjectModel.navigatorTreeModel.addTreeModelListener(this);
     }
 
     @Override
     public void dataSourcesLoaded() {
-        
     }
 
     @Override
-    public void dataSourcesIntervalAdded(ListDataEvent e) {        
-        
+    public void dataSourcesIntervalAdded(ListDataEvent e) {
+        for (int i = e.getIndex0(); i < e.getIndex1() + 1; i++) {
+            projectController.projectModel.navigatorTreeModel.addDataSource(projectController.projectModel.dataSources.get(i));
+            System.out.println("Adding " + i);
+        }
     }
 
     @Override
     public void dataSourcesIntervalRemoved(ListDataEvent e) {
-        
     }
 
     @Override
     public void dataSourcesContentsChanged(ListDataEvent e) {
-        
     }
 }

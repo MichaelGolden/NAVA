@@ -30,6 +30,7 @@ public class NHistogramPanel extends JPanel implements MouseMotionListener {
     double leftBorder = rightBorder;
     double bottomBorder = 15;
     double topBorder = bottomBorder;
+    public static Font titleFont = new Font("Arial", Font.BOLD, 12);
     public static Font normalFont = new Font("Arial", Font.PLAIN, 11);
     public static Font smallFont = new Font("Arial", Font.PLAIN, 10);
     public static DecimalFormat df = new DecimalFormat("0.00");
@@ -60,14 +61,19 @@ public class NHistogramPanel extends JPanel implements MouseMotionListener {
         g.setColor(Color.white);
         g.fillRect(0, 0, width, height);
 
-        if(histogram == null)
-        {
+        if (histogram == null) {
             g.setColor(Color.black);
-            GraphicsUtils.drawStringCentred(g, width/2, height/2, "Click on a substructure to compare it's distribution to that of the full sequence.");
-        }
-        else{
+            GraphicsUtils.drawStringCentred(g, width / 2, height / 2, "Click on a substructure to compare it's distribution to that of the full sequence.");
+        } else {
             columns.clear();
             g.setFont(normalFont);
+
+            if (histogram.title != null) {
+                topBorder = bottomBorder + 20;
+                g.setColor(Color.black);
+                g.setFont(titleFont);
+                GraphicsUtils.drawStringCentred(g, width / 2, topBorder / 2 - 5, histogram.title);
+            }
 
             double legendItemHeight = 25;
             double legendItemLeftBorder = 10;
@@ -96,22 +102,18 @@ public class NHistogramPanel extends JPanel implements MouseMotionListener {
                     double min = (double) i / ((double) (histogram.nbins));
                     double max = (double) (i + 1) / ((double) (histogram.nbins));
                     String mouseOverString = "";
-                     for (int k = 0; k < histogram.classes.size(); k++) {
-                         mouseOverString += histogram.classes.get(k).bins[i] + " ("+df.format(histogram.classes.get(k).percs[i]*100)+"%)";
-                         if(k != histogram.classes.size()-1)
-                         {
-                             mouseOverString += ", ";
-                         }
-                     }
-                    if (histogram.transform != null)
-                    {
+                    for (int k = 0; k < histogram.classes.size(); k++) {
+                        mouseOverString += histogram.classes.get(k).bins[i] + " (" + df.format(histogram.classes.get(k).percs[i] * 100) + "%)";
+                        if (k != histogram.classes.size() - 1) {
+                            mouseOverString += ", ";
+                        }
+                    }
+                    if (histogram.transform != null) {
                         min = histogram.transform.inverseTransform(min);
                         max = histogram.transform.inverseTransform(max);
-                        mouseOverString += " in range ["+histogram.transform.getFormattedString(min, 2) + ", " + histogram.transform.getFormattedString(max, 2)+")";
-                    }
-                    else
-                    {
-                        mouseOverString += " in range ["+df.format(min) + ", " + df.format(max)+")";
+                        mouseOverString += " in range [" + histogram.transform.getFormattedString(min, 2) + ", " + histogram.transform.getFormattedString(max, 2) + ")";
+                    } else {
+                        mouseOverString += " in range [" + df.format(min) + ", " + df.format(max) + ")";
                     }
                     ColumnRectangle columnRectangle = new ColumnRectangle(rect, mouseOverString);
                     columns.add(columnRectangle);
@@ -125,6 +127,7 @@ public class NHistogramPanel extends JPanel implements MouseMotionListener {
                 g.fill(new Rectangle2D.Double(leftBorder + graphWidth + legendItemLeftBorder, y + (legendItemHeight / 2) - (legendBlockHeight / 2), legendBlockWidth, legendBlockHeight));
 
                 g.setColor(Color.black);
+                g.setFont(normalFont);
                 GraphicsUtils.drawStringVerticallyCentred(g, leftBorder + graphWidth + legendItemLeftBorder + legendBlockWidth + 5, y + (legendItemHeight / 2), hist.name);
             }
 
@@ -163,8 +166,8 @@ public class NHistogramPanel extends JPanel implements MouseMotionListener {
             g.setFont(normalFont);
             // draw y-axis
             double maxPerc = histogram.maxBinPerc;
-            GraphicsUtils.drawStringVerticallyCentred(g, leftBorder - 20 - g.getFontMetrics().stringWidth(df.format(maxPerc*100)+"%"), topBorder, df.format(maxPerc*100)+"%");
-            GraphicsUtils.drawStringVerticallyCentred(g, leftBorder - 20 - g.getFontMetrics().stringWidth(df.format(maxPerc/2*100)+"%"), topBorder + graphHeight / 2, df.format(maxPerc/2*100)+"%");
+            GraphicsUtils.drawStringVerticallyCentred(g, leftBorder - 20 - g.getFontMetrics().stringWidth(df.format(maxPerc * 100) + "%"), topBorder, df.format(maxPerc * 100) + "%");
+            GraphicsUtils.drawStringVerticallyCentred(g, leftBorder - 20 - g.getFontMetrics().stringWidth(df.format(maxPerc / 2 * 100) + "%"), topBorder + graphHeight / 2, df.format(maxPerc / 2 * 100) + "%");
             GraphicsUtils.drawStringVerticallyCentred(g, leftBorder - 20 - g.getFontMetrics().stringWidth("0%"), topBorder + graphHeight, "0%");
 
             g.draw(new Line2D.Double(leftBorder, height - bottomBorder, leftBorder + graphWidth, height - bottomBorder));

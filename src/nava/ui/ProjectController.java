@@ -273,10 +273,8 @@ public class ProjectController implements SafeListListener {
         this.projectModel.dataSources.addSafeListListener(this);
 
         for (int i = 0; i < projectViews.size(); i++) {
-            System.out.println("Firing to view " + projectViews.get(i));
-            System.out.println(projectModel.dataSources);
+            projectViews.get(i).projectModelChanged(projectModel);            
             projectViews.get(i).dataSourcesLoaded();
-            projectViews.get(i).projectModelChanged(this.projectModel);
         }
     }
 

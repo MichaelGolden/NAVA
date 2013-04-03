@@ -4,8 +4,9 @@
  */
 package nava.utils;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Random;
-import java.util.Scanner;
 
 /**
  *
@@ -87,20 +88,26 @@ public class Utils {
         return "<html>" + plainText.replaceAll("\n", "<br>") + "</html>";
     }
 
-    public static boolean[] randomBooleanArray(Random random, int n, boolean [] array) {
+    public static boolean[] randomBooleanArray(Random random, int n, boolean[] array) {
         int end = Math.min(n, array.length);
-        for(int i = 0 ; i < end ; i++)
-        {
+        for (int i = 0; i < end; i++) {
             int a = random.nextInt(array.length);
-            for(int j = a ; j < a + array.length ; j++)
-            {
-                if(!array[j%array.length])
-                {
-                    array[j%array.length] = true;
+            for (int j = a; j < a + array.length; j++) {
+                if (!array[j % array.length]) {
+                    array[j % array.length] = true;
                     break;
                 }
             }
         }
         return array;
+    }
+
+    public static boolean isFilenameValid(File f) {
+        try {
+            f.getCanonicalPath();
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
     }
 }

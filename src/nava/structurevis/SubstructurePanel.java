@@ -354,4 +354,13 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
     public void dataOverlayChanged(Overlay oldOverlay, Overlay newOverlay) {
         //throw new UnsupportedOperationException("Not supported yet.");
     }
+
+    @Override
+    public void structureVisModelChanged(StructureVisModel newStructureVisModel) {
+        structureVisController.structureVisModel.substructureModel.removeSubstructureModelListener(this);
+        structureVisController.structureVisModel = newStructureVisModel;
+        structureDrawPanel.setModel(newStructureVisModel.substructureModel);
+        structureVisController.structureVisModel.substructureModel.addSubstructureModelListener(this);
+        refresh();
+    }
 }

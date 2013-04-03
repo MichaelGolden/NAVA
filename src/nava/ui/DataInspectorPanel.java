@@ -395,16 +395,23 @@ public class DataInspectorPanel extends javax.swing.JPanel implements ItemListen
         File folder = new File(browseField.getText()); // path to the directory to be opened
         folder = (folder.isDirectory() ? folder : folder.getParentFile());
         Desktop desktop = null;
+        System.out.println("openFolderButtonActionPerformed 1");
         if (Desktop.isDesktopSupported()) {
+             System.out.println("openFolderButtonActionPerformed 2");
             desktop = Desktop.getDesktop();
             try {
+                 System.out.println("openFolderButtonActionPerformed 3");
                 if (folder.exists()) {
+                    System.out.println("openFolderButtonActionPerformed 4 "+folder);
                     desktop.open(folder);
+                    System.out.println("openFolderButtonActionPerformed 5");
                 } else {
                     // TODO error dialog
                 }
             } catch (IOException e) {
+                e.printStackTrace();
             }
+            System.out.println("openFolderButtonActionPerformed 7");
         }
     }//GEN-LAST:event_openFolderButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables

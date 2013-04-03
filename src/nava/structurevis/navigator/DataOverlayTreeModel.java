@@ -202,7 +202,14 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
         }
         this.fireTreeNodesChanged(this, parent.getPath(), indices, children);
     }
+    
     @Override
     public void projectModelChanged(ProjectModel newProjectModel) {
+    }
+
+    @Override
+    public void structureVisModelChanged(StructureVisModel newStructureVisModel) {
+        this.structureVisModel = newStructureVisModel;
+        
     }
 }

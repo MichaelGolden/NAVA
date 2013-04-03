@@ -19,7 +19,7 @@ import nava.ui.ProjectView;
  *
  * @author Michael
  */
-public class NavigatorTreeModel extends DefaultTreeModel implements Serializable, ProjectView {
+public class NavigatorTreeModel extends DefaultTreeModel implements Serializable{
     
     private static final long serialVersionUID = 3401100959200439819L;
     
@@ -31,11 +31,10 @@ public class NavigatorTreeModel extends DefaultTreeModel implements Serializable
     DefaultMutableTreeNode matricesNode = null;
     DefaultMutableTreeNode structuresNode = null;
     DefaultMutableTreeNode tabularNode = null;
-    ProjectModel projectModel;
 
     public NavigatorTreeModel(DefaultMutableTreeNode root, ProjectModel projectModel) {
         super(root);
-        this.projectModel = projectModel;
+       // this.projectModel = projectModel;
         setup();
     }
 
@@ -98,20 +97,17 @@ public class NavigatorTreeModel extends DefaultTreeModel implements Serializable
 
         tabularNode = NavigatorTreeNode.createFolderNode("Tabular data");
         dataNode.add(tabularNode);
-        
-        this.projectModel = projectModel;
     }
 
+    /*
     @Override
     public void dataSourcesLoaded() {
-        /*setup();
+        setup();
         System.out.println("Data sources loaded!!"+projectModel.dataSources.size());
         for (int i = 0; i < projectModel.dataSources.size(); i++) {
              System.out.println(projectModel.dataSources.get(i));
             addDataSource(projectModel.dataSources.get(i));
         }
-        * 
-        */
     }
 
     @Override
@@ -137,5 +133,5 @@ public class NavigatorTreeModel extends DefaultTreeModel implements Serializable
     @Override
     public void projectModelChanged(ProjectModel projectModel) {
         this.projectModel = projectModel;
-    }
+    }*/
 }

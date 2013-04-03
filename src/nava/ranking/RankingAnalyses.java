@@ -77,6 +77,7 @@ public class RankingAnalyses {
         NHistogramClass substructureHist = new NHistogramClass("Substructure #" + structureNo, Color.green, substructureList);
         NHistogramClass fullHist = new NHistogramClass("Full sequence", Color.red, fullGenomeList);
         r.nhist = new NHistogram(dataOverlay1D.minValue, dataOverlay1D.maxValue, 30, dataOverlay1D.dataTransform);
+        r.nhist.title = "Histograms comparing the " + dataOverlay1D.title +" distributions for " + "substructure #" + structureNo + " and the full sequence.";
         r.nhist.add(substructureHist);
         r.nhist.add(fullHist);        
         r.nhist.calculate();
@@ -201,6 +202,7 @@ public class RankingAnalyses {
         Ranking r = new Ranking();
         NHistogramClass substructureHist = new NHistogramClass("Substructure #" + structureNo, Color.green, substructureList);
         r.nhist = new NHistogram(dataOverlay2D.minValue, dataOverlay2D.maxValue, 30, dataOverlay2D.dataTransform);
+        r.nhist.title = "Histograms comparing the " + dataOverlay2D.title +" distributions for " + "substructure #" + structureNo + " and the full sequence.";
         r.nhist.add(substructureHist);
         r.nhist.add(fullHist);        
         r.nhist.calculate();

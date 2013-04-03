@@ -121,10 +121,11 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
     ///JPopupMenu relayoutStructureBondPopupMenu = new JPopupMenu();
     JMenuItem redrawStructureItem = new JMenuItem("Re-draw structure");
     JMenuItem resetStructureItem = new JMenuItem("Reset structure");
-    SubstructureModel model = null;
+    SubstructureModel subtructureModel = null;
 
-    public void setModel(SubstructureModel model) {
-        this.model = model;
+    public void setModel(SubstructureModel substructureModel) {
+        this.subtructureModel = substructureModel;
+        this.openSubstructure(substructureModel.structure);
     }
 
     //public boolean drawUsingSVG = false; // if true draw graphic using SVG, otherwise use native java graphics
@@ -132,7 +133,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
         addMouseListener(this);
         addMouseMotionListener(this);
         addMouseWheelListener(this);
-        this.model = model;
+        this.subtructureModel = model;
 
         redrawStructureItem.addActionListener(this);
         popupMenu.add(redrawStructureItem);
@@ -234,11 +235,11 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             repaint();
         } else {
             this.noStructure = false;
-            model.structure = s;
-            if (model.structure.length < 500) {
-                model.structureDistanceMatrix = new DistanceMatrix(model.structure.pairedSites);
+            subtructureModel.structure = s;
+            if (subtructureModel.structure.length < 500) {
+                subtructureModel.structureDistanceMatrix = new DistanceMatrix(subtructureModel.structure.pairedSites);
             } else {
-                model.structureDistanceMatrix = null;
+                subtructureModel.structureDistanceMatrix = null;
             }
 
             if (showDNA) {
@@ -261,7 +262,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
      * structure.length); } computeAndDraw(); }
      */
     public void computeAndDraw() {
-        computeStructureToBeDrawn(model.structure);
+        computeStructureToBeDrawn(subtructureModel.structure);
         repaint = true;
         repaint();
     }
@@ -347,7 +348,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
 
-        if (model.structure == null || nucleotidePositions == null) {
+        if (subtructureModel.structure == null || nucleotidePositions == null) {
             return null;
         }
 
@@ -379,29 +380,29 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
 
         // draw two-dimensional data
         pw.println("<g>");
-        int length = model.structure.length;
+        int length = subtructureModel.structure.length;
         covariationInteractions.clear();
-        if (show2DData && model.data2D != null) {
-            for (int i = model.structure.getStartPosition(); i < model.structure.getEndPosition(); i++) {
-                for (int j = model.structure.getStartPosition(); j < model.structure.getEndPosition(); j++) {
-                    int k = i - model.structure.getStartPosition();
-                    int l = j - model.structure.getStartPosition();
+        if (show2DData && subtructureModel.data2D != null) {
+            for (int i = subtructureModel.structure.getStartPosition(); i < subtructureModel.structure.getEndPosition(); i++) {
+                for (int j = subtructureModel.structure.getStartPosition(); j < subtructureModel.structure.getEndPosition(); j++) {
+                    int k = i - subtructureModel.structure.getStartPosition();
+                    int l = j - subtructureModel.structure.getStartPosition();
 
-                    if (model.maxDistance == -1 || (model.structureDistanceMatrix != null && model.structureDistanceMatrix.getDistance(k, l) <= model.maxDistance) || (model.structureDistanceMatrix == null && model.structureDistanceMatrix.getDistance(i - 1, j - 1) <= model.maxDistance)) {
+                    if (subtructureModel.maxDistance == -1 || (subtructureModel.structureDistanceMatrix != null && subtructureModel.structureDistanceMatrix.getDistance(k, l) <= subtructureModel.maxDistance) || (subtructureModel.structureDistanceMatrix == null && subtructureModel.structureDistanceMatrix.getDistance(i - 1, j - 1) <= subtructureModel.maxDistance)) {
                         Color c = null;
 
-                        double value = model.data2D.get(i, j, model.mapping2D);
-                        if (value == model.data2D.emptyValue) {
+                        double value = subtructureModel.data2D.get(i, j, subtructureModel.mapping2D);
+                        if (value == subtructureModel.data2D.emptyValue) {
                             c = null;
-                        } else if (((!model.data2D.useLowerThreshold || value >= model.data2D.thresholdMin) && (!model.data2D.useUpperThreshold || value <= model.data2D.thresholdMax))) {
+                        } else if (((!subtructureModel.data2D.useLowerThreshold || value >= subtructureModel.data2D.thresholdMin) && (!subtructureModel.data2D.useUpperThreshold || value <= subtructureModel.data2D.thresholdMax))) {
                             //  Sy
-                            if (model.data2D != null) {
+                            if (subtructureModel.data2D != null) {
                                 //System.out.println(p);
-                                c = model.data2D.colorGradient.getColor((float) model.data2D.dataTransform.transform(value));
+                                c = subtructureModel.data2D.colorGradient.getColor((float) subtructureModel.data2D.dataTransform.transform(value));
                             }
                         }
 
-                        if (c != null && nucleotidePositions.length == model.structure.length) { // TODO strange error where the array length is different from the structure length, probably a race condition
+                        if (c != null && nucleotidePositions.length == subtructureModel.structure.length) { // TODO strange error where the array length is different from the structure length, probably a race condition
 
                             double x1 = nucleotidePositions[k].getX();
                             double y1 = nucleotidePositions[k].getY();
@@ -424,7 +425,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                              */
 
                             Shape shape = null;
-                            int structureMidpoint = model.structure.getStartPosition() + (model.structure.length / 2);
+                            int structureMidpoint = subtructureModel.structure.getStartPosition() + (subtructureModel.structure.length / 2);
 
                             /*
                              * if (i >= structure.gapStartA && i <=
@@ -463,26 +464,26 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
         // draw the nucleotides
         pw.println("<g>");
         for (int i = 0; i < nucleotidePositions.length; i++) {
-            int structurePos = (model.structure.startPosition + i) % model.sequenceLength;
+            int structurePos = (subtructureModel.structure.startPosition + i) % subtructureModel.sequenceLength;
             int pos = structurePos;
-            if (model.mapping1D != null) {
-                int pos2 = model.mapping1D.aToB(pos);
+            if (subtructureModel.mapping1D != null) {
+                int pos2 = subtructureModel.mapping1D.aToB(pos);
                 if (pos2 != -1) {
                     pos = pos2;
                 }
             }
-            Color nucleotideBackgroundColor = model.missingDataColor;
-            if (oneDimensionalData == SHOW && model.data1D != null && model.data1D.used[pos]) {
-                double p = model.data1D.data[pos];
-                if (model.data1D.used[pos] && ((!model.data1D.useLowerThreshold || p >= model.data1D.thresholdMin) && (!model.data1D.useUpperThreshold || p <= model.data1D.thresholdMax))) {
-                    nucleotideBackgroundColor = model.data1D.colorGradient.getColor(model.data1D.dataTransform.transform((float) p));
-                } else if (!((!model.data1D.useLowerThreshold || p >= model.data1D.thresholdMin) && (!model.data1D.useUpperThreshold || p <= model.data1D.thresholdMax))) {
-                    nucleotideBackgroundColor = model.filteredDataColor;
+            Color nucleotideBackgroundColor = subtructureModel.missingDataColor;
+            if (oneDimensionalData == SHOW && subtructureModel.data1D != null && subtructureModel.data1D.used[pos]) {
+                double p = subtructureModel.data1D.data[pos];
+                if (subtructureModel.data1D.used[pos] && ((!subtructureModel.data1D.useLowerThreshold || p >= subtructureModel.data1D.thresholdMin) && (!subtructureModel.data1D.useUpperThreshold || p <= subtructureModel.data1D.thresholdMax))) {
+                    nucleotideBackgroundColor = subtructureModel.data1D.colorGradient.getColor(subtructureModel.data1D.dataTransform.transform((float) p));
+                } else if (!((!subtructureModel.data1D.useLowerThreshold || p >= subtructureModel.data1D.thresholdMin) && (!subtructureModel.data1D.useUpperThreshold || p <= subtructureModel.data1D.thresholdMax))) {
+                    nucleotideBackgroundColor = subtructureModel.filteredDataColor;
                 }
             }
 
             // pw.println("<g transform=\"scale(1,0.5)\">");
-            pw.println("    <circle id=\"nucleotide_" + (model.structure.startPosition + i) + "\" cx=\"" + nucleotidePositions[i].getX() + "\" cy=\"" + nucleotidePositions[i].getY() + "\" r=\"" + nucleotideDiameter / 2 + "\" style=\"stroke-width:2;stroke:black;fill:#" + getHexString(nucleotideBackgroundColor) + "\"/>");
+            pw.println("    <circle id=\"nucleotide_" + (subtructureModel.structure.startPosition + i) + "\" cx=\"" + nucleotidePositions[i].getX() + "\" cy=\"" + nucleotidePositions[i].getY() + "\" r=\"" + nucleotideDiameter / 2 + "\" style=\"stroke-width:2;stroke:black;fill:#" + getHexString(nucleotideBackgroundColor) + "\"/>");
             //pw.println("</g>");
 
             // draw the information
@@ -514,21 +515,21 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             if (drawSequenceLogo) {
                 Color bestColor = ColorUtils.selectBestForegroundColor(nucleotideBackgroundColor, Color.white, Color.black);
                 int nucPos = i;
-                if (model.nucleotideSource != null) {
-                    if (model.nucleotideCompositionType == NucleotideComposition.Type.SHANNON_ENTROPY) {
+                if (subtructureModel.nucleotideSource != null) {
+                    if (subtructureModel.nucleotideCompositionType == NucleotideComposition.Type.SHANNON_ENTROPY) {
                         // fa = structure.shannonFrequencies[i];
-                        double[] nucfa = model.nucleotideSource.getMappedShannonEntropyAtNucleotide(model.nucleotideMapping, structurePos);
+                        double[] nucfa = subtructureModel.nucleotideSource.getMappedShannonEntropyAtNucleotide(subtructureModel.nucleotideMapping, structurePos);
                         if (nucfa != null) {
                             double[] fa = Arrays.copyOf(nucfa, 5);
                             for (int k = 0; k < 4; k++) {
                                 fa[k] = fa[k] / 2;
                             }
-                            pw.print(drawSequenceLogoSVG("logo_" + (model.structure.startPosition + i), nucleotidePositions[i].getX(), nucleotidePositions[i].getY() - (nucleotideDiameter / 2) + 4, nucleotideDiameter, nucleotideDiameter - 8, fa, bestColor));
+                            pw.print(drawSequenceLogoSVG("logo_" + (subtructureModel.structure.startPosition + i), nucleotidePositions[i].getX(), nucleotidePositions[i].getY() - (nucleotideDiameter / 2) + 4, nucleotideDiameter, nucleotideDiameter - 8, fa, bestColor));
                         }
-                    } else if (model.nucleotideCompositionType == NucleotideComposition.Type.FREQUENCY) {
-                        double[] nucfa = model.nucleotideSource.getMappedFrequencyAtNucleotide(model.nucleotideMapping, structurePos);
+                    } else if (subtructureModel.nucleotideCompositionType == NucleotideComposition.Type.FREQUENCY) {
+                        double[] nucfa = subtructureModel.nucleotideSource.getMappedFrequencyAtNucleotide(subtructureModel.nucleotideMapping, structurePos);
                         if (nucfa != null) {
-                            pw.print(drawSequenceLogoSVG("logo_" + (model.structure.startPosition + i), nucleotidePositions[i].getX(), nucleotidePositions[i].getY() - (nucleotideDiameter / 2) + 4, nucleotideDiameter, nucleotideDiameter - 8, nucfa, bestColor));
+                            pw.print(drawSequenceLogoSVG("logo_" + (subtructureModel.structure.startPosition + i), nucleotidePositions[i].getX(), nucleotidePositions[i].getY() - (nucleotideDiameter / 2) + 4, nucleotideDiameter, nucleotideDiameter - 8, nucfa, bestColor));
                         }
                     }
                 }
@@ -551,9 +552,9 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             }
 
             if (nucleotidePositions[i] != null) {
-                int pos = (model.structure.getStartPosition() + i - 1) % model.sequenceLength + 1;
+                int pos = (subtructureModel.structure.getStartPosition() + i - 1) % subtructureModel.sequenceLength + 1;
                 double fontSize = 11;
-                if (model.numbering != 0 && pos % model.numbering == 0) {
+                if (subtructureModel.numbering != 0 && pos % subtructureModel.numbering == 0) {
                     pw.println("    <text id=\"nucleotide_position_" + pos + "\" x=\"" + (offsetx + nucleotidePositions[i].getX()) + "\" y=\"" + (nucleotidePositions[i].getY() + (fontSize / 2)) + "\" style=\"font-size:" + fontSize + "px;stroke:none;fill:black\" text-anchor=\"" + textanchor + "\" >");
                     pw.println("        <tspan>" + pos + "</tspan>");
                     pw.println("    </text>");
@@ -630,7 +631,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
     public BufferedImage bufferedImage = null;
 
     public void drawStructureNative(Graphics graphics) {
-        if (model.structure == null || nucleotidePositions == null) {
+        if (subtructureModel.structure == null || nucleotidePositions == null) {
             return;
         }
 
@@ -693,24 +694,24 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
 
 
         g.setColor(Color.black);
-        int length = model.structure.length;
+        int length = subtructureModel.structure.length;
         covariationInteractions.clear();
-        if (show2DData && model.data2D != null) {
-            for (int i = model.structure.getStartPosition(); i < model.structure.getEndPosition(); i++) {
-                for (int j = model.structure.getStartPosition(); j < model.structure.getEndPosition(); j++) {
-                    int k = i - model.structure.getStartPosition();
-                    int l = j - model.structure.getStartPosition();
-                    if (model.maxDistance == -1 || (model.structureDistanceMatrix != null && model.structureDistanceMatrix.getDistance(k, l) <= model.maxDistance) || (model.structureDistanceMatrix == null && model.distanceMatrix.getDistance(i - 1, j - 1) <= model.maxDistance)) {
+        if (show2DData && subtructureModel.data2D != null) {
+            for (int i = subtructureModel.structure.getStartPosition(); i < subtructureModel.structure.getEndPosition(); i++) {
+                for (int j = subtructureModel.structure.getStartPosition(); j < subtructureModel.structure.getEndPosition(); j++) {
+                    int k = i - subtructureModel.structure.getStartPosition();
+                    int l = j - subtructureModel.structure.getStartPosition();
+                    if (subtructureModel.maxDistance == -1 || (subtructureModel.structureDistanceMatrix != null && subtructureModel.structureDistanceMatrix.getDistance(k, l) <= subtructureModel.maxDistance) || (subtructureModel.structureDistanceMatrix == null && subtructureModel.distanceMatrix.getDistance(i - 1, j - 1) <= subtructureModel.maxDistance)) {
                         Color c = null;
                         //double p = model.data2D.emptyValue;
-                        double p = model.data2D.get(i, j, model.mapping2D);
+                        double p = subtructureModel.data2D.get(i, j, subtructureModel.mapping2D);
                         //System.out.println("P"+(i-1)+"\t"+(j-1)+"\t"+model.data2D.get(i - 1, j - 1, model.mapping2D));
-                        if (p == model.data2D.emptyValue) {
+                        if (p == subtructureModel.data2D.emptyValue) {
                             c = null;
-                        } else if (((!model.data2D.useLowerThreshold || p >= model.data2D.thresholdMin) && (!model.data2D.useUpperThreshold || p <= model.data2D.thresholdMax))) {
-                            if (model.data2D != null) {
+                        } else if (((!subtructureModel.data2D.useLowerThreshold || p >= subtructureModel.data2D.thresholdMin) && (!subtructureModel.data2D.useUpperThreshold || p <= subtructureModel.data2D.thresholdMax))) {
+                            if (subtructureModel.data2D != null) {
                                 //System.out.println(p);
-                                c = model.data2D.colorGradient.getColor((float) model.data2D.dataTransform.transform(p));
+                                c = subtructureModel.data2D.colorGradient.getColor((float) subtructureModel.data2D.dataTransform.transform(p));
                             }
                         }
 
@@ -723,7 +724,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                             double y2 = nucleotidePositions[l].getY();
 
                             Shape shape = null;
-                            int structureMidpoint = model.structure.getStartPosition() + (model.structure.length / 2);
+                            int structureMidpoint = subtructureModel.structure.getStartPosition() + (subtructureModel.structure.length / 2);
 
                             /*
                              * if (i >= structure.gapStartA && i <=
@@ -778,23 +779,23 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
 
         // draw the nucleotides
         for (int i = 0; i < nucleotidePositions.length; i++) {
-            int structurePos = (model.structure.startPosition + i) % model.sequenceLength;
+            int structurePos = (subtructureModel.structure.startPosition + i) % subtructureModel.sequenceLength;
             int pos = structurePos;
-            if (model.mapping1D != null) {
-                int pos2 = model.mapping1D.aToB(pos);
+            if (subtructureModel.mapping1D != null) {
+                int pos2 = subtructureModel.mapping1D.aToB(pos);
                 if (pos2 != -1) {
                     pos = pos2;
                 }
             }
             Ellipse2D stemNucleotide = getCircleCenteredAt(nucleotidePositions[i].getX(), nucleotidePositions[i].getY(), nucleotideDiameter);
             g.setColor(Color.white);
-            Color nucleotideBackgroundColor = model.missingDataColor;
-            if (oneDimensionalData == SHOW && model.data1D != null && pos >= 0 && model.data1D.used[pos]) {
-                 double p = model.data1D.data[pos];
-                if (model.data1D.used[pos] && ((!model.data1D.useLowerThreshold || p >= model.data1D.thresholdMin) && (!model.data1D.useUpperThreshold || p <= model.data1D.thresholdMax))) {
-                    nucleotideBackgroundColor = model.data1D.colorGradient.getColor(model.data1D.dataTransform.transform((float) p));
-                } else if (!((!model.data1D.useLowerThreshold || p >= model.data1D.thresholdMin) && (!model.data1D.useUpperThreshold || p <= model.data1D.thresholdMax))) {
-                    nucleotideBackgroundColor = model.filteredDataColor;
+            Color nucleotideBackgroundColor = subtructureModel.missingDataColor;
+            if (oneDimensionalData == SHOW && subtructureModel.data1D != null && pos >= 0 && subtructureModel.data1D.used[pos]) {
+                 double p = subtructureModel.data1D.data[pos];
+                if (subtructureModel.data1D.used[pos] && ((!subtructureModel.data1D.useLowerThreshold || p >= subtructureModel.data1D.thresholdMin) && (!subtructureModel.data1D.useUpperThreshold || p <= subtructureModel.data1D.thresholdMax))) {
+                    nucleotideBackgroundColor = subtructureModel.data1D.colorGradient.getColor(subtructureModel.data1D.dataTransform.transform((float) p));
+                } else if (!((!subtructureModel.data1D.useLowerThreshold || p >= subtructureModel.data1D.thresholdMin) && (!subtructureModel.data1D.useUpperThreshold || p <= subtructureModel.data1D.thresholdMax))) {
+                    nucleotideBackgroundColor = subtructureModel.filteredDataColor;
                 }
                 g.setColor(nucleotideBackgroundColor);
                 g.fill(stemNucleotide);
@@ -820,10 +821,10 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
 
             // draw the information
             g.setColor(ColorUtils.selectBestForegroundColor(nucleotideBackgroundColor, Color.white, Color.black));
-            if (model.nucleotideSource != null) {
+            if (subtructureModel.nucleotideSource != null) {
                 int nucPos = i;
-                if (model.nucleotideCompositionType == NucleotideComposition.Type.SHANNON_ENTROPY) {
-                    double[] nucfa = model.nucleotideSource.getMappedShannonEntropyAtNucleotide(model.nucleotideMapping, structurePos);
+                if (subtructureModel.nucleotideCompositionType == NucleotideComposition.Type.SHANNON_ENTROPY) {
+                    double[] nucfa = subtructureModel.nucleotideSource.getMappedShannonEntropyAtNucleotide(subtructureModel.nucleotideMapping, structurePos);
                     if (nucfa != null) {
                         double[] fa = Arrays.copyOf(nucfa, 5);
                         for (int k = 0; k < fa.length; k++) // java Arrays.copy causes fatal error
@@ -838,8 +839,8 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                         drawSequenceLogo(g, nucleotidePositions[i].getX(), nucleotidePositions[i].getY() - (nucleotideDiameter / 2) + 0, nucleotideDiameter, nucleotideDiameter - 5, fa);
                         g.setFont(f2);
                     }
-                } else if (model.nucleotideCompositionType == NucleotideComposition.Type.FREQUENCY) {
-                    double[] nucfa = model.nucleotideSource.getMappedFrequencyAtNucleotide(model.nucleotideMapping, structurePos);
+                } else if (subtructureModel.nucleotideCompositionType == NucleotideComposition.Type.FREQUENCY) {
+                    double[] nucfa = subtructureModel.nucleotideSource.getMappedFrequencyAtNucleotide(subtructureModel.nucleotideMapping, structurePos);
                     if (nucfa != null) {
                         double[] fa = nucfa;
                         drawSequenceLogo(g, nucleotidePositions[i].getX(), nucleotidePositions[i].getY() - (nucleotideDiameter / 2) + 0, nucleotideDiameter, nucleotideDiameter - 5, fa);
@@ -864,8 +865,8 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             if (nucleotidePositions[i] != null) {
                 g.setColor(Color.black);
                 g.setFont(f2);
-                int pos = (model.structure.getStartPosition() + i - 1) % model.sequenceLength + 1;
-                if (model.numbering != 0 && pos % model.numbering == 0) {
+                int pos = (subtructureModel.structure.getStartPosition() + i - 1) % subtructureModel.sequenceLength + 1;
+                if (subtructureModel.numbering != 0 && pos % subtructureModel.numbering == 0) {
                     drawStringCentred(g, offsetx + nucleotidePositions[i].getX(), nucleotidePositions[i].getY() - 2, "" + pos);
                     g.setColor(Color.black);
                     g.draw(new Line2D.Double(nucleotidePositions[i].getX() + (side * nucleotideDiameter / 2) - 2, nucleotidePositions[i].getY(), nucleotidePositions[i].getX() + (side * nucleotideDiameter / 2) + 2, nucleotidePositions[i].getY()));
@@ -1016,7 +1017,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
      * }
      */
     public int drawComplexStructure() {
-        if (model.structure == null || nucleotidePositions == null) {
+        if (subtructureModel.structure == null || nucleotidePositions == null) {
             return 0;
         }
 
@@ -1026,7 +1027,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             return DRAW_NATIVE_GRAPHIC;
         }
 
-        if (model.structure.length <= 200) {
+        if (subtructureModel.structure.length <= 200) {
             createStructureSVG();
             return DRAW_SVG_GRAPHIC;
         } else {
@@ -1278,12 +1279,12 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                 g.setColor(Color.blue);
                 g.setStroke(new BasicStroke((float) 4));
 
-                int nucX = selectedNucleotideX - model.structure.startPosition + 1;
+                int nucX = selectedNucleotideX - subtructureModel.structure.startPosition + 1;
                 if (nucX >= 0 && nucX < nucleotidePositions.length) {
                     g.drawOval((int) nucleotidePositions[nucX].x - (nucleotideDiameter / 2), (int) nucleotidePositions[nucX].y - (nucleotideDiameter / 2), (int) (nucleotideDiameter), (int) (nucleotideDiameter));
                 }
 
-                int nucY = selectedNucleotideY - model.structure.startPosition + 1;
+                int nucY = selectedNucleotideY - subtructureModel.structure.startPosition + 1;
                 if (nucY >= 0 && nucY < nucleotidePositions.length) {
                     g.drawOval((int) nucleotidePositions[nucY].x - (nucleotideDiameter / 2), (int) nucleotidePositions[nucY].y - (nucleotideDiameter / 2), (int) (nucleotideDiameter), (int) (nucleotideDiameter));
                 }
@@ -1297,7 +1298,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                 g.setColor(Color.orange);
                 g.setStroke(new BasicStroke((float) 3));
 
-                int nucX = i - model.structure.startPosition;
+                int nucX = i - subtructureModel.structure.startPosition;
                 if (nucX >= 0 && nucX < nucleotidePositions.length) {
                     g.drawOval((int) nucleotidePositions[nucX].x - (nucleotideDiameter / 2), (int) nucleotidePositions[nucX].y - (nucleotideDiameter / 2), (int) (nucleotideDiameter), (int) (nucleotideDiameter));
                 }
@@ -1363,7 +1364,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
         double x = e.getPoint().x / zoomScale;
         double y = e.getPoint().y / zoomScale;
 
-        if (nucleotidePositions != null) {
+        if (subtructureModel.structure != null && nucleotidePositions != null) {
             // 1D interactions
             int minIndex = -1;
             double minDistance = Double.MAX_VALUE;
@@ -1380,10 +1381,10 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                 nucleotide = minIndex;
             }
 
-            int pos = (model.structure.getStartPosition() + nucleotide - 1) % model.sequenceLength;
+            int pos = (subtructureModel.structure.getStartPosition() + nucleotide - 1) % subtructureModel.sequenceLength;
 
-            if (model.nucleotideSource != null && nucleotide != -1) {
-                double[] nucfa = model.nucleotideSource.getMappedFrequencyAtNucleotide(model.nucleotideMapping, pos);
+            if (subtructureModel.nucleotideSource != null && nucleotide != -1) {
+                double[] nucfa = subtructureModel.nucleotideSource.getMappedFrequencyAtNucleotide(subtructureModel.nucleotideMapping, pos);
                 interactionText += "Composition (";
                 for (int i = 0; i < 4; i++) {
                     String a = "";
@@ -1412,16 +1413,16 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                     }
                     interactionText += a + " " + decimalFormat.format(perc * 100) + "%,  ";
                 }
-                int nonGapCount = model.nucleotideSource.getMappedNonGapCountAtNucleotide(model.nucleotideMapping, pos);
+                int nonGapCount = subtructureModel.nucleotideSource.getMappedNonGapCountAtNucleotide(subtructureModel.nucleotideMapping, pos);
 
                 interactionText += "[" + nonGapCount + "])     ";
             } else {
                 interactionText += "Composition (none)     ";
             }
 
-            if (model.data1D != null && nucleotide != -1) {
-                double p = model.data1D.data[pos];
-                interactionText += "1D data (" + (pos + 1) + ", " +  model.data1D.dataTransform.getFormattedString(p, 6) + ")     ";
+            if (subtructureModel.data1D != null && nucleotide != -1) {
+                double p = subtructureModel.data1D.data[pos];
+                interactionText += "1D data (" + (pos + 1) + ", " +  subtructureModel.data1D.dataTransform.getFormattedString(p, 6) + ")     ";
 
             } else {
                 interactionText += "1D data (none)     ";
@@ -1430,7 +1431,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
 
 
         // 2D interactions
-        if (model != null) {
+        if (subtructureModel != null) {
             //mainapp.data2DLabel.setText("");
             int interaction2D = -1;
             for (int i = 0; i < covariationInteractions.size(); i++) {
@@ -1460,10 +1461,10 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             selectedNucleotideY = -1;
             if (interaction2D != -1) {
                 Interaction interaction = covariationInteractions.get(interaction2D);
-                double p = model.data2D.get(interaction.nucleotidei - 1, interaction.nucleotidej - 1, model.mapping2D);
+                double p = subtructureModel.data2D.get(interaction.nucleotidei - 1, interaction.nucleotidej - 1, subtructureModel.mapping2D);
                 //mainapp.data2DLabel.setText(interaction.nucleotidei + " <-> " + interaction.nucleotidej + "  =  " + mainapp.data2D.matrix.get(interaction.nucleotidei - 1, interaction.nucleotidej - 1));
                 //System.out.println("INTERACTION " + covariationInteractions.get(i));
-                interactionText += "2D data (" + interaction.nucleotidei + " <-> " + interaction.nucleotidej + ", " + model.data2D.dataTransform.getFormattedString(p, 6) + ")";
+                interactionText += "2D data (" + interaction.nucleotidei + " <-> " + interaction.nucleotidej + ", " + subtructureModel.data2D.dataTransform.getFormattedString(p, 6) + ")";
                 this.selectedNucleotideX = interaction.nucleotidei - 1;
                 this.selectedNucleotideY = interaction.nucleotidej - 1;
             } else {
@@ -1643,16 +1644,16 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             redraw();
         } else if (e.getSource().equals(numberNone) || e.getSource().equals(number1) || e.getSource().equals(number5) || e.getSource().equals(number10)) {
             if (e.getSource().equals(numberNone)) {
-                model.numbering = 0;
+                subtructureModel.numbering = 0;
             }
             if (e.getSource().equals(number1)) {
-                model.numbering = 1;
+                subtructureModel.numbering = 1;
             }
             if (e.getSource().equals(number5)) {
-                model.numbering = 5;
+                subtructureModel.numbering = 5;
             }
             if (e.getSource().equals(number10)) {
-                model.numbering = 10;
+                subtructureModel.numbering = 10;
             }
             redraw();
         } else if (e.getSource().equals(disruptBondItem)) {

@@ -175,9 +175,8 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
         this.histogram = histogram;
         repaint();
     }
-
     Overlay overlay = null;
-    
+
     /**
      * Set all values associated with a data legend.
      *
@@ -195,10 +194,10 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
 
         this.downSliderOpen = !useUpperThreshold;
         this.upSliderOpen = !useLowerThreshold;
-        this.downSliderPercentY = (float) (1-thresholdMax);
-        this.upSliderPercentY = (float) (1-thresholdMin);
+        this.downSliderPercentY = (float) (1 - thresholdMax);
+        this.upSliderPercentY = (float) (1 - thresholdMin);
         this.overlay = overlay;
-        
+
         if (label != null) {
             this.setLayout(null);
             pane.setOpaque(false);
@@ -493,8 +492,7 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
      * exponentialFormat.setMaximumFractionDigits(fractionDigits); return
      * exponentialFormat.format(value); }
      * decimalFormat.setMaximumFractionDigits(fractionDigits); return
-     * decimalFormat.format(value);
-    }
+     * decimalFormat.format(value); }
      */
     public void fillVerticalArrow(Graphics2D g, double x, double y, double width, double height, int direction, Color fillColor) {
         Path2D.Double arrow = new Path2D.Double();
@@ -646,7 +644,7 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
                 sliderIndicatorPosY = e.getY();
                 double min = transform.transform(transform.min);
                 double max = transform.transform(transform.max);
-                double x = transform.inverseTransform(min + (1-downSliderPercentY) * (max - min));
+                double x = transform.inverseTransform(min + (1 - downSliderPercentY) * (max - min));
                 sliderIndicatorText = transform.getFormattedString(x, 2);
             } else if (sliderSelected == UP) {
                 upSliderPercentY = Math.max(Math.min((float) ((e.getY() - barOffsetY) / barHeight), 1), 0);
@@ -656,7 +654,7 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
                 sliderIndicatorPosY = e.getY();
                 double min = transform.transform(transform.min);
                 double max = transform.transform(transform.max);
-                double x = transform.inverseTransform(min + (1-upSliderPercentY) * (max - min));
+                double x = transform.inverseTransform(min + (1 - upSliderPercentY) * (max - min));
                 sliderIndicatorText = transform.getFormattedString(x, 2);
             }
             downSliderPosY = barOffsetY + downSliderPercentY * barHeight - arrowHeight;
@@ -698,29 +696,30 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
 
     void fireChangeEvent(ChangeEvent evt) {
         calculateThresholds();
-        if(overlay != null)
-        {
+        if (overlay != null) {
             overlay.useUpperThreshold = !this.downSliderOpen;
             overlay.useLowerThreshold = !this.upSliderOpen;
-            overlay.thresholdMin = (1-upSliderPercentY);
-            overlay.thresholdMax = (1-downSliderPercentY);
-                      
+            overlay.thresholdMin = (1 - upSliderPercentY);
+            overlay.thresholdMax = (1 - downSliderPercentY);
+
             /*
-             this.downSliderOpen = !useUpperThreshold;
-        this.upSliderOpen = !useLowerThreshold;
-        this.downSliderPercentY = (float) (1-thresholdMin);
-        this.upSliderPercentY = (float) (1-thresholdMax);
-        * */
+             * this.downSliderOpen = !useUpperThreshold; this.upSliderOpen =
+             * !useLowerThreshold; this.downSliderPercentY = (float)
+             * (1-thresholdMin); this.upSliderPercentY = (float)
+             * (1-thresholdMax);
+        *
+             */
             /*
-            overlay.useLowerThreshold = !this.upSliderOpen;
-            overlay.useUpperThreshold = !this.downSliderOpen;
-            overlay.thresholdMin = (double)this.downSliderPercentY;
-            overlay.thresholdMax = (double)this.upSliderPercentY;*/
+             * overlay.useLowerThreshold = !this.upSliderOpen;
+             * overlay.useUpperThreshold = !this.downSliderOpen;
+             * overlay.thresholdMin = (double)this.downSliderPercentY;
+             * overlay.thresholdMax = (double)this.upSliderPercentY;
+             */
             /*
-             this.downSliderOpen = !useUpperThreshold;
-        this.upSliderOpen = !useLowerThreshold;
-        this.downSliderPercentY = (float) thresholdMax*
-        this.upSliderPercentY = (float) thresholdMin;*/
+             * this.downSliderOpen = !useUpperThreshold; this.upSliderOpen =
+             * !useLowerThreshold; this.downSliderPercentY = (float)
+             * thresholdMax* this.upSliderPercentY = (float) thresholdMin;
+             */
         }
         Object[] listeners = listenerList.getListenerList();
         for (int i = 0; i < listeners.length; i += 2) {
@@ -799,16 +798,17 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
          */
         fireChangeEvent(new ChangeEvent(this));
     }
-    
     double thresholdMin = 0;
     double thresholdMax = 0;
 
     public void calculateThresholds() {
-        double min = transform.transform(transform.min);
-        double max = transform.transform(transform.max);
+        if (transform != null) {
+            double min = transform.transform(transform.min);
+            double max = transform.transform(transform.max);
 
-        thresholdMax = transform.inverseTransform(min + (1 - downSliderPercentY) * (max - min));
-        thresholdMin = transform.inverseTransform(min + (1 - upSliderPercentY) * (max - min));
+            thresholdMax = transform.inverseTransform(min + (1 - downSliderPercentY) * (max - min));
+            thresholdMin = transform.inverseTransform(min + (1 - upSliderPercentY) * (max - min));
+        }
     }
 
     public double getMinValue() {

@@ -314,6 +314,15 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
             structureDrawPanel.openSubstructure(null);
         }
         structureDrawPanel.redraw();
+        DataOverlay1D dataOverlay1D = structureVisController.structureVisModel.substructureModel.data1D;
+        if (dataOverlay1D != null) {
+            this.dataLegend1D.setLegend(dataOverlay1D.title, dataOverlay1D.dataTransform, dataOverlay1D.colorGradient, dataOverlay1D.defaultColorGradient, dataOverlay1D.useLowerThreshold, dataOverlay1D.useUpperThreshold, dataOverlay1D.thresholdMin, dataOverlay1D.thresholdMax, dataOverlay1D);
+        }
+
+        DataOverlay2D dataOverlay2D = structureVisController.structureVisModel.substructureModel.data2D;
+        if (dataOverlay2D != null) {
+            this.dataLegend1D.setLegend(dataOverlay2D.title, dataOverlay2D.dataTransform, dataOverlay2D.colorGradient, dataOverlay2D.defaultColorGradient, dataOverlay2D.useLowerThreshold, dataOverlay2D.useUpperThreshold, dataOverlay2D.thresholdMin, dataOverlay2D.thresholdMax, dataOverlay2D);
+        }
     }
 
     @Override
@@ -328,29 +337,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        if (e.getSource().equals(dataLegend1D)) {
-            /*
-             * structureDrawPanel.model.thresholdMin1D =
-             * dataLegend1D.getMinValue();
-             * structureDrawPanel.model.thresholdMax1D =
-             * dataLegend1D.getMaxValue();
-             * structureDrawPanel.model.thresholdMin2D =
-             * dataLegend2D.getMinValue();
-             * structureDrawPanel.model.thresholdMax2D =
-             * dataLegend2D.getMaxValue();
-             * structureDrawPanel.model.useUpperThreshold1D =
-             * !dataLegend1D.downSliderOpen;
-             * structureDrawPanel.model.useLowerThreshold1D =
-             * !dataLegend1D.upSliderOpen;
-             * structureDrawPanel.model.useUpperThreshold2D =
-             * !dataLegend2D.downSliderOpen;
-             * structureDrawPanel.model.useLowerThreshold2D =
-             * !dataLegend2D.upSliderOpen;
-             */
-            structureDrawPanel.redraw();
-        } else if (e.getSource().equals(dataLegend2D)) {
-            structureDrawPanel.redraw();
-        }
+        structureDrawPanel.redraw();
     }
 
     @Override

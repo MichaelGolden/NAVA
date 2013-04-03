@@ -199,8 +199,6 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
         this.upSliderPercentY = (float) (1-thresholdMin);
         this.overlay = overlay;
         
-        System.out.println("DDD"+useUpperThreshold+"\t"+useLowerThreshold+"\t"+(1-thresholdMin)+"\t"+(1-thresholdMax));
-
         if (label != null) {
             this.setLayout(null);
             pane.setOpaque(false);
@@ -706,9 +704,7 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
             overlay.useLowerThreshold = !this.upSliderOpen;
             overlay.thresholdMin = (1-upSliderPercentY);
             overlay.thresholdMax = (1-downSliderPercentY);
-            System.out.println("BBB"+overlay.useUpperThreshold+"\t"+overlay.useLowerThreshold+"\t"+overlay.thresholdMin+"\t"+overlay.thresholdMax);
-            
-            
+                      
             /*
              this.downSliderOpen = !useUpperThreshold;
         this.upSliderOpen = !useLowerThreshold;

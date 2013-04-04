@@ -37,4 +37,10 @@ public abstract class Overlay implements Serializable {
     }
 
     public abstract Icon getIcon();
+    
+    @Override
+    public String toString()
+    {
+        return title;
+    }
 }

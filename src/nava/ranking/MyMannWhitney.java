@@ -4,6 +4,7 @@
  */
 package nava.ranking;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -109,6 +110,52 @@ public class MyMannWhitney {
             tieCorrectionFactor += q;
         }
     }*/
+    
+    public MyMannWhitney(ArrayList<Double> x, ArrayList<Double> y) {
+        this.nx = x.size();
+        this.ny = y.size();
+        this.N = this.nx + this.ny;
+
+        for (int i = 0; i < x.size(); i++) {
+            groups.put(x.get(i), getGroup(x.get(i)) + 1);
+        }
+
+        for (int i = 0; i < y.size(); i++) {
+            groups.put(y.get(i), getGroup(y.get(i)) + 1);
+        }
+
+        double[] counts_x = new double[x.size()];
+        double[] counts_y = new double[y.size()];
+        for (int i = 0; i < x.size(); i++) {
+            for (int j = 0; j < y.size(); j++) {
+                if (x.get(i) == y.get(j)) {
+                    // deal with ties
+                    counts_x[i] += 0.5;
+                    counts_y[j] += 0.5;
+                } else if (x.get(i) > y.get(j)) {
+                    counts_x[i]++;
+                } else {
+                    counts_y[j]++;
+                }
+            }
+        }
+
+        for (int i = 0; i < counts_x.length; i++) {
+            ux += counts_x[i];
+        }
+
+        for (int i = 0; i < counts_y.length; i++) {
+            uy += counts_y[i];
+        }
+
+        tieCorrectionFactor = 0;
+        Enumeration<Double> keys = groups.keys();
+        while (keys.hasMoreElements()) {
+            double c = groups.get(keys.nextElement());
+            double q = (Math.pow(c, 3) - c) / 12;
+            tieCorrectionFactor += q;
+        }
+    }
     
     public MyMannWhitney(double[] x, double[] y) {
         this.nx = x.length;

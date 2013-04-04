@@ -34,6 +34,7 @@ public class NHistogramPanel extends JPanel implements MouseMotionListener {
     public static Font normalFont = new Font("Arial", Font.PLAIN, 11);
     public static Font smallFont = new Font("Arial", Font.PLAIN, 10);
     public static DecimalFormat df = new DecimalFormat("0.00");
+    public String nullText = "";
 
     public NHistogramPanel() {
         normalFont = MainFrame.fontLiberationSans.deriveFont(11f);
@@ -47,6 +48,11 @@ public class NHistogramPanel extends JPanel implements MouseMotionListener {
     public void setNHistogram(NHistogram histogram) {
         this.histogram = histogram;
         repaint();
+    }
+    
+    public void setNullText(String nullText)
+    {
+        this.nullText = nullText;
     }
     ArrayList<ColumnRectangle> columns = new ArrayList<>();
 
@@ -63,7 +69,7 @@ public class NHistogramPanel extends JPanel implements MouseMotionListener {
 
         if (histogram == null) {
             g.setColor(Color.black);
-            GraphicsUtils.drawStringCentred(g, width / 2, height / 2, "Click on a substructure to compare it's distribution to that of the full sequence.");
+            GraphicsUtils.drawStringCentred(g, width / 2, height / 2, nullText);
         } else {
             columns.clear();
             g.setFont(normalFont);

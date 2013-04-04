@@ -47,7 +47,10 @@ public class StartupDialog extends javax.swing.JDialog {
         for (int i = 0;; i++) {
             String recent = prefs.get("recentfile" + i, null);
             if (recent != null) {
-                recentFilesModel.addElement(new File(recent));
+                File projectFile = new File(recent);
+                if (projectFile.exists()) {
+                    recentFilesModel.addElement(new File(recent));
+                }
             } else {
                 break;
             }
@@ -57,11 +60,25 @@ public class StartupDialog extends javax.swing.JDialog {
             recentFilesComboBox.setModel(recentFilesModel);
             recentFilesComboBox.setEnabled(true);
         }
-        for (int i = 0; i < recentFilesModel.getSize(); i++) {
-            System.out.println(recentFilesModel.getElementAt(i));
-        }
+
         this.recentFilesComboBox.setRenderer(new ComboBoxRenderer());
         MainFrame.projectDialog.setCurrentDirectory(MainFrame.workspaceDirectory);
+    }
+
+    public static ArrayList<File> getRecentlyUsedProjectFiles() {
+        ArrayList<File> recentlyUsedFiles = new ArrayList<>();
+        for (int i = 0;; i++) {
+            String recent = prefs.get("recentfile" + i, null);
+            if (recent != null) {
+                File projectFile = new File(recent);
+                if (projectFile.exists()) {
+                    recentlyUsedFiles.add(new File(recent));
+                }
+            } else {
+                break;
+            }
+        }
+        return recentlyUsedFiles;
     }
 
     public File getSelectedFile() {
@@ -83,15 +100,22 @@ public class StartupDialog extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Open a NAVA project");
+        setResizable(false);
 
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/new-project-32x32.png"))); // NOI18N
         jButton1.setText("Start a new NAVA project");
+        jButton1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jButton1.setIconTextGap(10);
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
 
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/open-project-32x32.png"))); // NOI18N
         jButton2.setText("Open an existing NAVA project");
+        jButton2.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jButton2.setIconTextGap(10);
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -114,7 +138,7 @@ public class StartupDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 240, Short.MAX_VALUE)
+                    .addComponent(jButton2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 264, Short.MAX_VALUE)
                     .addComponent(recentFilesComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -122,11 +146,11 @@ public class StartupDialog extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 49, Short.MAX_VALUE)
+                .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 54, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 49, Short.MAX_VALUE)
+                .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(recentFilesComboBox, javax.swing.GroupLayout.DEFAULT_SIZE, 51, Short.MAX_VALUE)
+                .addComponent(recentFilesComboBox, javax.swing.GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -210,12 +234,9 @@ public class StartupDialog extends javax.swing.JDialog {
             }
         });
     }
-    
-    
-    
     public static ArrayList<String> recentFiles = new ArrayList<>();
-    public static void addProjectFileToRecentProjects(File inFile)
-    {
+
+    public static void addProjectFileToRecentProjects(File inFile) {
         recentFiles.clear();
         String filePath = (inFile.isDirectory() ? inFile : inFile.getParentFile()).getAbsolutePath();
 
@@ -236,17 +257,15 @@ public class StartupDialog extends javax.swing.JDialog {
         while (recentFiles.size() > 5) {
             recentFiles.remove(5);
         }
-        
+
         if (StartupDialog.prefs != null) {
             for (int i = 0; i < recentFiles.size(); i++) {
                 StartupDialog.prefs.put("recentfile" + i, recentFiles.get(i));
             }
         }
-        
+
         System.out.println(recentFiles);
     }
-    
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;

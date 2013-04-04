@@ -290,6 +290,7 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
 
     @Override
     public void structureVisModelChanged(StructureVisModel newStructureVisModel) {
+       // this.overlayTree.removeAll();
         this.overlayTree.setModel(newStructureVisModel.overlayNavigatorTreeModel);
         newStructureVisModel.overlayNavigatorTreeModel.addTreeModelListener(this);
     }

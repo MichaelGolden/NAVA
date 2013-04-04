@@ -31,11 +31,11 @@ import nava.utils.Pair;
  *
  * @author Michael
  */
-public class RankingPanel extends javax.swing.JPanel {
+public class PairTestPanel extends javax.swing.JPanel {
 
     ArrayList<Overlay> dataOverlays = new ArrayList();
     ArrayList<StructureOverlay> structureOverlays = new ArrayList();
-    RankingTable rankingTable = null;
+    PairTestTable pairTable = null;
     public RankingThread currentThread = null;
     StructureVisController structureVisController;
     NHistogramPanel nHistPanel = new NHistogramPanel();
@@ -44,12 +44,12 @@ public class RankingPanel extends javax.swing.JPanel {
     /**
      * Creates new form AnalysesPanel
      */
-    public RankingPanel(StructureVisController structureVisController) {
+    public PairTestPanel(StructureVisController structureVisController) {
         initComponents();
         this.structureVisController = structureVisController;
 
-        rankingTable = new RankingTable();
-        jPanel1.add(rankingTable);
+        pairTable = new PairTestTable();
+        jPanel1.add(pairTable);
 
         dataOverlays.addAll(structureVisController.structureVisModel.structureVisDataOverlays1D.getArrayListShallowCopy());
         dataOverlays.addAll(structureVisController.structureVisModel.structureVisDataOverlays2D.getArrayListShallowCopy());
@@ -68,25 +68,25 @@ public class RankingPanel extends javax.swing.JPanel {
             structureOverlaysModel.addElement(structureOverlays.get(i));
         }
 
-        rankingTable.table.addMouseListener(new MouseAdapter() {
+        pairTable.table.addMouseListener(new MouseAdapter() {
 
             public void mouseClicked(MouseEvent e) {
                 JTable target = (JTable) e.getSource();
                 int row = target.getSelectedRow();
                 int column = target.getSelectedColumn();
 
-                int s = ((Integer) rankingTable.table.getModel().getValueAt(row, 0)).intValue() - 1;
-                Ranking ranking = (Ranking) rankingTable.table.getModel().getValueAt(row, 13);
+                int s = ((Integer) pairTable.table.getModel().getValueAt(row, 0)).intValue() - 1;
+                Ranking ranking = (Ranking) pairTable.table.getModel().getValueAt(row, 13);
                 nHistPanel.setNHistogram(ranking.nhist);
             }
         });
         histogramPanel.add(nHistPanel);
-        this.nHistPanel.setNullText("Click on a substructure to compare it's distribution to that of the full sequence.");
 
+        this.nHistPanel.setNullText("Click on a substructure to compare the distribution of it's paired nucleotides to that of it's unpaired nucleotides.");
     }
-    Hashtable<RankingKey, ArrayList> rowCache = new Hashtable<>();
+    Hashtable<PairTestKey, ArrayList> rowCache = new Hashtable<>();
 
-    public ArrayList getListFromCache(RankingKey key) {
+    public ArrayList getListFromCache(PairTestKey key) {
         ArrayList ret = rowCache.get(key);
         if (ret == null) {
             return new ArrayList();
@@ -95,16 +95,14 @@ public class RankingPanel extends javax.swing.JPanel {
         return ret;
     }
 
-    class RankingKey {
+    class PairTestKey {
 
         Overlay dataOverlay;
         StructureOverlay structureOverlay;
-        int pairingParamter;
 
-        public RankingKey(Overlay dataOverlay, StructureOverlay structureOverlay, int pairingParamter) {
+        public PairTestKey(Overlay dataOverlay, StructureOverlay structureOverlay) {
             this.dataOverlay = dataOverlay;
             this.structureOverlay = structureOverlay;
-            this.pairingParamter = pairingParamter;
         }
 
         @Override
@@ -115,14 +113,11 @@ public class RankingPanel extends javax.swing.JPanel {
             if (getClass() != obj.getClass()) {
                 return false;
             }
-            final RankingKey other = (RankingKey) obj;
+            final PairTestKey other = (PairTestKey) obj;
             if (!Objects.equals(this.dataOverlay, other.dataOverlay)) {
                 return false;
             }
             if (!Objects.equals(this.structureOverlay, other.structureOverlay)) {
-                return false;
-            }
-            if (this.pairingParamter != other.pairingParamter) {
                 return false;
             }
             return true;
@@ -130,10 +125,9 @@ public class RankingPanel extends javax.swing.JPanel {
 
         @Override
         public int hashCode() {
-            int hash = 7;
-            hash = 83 * hash + Objects.hashCode(this.dataOverlay);
-            hash = 83 * hash + Objects.hashCode(this.structureOverlay);
-            hash = 83 * hash + this.pairingParamter;
+            int hash = 5;
+            hash = 61 * hash + Objects.hashCode(this.dataOverlay);
+            hash = 61 * hash + Objects.hashCode(this.structureOverlay);
             return hash;
         }
     }
@@ -159,100 +153,92 @@ public class RankingPanel extends javax.swing.JPanel {
             statusLabel.setForeground(Color.red);
             statusLabel.setText("Ranking...");
 
-            rankingTable.tableDataModel.clear();
-            boolean paired = true;
-
-            int PAIR_PARAMETER = 0;
-            boolean unpaired = true;
-            if (RankingPanel.this.pairedOnlyButton.isSelected()) {
-                paired = true;
-                unpaired = false;
-                PAIR_PARAMETER = 1;
-            } else if (RankingPanel.this.unpairedOnlyButton.isSelected()) {
-                paired = false;
-                unpaired = true;
-                PAIR_PARAMETER = 2;
-            }
+            pairTable.tableDataModel.clear();
 
             if (dataOverlay instanceof DataOverlay1D) {
                 DataOverlay1D dataOverlay1D = (DataOverlay1D) dataOverlay;
                 //String cacheKey = dataOverlay1D.name + "_" + PAIR_PARAMETER;
                 // Pair<Overlay, Integer> cacheKey = new Pair((Overlay) dataOverlay1D, new Integer(PAIR_PARAMETER));
-                RankingKey key = new RankingKey(dataOverlay1D, structureOverlay, PAIR_PARAMETER);
+                PairTestKey key = new PairTestKey(dataOverlay1D, structureOverlay);
                 ArrayList rows = getListFromCache(key);
-                rankingTable.tableDataModel.addRows(rows);
-                ArrayList<Substructure> structures = structureOverlay.substructureList.substructures;
+                pairTable.tableDataModel.addRows(rows);
+                ArrayList<Substructure> structures = new ArrayList<>();                
+                structures.add(new Substructure(0, structureOverlay.pairedSites));
+                structures.addAll(structureOverlay.substructureList.substructures);
                 for (int i = rows.size(); running && i < structures.size(); i++) {
                     statusLabel.setText("Ranking (" + (i + 1) + " of " + structures.size() + ")");
                     Substructure structure = structures.get(i);
                     Mapping mapping = structureVisController.getMapping(structureOverlay.mappingSource, dataOverlay1D.mappingSource);
-                    //System.out.println("Mapping "+(mapping == null));
-                    Ranking ranking = RankingAnalyses.rankSequenceData1D(dataOverlay1D, mapping, structure, structureOverlay.pairedSites, paired, unpaired, i + 1);
 
-                    //System.out.println(ranking.zScore + "\t" + StatUtil.erf(Math.abs(ranking.zScore/2)) + "\t" + StatUtil.erfc(Math.abs(ranking.zScore))+ "\t" + StatUtil.erfcx(Math.abs(ranking.zScore))+ "\t" + StatUtil.getInvCDF(Math.abs(ranking.zScore), true)+"\t"+RankingAnalyses.NormalZ(Math.abs(ranking.zScore))/2);
-                    final Object[] row = {new Integer(i + 1), structure.name, new Location(structure.startPosition, structure.startPosition + structure.length), new Integer(structure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore), ranking};
+                    Ranking ranking = RankingAnalyses.basePairComparison1D(dataOverlay1D, mapping, structure, structureOverlay.pairedSites, i + 1);
+
+                    Object[] row1 = {new Integer(i), structure.name, new Location(structure.startPosition, structure.startPosition + structure.length), new Integer(structure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore), ranking};
+                    final Object[] row;
+                    if (i == 0) {
+                        Object[] row2 = {new Integer(i), "Full genome", new Location(structure.startPosition, structure.startPosition + structure.length), new Integer(structure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore), ranking};
+                        row = row2;
+                    } else {
+                        row = row1;
+                    }
                     SwingUtilities.invokeLater(
                             new Runnable() {
 
                                 @Override
                                 public void run() {
-                                    rankingTable.tableDataModel.addRow(row);
-                                    rankingTable.repaint();
+                                    pairTable.tableDataModel.addRow(row);
+                                    pairTable.repaint();
                                 }
                             });
                 }
 
                 ArrayList<Object[]> clone = new ArrayList<>();
-                for (int i = 0; i < rankingTable.tableDataModel.rows.size(); i++) {
-                    clone.add(rankingTable.tableDataModel.rows.get(i));
+                for (int i = 0; i < pairTable.tableDataModel.rows.size(); i++) {
+                    clone.add(pairTable.tableDataModel.rows.get(i));
                 }
                 rowCache.put(key, clone);
             } else if (dataOverlay instanceof DataOverlay2D) {
                 DataOverlay2D dataOverlay2D = (DataOverlay2D) dataOverlay;
                 //Pair<Overlay, Integer> cacheKey = new Pair((Overlay) dataOverlay2D, new Integer(PAIR_PARAMETER));
-                RankingKey key = new RankingKey(dataOverlay2D, structureOverlay, PAIR_PARAMETER);
+                PairTestKey key = new PairTestKey(dataOverlay2D, structureOverlay);
                 ArrayList rows = getListFromCache(key);
-                rankingTable.tableDataModel.addRows(rows);
-                ArrayList<Substructure> structures = structureOverlay.substructureList.substructures;
-                ArrayList<Double> fullGenomeList = null;
-                if (running && rows.size() < structures.size()) {
-                    try {
-                        fullGenomeList = RankingAnalyses.getValues(dataOverlay2D, structureVisController.getMapping(structureOverlay.mappingSource, dataOverlay2D.mappingSource), new Substructure(0, structureOverlay.pairedSites), structureOverlay.pairedSites, paired, unpaired);
-                    } catch (IOException ex) {
-                        Logger.getLogger(RankingPanel.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-                
-                double [] fullGenomeValues = RankingAnalyses.toDoubleArray(fullGenomeList);
-                NHistogramClass fullHist = new NHistogramClass("Full", Color.red, fullGenomeList);
-                fullHist.calculate(dataOverlay2D.minValue, dataOverlay2D.maxValue, 30, dataOverlay2D.dataTransform);
+                pairTable.tableDataModel.addRows(rows);
+                ArrayList<Substructure> structures = new ArrayList<>();                
+                structures.add(new Substructure(0, structureOverlay.pairedSites));
+                structures.addAll(structureOverlay.substructureList.substructures);
                 for (int i = rows.size(); running && i < structures.size(); i++) {
                     statusLabel.setText("Ranking (" + (i + 1) + " of " + structures.size() + ")");
                     Substructure structure = structures.get(i);
 
                     Ranking ranking;
                     try {
-                        ranking = RankingAnalyses.rankSequenceData2D(dataOverlay2D, structureVisController.getMapping(structureOverlay.mappingSource, dataOverlay2D.mappingSource), structure, structureOverlay.pairedSites, paired, unpaired, fullGenomeList, fullGenomeValues, fullHist, i + 1);
+                        ranking = RankingAnalyses.basePairComparison2D(dataOverlay2D, structureVisController.getMapping(structureOverlay.mappingSource, dataOverlay2D.mappingSource), structure, structureOverlay.pairedSites, i + 1);
 
-                        final Object[] row = {new Integer(i + 1), structure.name, new Location(structure.startPosition, structure.startPosition + structure.length), new Integer(structure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore), ranking};
+                        Object[] row1 = {new Integer(i), structure.name, new Location(structure.startPosition, structure.startPosition + structure.length), new Integer(structure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore), ranking};
+                        final Object[] row;
+                        if (i == 0) {
+                            Object[] row2 = {new Integer(i), "Full genome", new Location(structure.startPosition, structure.startPosition + structure.length), new Integer(structure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore), ranking};
+                            row = row2;
+                        } else {
+                            row = row1;
+                        }
                         SwingUtilities.invokeLater(
                                 new Runnable() {
 
                                     @Override
                                     public void run() {
-                                        rankingTable.tableDataModel.addRow(row);
-                                        rankingTable.repaint();
+                                        pairTable.tableDataModel.addRow(row);
+                                        pairTable.repaint();
                                     }
                                 });
 
                     } catch (IOException ex) {
-                        Logger.getLogger(RankingPanel.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(PairTestPanel.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
 
                 ArrayList<Object[]> clone = new ArrayList<Object[]>();
-                for (int i = 0; i < rankingTable.tableDataModel.rows.size(); i++) {
-                    clone.add(rankingTable.tableDataModel.rows.get(i));
+                for (int i = 0; i < pairTable.tableDataModel.rows.size(); i++) {
+                    clone.add(pairTable.tableDataModel.rows.get(i));
                 }
                 rowCache.put(key, clone);
             }
@@ -270,7 +256,7 @@ public class RankingPanel extends javax.swing.JPanel {
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(RankingPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(PairTestPanel.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
@@ -287,13 +273,13 @@ public class RankingPanel extends javax.swing.JPanel {
         kill();
 
         if (dataOverlayBox.getSelectedIndex() >= 0) {
-            Overlay dataOverlay = dataOverlays.get(dataOverlayBox.getSelectedIndex());            
+            Overlay dataOverlay = dataOverlays.get(dataOverlayBox.getSelectedIndex());
             StructureOverlay structureOverlay = (StructureOverlay) structureOverlayComboBox.getSelectedItem();
-            if (dataOverlay != null && structureOverlay != null) {  
+            if (dataOverlay != null && structureOverlay != null) {
                 nHistPanel.setNHistogram(null);
                 structureOverlay.loadData();
                 currentThread = new RankingThread(dataOverlay, structureOverlay);
-                currentThread.setPriority(Thread.MIN_PRIORITY);
+                // currentThread.setPriority(Thread.MIN_PRIORITY);
                 currentThread.start();
             }
         }
@@ -312,11 +298,8 @@ public class RankingPanel extends javax.swing.JPanel {
         jSplitPane1 = new javax.swing.JSplitPane();
         histogramPanel = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
-        pairedOnlyButton = new javax.swing.JRadioButton();
         dataOverlayBox = new javax.swing.JComboBox();
-        unpairedOnlyButton = new javax.swing.JRadioButton();
         saveAsCSVButton = new javax.swing.JButton();
-        allSitesButton = new javax.swing.JRadioButton();
         jLabel2 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         structureOverlayComboBox = new javax.swing.JComboBox();
@@ -331,25 +314,9 @@ public class RankingPanel extends javax.swing.JPanel {
         histogramPanel.setLayout(new java.awt.BorderLayout());
         jSplitPane1.setBottomComponent(histogramPanel);
 
-        buttonGroup1.add(pairedOnlyButton);
-        pairedOnlyButton.setText("Paired only");
-        pairedOnlyButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                pairedOnlyButtonActionPerformed(evt);
-            }
-        });
-
         dataOverlayBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 dataOverlayBoxActionPerformed(evt);
-            }
-        });
-
-        buttonGroup1.add(unpairedOnlyButton);
-        unpairedOnlyButton.setText("Unpaired only");
-        unpairedOnlyButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                unpairedOnlyButtonActionPerformed(evt);
             }
         });
 
@@ -358,15 +325,6 @@ public class RankingPanel extends javax.swing.JPanel {
         saveAsCSVButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 saveAsCSVButtonActionPerformed(evt);
-            }
-        });
-
-        buttonGroup1.add(allSitesButton);
-        allSitesButton.setSelected(true);
-        allSitesButton.setText("All nucleotides");
-        allSitesButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                allSitesButtonActionPerformed(evt);
             }
         });
 
@@ -392,11 +350,21 @@ public class RankingPanel extends javax.swing.JPanel {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(626, Short.MAX_VALUE)
-                .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(saveAsCSVButton)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .addGap(317, 317, 317)
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(dataOverlayBox, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
+                        .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(saveAsCSVButton))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
             .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel2Layout.createSequentialGroup()
@@ -404,24 +372,10 @@ public class RankingPanel extends javax.swing.JPanel {
                     .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 922, Short.MAX_VALUE)
                         .addGroup(jPanel2Layout.createSequentialGroup()
-                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(jPanel2Layout.createSequentialGroup()
-                                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jLabel1)
-                                        .addComponent(jLabel3))
-                                    .addGap(18, 18, 18)
-                                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(jPanel2Layout.createSequentialGroup()
-                                            .addComponent(structureOverlayComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addGap(18, 18, 18)
-                                            .addComponent(allSitesButton)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(pairedOnlyButton)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(unpairedOnlyButton))
-                                        .addComponent(dataOverlayBox, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addComponent(jLabel2))
-                            .addGap(0, 0, Short.MAX_VALUE)))
+                            .addComponent(jLabel3)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addComponent(structureOverlayComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(0, 666, Short.MAX_VALUE)))
                     .addContainerGap()))
         );
         jPanel2Layout.setVerticalGroup(
@@ -430,25 +384,20 @@ public class RankingPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(saveAsCSVButton)
-                    .addComponent(statusLabel))
-                .addGap(265, 265, 265))
+                    .addComponent(statusLabel)
+                    .addComponent(dataOverlayBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel2)
+                .addContainerGap())
             .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel2Layout.createSequentialGroup()
                     .addContainerGap()
                     .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel3)
-                        .addComponent(structureOverlayComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(allSitesButton)
-                        .addComponent(unpairedOnlyButton)
-                        .addComponent(pairedOnlyButton))
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(dataOverlayBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel1))
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                    .addComponent(jLabel2)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
+                        .addComponent(structureOverlayComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGap(31, 31, 31)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE)
                     .addContainerGap()))
         );
 
@@ -466,21 +415,9 @@ public class RankingPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void dataOverlayBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataOverlayBoxActionPerformed
+    private void structureOverlayComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_structureOverlayComboBoxActionPerformed
         performRanking();
-    }//GEN-LAST:event_dataOverlayBoxActionPerformed
-
-    private void allSitesButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_allSitesButtonActionPerformed
-        performRanking();
-    }//GEN-LAST:event_allSitesButtonActionPerformed
-
-    private void pairedOnlyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pairedOnlyButtonActionPerformed
-        performRanking();
-    }//GEN-LAST:event_pairedOnlyButtonActionPerformed
-
-    private void unpairedOnlyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_unpairedOnlyButtonActionPerformed
-        performRanking();
-    }//GEN-LAST:event_unpairedOnlyButtonActionPerformed
+    }//GEN-LAST:event_structureOverlayComboBoxActionPerformed
 
     private void saveAsCSVButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveAsCSVButtonActionPerformed
 
@@ -509,14 +446,14 @@ public class RankingPanel extends javax.swing.JPanel {
          */
     }//GEN-LAST:event_saveAsCSVButtonActionPerformed
 
-    private void structureOverlayComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_structureOverlayComboBoxActionPerformed
+    private void dataOverlayBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataOverlayBoxActionPerformed
         performRanking();
-    }//GEN-LAST:event_structureOverlayComboBoxActionPerformed
+    }//GEN-LAST:event_dataOverlayBoxActionPerformed
 
     public void saveAsCSV(File outFile) {
         try {
             BufferedWriter buffer = new BufferedWriter(new FileWriter(outFile));
-            TableColumnModel columnModel = rankingTable.table.getTableHeader().getColumnModel();
+            TableColumnModel columnModel = pairTable.table.getTableHeader().getColumnModel();
             for (int i = 0; i < columnModel.getColumnCount() - 1; i++) {
                 buffer.write(columnModel.getColumn(i).getHeaderValue().toString() + ",");
             }
@@ -532,7 +469,7 @@ public class RankingPanel extends javax.swing.JPanel {
              * buffer.newLine(); }
              */
 
-            TableModel tableModel = rankingTable.table.getModel();
+            TableModel tableModel = pairTable.table.getModel();
             for (int i = 0; i < tableModel.getRowCount(); i++) {
                 //Object[] row = rows.get(i);
                 for (int j = 0; j < tableModel.getColumnCount() - 1; j++) {
@@ -555,7 +492,7 @@ public class RankingPanel extends javax.swing.JPanel {
         frame.setIconImage(parent.getIconImage());
 
         //Create and set up the content pane.
-        RankingPanel newContentPane = new RankingPanel(null);
+        PairTestPanel newContentPane = new PairTestPanel(null);
         newContentPane.setOpaque(true); //content panes must be opaque
         frame.setContentPane(newContentPane);
 
@@ -575,7 +512,6 @@ public class RankingPanel extends javax.swing.JPanel {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JRadioButton allSitesButton;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JComboBox dataOverlayBox;
     private javax.swing.JPanel histogramPanel;
@@ -585,10 +521,8 @@ public class RankingPanel extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JSplitPane jSplitPane1;
-    private javax.swing.JRadioButton pairedOnlyButton;
     private javax.swing.JButton saveAsCSVButton;
     private javax.swing.JLabel statusLabel;
     private javax.swing.JComboBox structureOverlayComboBox;
-    private javax.swing.JRadioButton unpairedOnlyButton;
     // End of variables declaration//GEN-END:variables
 }

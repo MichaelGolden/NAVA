@@ -19,6 +19,7 @@ import nava.ui.ProjectModel;
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
 public class StructureOverlay extends Overlay implements Serializable {
+    private static final long serialVersionUID = -1056305922110763626L;
 
     public SecondaryStructure structure;
     public MappingSource mappingSource;
@@ -57,11 +58,6 @@ public class StructureOverlay extends Overlay implements Serializable {
     public void loadData() {
         this.data = structure.getObject(ProjectModel.path, MainFrame.dataSourceCache);
         this.pairedSites = this.data.pairedSites;
-    }
-
-    @Override
-    public String toString() {
-        return title;
     }
 
     /**

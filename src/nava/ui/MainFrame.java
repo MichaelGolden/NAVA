@@ -4,23 +4,22 @@
  */
 package nava.ui;
 
-import java.awt.BorderLayout;
-import java.awt.Font;
-import java.awt.FontFormatException;
-import java.awt.Image;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
+import javax.swing.*;
 import nava.tasks.applications.ApplicationController;
 import nava.data.types.DataSourceCache;
+import nava.ranking.PairTestPanel;
 import nava.ranking.RankingPanel;
 import nava.structurevis.StructureVisModel;
 import nava.structurevis.StructureVisPanel;
@@ -28,12 +27,13 @@ import nava.tasks.TaskManager;
 import nava.ui.StartupDialog.Startup;
 import nava.ui.navigator.NavigatorPanel;
 import nava.utils.GraphicsUtils;
+import nava.utils.MenuAction;
 
 /**
  *
  * @author Michael
  */
-public class MainFrame extends javax.swing.JFrame implements WindowListener {
+public class MainFrame extends javax.swing.JFrame implements WindowListener, ActionListener {
 
     public static PropertyResourceBundle resources = (PropertyResourceBundle) ResourceBundle.getBundle("resources.text.text");
     public static TaskManager taskManager;
@@ -48,7 +48,7 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
     public static JFileChooser browseDialog = new JFileChooser();
     public static JFileChooser projectDialog = new JFileChooser();
     StartupDialog startupDialog;
-    public static File workspaceDirectory = new File("workspace"+File.separator);
+    public static File workspaceDirectory = new File("workspace" + File.separator);
 
     public void startup() {
         try {
@@ -101,9 +101,11 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
     }
 
     public void createNewProject(File projectDirectory) {
-        projectDirectory.mkdirs();
-        projectController.openProject(new ProjectModel(projectDirectory.getAbsolutePath()));
-        StartupDialog.addProjectFileToRecentProjects(projectDirectory);
+        if (projectDirectory != null) {
+            projectDirectory.mkdirs();
+            projectController.openProject(new ProjectModel(projectDirectory.getAbsolutePath()));
+            StartupDialog.addProjectFileToRecentProjects(projectDirectory);
+        }
     }
 
     public void openProject(File projectDirectory) {
@@ -136,9 +138,12 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
         jPanel2 = new javax.swing.JPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
+        jMenuItem6 = new javax.swing.JMenuItem();
         jMenuItem1 = new javax.swing.JMenuItem();
+        jMenu2 = new javax.swing.JMenu();
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
+        jMenuItem5 = new javax.swing.JMenuItem();
         jMenuItem4 = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
         jMenuItem3 = new javax.swing.JMenuItem();
@@ -164,6 +169,14 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
 
         jMenu1.setText("File");
 
+        jMenuItem6.setText("Start a new project");
+        jMenuItem6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem6ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem6);
+
         jMenuItem1.setText("Open project");
         jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -171,6 +184,23 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
             }
         });
         jMenu1.add(jMenuItem1);
+
+        jMenu2.setText("Open recently used");
+        jMenu2.addMenuListener(new javax.swing.event.MenuListener() {
+            public void menuCanceled(javax.swing.event.MenuEvent evt) {
+            }
+            public void menuSelected(javax.swing.event.MenuEvent evt) {
+                jMenu2MenuSelected(evt);
+            }
+            public void menuDeselected(javax.swing.event.MenuEvent evt) {
+            }
+        });
+        jMenu2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenu2ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenu2);
 
         jMenuItem2.setText("Exit");
         jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
@@ -183,6 +213,14 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
         jMenuBar1.add(jMenu1);
 
         jMenu4.setText("Analysis");
+
+        jMenuItem5.setText("Paired sites comparison");
+        jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem5ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem5);
 
         jMenuItem4.setText("Ranking");
         jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
@@ -251,6 +289,48 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
         frame.setVisible(true);
     }//GEN-LAST:event_jMenuItem4ActionPerformed
 
+    private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
+        JFrame frame = new JFrame("Structure ranking");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setIconImage(getIconImage());
+
+        //Create and set up the content pane.
+        PairTestPanel newContentPane = new PairTestPanel(structureVisPanel.structureVisController);
+        newContentPane.setOpaque(true); //content panes must be opaque
+        frame.setContentPane(newContentPane);
+
+        //Display the window.
+        frame.pack();
+        frame.setVisible(true);
+    }//GEN-LAST:event_jMenuItem5ActionPerformed
+
+    private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
+        NewProjectDialog newProjectDialog = new NewProjectDialog(this, true);
+        newProjectDialog.setIconImage(new ImageIcon(ClassLoader.getSystemResource("resources/icons/icon-32x32.png")).getImage());
+        GraphicsUtils.centerWindowOnScreen(newProjectDialog);
+        newProjectDialog.setVisible(true);
+        if (newProjectDialog.createNewProject) {
+            System.out.println(newProjectDialog.projectFile);
+            createNewProject(newProjectDialog.projectFile);
+        }
+    }//GEN-LAST:event_jMenuItem6ActionPerformed
+
+    private void jMenu2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu2ActionPerformed
+    }//GEN-LAST:event_jMenu2ActionPerformed
+
+    private void jMenu2MenuSelected(javax.swing.event.MenuEvent evt) {//GEN-FIRST:event_jMenu2MenuSelected
+        ArrayList<File> recentlyUsedFiles = StartupDialog.getRecentlyUsedProjectFiles();
+        jMenu2.removeAll();
+        for (File recent : recentlyUsedFiles) {
+            JMenuItem menuItem = new JMenuItem(recent.getAbsolutePath());
+            menuItem.addActionListener(this);
+            MenuAction openAction = new MenuAction(recent.getAbsolutePath());
+            openAction.putValue("file", recent);
+            menuItem.setAction(openAction);
+            jMenu2.add(menuItem);
+        }
+    }//GEN-LAST:event_jMenu2MenuSelected
+
     /**
      * @param args the command line arguments
      */
@@ -305,7 +385,6 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
                         }
                         mainFrame.openProject(projectDir);
                     } else if (mainFrame.startupDialog.startup == Startup.CREATE_NEW) {
-                        projectDir.mkdirs();
                         mainFrame.createNewProject(projectDir);
                     }
                 }
@@ -314,6 +393,7 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
@@ -321,6 +401,8 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
+    private javax.swing.JMenuItem jMenuItem5;
+    private javax.swing.JMenuItem jMenuItem6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JTabbedPane jTabbedPane1;
@@ -353,5 +435,17 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener {
 
     @Override
     public void windowDeactivated(WindowEvent e) {
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        System.out.println(e.getSource());
+        if (e.getSource() instanceof JMenuItem) {
+            JMenuItem menuItem = (JMenuItem) e.getSource();
+            MenuAction action = (MenuAction) menuItem.getAction();
+            File projectFile = (File) action.getValue("file");
+            System.out.println("Opening project file " + projectFile);
+            openProject(projectFile);
+        }
     }
 }

@@ -14,6 +14,9 @@ import java.util.Random;
  */
 public class Utils {
 
+    public static long startTime = System.currentTimeMillis();
+    public static long fileid = startTime;
+
     public static String padStringRight(String s, int n, char c) {
         String ret = s;
         for (int i = s.length(); i < n; i++) {
@@ -109,5 +112,17 @@ public class Utils {
         } catch (IOException e) {
             return false;
         }
+    }
+
+    public static File createTempDirectory() {
+        File tempDir = new File(System.getProperty("java.io.tmpdir") + File.separator + fileid + File.separator);
+        tempDir.mkdirs();
+        fileid++;
+        return tempDir;
+    }
+    
+    public static File getFile(File path, String filename)
+    {
+        return new File(path.getAbsolutePath()+File.separator+filename);
     }
 }

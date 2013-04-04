@@ -50,6 +50,7 @@ public class ApplicationPanel extends javax.swing.JPanel implements ListSelectio
         appController.registerApplication(new MAFFTApplication());
         appController.registerApplication(new MuscleApplication());
         appController.registerApplication(new ClustalWApplication());
+        appController.registerApplication(new SimpleNucleotideDiversity());
         applications = appController.getApplications();
 
         applicationListModel = new DefaultListModel<>();
@@ -197,7 +198,7 @@ public class ApplicationPanel extends javax.swing.JPanel implements ListSelectio
             try {
                 Application app = (Application) jList1.getSelectedValue().getClass().newInstance();
                 app.setDataSource(selectedDataSources.get(0));
-                MainFrame.taskManager.queueTask(app);
+                MainFrame.taskManager.queueTask(app, false);
             } catch (InstantiationException ex) {
                 Logger.getLogger(ApplicationPanel.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IllegalAccessException ex) {

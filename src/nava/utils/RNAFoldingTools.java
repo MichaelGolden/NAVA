@@ -91,8 +91,6 @@ public class RNAFoldingTools {
             }
         }
         
-     //   Double.parseDouble("ssfafa_C");
-        
         return getPosteriorDecodingConsensusStructure(basePairProb, singleBaseProb);
     }
 

@@ -32,7 +32,7 @@ public class StructureVisModel implements Serializable {
     public DataOverlayTreeModel overlayNavigatorTreeModel;
     // protected transient EventListenerList listeners = new EventListenerList();
     public  SubstructureModel substructureModel;
-    Hashtable<Pair<MappingSource, MappingSource>, Mapping> mappings = new Hashtable<>();
+    Hashtable<Pair<MappingSource, MappingSource>, Mapping> mappings = new Hashtable<>(); // data mapping source, structure mapping source
     //public File structureVisModelFile = null;
 
     public void saveStructureVisModel(File outFile) {

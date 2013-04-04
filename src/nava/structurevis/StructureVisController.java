@@ -14,18 +14,21 @@ import nava.data.io.IO;
 import nava.data.types.Alignment;
 import nava.data.types.DataSource;
 import nava.data.types.DataType;
+import nava.data.types.SecondaryStructure;
 import nava.structurevis.data.*;
 import nava.tasks.MappingTask;
+import nava.tasks.ProcessReference;
 import nava.ui.MainFrame;
 import nava.ui.ProjectController;
 import nava.ui.ProjectModel;
+import nava.ui.ProjectView;
 import nava.utils.*;
 
 /**
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class StructureVisController implements SafeListListener {
+public class StructureVisController implements SafeListListener, ProjectView {
 
     public StructureVisModel structureVisModel;
     transient ProjectController projectController;
@@ -33,6 +36,7 @@ public class StructureVisController implements SafeListListener {
 
     public StructureVisController(ProjectController projectController, ProjectModel projectModel) {
         this.projectController = projectController;
+        this.projectController.addView(this);
         this.projectModel = projectModel;
 
         openStructureVisModel(new StructureVisModel());
@@ -41,12 +45,9 @@ public class StructureVisController implements SafeListListener {
     public void openStructureVisModel(StructureVisModel structureVisModel) {
         this.structureVisModel = structureVisModel;
         //structureVisModel.substructureModel = new SubstructureModel(this);\
-        if(structureVisModel.substructureModel == null)
-        {
+        if (structureVisModel.substructureModel == null) {
             structureVisModel.substructureModel = new SubstructureModel(this);
-        }
-        else
-        {
+        } else {
             this.structureVisModel.substructureModel.structureVisController = this;
         }
         //structureVisModel.structureVisModelFile = new File(getWorkingDirectory().getAbsolutePath() + File.separatorChar + "structurevis.model");
@@ -78,14 +79,20 @@ public class StructureVisController implements SafeListListener {
             for (int j = 0; j < structureVisModel.structureVisDataOverlays1D.size(); j++) {
                 DataOverlay1D dataSource = structureVisModel.structureVisDataOverlays1D.get(j);
                 if (s.mappingSource != null && dataSource.mappingSource != null) {
-                    MainFrame.taskManager.queueUITask(new MappingTask(this, dataSource.mappingSource, s.mappingSource));
+                    if (!structureVisModel.mappings.containsKey(new Pair<>(dataSource.mappingSource, s.mappingSource))) {
+                        MainFrame.taskManager.queueTask(new MappingTask(this, dataSource.mappingSource, s.mappingSource), true);
+                    }
                 }
             }
 
             for (int j = 0; j < structureVisModel.structureVisDataOverlays2D.size(); j++) {
                 DataOverlay2D dataSource = structureVisModel.structureVisDataOverlays2D.get(j);
                 if (s.mappingSource != null && dataSource.mappingSource != null) {
-                    MainFrame.taskManager.queueUITask(new MappingTask(this, dataSource.mappingSource, s.mappingSource));
+                    if (structureVisModel.mappings.containsKey(new Pair<>(dataSource.mappingSource, s.mappingSource))) {
+                        if (!structureVisModel.mappings.containsKey(new Pair<>(dataSource.mappingSource, s.mappingSource))) {
+                            MainFrame.taskManager.queueTask(new MappingTask(this, dataSource.mappingSource, s.mappingSource), true);
+                        }
+                    }
                 }
             }
 
@@ -94,8 +101,9 @@ public class StructureVisController implements SafeListListener {
                 for (Feature f : annotationSource.features) // probably all have the same source, so this is not too slow
                 {
                     if (s.mappingSource != null && f.mappingSource != null) {
-                        //getMapping(f.mappingSource, s.mappingSource);
-                        MainFrame.taskManager.queueUITask(new MappingTask(this, f.mappingSource, s.mappingSource));
+                        if (!structureVisModel.mappings.containsKey(new Pair<>(f.mappingSource, s.mappingSource))) {
+                            MainFrame.taskManager.queueTask(new MappingTask(this, f.mappingSource, s.mappingSource), true);
+                        }
                     }
                 }
             }
@@ -104,8 +112,9 @@ public class StructureVisController implements SafeListListener {
                 NucleotideComposition nucleotideComposition = structureVisModel.nucleotideSources.get(j);
                 System.out.println("CREATING NUC " + j + "\t" + nucleotideComposition);
                 if (s.mappingSource != null && nucleotideComposition.mappingSource != null) {
-                    //getMapping(f.mappingSource, s.mappingSource);
-                    MainFrame.taskManager.queueUITask(new MappingTask(this, nucleotideComposition.mappingSource, s.mappingSource));
+                    if (!structureVisModel.mappings.containsKey(new Pair<>(nucleotideComposition.mappingSource, s.mappingSource))) {
+                        MainFrame.taskManager.queueTask(new MappingTask(this, nucleotideComposition.mappingSource, s.mappingSource), true);
+                    }
                 }
             }
         }
@@ -154,6 +163,13 @@ public class StructureVisController implements SafeListListener {
         }
     }
 
+    /**
+     * Replace the current overlay with a new overlay (usually a edited version
+     * of the same overlay)
+     *
+     * @param currentOverlay
+     * @param structureSource
+     */
     public void setStructureSource(Overlay currentOverlay, StructureOverlay structureSource) {
         int index = structureVisModel.structureSources.indexOf(currentOverlay);
         if (index >= 0) {
@@ -167,6 +183,13 @@ public class StructureVisController implements SafeListListener {
         refreshMappings();
     }
 
+    /**
+     * Replace the current overlay with a new overlay (usually a edited version
+     * of the same overlay)
+     *
+     * @param currentOverlay
+     * @param structureSource
+     */
     public void setStructureVisDataSource1D(Overlay currentOverlay, DataOverlay1D dataSource) {
         int index = structureVisModel.structureVisDataOverlays1D.indexOf(currentOverlay);
         if (index >= 0) {
@@ -177,6 +200,13 @@ public class StructureVisController implements SafeListListener {
         refreshMappings();
     }
 
+    /**
+     * Replace the current overlay with a new overlay (usually a edited version
+     * of the same overlay)
+     *
+     * @param currentOverlay
+     * @param structureSource
+     */
     public void setStructureVisDataSource2D(Overlay currentOverlay, DataOverlay2D dataSource) {
         int index = structureVisModel.structureVisDataOverlays2D.indexOf(currentOverlay);
         if (index >= 0) {
@@ -187,6 +217,13 @@ public class StructureVisController implements SafeListListener {
         refreshMappings();
     }
 
+    /**
+     * Replace the current overlay with a new overlay (usually a edited version
+     * of the same overlay)
+     *
+     * @param currentOverlay
+     * @param structureSource
+     */
     public void setAnnotationsSource(Overlay currentOverlay, AnnotationSource annotationSource) {
         int index = structureVisModel.annotationSources.indexOf(currentOverlay);
         if (index >= 0) {
@@ -197,6 +234,13 @@ public class StructureVisController implements SafeListListener {
         refreshMappings();
     }
 
+    /**
+     * Replace the current overlay with a new overlay (usually a edited version
+     * of the same overlay)
+     *
+     * @param currentOverlay
+     * @param structureSource
+     */
     public void setNucleotideCompositionSource(Overlay currentOverlay, NucleotideComposition nucleotideComposition) {
         int index = structureVisModel.nucleotideSources.indexOf(currentOverlay);
         if (index >= 0) {
@@ -229,10 +273,10 @@ public class StructureVisController implements SafeListListener {
     }
 
     public Mapping getMapping(MappingSource a, MappingSource b) {
-        return getMapping(a, b, 1);
+        return getMapping(a, b, 1, new ProcessReference());
     }
 
-    public Mapping getMapping(MappingSource a, MappingSource b, int select) {
+    public Mapping getMapping(MappingSource a, MappingSource b, int select, ProcessReference processReference) {
         if (a == null || b == null) {
             return null;
         }
@@ -240,7 +284,7 @@ public class StructureVisController implements SafeListListener {
         Pair p = new Pair(a, b);
         Mapping m = structureVisModel.mappings.get(p);
         if (m == null) {
-            m = createMapping(a, b, select);
+            m = createMapping(a, b, select, processReference);
             if (m != null) {
                 structureVisModel.mappings.put(p, m);
             } else {
@@ -250,7 +294,7 @@ public class StructureVisController implements SafeListListener {
         return m;
     }
 
-    public Mapping createMapping(MappingSource a, MappingSource b, int select) {
+    public Mapping createMapping(MappingSource a, MappingSource b, int select, ProcessReference processReference) {
         ArrayList<String> sequencesA = new ArrayList<>();
         ArrayList<String> sequencesNamesA = new ArrayList<>();
         ArrayList<String> sequencesB = new ArrayList<>();
@@ -285,7 +329,7 @@ public class StructureVisController implements SafeListListener {
          * System.out.println(sequencesB); System.out.println("----------");
          */
 
-        Mapping mapping = Mapping.createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, select);
+        Mapping mapping = Mapping.createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, select, processReference);
         if (mapping != null) {
             structureVisModel.mappings.put(new Pair(a, b), mapping);
         }
@@ -427,11 +471,58 @@ public class StructureVisController implements SafeListListener {
                 for (int j = e.getIndex0(); j <= e.getIndex1(); j++) {
                     Object o = list.get(j);
                     if (o instanceof Overlay) {
-                        System.out.println("CONENTS CHANGEDxxx" +e.getOldElement().toString()+"\t"+e.getNewElement().toString());
-                        structureVisViews.get(i).dataOverlayChanged((Overlay)e.getOldElement(), (Overlay)e.getNewElement());
+                        System.out.println("CONENTS CHANGEDxxx" + e.getOldElement().toString() + "\t" + e.getNewElement().toString());
+                        structureVisViews.get(i).dataOverlayChanged((Overlay) e.getOldElement(), (Overlay) e.getNewElement());
                     }
                 }
             }
         }
+    }
+
+    @Override
+    public void projectModelChanged(ProjectModel newProjectModel) {
+        this.projectModel = newProjectModel;
+
+    }
+
+    @Override
+    public void dataSourcesLoaded() {
+    }
+
+    public void dataSourcesIntervalAdded(ListDataEvent e) {
+        autoCreateMappings();
+    }
+
+    public void autoCreateMappings() {
+        System.out.println("autoCreateMappings");
+        System.out.println("V" + structureVisModel.structureSources.size());
+        for (int j = 0; j < projectModel.dataSources.size(); j++) {
+            DataSource d = projectModel.dataSources.get(j);
+            MappingSource m = null;
+            if (d instanceof Alignment) {
+                Alignment alignment = (Alignment) d;
+                m = new MappingSource(alignment);
+            }
+            System.out.println("A" + structureVisModel.structureSources.size());
+            for (int i = 0; i < structureVisModel.structureSources.size(); i++) {
+                StructureOverlay s = structureVisModel.structureSources.get(i);
+                System.out.println("N" + i);
+                if (s.mappingSource != null && m != null) {
+                    System.out.println("M" + i);
+                    if (!this.structureVisModel.mappings.containsKey(new Pair<>(m, s.mappingSource))) {
+                        System.out.println("Q" + i);
+                        MainFrame.taskManager.queueTask(new MappingTask(this, m, s.mappingSource), true);
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void dataSourcesIntervalRemoved(ListDataEvent e) {
+    }
+
+    @Override
+    public void dataSourcesContentsChanged(ListDataEvent e) {
     }
 }

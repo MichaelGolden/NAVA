@@ -9,6 +9,7 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import nava.data.io.IO;
+import nava.tasks.ProcessReference;
 
 /**
  *
@@ -32,10 +33,10 @@ public class Mapping implements Serializable {
     public String alignedB0;
     public File mappingFile;
     public boolean bReversedComplemented = false;
-    int [] aToRefList = {};
-    int [] bToRefList = {};
-    int [] refToAList = {};
-    int [] refToBList = {};
+    int[] aToRefList = {};
+    int[] bToRefList = {};
+    int[] refToAList = {};
+    int[] refToBList = {};
     int refLen;
 
     public static void setAlignmentParameters(double gapOpen, double gapExtend, int s) {
@@ -252,14 +253,17 @@ public class Mapping implements Serializable {
         int maxSequencesToLoad = Math.max(Mapping.select, 100); // to ensure fast loading limit the number of sequences to be load
         IO.loadFastaSequences(alignmentA, sequencesA, sequencesNamesA, maxSequencesToLoad);
         IO.loadFastaSequences(alignmentB, sequencesB, sequencesNamesB, maxSequencesToLoad);
-        return createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, select, reverseComplementB, outputfileName);
+        return createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, select, reverseComplementB, outputfileName, new ProcessReference());
     }
 
-    public static Mapping createMapping(ArrayList<String> sequencesA, ArrayList<String> sequencesNamesA, ArrayList<String> sequencesB, ArrayList<String> sequencesNamesB, int select, boolean reverseComplementB, String outputfileName) {
+    public static Mapping createMapping(ArrayList<String> sequencesA, ArrayList<String> sequencesNamesA, ArrayList<String> sequencesB, ArrayList<String> sequencesNamesB, int select, boolean reverseComplementB, String outputfileName, ProcessReference processReference) {
         Mapping mapping = null;
 
+        File tempDir = Utils.createTempDirectory();
+        File inputFile = Utils.getFile(tempDir, "inputfile.fasta");
+        File outputFile = Utils.getFile(tempDir, outputfileName);
         try {
-            BufferedWriter buffer = new BufferedWriter(new FileWriter("inputfile.fasta"));
+            BufferedWriter buffer = new BufferedWriter(new FileWriter(inputFile));
             if (impute) {
                 AlignmentUtils.impute(sequencesA, Mapping.select);
                 AlignmentUtils.impute(sequencesB, Mapping.select);
@@ -305,32 +309,40 @@ public class Mapping implements Serializable {
             buffer.close();
 
             if (Mapping.select >= 1) {
-                String cmd = MUSCLE_EXECUTABLE + " -in inputfile.fasta -out " + outputfileName + " -gapopen " + gapOpen + " -gapextend " + gapExtend;
+                String cmd = MUSCLE_EXECUTABLE + " -in " + inputFile.getAbsolutePath() + " -out " + outputFile.getAbsolutePath() + " -gapopen " + gapOpen + " -gapextend " + gapExtend;
+
                 Process p = Runtime.getRuntime().exec(cmd);
-                BufferedReader reader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-                String textline = null;
-                while ((textline = reader.readLine()) != null) {
-                    System.err.println(textline);
-                }
-                reader.close();
-                if (p.waitFor() == 0) {
-                    ArrayList<String> alignedSequences = new ArrayList<String>();
-                    ArrayList<String> alignedSequenceNames = new ArrayList<String>();
-                    IO.loadFastaSequences(new File(outputfileName), alignedSequences, alignedSequenceNames);
-
-                    String alignedA0 = null;
-                    String alignedB0 = null;
-                    for (int i = 0; i < alignedSequences.size(); i++) {
-                        if (alignedSequenceNames.get(i).startsWith("a")) {
-                            alignedA0 = alignedSequences.get(i);
-                        }
-
-                        if (alignedSequenceNames.get(i).startsWith("b")) {
-                            alignedB0 = alignedSequences.get(i);
-                        }
+                processReference.addProcess(p);
+                if (!processReference.cancelled) {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+                    String textline = null;
+                    while ((textline = reader.readLine()) != null) {
+                        System.err.println(textline);
                     }
+                    reader.close();
+                    if (p.waitFor() == 0) {
+                        ArrayList<String> alignedSequences = new ArrayList<String>();
+                        ArrayList<String> alignedSequenceNames = new ArrayList<String>();
+                        IO.loadFastaSequences(outputFile, alignedSequences, alignedSequenceNames);
 
-                    mapping = getMappingFromAlignedStrings(alignedA0, alignedB0, reverseComplementB);
+                        String alignedA0 = null;
+                        String alignedB0 = null;
+                        for (int i = 0; i < alignedSequences.size(); i++) {
+                            if (alignedSequenceNames.get(i).startsWith("a")) {
+                                alignedA0 = alignedSequences.get(i);
+                            }
+
+                            if (alignedSequenceNames.get(i).startsWith("b")) {
+                                alignedB0 = alignedSequences.get(i);
+                            }
+                        }
+
+                        mapping = getMappingFromAlignedStrings(alignedA0, alignedB0, reverseComplementB);
+                    }
+                }
+                else
+                {
+                    p.destroy();
                 }
             }
         } catch (InterruptedException ex) {
@@ -358,17 +370,17 @@ public class Mapping implements Serializable {
         int maxSequencesToLoad = Math.max(Mapping.select, 100); // to ensure fast loading limit the number of sequences to be loaded
         IO.loadFastaSequences(alignmentA, sequencesA, sequencesNamesA, maxSequencesToLoad);
         IO.loadFastaSequences(alignmentB, sequencesB, sequencesNamesB, maxSequencesToLoad);
-        return Mapping.createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, select);
+        return Mapping.createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, select, new ProcessReference());
     }
 
-    public static Mapping createMapping(ArrayList<String> sequencesA, ArrayList<String> sequencesNamesA, ArrayList<String> sequencesB, ArrayList<String> sequencesNamesB, int select) {
+    public static Mapping createMapping(ArrayList<String> sequencesA, ArrayList<String> sequencesNamesA, ArrayList<String> sequencesB, ArrayList<String> sequencesNamesB, int select, ProcessReference processReference) {
         // identity mapping
         if (sequencesA.equals(sequencesB)) { // if alignments are identical
             return Mapping.getMappingFromAlignedStrings(sequencesA.get(0), sequencesA.get(0), false);
         }
 
-        Mapping mapping = createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, select, false, "mappingforward.fas");
-        Mapping reverseMapping = createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, select, true, "mappingreverse.fas");
+        Mapping mapping = createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, select, false, "mappingforward.fas", processReference);
+        Mapping reverseMapping = createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, select, true, "mappingreverse.fas", processReference);
 
         if (mapping == null || reverseMapping == null) {
             return null;
@@ -405,6 +417,7 @@ public class Mapping implements Serializable {
         }
 
         if (alignedA0.length() != alignedB0.length()) {
+            System.out.println(alignedA0 + "\t" + alignedB0);
             throw new Error("Aligned sequences are not of equal length.");
         }
 
@@ -422,7 +435,7 @@ public class Mapping implements Serializable {
         Arrays.fill(mapping.refToBList, -1);
         Arrays.fill(mapping.aToRefList, -1);
         Arrays.fill(mapping.bToRefList, -1);
-        
+
         for (int i = 0; i < alignedA0.length(); i++) {
             int ref = i;
             int refToA = getUngappedPosition(alignedA0, ref);
@@ -431,8 +444,7 @@ public class Mapping implements Serializable {
                 mapping.refToAList[ref] = refToA;
                 /*
                  * if (!mapping.aToReference.containsKey(refToA)) {
-                 * mapping.aToReference.put(refToA, ref);
-                }
+                 * mapping.aToReference.put(refToA, ref); }
                  */
             }
         }
@@ -447,8 +459,7 @@ public class Mapping implements Serializable {
                     mapping.refToBList[ref] = refToB;
                     /*
                      * if (!mapping.bToReference.containsKey(refToB)) {
-                     * mapping.bToReference.put(refToB, ref);
-                    }
+                     * mapping.bToReference.put(refToB, ref); }
                      */
                 }
             }
@@ -461,20 +472,19 @@ public class Mapping implements Serializable {
                     mapping.refToBList[ref] = refToB;
                     /*
                      * if (!mapping.bToReference.containsKey(refToB)) {
-                     * mapping.bToReference.put(refToB, ref);
-                    }
+                     * mapping.bToReference.put(refToB, ref); }
                      */
                 }
             }
         }
 
-        for (int i = 0; i < mapping.refToAList.length ; i++) {
+        for (int i = 0; i < mapping.refToAList.length; i++) {
             if (mapping.refToAList[i] > -1) {
                 mapping.aToRefList[mapping.refToAList[i]] = i;
             }
         }
 
-        for (int i = 0; i < mapping.refToBList.length ; i++) {
+        for (int i = 0; i < mapping.refToBList.length; i++) {
             if (mapping.refToBList[i] > -1) {
                 mapping.bToRefList[mapping.refToBList[i]] = i;
             }

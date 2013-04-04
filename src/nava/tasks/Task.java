@@ -19,6 +19,7 @@ public abstract class Task<T> {
     public static ConsoleDatabase consoleDatabase = new ConsoleDatabase();
     protected String taskInstanceId;
     TaskManager taskManager;
+    protected boolean deferrable = false;
     
     
     public ConsoleBuffer combinedBuffer; // the actively used buffer

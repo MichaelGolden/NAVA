@@ -25,11 +25,12 @@ public class TaskManager extends Thread {
 
     LinkedList<Task> runQueue = new LinkedList<>();
     LinkedList<Task> generalTaskQueue = new LinkedList<>();
+    LinkedList<Task> deferrableTaskQueue = new LinkedList<>();
     LinkedList<UITask> uiTaskQueue = new LinkedList<>();
-    int totalSlots = Runtime.getRuntime().availableProcessors();
+    int totalSlots = Math.max(Runtime.getRuntime().availableProcessors() / 2, 1);
     int usedSlots = 0;
     int availableSlots = totalSlots - usedSlots;
-    
+    int deferrableTasksUsedSlots = 0;
     ProjectController projectController;
 
     public TaskManager(ProjectController projectController) {
@@ -38,10 +39,15 @@ public class TaskManager extends Thread {
     }
 
     private void runTask(Task task) {
-        usedSlots += task.slotUsage;
-        availableSlots = totalSlots - usedSlots;
-        runQueue.add(task);
-        execute(task);
+        if (task.getStatus() != Status.RUNNING && task.getStatus() != Status.FINISHED) {
+            usedSlots += task.slotUsage;
+            availableSlots = totalSlots - usedSlots;
+            if (task.deferrable) {
+                deferrableTasksUsedSlots += task.slotUsage;
+            }
+            runQueue.add(task);
+            execute(task);
+        }
     }
 
     private void execute(final Task task) {
@@ -52,37 +58,33 @@ public class TaskManager extends Thread {
             @Override
             public void run() {
                 task.setStatus(Status.RUNNING);
-                try
-                {
+                try {
                     task.task();
-                }
-                catch(Exception ex)
-                {
+                } catch (Exception ex) {
                     ex.printStackTrace();
                     //System.out.println("CONSOLE STATUS"+task.consoleErrorBuffer);
-                    task.combinedBuffer.bufferedWrite("Finished with error:\n"+ex.getMessage(), task.taskInstanceId, "standard_err");
+                    task.combinedBuffer.bufferedWrite("Finished with error:\n" + ex.getMessage(), task.taskInstanceId, "standard_err");
                     task.setStatus(Status.FINISHED);
                 }
-                if(task instanceof Application)
-                {                    
+                if (task instanceof Application) {
                     Application app = (Application) task;
-                    if(app.isCanceled())
-                    {
+                    if (app.isCanceled()) {
                         task.setStatus(Status.STOPPED);
-                    }
-                    else
-                    {
-                        task.setStatus(Status.FINISHED);            
+                    } else {
+                        task.setStatus(Status.FINISHED);
                         List<ApplicationOutput> outputFiles = app.getOutputFiles();
-                        for(ApplicationOutput outputFile : outputFiles)
-                        {
+                        for (ApplicationOutput outputFile : outputFiles) {
                             projectController.importDataSourceFromOutputFile(outputFile);
                         }
                     }
-                }
-                else
-                {
-                    task.setStatus(Status.FINISHED);
+                } else {
+                    if (task.getStatus() == Status.STOPPED) {
+                        
+                    }
+                    else
+                    {
+                        task.setStatus(Status.FINISHED);
+                    }
                 }
                 task.finishTime = System.currentTimeMillis();
                 task.setProgress(1.0);
@@ -98,53 +100,76 @@ public class TaskManager extends Thread {
             uiTaskQueue.remove((UITask) task);
         }
         generalTaskQueue.remove(task);
-        
+        deferrableTaskQueue.remove(task);
+
         usedSlots -= task.slotUsage;
         availableSlots = totalSlots - usedSlots;
-        
-    }
-
-    public void queueTask(Task task) {
-        task.taskManager = this;
-        
-        if (runQueue.contains(task) ||  generalTaskQueue.contains(task))
-        {
-            System.err.println("Task is already queued.");
-        }
-        else
-        {
-            task.before();
-            generalTaskQueue.add(task);            
-            task.setStatus(Status.QUEUED);
-            task.queueTime = System.currentTimeMillis();
+        if (task.deferrable) {
+            deferrableTasksUsedSlots -= task.slotUsage;
         }
     }
 
-    public void queueUITask(UITask task) {
+    public void queueTask(Task task, boolean deferrable) {
+        task.deferrable = deferrable;
         task.taskManager = this;
 
-        if (runQueue.contains(task) || uiTaskQueue.contains(task)) {
+        if (runQueue.contains(task) || generalTaskQueue.contains(task) || deferrableTaskQueue.contains(task)) {
             System.err.println("Task is already queued.");
         } else {
             task.before();
-            uiTaskQueue.add(task);            
+            if (task.deferrable) {
+                deferrableTaskQueue.add(task);
+            } else {
+                generalTaskQueue.add(task);
+            }
             task.setStatus(Status.QUEUED);
             task.queueTime = System.currentTimeMillis();
         }
     }
+
+    /*
+     * public void queueUITask(UITask task) { task.taskManager = this;
+     *
+     * if (runQueue.contains(task) || uiTaskQueue.contains(task)) {
+     * System.err.println("Task is already queued."); } else { task.before();
+     * uiTaskQueue.add(task); task.setStatus(Status.QUEUED); task.queueTime =
+     * System.currentTimeMillis(); } }
+     */
+    long iter = 0;
 
     @Override
     public void run() {
         while (true) {
-            
-            if (availableSlots > 0 && uiTaskQueue.size() > 0) {
-                UITask task = uiTaskQueue.removeFirst();
-                runTask(task);
+            availableSlots = totalSlots - usedSlots;
+            if (iter % 100 == 0) {
+                System.out.println("Tmanager\t" + availableSlots + "\t" + usedSlots + "\t" + generalTaskQueue.size() + "\t" + deferrableTaskQueue + "\t" + runQueue.size());
             }
-            
-            
+            iter++;
+            /*
+             * if (availableSlots > 0 && uiTaskQueue.size() > 0) { UITask task =
+             * uiTaskQueue.removeFirst(); runTask(task);
+            }
+             */
+
+            if (availableSlots <= 0 && generalTaskQueue.size() > 0) {
+                // cancel a deferrable task if not enough slots available
+                for (Task t : runQueue) {
+                    if (t.deferrable) {
+                        t.cancelTask();
+                        // re-queue
+                        queueTask(t, true);
+                        break;
+                    }
+                }
+            }
+
             if (availableSlots > 0 && generalTaskQueue.size() > 0) {
+                System.out.println("Running general task");
                 Task task = generalTaskQueue.removeFirst();
+                runTask(task);
+            } else if (availableSlots > 0 && deferrableTaskQueue.size() > 0) {
+                Task task = deferrableTaskQueue.removeFirst();
+                System.out.println("Running deferable task");
                 runTask(task);
             }
 
@@ -166,8 +191,10 @@ public class TaskManager extends Thread {
     }
 
     public void fireTaskStatusChanged(Task task, Status oldStatus, Status newStatus) {
-        if (newStatus == Status.FINISHED) {
+        if (newStatus == Status.FINISHED || newStatus == Status.STOPPED) {
+            System.out.println("dequeuing task "+ task);
             dequeTask(task);
+            
         }
 
         Object[] listeners = this.listeners.getListenerList();

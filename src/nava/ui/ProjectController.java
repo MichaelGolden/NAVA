@@ -36,7 +36,7 @@ public class ProjectController implements SafeListListener {
     public ProjectModel projectModel;
 
     public ProjectController() {
-      projectViews = new ArrayList<>();
+        projectViews = new ArrayList<>();
         /*
          * this.projectModel = projectModel;
          *
@@ -59,7 +59,7 @@ public class ProjectController implements SafeListListener {
                         secondaryStructure.originalFile = dataFile;
                         secondaryStructure.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                         secondaryStructure.dataType = dataType;
-                        secondaryStructure.persistObject(projectModel.getProjectPathString(),structures.get(0));
+                        secondaryStructure.persistObject(projectModel.getProjectPathString(), structures.get(0));
                         secondaryStructure.fileSize = new FileSize(dataFile.length());
                         secondaryStructure.length = structures.get(0).pairedSites.length;
                         dataSource = secondaryStructure;
@@ -88,7 +88,7 @@ public class ProjectController implements SafeListListener {
                         dataSource.originalFile = dataFile;
                         dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                         dataSource.dataType = dataType;
-                        dataSource.persistObject(projectModel.getProjectPathString(),dataSource);
+                        dataSource.persistObject(projectModel.getProjectPathString(), dataSource);
                         dataSource.fileSize = new FileSize(dataFile.length());
                         ExcelIO.saveAsCSV(dataFile, Paths.get(dataSource.getImportedDataSourcePath(projectModel.getProjectPathString())).toFile());
                     } else if (dataType.fileFormat.equals(DataType.FileFormat.CSV)) {
@@ -180,10 +180,10 @@ public class ProjectController implements SafeListListener {
             if (outputFile.object != null) {
                 SecondaryStructure structure = (SecondaryStructure) outputFile.dataSource;
                 structure.setImportId(getNextImportId());
-                structure.originalDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "dbn").toString();
+                structure.originalDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "orig.dbn").toString();
                 structure.importedDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "dbn").toString();
                 structure.title = outputFile.dataSource.title;
-                structure.persistObject(projectModel.getProjectPathString(),outputFile.object);
+                structure.persistObject(projectModel.getProjectPathString(), outputFile.object);
 
                 //dataSource.dataType = DataType.Primary.SECONDARY_STRUCTURE;
                 structure.fileSize = new FileSize(Paths.get(structure.getImportedDataSourcePath(projectModel.getProjectPathString())).toFile().length());
@@ -193,7 +193,7 @@ public class ProjectController implements SafeListListener {
             if (outputFile.file != null) {
                 Matrix matrix = (Matrix) outputFile.dataSource;
                 matrix.setImportId(getNextImportId());
-                matrix.originalDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "matrix").toString();
+                matrix.originalDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "orig.matrix").toString();
                 matrix.importedDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "matrix").toString();
                 matrix.title = outputFile.dataSource.title;
                 try {
@@ -208,7 +208,7 @@ public class ProjectController implements SafeListListener {
         } else if (outputFile.dataSource instanceof Alignment) {
             Alignment alignment = (Alignment) outputFile.dataSource;
             alignment.setImportId(getNextImportId());
-            alignment.originalDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "fas").toString();
+            alignment.originalDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "orig.fas").toString();
             alignment.importedDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "fas").toString();
             alignment.title = outputFile.dataSource.title;
 
@@ -220,18 +220,34 @@ public class ProjectController implements SafeListListener {
             alignment.fileSize = new FileSize(Paths.get(alignment.getImportedDataSourcePath(projectModel.getProjectPathString())).toFile().length());
 
             projectModel.dataSources.addElement(alignment);
+        } else if (outputFile.dataSource instanceof Tabular) {
+            try {
+                Tabular tabular = CsvReader.getTabularRepresentation(outputFile.dataSource.originalFile);
+                tabular.setImportId(getNextImportId());
+                tabular.originalDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "orig.csv").toString();
+                tabular.importedDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "csv").toString();
+                tabular.title = outputFile.dataSource.title;
+
+                IO.copyFile(outputFile.dataSource.originalFile, new File(tabular.getOriginalDataSourcePath(projectModel.getProjectPathString())));
+                IO.copyFile(outputFile.dataSource.originalFile, new File(tabular.getImportedDataSourcePath(projectModel.getProjectPathString())));
+                tabular.fileSize = new FileSize(Paths.get(tabular.getImportedDataSourcePath(projectModel.getProjectPathString())).toFile().length());
+
+                projectModel.dataSources.addElement(tabular);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
 
     }
 
     public void createPath(DataSource dataSource, String origExtension, String newExtension) {
         dataSource.setImportId(getNextImportId());
-        Path p = generatePath(dataSource.getImportId(),newExtension);
-        System.out.println("here"+projectModel.getProjectPath().resolve(p));
+        Path p = generatePath(dataSource.getImportId(), newExtension);
+        System.out.println("here" + projectModel.getProjectPath().resolve(p));
         while (Files.exists(projectModel.getProjectPath().resolve(p))) {
             dataSource.setImportId(getNextImportId());
             p = generatePath(dataSource.getImportId(), newExtension);
-            System.out.println("q"+projectModel.getProjectPath().resolve(p));
+            System.out.println("q" + projectModel.getProjectPath().resolve(p));
         }
         dataSource.originalDataSourcePath = generatePath(dataSource.getImportId(), "orig." + origExtension).toString();
         dataSource.importedDataSourcePath = generatePath(dataSource.getImportId(), newExtension).toString();
@@ -239,7 +255,7 @@ public class ProjectController implements SafeListListener {
 
     public Path generatePath(long id, String extension) {
         Path p = Paths.get(id + "." + extension);
-        
+
         return p;
     }
 
@@ -252,7 +268,7 @@ public class ProjectController implements SafeListListener {
             DataSource dataSource = importDataSourceFromFile(dataFile, possibleDataTypes.get(0));
             return new Pair(possibleDataTypes.get(0), dataSource);
         }
-        
+
         return null;
     }
 
@@ -273,7 +289,7 @@ public class ProjectController implements SafeListListener {
         this.projectModel.dataSources.addSafeListListener(this);
 
         for (int i = 0; i < projectViews.size(); i++) {
-            projectViews.get(i).projectModelChanged(projectModel);            
+            projectViews.get(i).projectModelChanged(projectModel);
             projectViews.get(i).dataSourcesLoaded();
         }
     }
@@ -288,7 +304,7 @@ public class ProjectController implements SafeListListener {
             treeListenersList.add(treeListeners[i]);
             projectModel.navigatorTreeModel.removeTreeModelListener(treeListeners[i]);
         }
-        
+
         projectModel.saveProject(projectModel.getProjectPath().resolve(Paths.get("project.data")).toFile());
 
         // re-add the listeners, this is only necessary if the application stays open

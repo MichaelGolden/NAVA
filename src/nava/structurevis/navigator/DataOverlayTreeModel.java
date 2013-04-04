@@ -26,10 +26,10 @@ import nava.utils.SafeListModel;
  * @author Michael
  */
 public class DataOverlayTreeModel extends DefaultTreeModel implements Serializable, ProjectView, StructureVisView {
-    private static final long serialVersionUID = -1625375843157333064L;
 
-     DefaultMutableTreeNode oneDimensionalData = null;
-     DefaultMutableTreeNode twoDimensionalData = null;
+    private static final long serialVersionUID = -1625375843157333064L;
+    DefaultMutableTreeNode oneDimensionalData = null;
+    DefaultMutableTreeNode twoDimensionalData = null;
     DefaultMutableTreeNode nucleotideData = null;
     DefaultMutableTreeNode structureData = null;
     StructureVisModel structureVisModel;
@@ -37,15 +37,14 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
     public DataOverlayTreeModel(DefaultMutableTreeNode root, StructureVisController structureVisController) {
         super(root);
         this.structureVisModel = structureVisController.structureVisModel;
-        
-        setup();        
+
+        setup();
     }
-    
-    public void setup()
-    {
-        DefaultMutableTreeNode root = (DefaultMutableTreeNode)this.getRoot();
+
+    public void setup() {
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode) this.getRoot();
         root.removeAllChildren();
-        
+
         oneDimensionalData = DataOverlayTreeNode.createFolderNode("1D overlays");
         root.add(oneDimensionalData);
 
@@ -73,13 +72,13 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
     }
 
     /*
-    public void addListDataListeners() {
-        structureVisController.structureVisDataOverlays1D.addListDataListener(this);
-        structureVisController.structureVisDataOverlays2D.addListDataListener(this);
-        structureVisController.nucleotideSources.addListDataListener(this);
-        structureVisController.structureSources.addListDataListener(this);
-    }*/
-
+     * public void addListDataListeners() {
+     * structureVisController.structureVisDataOverlays1D.addListDataListener(this);
+     * structureVisController.structureVisDataOverlays2D.addListDataListener(this);
+     * structureVisController.nucleotideSources.addListDataListener(this);
+     * structureVisController.structureSources.addListDataListener(this);
+    }
+     */
     public DataOverlayTreeNode findNode(Overlay overlay) {
         Enumeration<DefaultMutableTreeNode> en = ((DefaultMutableTreeNode) getRoot()).breadthFirstEnumeration();
         while (en.hasMoreElements()) {
@@ -136,7 +135,7 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
 
     @Override
     public void dataSourcesLoaded() {
-         System.out.println("Datasources loaded");
+        System.out.println("Datasources loaded");
         setup();
     }
 
@@ -162,25 +161,19 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
     }
 
     /*
-    @Override
-    public void intervalAdded(ListDataEvent e) {
-        System.out.println("StructureVis source added");
-        for (int i = e.getIndex0(); i < e.getIndex1() + 1; i++) {
-            addDataOverlay(((SafeListModel<Overlay>) e.getSource()).get(i));
-        }
+     * @Override public void intervalAdded(ListDataEvent e) {
+     * System.out.println("StructureVis source added"); for (int i =
+     * e.getIndex0(); i < e.getIndex1() + 1; i++) {
+     * addDataOverlay(((SafeListModel<Overlay>) e.getSource()).get(i)); } }
+     *
+     * @Override public void intervalRemoved(ListDataEvent e) { }
+     *
+     * @Override public void contentsChanged(ListDataEvent e) {
     }
-
-    @Override
-    public void intervalRemoved(ListDataEvent e) {
-    }
-
-    @Override
-    public void contentsChanged(ListDataEvent e) {
-    }*/
-
+     */
     @Override
     public void dataOverlayAdded(Overlay overlay) {
-        System.out.println("dataOverlayAdded"+overlay);
+        System.out.println("dataOverlayAdded" + overlay);
         addDataOverlay(overlay);
     }
 
@@ -193,16 +186,15 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
     public void dataOverlayChanged(Overlay oldOverlay, Overlay newOverlay) {
         DataOverlayTreeNode node = this.findNode(oldOverlay);
         node.overlay = newOverlay;
-        DataOverlayTreeNode parent = (DataOverlayTreeNode)node.getParent();
-        int [] indices = { parent.getIndex(node)};
-        Object [] children = {node};
-        if(oldOverlay.getState() == Overlay.OverlayState.PRIMARY_SELECTED)
-        {
+        DataOverlayTreeNode parent = (DataOverlayTreeNode) node.getParent();
+        int[] indices = {parent.getIndex(node)};
+        Object[] children = {node};
+        if (oldOverlay.getState() == Overlay.OverlayState.PRIMARY_SELECTED) {
             structureVisModel.substructureModel.setAsPrimaryOverlay(newOverlay);
         }
         this.fireTreeNodesChanged(this, parent.getPath(), indices, children);
     }
-    
+
     @Override
     public void projectModelChanged(ProjectModel newProjectModel) {
     }
@@ -210,6 +202,6 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
     @Override
     public void structureVisModelChanged(StructureVisModel newStructureVisModel) {
         this.structureVisModel = newStructureVisModel;
-        
+
     }
 }

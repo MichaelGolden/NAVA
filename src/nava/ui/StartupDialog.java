@@ -237,34 +237,34 @@ public class StartupDialog extends javax.swing.JDialog {
     public static ArrayList<String> recentFiles = new ArrayList<>();
 
     public static void addProjectFileToRecentProjects(File inFile) {
-        recentFiles.clear();
-        String filePath = (inFile.isDirectory() ? inFile : inFile.getParentFile()).getAbsolutePath();
+        if (inFile.exists()) {
+            recentFiles.clear();
+            String filePath = (inFile.isDirectory() ? inFile : inFile.getParentFile()).getAbsolutePath();
 
-        for (int i = 0; i < 5; i++) {
-            String recentFile = StartupDialog.prefs.get("recentfile" + i, null);
-            if (recentFile != null && !recentFiles.contains(recentFile)) {
-                recentFiles.add(recentFile);
+            for (int i = 0; i < 5; i++) {
+                String recentFile = StartupDialog.prefs.get("recentfile" + i, null);
+                if (recentFile != null && !recentFiles.contains(recentFile)) {
+                    recentFiles.add(recentFile);
+                }
+            }
+            recentFiles.add(0, filePath);
+
+            for (int i = 1; i < recentFiles.size(); i++) {
+                if (filePath.equals(recentFiles.get(i))) {
+                    recentFiles.remove(i);
+                }
+            }
+
+            while (recentFiles.size() > 5) {
+                recentFiles.remove(5);
+            }
+
+            if (StartupDialog.prefs != null) {
+                for (int i = 0; i < recentFiles.size(); i++) {
+                    StartupDialog.prefs.put("recentfile" + i, recentFiles.get(i));
+                }
             }
         }
-        recentFiles.add(0, filePath);
-
-        for (int i = 1; i < recentFiles.size(); i++) {
-            if (filePath.equals(recentFiles.get(i))) {
-                recentFiles.remove(i);
-            }
-        }
-
-        while (recentFiles.size() > 5) {
-            recentFiles.remove(5);
-        }
-
-        if (StartupDialog.prefs != null) {
-            for (int i = 0; i < recentFiles.size(); i++) {
-                StartupDialog.prefs.put("recentfile" + i, recentFiles.get(i));
-            }
-        }
-
-        System.out.println(recentFiles);
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;

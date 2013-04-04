@@ -59,7 +59,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         legendPanel.add(dataLegend1D);
         legendPanel.add(dataLegend2D);
 
-
+        distanceSlider.addChangeListener(this);
         //populateStructureComboBox(Collections.list(projectController.projectModel.dataSources.elements()));
     }
 
@@ -108,7 +108,10 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         structureComboBox = new javax.swing.JComboBox();
         jLabel2 = new javax.swing.JLabel();
         substructureComboBox = new javax.swing.JComboBox();
-        jButton1 = new javax.swing.JButton();
+        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(15, 0), new java.awt.Dimension(15, 0), new java.awt.Dimension(15, 32767));
+        jLabel3 = new javax.swing.JLabel();
+        distanceSlider = new javax.swing.JSlider();
+        distanceLabel = new javax.swing.JLabel();
 
         jSplitPane1.setDividerLocation(150);
 
@@ -144,7 +147,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jButton2)
-                .addContainerGap())
+                .addGap(10, 10, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(treePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -172,20 +175,23 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
 
         substructureComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jPanel2.add(substructureComboBox);
+        jPanel2.add(filler1);
 
-        jButton1.setText("Add structure");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-        jPanel2.add(jButton1);
+        jLabel3.setText("Limit nearby 2D interactions");
+        jPanel2.add(jLabel3);
+
+        distanceSlider.setPaintLabels(true);
+        distanceSlider.setValue(100);
+        jPanel2.add(distanceSlider);
+
+        distanceLabel.setText("No limit");
+        jPanel2.add(distanceLabel);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 618, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 703, Short.MAX_VALUE)
             .addComponent(jSplitPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
@@ -197,22 +203,18 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        StructureOverlayDialog d = new StructureOverlayDialog(null, true, projectController.projectModel, structureVisController);
-        d.setSize(640, 580);
-        d.setEditMode(null);
-        d.setVisible(true);
-    }//GEN-LAST:event_jButton1ActionPerformed
-
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         AddDataOverlayDialog dialog = new AddDataOverlayDialog(null, true, projectController, structureVisController);
         dialog.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JLabel distanceLabel;
+    private javax.swing.JSlider distanceSlider;
+    private javax.swing.Box.Filler filler1;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel4;
@@ -226,6 +228,8 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
 
     @Override
     public void itemStateChanged(ItemEvent e) {
+
+        System.out.println(e.getSource());
         if (e.getSource().equals(structureComboBox)) {
             StructureOverlay structureSource = (StructureOverlay) structureComboBox.getSelectedItem();
 
@@ -281,7 +285,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
             dataLegend1D.setVisible(false);
         } else {
             dataLegend1D.setVisible(true);
-            dataLegend1D.setLegend(dataSource1D.title, dataSource1D.dataTransform, dataSource1D.colorGradient, dataSource1D.defaultColorGradient, dataSource1D.useLowerThreshold, dataSource1D.useUpperThreshold, dataSource1D.thresholdMin, dataSource1D.thresholdMax, dataSource1D);
+            dataLegend1D.setLegend(dataSource1D.title, dataSource1D.dataTransform, dataSource1D.colorGradient, dataSource1D.defaultColorGradient, dataSource1D.useLowerThreshold, dataSource1D.useUpperThreshold, dataSource1D.thresholdMinPerc, dataSource1D.thresholdMaxPerc, dataSource1D);
         }
         structureDrawPanel.redraw();
     }
@@ -292,7 +296,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
             dataLegend2D.setVisible(false);
         } else {
             dataLegend2D.setVisible(true);
-            dataLegend2D.setLegend(dataSource2D.title, dataSource2D.dataTransform, dataSource2D.colorGradient, dataSource2D.defaultColorGradient, dataSource2D.useLowerThreshold, dataSource2D.useUpperThreshold, dataSource2D.thresholdMin, dataSource2D.thresholdMax, dataSource2D);
+            dataLegend2D.setLegend(dataSource2D.title, dataSource2D.dataTransform, dataSource2D.colorGradient, dataSource2D.defaultColorGradient, dataSource2D.useLowerThreshold, dataSource2D.useUpperThreshold, dataSource2D.thresholdMinPerc, dataSource2D.thresholdMaxPerc, dataSource2D);
         }
 
         structureDrawPanel.redraw();
@@ -316,12 +320,12 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         structureDrawPanel.redraw();
         DataOverlay1D dataOverlay1D = structureVisController.structureVisModel.substructureModel.data1D;
         if (dataOverlay1D != null) {
-            this.dataLegend1D.setLegend(dataOverlay1D.title, dataOverlay1D.dataTransform, dataOverlay1D.colorGradient, dataOverlay1D.defaultColorGradient, dataOverlay1D.useLowerThreshold, dataOverlay1D.useUpperThreshold, dataOverlay1D.thresholdMin, dataOverlay1D.thresholdMax, dataOverlay1D);
+            this.dataLegend1D.setLegend(dataOverlay1D.title, dataOverlay1D.dataTransform, dataOverlay1D.colorGradient, dataOverlay1D.defaultColorGradient, dataOverlay1D.useLowerThreshold, dataOverlay1D.useUpperThreshold, dataOverlay1D.thresholdMinPerc, dataOverlay1D.thresholdMaxPerc, dataOverlay1D);
         }
 
         DataOverlay2D dataOverlay2D = structureVisController.structureVisModel.substructureModel.data2D;
         if (dataOverlay2D != null) {
-            this.dataLegend1D.setLegend(dataOverlay2D.title, dataOverlay2D.dataTransform, dataOverlay2D.colorGradient, dataOverlay2D.defaultColorGradient, dataOverlay2D.useLowerThreshold, dataOverlay2D.useUpperThreshold, dataOverlay2D.thresholdMin, dataOverlay2D.thresholdMax, dataOverlay2D);
+            this.dataLegend1D.setLegend(dataOverlay2D.title, dataOverlay2D.dataTransform, dataOverlay2D.colorGradient, dataOverlay2D.defaultColorGradient, dataOverlay2D.useLowerThreshold, dataOverlay2D.useUpperThreshold, dataOverlay2D.thresholdMinPerc, dataOverlay2D.thresholdMaxPerc, dataOverlay2D);
         }
     }
 
@@ -335,9 +339,28 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         structureDrawPanel.redraw();
     }
 
+    public void setDistanceLimit(int value) {
+        if(!(distanceSlider.getValue() == value || value == -1 && distanceSlider.getValue() == distanceSlider.getMaximum()))
+        {
+             distanceSlider.setValue(value == -1 ? distanceSlider.getMaximum() : value);
+        }
+        
+        if (value == distanceSlider.getMaximum() || value == -1) {
+            structureVisController.structureVisModel.substructureModel.maxDistance = -1;
+            distanceLabel.setText("No limit");
+        } else {
+            structureVisController.structureVisModel.substructureModel.maxDistance = value;
+            distanceLabel.setText(value + "");
+            structureDrawPanel.redraw();
+        }
+    }
+
     @Override
     public void stateChanged(ChangeEvent e) {
-        structureDrawPanel.redraw();
+        if (e.getSource().equals(distanceSlider)) {
+            setDistanceLimit(distanceSlider.getValue());
+        }
+        this.structureDrawPanel.redraw();
     }
 
     @Override
@@ -361,6 +384,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         structureVisController.structureVisModel = newStructureVisModel;
         structureDrawPanel.setModel(newStructureVisModel.substructureModel);
         structureVisController.structureVisModel.substructureModel.addSubstructureModelListener(this);
+        setDistanceLimit(structureVisController.structureVisModel.substructureModel.maxDistance);
         refresh();
     }
 }

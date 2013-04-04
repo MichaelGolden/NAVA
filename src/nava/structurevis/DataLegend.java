@@ -699,8 +699,10 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
         if (overlay != null) {
             overlay.useUpperThreshold = !this.downSliderOpen;
             overlay.useLowerThreshold = !this.upSliderOpen;
-            overlay.thresholdMin = (1 - upSliderPercentY);
-            overlay.thresholdMax = (1 - downSliderPercentY);
+            overlay.thresholdMinPerc = (1 - upSliderPercentY);
+            overlay.thresholdMaxPerc = (1 - downSliderPercentY);
+            overlay.thresholdMin = transform.inverseTransform(overlay.thresholdMinPerc);
+            overlay.thresholdMax = transform.inverseTransform(overlay.thresholdMaxPerc);
 
             /*
              * this.downSliderOpen = !useUpperThreshold; this.upSliderOpen =
@@ -806,8 +808,8 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
             double min = transform.transform(transform.min);
             double max = transform.transform(transform.max);
 
-            thresholdMax = transform.inverseTransform(min + (1 - downSliderPercentY) * (max - min));
-            thresholdMin = transform.inverseTransform(min + (1 - upSliderPercentY) * (max - min));
+            thresholdMax = transform.inverseTransform(min + (downSliderPercentY) * (max - min));
+            thresholdMin = transform.inverseTransform(min + (upSliderPercentY) * (max - min));
         }
     }
 

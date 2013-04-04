@@ -269,6 +269,11 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
 
     public void redraw() {
         repaint = true;
+        if(subtructureModel.data2D != null)
+        {
+            System.out.println("changed "+!subtructureModel.data2D.useLowerThreshold+"\t"+subtructureModel.data2D.thresholdMin+"\t"+!subtructureModel.data2D.useUpperThreshold+"\t"+subtructureModel.data2D.thresholdMax);
+        }
+        //((!subtructureModel.data2D.useLowerThreshold || p >= subtructureModel.data2D.thresholdMin) && (!subtructureModel.data2D.useUpperThreshold || p <= subtructureModel.data2D.thresholdMax))
         repaint();
     }
     double horizontalScale = 2.6;

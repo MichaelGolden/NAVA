@@ -141,7 +141,7 @@ public class PersistentSparseMatrix implements Serializable {
         return emptyValue;
     }
 
-    public CachedLine getCachedLineForPosition(int i, int j) throws IOException {
+    public synchronized CachedLine getCachedLineForPosition(int i, int j) throws IOException {
         CachedLineKey cachedLineKey = new CachedLineKey(i, j / cacheLineSize);
         //System.out.println("cachedlined" + i + "\t" + (j / cacheLineSize));
         CachedLine cachedLine = lineCache.get(cachedLineKey);

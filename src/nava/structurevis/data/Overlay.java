@@ -25,8 +25,10 @@ public abstract class Overlay implements Serializable {
     // only applies to 1D and 2D data overlays
     public boolean useLowerThreshold = true;
     public boolean useUpperThreshold = true;
+    public double thresholdMinPerc = 0;
+    public double thresholdMaxPerc = 1;
     public double thresholdMin = 0;
-    public double thresholdMax = 1;
+    public double thresholdMax = 0;
 
     public OverlayState getState() {
         return state;

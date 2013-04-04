@@ -187,12 +187,12 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
 
         jMenu2.setText("Open recently used");
         jMenu2.addMenuListener(new javax.swing.event.MenuListener() {
+            public void menuDeselected(javax.swing.event.MenuEvent evt) {
+            }
             public void menuCanceled(javax.swing.event.MenuEvent evt) {
             }
             public void menuSelected(javax.swing.event.MenuEvent evt) {
                 jMenu2MenuSelected(evt);
-            }
-            public void menuDeselected(javax.swing.event.MenuEvent evt) {
             }
         });
         jMenu2.addActionListener(new java.awt.event.ActionListener() {

@@ -18,8 +18,8 @@ import nava.utils.Mapping;
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
 public class DataOverlay2D extends Overlay implements Serializable {
-    private static final long serialVersionUID = 923970269971431138L;
 
+    private static final long serialVersionUID = 923970269971431138L;
     public ColorGradient defaultColorGradient;
     public ColorGradient colorGradient;
     public DataTransform dataTransform;
@@ -37,20 +37,21 @@ public class DataOverlay2D extends Overlay implements Serializable {
     public transient String[] data2;
     public transient boolean[] used;
     public double emptyValue;
-    
-    
-    public static enum MatrixRegion{FULL, UPPER_TRIANGLE, LOWER_TRIANGLE};
+
+    public static enum MatrixRegion {
+
+        FULL, UPPER_TRIANGLE, LOWER_TRIANGLE
+    };
     MatrixRegion matrixRegion = MatrixRegion.FULL;
-    
+
     public void loadData() {
-        dataMatrix = matrix.getObject(ProjectModel.path,MainFrame.dataSourceCache);
-        if(dataMatrix != null)
-        {
+        dataMatrix = matrix.getObject(ProjectModel.path, MainFrame.dataSourceCache);
+        if (dataMatrix != null) {
             emptyValue = dataMatrix.getEmptyValue();
         }
     }
 
-    public static DataOverlay2D getDataOverlay2D(Matrix matrix, String title,boolean naturalPositions, int dataOffset, boolean codonPositions, double min, double max, boolean excludeValuesOutOfRange, DataTransform dataTransform, ColorGradient colorGradient, MappingSource mappingSource, MatrixRegion matrixRegion) {
+    public static DataOverlay2D getDataOverlay2D(Matrix matrix, String title, boolean naturalPositions, int dataOffset, boolean codonPositions, double min, double max, boolean excludeValuesOutOfRange, DataTransform dataTransform, ColorGradient colorGradient, MappingSource mappingSource, MatrixRegion matrixRegion) {
         DataOverlay2D dataOverlay = new DataOverlay2D();
         dataOverlay.matrix = matrix;
         dataOverlay.title = title;
@@ -60,6 +61,8 @@ public class DataOverlay2D extends Overlay implements Serializable {
         dataOverlay.codonPositions = codonPositions;
         dataOverlay.minValue = min;
         dataOverlay.maxValue = max;
+        dataOverlay.thresholdMin = min;
+        dataOverlay.thresholdMax = max;
         dataOverlay.excludeValuesOutOfRange = excludeValuesOutOfRange;
         dataOverlay.dataTransform = dataTransform;
         dataOverlay.colorGradient = colorGradient;
@@ -70,56 +73,43 @@ public class DataOverlay2D extends Overlay implements Serializable {
 
         return dataOverlay;
     }
-    
-    public double get(int i, int j, Mapping mapping)
-    {
-        int x = i-dataOffset;
-        int y = j-dataOffset;
-        if(codonPositions)
-        {
-           x = x/3;
-           y = y/3;
+
+    public double get(int i, int j, Mapping mapping) {
+        int x = i - dataOffset;
+        int y = j - dataOffset;
+        if (codonPositions) {
+            x = x / 3;
+            y = y / 3;
         }
-        if(mapping != null)
-        { 
-            x = mapping.aToB(i-dataOffset);
-            y = mapping.aToB(j-dataOffset);
+        if (mapping != null) {
+            x = mapping.aToB(i - dataOffset);
+            y = mapping.aToB(j - dataOffset);
         }
-        try
-        {
-            switch(matrixRegion)
-            {
+        try {
+            switch (matrixRegion) {
                 case FULL:
                     return dataMatrix.getValue(x, y);
                 case UPPER_TRIANGLE:
-                    if(x <= y)
-                    {
+                    if (x <= y) {
                         return dataMatrix.getValue(x, y);
-                    }
-                    else
-                    {
+                    } else {
                         return emptyValue;
                     }
                 case LOWER_TRIANGLE:
-                    if(x >= y)
-                    {
+                    if (x >= y) {
                         return dataMatrix.getValue(x, y);
-                    }
-                    else
-                    {
+                    } else {
                         return emptyValue;
                     }
                 default:
                     return emptyValue;
             }
-        }
-        catch(Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
             return emptyValue;
         }
     }
-    
+
     @Override
     public Icon getIcon() {
         return new ImageIcon(ClassLoader.getSystemResource("resources/icons/matrix-16x16.png"));

@@ -178,6 +178,8 @@ public class DataOverlay1D extends Overlay implements Serializable {
         dataOverlay.codonPositions = codonPositions;
         dataOverlay.minValue = min;
         dataOverlay.maxValue = max;
+        dataOverlay.thresholdMin = min;
+        dataOverlay.thresholdMax= max;
         dataOverlay.excludeValuesOutOfRange = excludeValuesOutOfRange;
         dataOverlay.dataTransform = dataTransform;
         dataOverlay.colorGradient = colorGradient;

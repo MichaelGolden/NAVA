@@ -264,7 +264,7 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
         this.missingDataRadioButton.setSelected(dataSource2D.excludeValuesOutOfRange);
         this.clampedRadioButton.setSelected(!dataSource2D.excludeValuesOutOfRange);
         this.transformComboBoxModel.setSelectedItem(dataSource2D.dataTransform.type);
-        this.dataLegend.setLegend(dataSource2D.title, dataSource2D.dataTransform, dataSource2D.colorGradient, dataSource2D.defaultColorGradient, dataSource2D.useLowerThreshold, dataSource2D.useUpperThreshold, dataSource2D.thresholdMin, dataSource2D.thresholdMax, dataSource2D);
+        this.dataLegend.setLegend(dataSource2D.title, dataSource2D.dataTransform, dataSource2D.colorGradient, dataSource2D.defaultColorGradient, dataSource2D.useLowerThreshold, dataSource2D.useUpperThreshold, dataSource2D.thresholdMinPerc, dataSource2D.thresholdMaxPerc, dataSource2D);
         this.mappingSourceComboBoxModel.setSelectedItem(dataSource2D.mappingSource.alignmentSource);
 
     }

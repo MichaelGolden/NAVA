@@ -4,16 +4,27 @@
  */
 package nava.ui.navigator;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.List;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.*;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
+import nava.ui.MainFrame;
 import nava.ui.ProjectController;
 import nava.ui.ProjectModel;
 import nava.ui.ProjectView;
@@ -22,9 +33,12 @@ import nava.ui.ProjectView;
  *
  * @author Michael
  */
-public class NavigatorPanel extends javax.swing.JPanel implements TreeSelectionListener, TreeModelListener, ProjectView {
+public class NavigatorPanel extends javax.swing.JPanel implements ActionListener, TreeSelectionListener, TreeModelListener, ProjectView {
 
+    public static final ImageIcon addIcon = new ImageIcon(ClassLoader.getSystemResource("resources/icons/add-16x16.png"));
+    JButton importButton = new JButton("Import file", addIcon);
     ProjectController projectController;
+    JFileChooser importFileChooser = new JFileChooser();
 
     /**
      * Creates new form NavigatorPanel
@@ -67,7 +81,24 @@ public class NavigatorPanel extends javax.swing.JPanel implements TreeSelectionL
             }
         });
 
-
+        
+        JTextArea textArea = new JTextArea("Drop and drag a file into the area above to import or click 'Import file'.");
+        textArea.setFont(textArea.getFont().deriveFont(Font.ITALIC));
+        textArea.setLineWrap(true);
+        textArea.setEditable(false);
+        textArea.setBorder(new EmptyBorder(1,4,3,3));
+        textArea.setOpaque(false);
+        textArea.setBackground(new Color(0,0,0,0));
+        textArea.setWrapStyleWord(true);
+        this.addDataSourcePanel.add(textArea, BorderLayout.CENTER);
+        
+        importButton.addActionListener(this);
+        importButton.setIconTextGap(8);
+        //importButton.setHorizontalAlignment(SwingConstants.LEFT);
+        this.addDataSourcePanel.add(importButton, BorderLayout.SOUTH);
+        
+        importFileChooser.setApproveButtonText("Import");
+        importFileChooser.setMultiSelectionEnabled(true);
     }
 
     /**
@@ -80,15 +111,25 @@ public class NavigatorPanel extends javax.swing.JPanel implements TreeSelectionL
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
+        jPanel1 = new javax.swing.JPanel();
         navigationTree = new javax.swing.JTree();
+        addDataSourcePanel = new javax.swing.JPanel();
 
         setLayout(new java.awt.BorderLayout());
 
-        jScrollPane1.setViewportView(navigationTree);
+        jPanel1.setLayout(new java.awt.BorderLayout());
+        jPanel1.add(navigationTree, java.awt.BorderLayout.CENTER);
+
+        jScrollPane1.setViewportView(jPanel1);
 
         add(jScrollPane1, java.awt.BorderLayout.CENTER);
+
+        addDataSourcePanel.setLayout(new java.awt.BorderLayout());
+        add(addDataSourcePanel, java.awt.BorderLayout.PAGE_END);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel addDataSourcePanel;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTree navigationTree;
     // End of variables declaration//GEN-END:variables
@@ -135,7 +176,7 @@ public class NavigatorPanel extends javax.swing.JPanel implements TreeSelectionL
 
     @Override
     public void treeNodesInserted(TreeModelEvent e) {
-         navigationTree.expandPath(e.getTreePath().getParentPath());
+        navigationTree.expandPath(e.getTreePath().getParentPath());
     }
 
     @Override
@@ -174,5 +215,16 @@ public class NavigatorPanel extends javax.swing.JPanel implements TreeSelectionL
 
     @Override
     public void dataSourcesContentsChanged(ListDataEvent e) {
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        importFileChooser.setSelectedFile(MainFrame.browseDialog.getCurrentDirectory());                
+        importFileChooser.showOpenDialog(this);
+        File [] files = importFileChooser.getSelectedFiles();
+        for(File file : files)
+        {
+            NavigatorPanel.this.projectController.autoAddDataSourceWithAmbiguityResolution(file);
+        }
     }
 }

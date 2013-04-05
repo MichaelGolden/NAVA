@@ -144,7 +144,7 @@ public class FileImport {
         if (ReadseqTools.isKnownFormat(inFile)) {
             
             DataType dataType = new DataType(DataType.Primary.ALIGNMENT, ReadseqTools.getAlignmentFileFormat(inFile));
-            if(!possibleDataTypes.contains(dataType))
+            if(!possibleDataTypes.contains(dataType) && dataType.fileFormat != FileFormat.UNKNOWN)
             {
                 possibleDataTypes.add(dataType);
             }

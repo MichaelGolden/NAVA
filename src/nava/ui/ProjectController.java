@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.TreeModelListener;
@@ -22,6 +23,7 @@ import nava.data.io.*;
 import nava.data.types.*;
 import nava.structurevis.data.PersistentSparseMatrix;
 import nava.tasks.applications.ApplicationOutput;
+import nava.utils.GraphicsUtils;
 import nava.utils.Pair;
 import nava.utils.SafeListEvent;
 import nava.utils.SafeListListener;
@@ -257,6 +259,29 @@ public class ProjectController implements SafeListListener {
         Path p = Paths.get(id + "." + extension);
 
         return p;
+    }
+
+    public Pair<DataType, DataSource> autoAddDataSourceWithAmbiguityResolution(File dataFile) {
+        ArrayList<DataType> possibleDataTypes = null;
+        if (dataFile.isFile()) {
+            possibleDataTypes = FileImport.getPossibleDataTypes(dataFile);
+        }
+        if (possibleDataTypes != null && possibleDataTypes.size() > 0) {
+            if (possibleDataTypes.size() == 1) {
+                DataSource dataSource = importDataSourceFromFile(dataFile, possibleDataTypes.get(0));
+                return new Pair(possibleDataTypes.get(0), dataSource);
+            } else {
+                ResolveImportAmbiguityDialog resolveDialog = new ResolveImportAmbiguityDialog(null, true, dataFile, possibleDataTypes);
+                resolveDialog.setIconImage(new ImageIcon(ClassLoader.getSystemResource("resources/icons/icon-32x32.png")).getImage());
+                GraphicsUtils.centerWindowOnScreen(resolveDialog);
+                resolveDialog.setVisible(true);
+
+                DataSource dataSource = importDataSourceFromFile(dataFile, resolveDialog.getSelectedDataType());
+                return new Pair(resolveDialog.getSelectedDataType(), dataSource);
+            }
+        }
+
+        return null;
     }
 
     public Pair<DataType, DataSource> autoAddDataSource(File dataFile) {

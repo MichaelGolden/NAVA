@@ -65,6 +65,7 @@ public class SecondaryStructure extends DataSource {
     public void persistObject(String projectDir, Object object) {
         if (object instanceof SecondaryStructureData) {
             SecondaryStructureData structure = (SecondaryStructureData) object;
+            System.out.println(Paths.get(getImportedDataSourcePath(projectDir)).toFile());
             RNAFoldingTools.saveDotBracketFile(Paths.get(getImportedDataSourcePath(projectDir)).toFile(), structure.pairedSites, structure.title, structure.sequence);
         }
     }

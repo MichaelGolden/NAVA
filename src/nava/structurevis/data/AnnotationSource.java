@@ -219,7 +219,7 @@ public class AnnotationSource implements Serializable {
         for (Feature feature : features) {
             Feature mappedFeature = feature.clone();
             if (structureSource != null && structureVisController != null) {
-                Mapping mapping = structureVisController.getMapping(mappedFeature.mappingSource, structureSource.mappingSource);
+                Mapping mapping = structureVisController.getMapping(structureSource.mappingSource, mappedFeature.mappingSource);
 
                 if (mapping != null) {                   
                     annotationSource.mappedSequenceLength = Math.max(annotationSource.mappedSequenceLength, mapping.getBLength());

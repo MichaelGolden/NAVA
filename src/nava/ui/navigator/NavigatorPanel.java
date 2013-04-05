@@ -56,7 +56,7 @@ public class NavigatorPanel extends javax.swing.JPanel implements TreeSelectionL
                     evt.acceptDrop(DnDConstants.ACTION_COPY);
                     List<File> droppedFiles = (List<File>) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
                     for (int i = 0; i < droppedFiles.size(); i++) {
-                        NavigatorPanel.this.projectController.autoAddDataSource(droppedFiles.get(i));
+                        NavigatorPanel.this.projectController.autoAddDataSourceWithAmbiguityResolution(droppedFiles.get(i));
                         if (droppedFiles.get(i).isDirectory()) {
                             System.err.println("TODO this file is a folder. How should we handle this?");
                         }

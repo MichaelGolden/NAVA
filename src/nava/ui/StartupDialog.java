@@ -26,6 +26,8 @@ public class StartupDialog extends javax.swing.JDialog {
 
     public static Preferences prefs = null;
     DefaultComboBoxModel<Object> recentFilesModel = new DefaultComboBoxModel<>();
+    
+    
 
     public enum Startup {
 
@@ -41,7 +43,6 @@ public class StartupDialog extends javax.swing.JDialog {
         initComponents();
 
         prefs = Preferences.userRoot().node(this.getClass().getName());
-
         recentFilesModel.removeAllElements();
         recentFilesModel.addElement("Select a recently used project");
         for (int i = 0;; i++) {
@@ -274,11 +275,14 @@ public class StartupDialog extends javax.swing.JDialog {
 }
 
 class ComboBoxRenderer extends JLabel implements ListCellRenderer {
+    
+    public static final ImageIcon recentIcon = new ImageIcon(ClassLoader.getSystemResource("resources/icons/recent-project-icon-32x32.png"));
+    public static final ImageIcon centeredIcon = new ImageIcon(ClassLoader.getSystemResource("resources/icons/centered-icon-32x32.png"));
 
     public ComboBoxRenderer() {
         setOpaque(true);
         //this.set
-        setBorder(new EmptyBorder(2, 5, 2, 2));
+        setBorder(new EmptyBorder(2, 13, 2, 2));
         //this.setHorizontalTextPosition(SwingConstants.RIGHT);
         setHorizontalAlignment(LEFT);
         //s/etVerticalAlignment(CENTER);
@@ -307,12 +311,16 @@ class ComboBoxRenderer extends JLabel implements ListCellRenderer {
             setBackground(list.getBackground());
             setForeground(list.getForeground());
         }
-        if (value instanceof File) {
+        if (value instanceof File) {            
+            setIcon(centeredIcon);            
+            this.setIconTextGap(10);
             File file = ((File) value);
             file = file.isDirectory() ? file : file.getParentFile();
-            setText(file.getName());
+            setText(file.getName());            
             tooltip = file.getAbsolutePath();
         } else {
+            setIcon(recentIcon);
+            this.setIconTextGap(10);
             tooltip = value.toString();
             setText(value.toString());
         }

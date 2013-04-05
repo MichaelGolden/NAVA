@@ -13,6 +13,7 @@ import java.util.Arrays;
  * @author Michael Golden
  */
 public class ColorGradient implements Serializable {
+    private static final long serialVersionUID = -4783214134588393209L;
 
     public Color[] colours;
     public float[] positions;
@@ -156,6 +157,12 @@ public class ColorGradient implements Serializable {
     public ColorGradient clone ()
     {
         return new ColorGradient(Arrays.copyOf(colours, colours.length), Arrays.copyOf(positions, positions.length));
+    }
+    
+    public void setColorGradientTo(ColorGradient colorGradient)
+    {
+        this.colours = Arrays.copyOf(colorGradient.colours, colorGradient.colours.length);
+        this.positions = Arrays.copyOf(colorGradient.positions, colorGradient.positions.length);
     }
 
     public static void main(String[] args) {

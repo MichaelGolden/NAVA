@@ -115,7 +115,19 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
                 projectController.openProject(ProjectModel.loadProject(projectFile));
                 StartupDialog.addProjectFileToRecentProjects(projectFile);
                 File structureVisModelFile = new File(projectDirectory.getAbsolutePath() + File.separatorChar + "structurevis.model");
-                structureVisPanel.structureVisController.openStructureVisModel(StructureVisModel.loadProject(structureVisModelFile, structureVisPanel.structureVisController));
+                if (structureVisModelFile.exists()) {
+                    structureVisPanel.structureVisController.openStructureVisModel(StructureVisModel.loadProject(structureVisModelFile, structureVisPanel.structureVisController));
+                } else {
+                    StructureVisModel model = new StructureVisModel();                                    
+                    model.initialise(structureVisPanel.structureVisController);
+                    structureVisPanel.structureVisController.openStructureVisModel(model);    
+                }
+            } else {
+                projectController.openProject(new ProjectModel(projectDirectory.getAbsolutePath()));
+                StructureVisModel model = new StructureVisModel();
+                model.initialise(structureVisPanel.structureVisController);
+                structureVisPanel.structureVisController.openStructureVisModel(model);
+
             }
         } catch (IOException ex) {
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);

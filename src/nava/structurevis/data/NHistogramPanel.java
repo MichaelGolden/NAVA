@@ -26,8 +26,8 @@ public class NHistogramPanel extends JPanel implements MouseMotionListener {
 
     NHistogram histogram;
     double horizontalSpacing = 4;
-    double rightBorder = 70;
-    double leftBorder = rightBorder;
+    //double rightBorder = 0;
+    double leftBorder = 70;
     double bottomBorder = 15;
     double topBorder = bottomBorder;
     public static Font titleFont = new Font("Arial", Font.BOLD, 12);
@@ -126,6 +126,8 @@ public class NHistogramPanel extends JPanel implements MouseMotionListener {
                     g.fill(rect);
                 }
             }
+            
+            // draw legends
             for (int j = 0; j < histogram.classes.size(); j++) {
                 NHistogramClass hist = histogram.classes.get(j);
                 g.setColor(hist.transparentColor);
@@ -176,9 +178,11 @@ public class NHistogramPanel extends JPanel implements MouseMotionListener {
             GraphicsUtils.drawStringVerticallyCentred(g, leftBorder - 20 - g.getFontMetrics().stringWidth(df.format(maxPerc / 2 * 100) + "%"), topBorder + graphHeight / 2, df.format(maxPerc / 2 * 100) + "%");
             GraphicsUtils.drawStringVerticallyCentred(g, leftBorder - 20 - g.getFontMetrics().stringWidth("0%"), topBorder + graphHeight, "0%");
 
+            // draw graph borders
             g.draw(new Line2D.Double(leftBorder, height - bottomBorder, leftBorder + graphWidth, height - bottomBorder));
             g.draw(new Line2D.Double(leftBorder, topBorder, leftBorder, height - bottomBorder));
 
+            // draw medians
             float dash[] = {2.0f};
             for (int j = 0; j < histogram.classes.size(); j++) {
                 g.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash, (float) j / (float) histogram.classes.size() * 2.0f));

@@ -35,6 +35,7 @@ public class StructureVisModel implements Serializable {
     Hashtable<Pair<MappingSource, MappingSource>, Mapping> mappings = new Hashtable<>(); // data mapping source, structure mapping source
     //public File structureVisModelFile = null;
 
+
     public void saveStructureVisModel(File outFile) {
         ArrayList<TreeModelListener> treeListenersList = new ArrayList<>();
         TreeModelListener[] overlayTreeListeners = overlayNavigatorTreeModel.getTreeModelListeners();
@@ -72,10 +73,14 @@ public class StructureVisModel implements Serializable {
     }
 
     public void initialise(StructureVisController structureVisController) {
-        substructureModel.initialise(structureVisController);
+        if(substructureModel == null)
+        {
+            substructureModel = new SubstructureModel(structureVisController);
+        }
         if (overlayNavigatorTreeModel == null) {
             overlayNavigatorTreeModel = new DataOverlayTreeModel(new DefaultMutableTreeNode(), structureVisController);
-        }
+        }        
+        substructureModel.initialise(structureVisController);
         structureVisController.addView(overlayNavigatorTreeModel);
         structureVisDataOverlays1D.addSafeListListener(structureVisController);
         structureVisDataOverlays2D.addSafeListListener(structureVisController);

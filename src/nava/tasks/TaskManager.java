@@ -135,16 +135,11 @@ public class TaskManager extends Thread {
      * uiTaskQueue.add(task); task.setStatus(Status.QUEUED); task.queueTime =
      * System.currentTimeMillis(); } }
      */
-    long iter = 0;
 
     @Override
     public void run() {
         while (true) {
             availableSlots = totalSlots - usedSlots;
-            if (iter % 100 == 0) {
-                System.out.println("Tmanager\t" + availableSlots + "\t" + usedSlots + "\t" + generalTaskQueue.size() + "\t" + deferrableTaskQueue + "\t" + runQueue.size());
-            }
-            iter++;
             /*
              * if (availableSlots > 0 && uiTaskQueue.size() > 0) { UITask task =
              * uiTaskQueue.removeFirst(); runTask(task);
@@ -164,12 +159,10 @@ public class TaskManager extends Thread {
             }
 
             if (availableSlots > 0 && generalTaskQueue.size() > 0) {
-                System.out.println("Running general task");
                 Task task = generalTaskQueue.removeFirst();
                 runTask(task);
             } else if (availableSlots > 0 && deferrableTaskQueue.size() > 0) {
                 Task task = deferrableTaskQueue.removeFirst();
-                System.out.println("Running deferable task");
                 runTask(task);
             }
 
@@ -192,7 +185,6 @@ public class TaskManager extends Thread {
 
     public void fireTaskStatusChanged(Task task, Status oldStatus, Status newStatus) {
         if (newStatus == Status.FINISHED || newStatus == Status.STOPPED) {
-            System.out.println("dequeuing task "+ task);
             dequeTask(task);
             
         }

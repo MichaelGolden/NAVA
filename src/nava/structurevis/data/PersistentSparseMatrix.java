@@ -588,10 +588,13 @@ public class PersistentSparseMatrix implements Serializable {
 
     public void saveAsCoordinateListMatrix(File outFile) throws IOException {
         BufferedWriter buffer = new BufferedWriter(new FileWriter(outFile));
-        Iterator<Element> it = iterator();
+        Iterator<Element> it = this.iterator();
         while (it.hasNext()) {
             Element e = it.next();
-            buffer.write(e.i + "," + e.j + "," + e.value + "\n");
+            if(e.value != this.emptyValue)
+            {
+                buffer.write(e.i + "," + e.j + "," + e.value + "\n");
+            }
         }
         buffer.close();
     }

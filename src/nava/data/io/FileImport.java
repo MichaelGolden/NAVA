@@ -123,7 +123,7 @@ public class FileImport {
         }
 
         if (ReadseqTools.isInFastaFormat(inFile)) {
-            possibleDataTypes.add(new DataType(DataType.Primary.ALIGNMENT, DataType.FileFormat.UNKNOWN));
+            possibleDataTypes.add(new DataType(DataType.Primary.ALIGNMENT, DataType.FileFormat.FASTA));
         }
 
         if (CsvReader.isCsvFormat(inFile)) {
@@ -142,7 +142,12 @@ public class FileImport {
         }
 
         if (ReadseqTools.isKnownFormat(inFile)) {
-            possibleDataTypes.add(new DataType(DataType.Primary.ALIGNMENT, DataType.FileFormat.UNKNOWN));
+            
+            DataType dataType = new DataType(DataType.Primary.ALIGNMENT, ReadseqTools.getAlignmentFileFormat(inFile));
+            if(!possibleDataTypes.contains(dataType))
+            {
+                possibleDataTypes.add(dataType);
+            }
         }
 
         System.out.println("Possible datatypes " + possibleDataTypes);

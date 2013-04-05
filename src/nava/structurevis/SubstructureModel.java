@@ -91,7 +91,7 @@ public class SubstructureModel implements Serializable {
         }
         this.data1D = dataSource1D;
         if (data1D != null && data1D.mappingSource != null && structureOverlay != null && structureOverlay.mappingSource != null) {
-            mapping1D = structureVisController.getMapping(data1D.mappingSource, structureOverlay.mappingSource);
+            mapping1D = structureVisController.getMapping(structureOverlay.mappingSource, data1D.mappingSource);
         }
 
         // set selection state
@@ -111,7 +111,7 @@ public class SubstructureModel implements Serializable {
         }
         this.data2D = dataSource2D;
         if (data2D != null && data2D.mappingSource != null && structureOverlay != null && structureOverlay.mappingSource != null) {
-            mapping2D = structureVisController.getMapping(data2D.mappingSource, structureOverlay.mappingSource);
+            mapping2D = structureVisController.getMapping(structureOverlay.mappingSource, data2D.mappingSource);
         }
 
         // set selection state
@@ -135,13 +135,13 @@ public class SubstructureModel implements Serializable {
 
             this.sequenceLength = structureOverlay.pairedSites.length;
             if (data1D != null && data1D.mappingSource != null && structureOverlay.mappingSource != null) {
-                mapping1D = structureVisController.getMapping(data1D.mappingSource, structureOverlay.mappingSource);
+                mapping1D = structureVisController.getMapping(structureOverlay.mappingSource, data1D.mappingSource);
             }
             if (data2D != null && data2D.mappingSource != null && structureOverlay.mappingSource != null) {
-                mapping2D = structureVisController.getMapping(data2D.mappingSource, structureOverlay.mappingSource);
+                mapping2D = structureVisController.getMapping(structureOverlay.mappingSource, data2D.mappingSource);
             }
             if (nucleotideSource != null && nucleotideSource.mappingSource != null) {
-                nucleotideMapping = structureVisController.getMapping(nucleotideSource.mappingSource, structureOverlay.mappingSource);
+                nucleotideMapping = structureVisController.getMapping(structureOverlay.mappingSource, nucleotideSource.mappingSource);
             }
         }
 
@@ -158,7 +158,7 @@ public class SubstructureModel implements Serializable {
     public void setNucleotideOverlay(NucleotideComposition nucleotideOverlay) {
         this.nucleotideSource = nucleotideOverlay;
         if (nucleotideOverlay != null && nucleotideOverlay.mappingSource != null && structureOverlay != null) {
-            nucleotideMapping = structureVisController.getMapping(nucleotideOverlay.mappingSource, structureOverlay.mappingSource);
+            nucleotideMapping = structureVisController.getMapping(structureOverlay.mappingSource, nucleotideOverlay.mappingSource);
         }
         for (int i = 0; i < structureVisController.structureVisModel.nucleotideSources.size(); i++) {
             if (structureVisController.structureVisModel.nucleotideSources.get(i).equals(nucleotideOverlay)) {

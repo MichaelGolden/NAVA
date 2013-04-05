@@ -11,6 +11,7 @@ import java.io.Serializable;
  * @author Michael
  */
 public class DataType implements Serializable {
+    private static final long serialVersionUID = -6001358785173256742L;
 
     /*
     public enum StructureFormat {
@@ -167,4 +168,31 @@ public class DataType implements Serializable {
     public String toString() {
         return primaryType.toString() + " (" + fileFormat.toString() + ")";
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final DataType other = (DataType) obj;
+        if (this.primaryType != other.primaryType) {
+            return false;
+        }
+        if (this.fileFormat != other.fileFormat) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 53 * hash + (this.primaryType != null ? this.primaryType.hashCode() : 0);
+        hash = 53 * hash + (this.fileFormat != null ? this.fileFormat.hashCode() : 0);
+        return hash;
+    }
+    
 }

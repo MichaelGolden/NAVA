@@ -35,7 +35,7 @@ import net.hanjava.svg.SVG2EMF;
  * @author Michael Golden
  */
 public class DataLegend extends JPanel implements ActionListener, MouseListener, MouseMotionListener {
-
+       
     public static final String EDIT_MODE_STRING = "Change color gradient";
     public static final String RANGE_MODE_STRING = "Set numeric range";
     protected javax.swing.event.EventListenerList listenerList = new javax.swing.event.EventListenerList();
@@ -740,13 +740,13 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
             }
             repaint();
         } else if (e.getSource().equals(this.blueWhiteGreenItem)) {
-            colorGradient = new ColorGradient(Color.blue, Color.white, Color.green);
+            colorGradient.setColorGradientTo(new ColorGradient(Color.blue, Color.white, Color.green));
             repaint();
         } else if (e.getSource().equals(this.orangeRedItem)) {
-            colorGradient = new ColorGradient(Color.orange, Color.red);
+            colorGradient.setColorGradientTo(new ColorGradient(Color.orange, Color.red));
             repaint();
         } else if (e.getSource().equals(this.whiteBlackItem)) {
-            colorGradient = new ColorGradient(Color.white, Color.black);
+            colorGradient.setColorGradientTo(new ColorGradient(Color.white, Color.black));
             repaint();
         } else if (e.getSource().equals(distributeColorsItem)) {
             colorGradient.distributeColors();
@@ -755,7 +755,7 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
             colorGradient.reverseOrder();
             repaint();
         } else if (e.getSource().equals(useDefaultItem)) {
-            colorGradient = defaultColorGradient.clone();
+            colorGradient.setColorGradientTo(defaultColorGradient.clone());
             repaint();
         }/*
          * else if (e.getSource().equals(saveAsPNGItem)) { String name =

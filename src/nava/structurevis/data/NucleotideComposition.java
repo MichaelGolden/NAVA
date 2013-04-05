@@ -48,7 +48,7 @@ public class NucleotideComposition extends Overlay implements Serializable {
 
     public double[] getMappedFrequencyAtNucleotide(Mapping mapping, int structurePos) {
         if (mapping != null) {
-            int mappedPos = mapping.bToA(structurePos);
+            int mappedPos = mapping.aToB(structurePos);
            // System.out.println("MFAN" + mappedPos + "->" + structurePos);
 
 

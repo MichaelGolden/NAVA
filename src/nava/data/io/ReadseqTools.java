@@ -12,6 +12,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import nava.data.types.DataType.FileFormat;
 
 /**
  *
@@ -83,6 +84,37 @@ public class ReadseqTools {
             Logger.getLogger(ReadseqTools.class.getName()).log(Level.SEVERE, null, ex);
         }
         return false;
+    }
+    
+    public static FileFormat getAlignmentFileFormat(File file)
+    {
+        try {
+            Readseq rd = new Readseq();
+            rd.setInput(file);
+            if (rd.isKnownFormat() && rd.readInit()) {
+                rd.close();
+                int formatCode = rd.getFormat();
+                switch(formatCode)
+                {
+                    case 8:
+                        return FileFormat.FASTA;
+                    case 11:
+                    case 12:
+                        return FileFormat.PHYLIP4;
+                    case 17:
+                        return FileFormat.NEXUS;
+                    case 22:
+                        return FileFormat.CLUSTAL;
+                    default:
+                        return FileFormat.UNKNOWN;
+                }
+            }
+            rd.close();
+        } catch (IOException ex) {
+            Logger.getLogger(ReadseqTools.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return FileFormat.UNKNOWN;
     }
 
     public static String getFormatName(File file) {

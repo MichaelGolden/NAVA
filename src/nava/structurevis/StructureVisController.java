@@ -79,8 +79,8 @@ public class StructureVisController implements SafeListListener, ProjectView {
             for (int j = 0; j < structureVisModel.structureVisDataOverlays1D.size(); j++) {
                 DataOverlay1D dataSource = structureVisModel.structureVisDataOverlays1D.get(j);
                 if (s.mappingSource != null && dataSource.mappingSource != null) {
-                    if (!structureVisModel.mappings.containsKey(new Pair<>(dataSource.mappingSource, s.mappingSource))) {
-                        MainFrame.taskManager.queueTask(new MappingTask(this, dataSource.mappingSource, s.mappingSource), true);
+                    if (!structureVisModel.mappings.containsKey(new Pair<>(s.mappingSource, dataSource.mappingSource))) {
+                        MainFrame.taskManager.queueTask(new MappingTask(this, s.mappingSource, dataSource.mappingSource), true);
                     }
                 }
             }
@@ -88,11 +88,9 @@ public class StructureVisController implements SafeListListener, ProjectView {
             for (int j = 0; j < structureVisModel.structureVisDataOverlays2D.size(); j++) {
                 DataOverlay2D dataSource = structureVisModel.structureVisDataOverlays2D.get(j);
                 if (s.mappingSource != null && dataSource.mappingSource != null) {
-                    if (structureVisModel.mappings.containsKey(new Pair<>(dataSource.mappingSource, s.mappingSource))) {
-                        if (!structureVisModel.mappings.containsKey(new Pair<>(dataSource.mappingSource, s.mappingSource))) {
-                            MainFrame.taskManager.queueTask(new MappingTask(this, dataSource.mappingSource, s.mappingSource), true);
+                        if (!structureVisModel.mappings.containsKey(new Pair<>(s.mappingSource, dataSource.mappingSource))) {
+                            MainFrame.taskManager.queueTask(new MappingTask(this, s.mappingSource, dataSource.mappingSource), true);
                         }
-                    }
                 }
             }
 
@@ -101,8 +99,8 @@ public class StructureVisController implements SafeListListener, ProjectView {
                 for (Feature f : annotationSource.features) // probably all have the same source, so this is not too slow
                 {
                     if (s.mappingSource != null && f.mappingSource != null) {
-                        if (!structureVisModel.mappings.containsKey(new Pair<>(f.mappingSource, s.mappingSource))) {
-                            MainFrame.taskManager.queueTask(new MappingTask(this, f.mappingSource, s.mappingSource), true);
+                        if (!structureVisModel.mappings.containsKey(new Pair<>(s.mappingSource, f.mappingSource))) {
+                            MainFrame.taskManager.queueTask(new MappingTask(this, s.mappingSource, f.mappingSource), true);
                         }
                     }
                 }
@@ -112,8 +110,8 @@ public class StructureVisController implements SafeListListener, ProjectView {
                 NucleotideComposition nucleotideComposition = structureVisModel.nucleotideSources.get(j);
                 System.out.println("CREATING NUC " + j + "\t" + nucleotideComposition);
                 if (s.mappingSource != null && nucleotideComposition.mappingSource != null) {
-                    if (!structureVisModel.mappings.containsKey(new Pair<>(nucleotideComposition.mappingSource, s.mappingSource))) {
-                        MainFrame.taskManager.queueTask(new MappingTask(this, nucleotideComposition.mappingSource, s.mappingSource), true);
+                    if (!structureVisModel.mappings.containsKey(new Pair<>(s.mappingSource, nucleotideComposition.mappingSource))) {
+                        MainFrame.taskManager.queueTask(new MappingTask(this, s.mappingSource, nucleotideComposition.mappingSource), true);
                     }
                 }
             }
@@ -509,9 +507,9 @@ public class StructureVisController implements SafeListListener, ProjectView {
                 System.out.println("N" + i);
                 if (s.mappingSource != null && m != null) {
                     System.out.println("M" + i);
-                    if (!this.structureVisModel.mappings.containsKey(new Pair<>(m, s.mappingSource))) {
+                    if (!this.structureVisModel.mappings.containsKey(new Pair<>(s.mappingSource, m))) {
                         System.out.println("Q" + i);
-                        MainFrame.taskManager.queueTask(new MappingTask(this, m, s.mappingSource), true);
+                        MainFrame.taskManager.queueTask(new MappingTask(this, s.mappingSource, m), true);
                     }
                 }
             }

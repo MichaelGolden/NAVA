@@ -5,17 +5,21 @@
 package nava.structurevis;
 
 import java.awt.Color;
-import java.io.Serializable;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import javax.swing.event.EventListenerList;
+import nava.data.types.SecondaryStructureData;
+import nava.data.types.TabularField;
+import nava.data.types.TabularFieldData;
 import nava.structurevis.data.*;
 import nava.structurevis.navigator.DataOverlayTreeModel;
 import nava.ui.MainFrame;
 import nava.ui.ProgressBarMonitor;
+import nava.ui.ProjectModel;
 import nava.utils.Mapping;
 
 /**
@@ -42,8 +46,6 @@ public class SubstructureModel implements Serializable {
     transient DistanceMatrix distanceMatrix = null;
     transient DistanceMatrix structureDistanceMatrix = null;
     int maxDistance = -1;
-    
-    
     protected transient EventListenerList listeners = new EventListenerList();
     /*
      * boolean useLowerThreshold1D = false; boolean useUpperThreshold1D = false;
@@ -93,6 +95,7 @@ public class SubstructureModel implements Serializable {
         this.data1D = dataSource1D;
 
         Thread taskThread = new Thread() {
+
             public void run() {
                 try {
                     SwingUtilities.invokeAndWait(
@@ -129,6 +132,7 @@ public class SubstructureModel implements Serializable {
                 structureVisController.structureVisModel.structureVisDataOverlays1D.get(i).setState(Overlay.OverlayState.UNSELECTED);
             }
         }
+        
     }
 
     public void setOverlay2D(final DataOverlay2D dataSource2D) {
@@ -348,5 +352,24 @@ public class SubstructureModel implements Serializable {
                 ((SubstructureModelListener) listeners[i + 1]).nucleotideSourceChanged(nucleotideSource);
             }
         }
+    }
+
+    public void saveDataOverlay1DAndStructure(DataOverlay1D dataOverlay1D, File outFile) throws IOException {
+        BufferedWriter buffer = new BufferedWriter(new FileWriter(outFile));
+        SecondaryStructureData structure = structureOverlay.structure.getObject(ProjectModel.path, MainFrame.dataSourceCache);
+        buffer.write("Structure position,Paired position,Data position,Data value\n");
+
+        Mapping mapping = structureVisController.getMapping(structureOverlay.mappingSource, dataOverlay1D.mappingSource);
+        dataOverlay1D.loadData();
+        for (int i = 0; i < structure.pairedSites.length; i++) {
+
+            int dataPos = mapping.aToB(i);
+            if (dataPos != -1) {
+                buffer.write((i + 1) + "," + (structure.pairedSites[i] == 0 ? "-" : structure.pairedSites[i] +1) + "," + (dataPos+1) + "," + dataOverlay1D.data[i] + "\n");
+            } else {
+                buffer.write((i + 1) + "," + (structure.pairedSites[i] == 0 ? "-" : structure.pairedSites[i] +1) + "," + "," + "\n");
+            }
+        }
+        buffer.close();
     }
 }

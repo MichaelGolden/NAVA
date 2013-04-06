@@ -13,7 +13,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
@@ -26,6 +30,7 @@ import nava.data.types.DataType;
 import nava.data.types.Tabular;
 import nava.structurevis.*;
 import nava.structurevis.data.*;
+import nava.ui.MainFrame;
 import nava.ui.ProjectController;
 import nava.ui.ProjectModel;
 import nava.ui.ProjectView;
@@ -39,10 +44,12 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
 
     ProjectController projectController;
     StructureVisController structureVisController;
-    JPopupMenu popupMenu = new JPopupMenu();
+    JPopupMenu popupMenu1 = new JPopupMenu();
+    //JPopupMenu popupMenu2 = new JPopupMenu();
     JMenuItem setAsOverlayItem = new JMenuItem("View");
     JMenuItem editItem = new JMenuItem("Edit");
     JMenuItem deleteItem = new JMenuItem("Delete");
+    JMenuItem saveItem = new JMenuItem("Save mapped data (CSV)");
 
     /**
      * Creates new form NavigatorPanel
@@ -87,11 +94,19 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
         });
 
         setAsOverlayItem.addActionListener(this);
-        popupMenu.add(setAsOverlayItem);
+        popupMenu1.add(setAsOverlayItem);
         editItem.addActionListener(this);
-        popupMenu.add(editItem);
+        popupMenu1.add(editItem);
         deleteItem.addActionListener(this);
-        popupMenu.add(deleteItem);
+        popupMenu1.add(deleteItem);
+
+        /*
+         * popupMenu2.add(setAsOverlayItem); editItem.addActionListener(this);
+         * popupMenu2.add(editItem); deleteItem.addActionListener(this);
+         * popupMenu2.add(deleteItem);
+         */
+        saveItem.addActionListener(this);
+        popupMenu1.add(saveItem);
 
         overlayTree.addMouseListener(this);
     }
@@ -184,7 +199,12 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
                 if (tp != null) {
                     overlayTree.setSelectionPath(tp);
                 }
-                popupMenu.show(e.getComponent(), e.getX(), e.getY());
+                if (selectedOverlay instanceof DataOverlay1D) {
+                    this.saveItem.setEnabled(true);
+                } else {
+                    this.saveItem.setEnabled(false);
+                }
+                popupMenu1.show(e.getComponent(), e.getX(), e.getY());
                 switch (selectedOverlay.getState()) {
                     case PRIMARY_SELECTED:
                     case SECONDARY_SELECTED:
@@ -265,6 +285,27 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
 
             // update node icons on tree
             structureVisController.structureVisModel.overlayNavigatorTreeModel.valueForPathChanged(overlayTree.getSelectionPath(), overlay);
+        } else if (e.getSource().equals(saveItem)) {
+            File directoryFile = MainFrame.saveDialog.getCurrentDirectory();
+            if (MainFrame.saveDialog.getSelectedFile() != null) {
+                directoryFile = MainFrame.saveDialog.getSelectedFile().isDirectory() ? MainFrame.saveDialog.getSelectedFile() : MainFrame.saveDialog.getSelectedFile().getParentFile();
+            }
+
+
+            MainFrame.saveDialog.setSelectedFile(new File(directoryFile.getAbsolutePath() + File.separator + "data.csv"));
+            MainFrame.saveDialog.showSaveDialog(MainFrame.self);
+            File saveFile = MainFrame.saveDialog.getSelectedFile();
+            if (saveFile != null) {
+                try {
+                    Overlay overlay =  ((DataOverlayTreeNode) overlayTree.getSelectionPath().getLastPathComponent()).overlay;
+                    if(overlay instanceof DataOverlay1D)
+                    {
+                        structureVisController.structureVisModel.substructureModel.saveDataOverlay1DAndStructure((DataOverlay1D)overlay, saveFile);
+                    }
+                } catch (IOException ex) {
+                    Logger.getLogger(DataOverlayTreePanel.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
         }
     }
 
@@ -290,7 +331,7 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
 
     @Override
     public void structureVisModelChanged(StructureVisModel newStructureVisModel) {
-       // this.overlayTree.removeAll();
+        // this.overlayTree.removeAll();
         this.overlayTree.setModel(newStructureVisModel.overlayNavigatorTreeModel);
         newStructureVisModel.overlayNavigatorTreeModel.addTreeModelListener(this);
     }

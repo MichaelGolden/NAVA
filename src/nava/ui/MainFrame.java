@@ -45,6 +45,7 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
     public static Font fontLiberationSans = new Font("Sans", Font.PLAIN, 12);
     public static Font fontDroidSansMono = new Font("Sans", Font.PLAIN, 12);
     StructureVisPanel structureVisPanel;
+    public static JFileChooser saveDialog = new JFileChooser();
     public static JFileChooser browseDialog = new JFileChooser();
     public static JFileChooser projectDialog = new JFileChooser();
     StartupDialog startupDialog;
@@ -93,7 +94,7 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
         jPanel1.add(dataPanel, BorderLayout.CENTER);
         structureVisPanel = new StructureVisPanel(projectController);
         jPanel2.add(structureVisPanel, BorderLayout.CENTER);
-
+       
         //projectDialog.setFileFilter(new ProjectFileFilter());
         projectDialog.setFileView(new ProjectFileView());
         projectDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -294,18 +295,19 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
         JFrame frame = new JFrame("Structure ranking");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setIconImage(getIconImage());
-        
+
 
         //Create and set up the content pane.
         final RankingPanel newContentPane = new RankingPanel(structureVisPanel.structureVisController);
         newContentPane.setOpaque(true); //content panes must be opaque
         frame.addWindowListener(new WindowAdapter() {
+
             @Override
             public void windowClosing(WindowEvent we) {
                 newContentPane.kill();
             }
         });
-        
+
         frame.setContentPane(newContentPane);
         //Display the window.
         frame.pack();
@@ -322,6 +324,7 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
         newContentPane.setOpaque(true); //content panes must be opaque
         frame.setContentPane(newContentPane);
         frame.addWindowListener(new WindowAdapter() {
+
             @Override
             public void windowClosing(WindowEvent we) {
                 newContentPane.kill();

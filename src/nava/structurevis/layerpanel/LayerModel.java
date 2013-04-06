@@ -23,9 +23,8 @@ public class LayerModel implements Serializable {
 
     private static final long serialVersionUID = 3879990042201539258L;
     ArrayList<LayerItem> items = new ArrayList<>();
-    
-    public LayerModel()
-    {        
+
+    public LayerModel() {
         addAnnotationSource(null);
         addDataOverlay1D("1D overlay (none)", null);
     }
@@ -60,6 +59,9 @@ public class LayerModel implements Serializable {
     }
 
     public void removeLayerModelListener(LayerModelListener l) {
+        if (listenerList == null) {
+            listenerList = new EventListenerList();
+        }
         listenerList.remove(LayerModelListener.class, l);
     }
 

@@ -390,7 +390,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
 
         DataOverlay2D dataOverlay2D = structureVisController.structureVisModel.substructureModel.data2D;
         if (dataOverlay2D != null) {
-            this.dataLegend1D.setLegend(dataOverlay2D.title, dataOverlay2D.dataTransform, dataOverlay2D.colorGradient, dataOverlay2D.defaultColorGradient, dataOverlay2D.useLowerThreshold, dataOverlay2D.useUpperThreshold, dataOverlay2D.thresholdMinPerc, dataOverlay2D.thresholdMaxPerc, dataOverlay2D);
+            this.dataLegend2D.setLegend(dataOverlay2D.title, dataOverlay2D.dataTransform, dataOverlay2D.colorGradient, dataOverlay2D.defaultColorGradient, dataOverlay2D.useLowerThreshold, dataOverlay2D.useUpperThreshold, dataOverlay2D.thresholdMinPerc, dataOverlay2D.thresholdMaxPerc, dataOverlay2D);
         }
     }
 

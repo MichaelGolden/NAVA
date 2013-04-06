@@ -6,9 +6,12 @@ package nava.structurevis;
 
 import java.awt.BorderLayout;
 import javax.swing.ImageIcon;
+import javax.swing.SwingUtilities;
 import nava.structurevis.data.AnnotationSource;
 import nava.structurevis.data.NucleotideComposition;
 import nava.structurevis.data.Overlay;
+import nava.ui.MainFrame;
+import nava.ui.ProgressBarMonitor;
 import nava.ui.ProjectModel;
 
 /**
@@ -104,15 +107,35 @@ public class NucleotideCompositionDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
-        NucleotideComposition nucleotideComposition = nucleotidePanel.getNucleotideSource();
-        if(editOverlay == null)
-        {
-            structureVisController.addNucleotideCompositionSource(nucleotideComposition);
-        }
-        else
-        {
-            structureVisController.setNucleotideCompositionSource(editOverlay, nucleotideComposition);
-        }
+
+        Thread taskThread = new Thread() {
+
+            public void run() {
+                try {
+                    SwingUtilities.invokeAndWait(
+                            new Runnable() {
+
+                                public void run() {
+                                    MainFrame.progressBarMonitor.set(true, ProgressBarMonitor.ADDING_DATA_OVERLAY, 0);
+                                    MainFrame.self.setEnabled(false);
+                                }
+                            });
+
+                    NucleotideComposition nucleotideComposition = nucleotidePanel.getNucleotideSource();
+                    if (editOverlay == null) {
+                        structureVisController.addNucleotideCompositionSource(nucleotideComposition);
+                    } else {
+                        structureVisController.setNucleotideCompositionSource(editOverlay, nucleotideComposition);
+                    }
+
+                    MainFrame.progressBarMonitor.set(false, ProgressBarMonitor.INACTIVE, ProgressBarMonitor.INACTIVE_VALUE);
+                    MainFrame.self.setEnabled(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        taskThread.start();
         this.dispose();
     }//GEN-LAST:event_addButtonActionPerformed
 

@@ -5,10 +5,7 @@
 package nava.ui;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
+import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -297,12 +294,19 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
         JFrame frame = new JFrame("Structure ranking");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setIconImage(getIconImage());
+        
 
         //Create and set up the content pane.
-        RankingPanel newContentPane = new RankingPanel(structureVisPanel.structureVisController);
+        final RankingPanel newContentPane = new RankingPanel(structureVisPanel.structureVisController);
         newContentPane.setOpaque(true); //content panes must be opaque
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent we) {
+                newContentPane.kill();
+            }
+        });
+        
         frame.setContentPane(newContentPane);
-
         //Display the window.
         frame.pack();
         frame.setVisible(true);
@@ -314,9 +318,15 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
         frame.setIconImage(getIconImage());
 
         //Create and set up the content pane.
-        PairTestPanel newContentPane = new PairTestPanel(structureVisPanel.structureVisController);
+        final PairTestPanel newContentPane = new PairTestPanel(structureVisPanel.structureVisController);
         newContentPane.setOpaque(true); //content panes must be opaque
         frame.setContentPane(newContentPane);
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent we) {
+                newContentPane.kill();
+            }
+        });
 
         //Display the window.
         frame.pack();

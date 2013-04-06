@@ -21,6 +21,7 @@ public class ProgressBarMonitor {
     
     public static String CREATE_MAPPING = "Creating mapping";
     public static String IMPORT_DATASOURCE = "Importing data source";
+    public static String ADDING_DATA_OVERLAY = "Adding data overlay";
     public static String INACTIVE = "Inactive";
     
     public static int INACTIVE_VALUE = 0;

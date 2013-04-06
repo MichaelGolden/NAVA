@@ -90,19 +90,17 @@ public class SubstructureModel implements Serializable {
 
         this.data1D = dataSource1D;
 
-        final Runnable progressBarThread = new Runnable() {
-
-            public void run() {
-                MainFrame.progressBarMonitor.set(true, ProgressBarMonitor.CREATE_MAPPING, 0);
-                MainFrame.self.setEnabled(false);
-            }
-        };
-
         Thread taskThread = new Thread() {
-
             public void run() {
                 try {
-                    SwingUtilities.invokeAndWait(progressBarThread);
+                    SwingUtilities.invokeAndWait(
+                            new Runnable() {
+
+                                public void run() {
+                                    MainFrame.progressBarMonitor.set(true, ProgressBarMonitor.CREATE_MAPPING, 0);
+                                    MainFrame.self.setEnabled(false);
+                                }
+                            });
 
                     if (dataSource1D != null) {
                         dataSource1D.loadData();
@@ -176,8 +174,9 @@ public class SubstructureModel implements Serializable {
     public void setStructureOverlay(final StructureOverlay structureOverlay) {
 
         this.structureOverlay = structureOverlay;
-        
+
         final Runnable progressBarThread = new Runnable() {
+
             public void run() {
                 MainFrame.progressBarMonitor.set(true, ProgressBarMonitor.CREATE_MAPPING, 0);
                 MainFrame.self.setEnabled(false);
@@ -185,6 +184,7 @@ public class SubstructureModel implements Serializable {
         };
 
         Thread taskThread = new Thread() {
+
             public void run() {
                 try {
                     SwingUtilities.invokeAndWait(progressBarThread);
@@ -232,12 +232,14 @@ public class SubstructureModel implements Serializable {
         if (nucleotideOverlay != null && nucleotideOverlay.mappingSource != null && structureOverlay != null) {
 
             final Runnable progressBarThread = new Runnable() {
+
                 public void run() {
                     MainFrame.progressBarMonitor.set(true, ProgressBarMonitor.CREATE_MAPPING, 0);
                     MainFrame.self.setEnabled(false);
                 }
             };
             Thread taskThread = new Thread() {
+
                 public void run() {
                     try {
                         SwingUtilities.invokeAndWait(progressBarThread);

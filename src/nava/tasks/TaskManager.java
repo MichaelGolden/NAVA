@@ -48,6 +48,8 @@ public class TaskManager extends Thread {
             runQueue.add(task);
             execute(task);
         }
+
+        checkQueue();
     }
 
     private void execute(final Task task) {
@@ -130,6 +132,8 @@ public class TaskManager extends Thread {
         for (Task t : runQueue) {
             t.cancelTask();
         }
+
+        checkQueue();
     }
 
     /*
@@ -140,47 +144,50 @@ public class TaskManager extends Thread {
      * uiTaskQueue.add(task); task.setStatus(Status.QUEUED); task.queueTime =
      * System.currentTimeMillis(); } }
      */
+    public synchronized void checkQueue() {
+        if (!running) {
+            // cancel all tasks
+            for (Task t : runQueue) {
+                t.cancelTask();
+            }
+            return;
+        }
+
+        availableSlots = totalSlots - usedSlots;
+        /*
+         * if (availableSlots > 0 && uiTaskQueue.size() > 0) { UITask task =
+         * uiTaskQueue.removeFirst(); runTask(task); }
+         */
+
+        if (availableSlots <= 0 && generalTaskQueue.size() > 0) {
+            // cancel a deferrable task if not enough slots available
+            for (Task t : runQueue) {
+                if (t.deferrable) {
+                    t.cancelTask();
+                    // re-queue
+                    queueTask(t, true);
+                    break;
+                }
+            }
+        }
+
+        if (availableSlots > 0 && generalTaskQueue.size() > 0) {
+            Task task = generalTaskQueue.removeFirst();
+            runTask(task);
+        } else if (availableSlots > 0 && deferrableTaskQueue.size() > 0) {
+            Task task = deferrableTaskQueue.removeFirst();
+            runTask(task);
+        }
+    }
     boolean running = true;
 
     @Override
     public void run() {
         while (running) {
-            if (!running) {
-                // cancel all tasks
-                for (Task t : runQueue) {
-                    t.cancelTask();
-                }
-                break;
-            }
-
-            availableSlots = totalSlots - usedSlots;
-            /*
-             * if (availableSlots > 0 && uiTaskQueue.size() > 0) { UITask task =
-             * uiTaskQueue.removeFirst(); runTask(task); }
-             */
-
-            if (availableSlots <= 0 && generalTaskQueue.size() > 0) {
-                // cancel a deferrable task if not enough slots available
-                for (Task t : runQueue) {
-                    if (t.deferrable) {
-                        t.cancelTask();
-                        // re-queue
-                        queueTask(t, true);
-                        break;
-                    }
-                }
-            }
-
-            if (availableSlots > 0 && generalTaskQueue.size() > 0) {
-                Task task = generalTaskQueue.removeFirst();
-                runTask(task);
-            } else if (availableSlots > 0 && deferrableTaskQueue.size() > 0) {
-                Task task = deferrableTaskQueue.removeFirst();
-                runTask(task);
-            }
+            checkQueue();
 
             try {
-                Thread.sleep(100);
+                Thread.sleep(2000);
             } catch (InterruptedException ex) {
                 Logger.getLogger(TaskManager.class.getName()).log(Level.SEVERE, null, ex);
             }

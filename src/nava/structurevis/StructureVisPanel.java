@@ -69,8 +69,6 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
 
         layerPanel = new LayerPanel(structureVisController, projectController);
         layerModel = new LayerModel();
-        layerModel.addAnnotationSource(null);
-        layerModel.addDataOverlay1D("1D Overlay (none)", null);
         layerPanel.setLayerModel(layerModel);
 
         /*

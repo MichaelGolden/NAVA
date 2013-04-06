@@ -536,7 +536,6 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        System.out.println("ACTION:" + e.getActionCommand());
         if (e.getSource().equals(removeAnnotationItem)) {
             for (Pair<Shape, Feature> featurePosition : featurePositions) {
                 if (featurePosition.getLeft().contains(popupMenuX, popupMenuY)) {
@@ -579,6 +578,10 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
              * parent.updatePanel(); }
              */
         } else if (e.getSource().equals(this.addAnnotationFromSourceItem)) {
+            System.out.println("A"+projectController);
+            System.out.println("B"+projectController.projectModel);
+            System.out.println("C"+structureVisController);
+            
             AnnotationsDialog d = new AnnotationsDialog(null, true, projectController.projectModel, structureVisController);
             //d.setSize(640, 480);
             // d.editMode = false;

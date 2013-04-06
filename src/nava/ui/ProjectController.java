@@ -8,6 +8,7 @@ package nava.ui;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -263,49 +264,31 @@ public class ProjectController implements SafeListListener {
     }
 
     public void autoAddDataSourceWithAmbiguityResolution(final File dataFile) {
-        final Runnable progressBarThread = new Runnable() {
+        DataType dataType = null;
 
-            public void run() {
-                MainFrame.progressBarMonitor.set(true, ProgressBarMonitor.IMPORT_DATASOURCE, 0);
-                MainFrame.self.setEnabled(false);
+        ArrayList<DataType> possibleDataTypes = null;
+        if (dataFile.isFile()) {
+            System.out.println("FILE:" + dataFile);
+            possibleDataTypes = FileImport.getPossibleDataTypes(dataFile);
+            System.out.println("TYPE:" + possibleDataTypes);
+        }
+        if (possibleDataTypes != null && possibleDataTypes.size() > 0) {
+            if (possibleDataTypes.size() == 1) {
+                dataType = possibleDataTypes.get(0);
+                //importDataSourceFromFile(dataFile, possibleDataTypes.get(0));
+                //return new Pair(possibleDataTypes.get(0), dataSource);
+            } else {
+                ResolveImportAmbiguityDialog resolveDialog = new ResolveImportAmbiguityDialog(MainFrame.self, true, dataFile, possibleDataTypes);
+                resolveDialog.setIconImage(new ImageIcon(ClassLoader.getSystemResource("resources/icons/icon-32x32.png")).getImage());
+                GraphicsUtils.centerWindowOnScreen(resolveDialog);
+                resolveDialog.setVisible(true);
+
+                dataType = resolveDialog.getSelectedDataType();
             }
-        };
-        Thread taskThread = new Thread() {
 
-            public void run() {
-                try {
-                    SwingUtilities.invokeAndWait(progressBarThread);
-
-                    ArrayList<DataType> possibleDataTypes = null;
-                    if (dataFile.isFile()) {
-                        possibleDataTypes = FileImport.getPossibleDataTypes(dataFile);
-                    }
-                    if (possibleDataTypes != null && possibleDataTypes.size() > 0) {
-                        if (possibleDataTypes.size() == 1) {
-                            DataSource dataSource = importDataSourceFromFile(dataFile, possibleDataTypes.get(0));
-                            //return new Pair(possibleDataTypes.get(0), dataSource);
-                        } else {
-                            ResolveImportAmbiguityDialog resolveDialog = new ResolveImportAmbiguityDialog(null, true, dataFile, possibleDataTypes);
-                            resolveDialog.setIconImage(new ImageIcon(ClassLoader.getSystemResource("resources/icons/icon-32x32.png")).getImage());
-                            GraphicsUtils.centerWindowOnScreen(resolveDialog);
-                            resolveDialog.setVisible(true);
-
-                            DataSource dataSource = importDataSourceFromFile(dataFile, resolveDialog.getSelectedDataType());
-                            //return new Pair(resolveDialog.getSelectedDataType(), dataSource);
-                        }
-                    }
-
-                    MainFrame.progressBarMonitor.set(false, ProgressBarMonitor.INACTIVE, ProgressBarMonitor.INACTIVE_VALUE);
-                    MainFrame.self.setEnabled(true);
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        taskThread.start();
-
-        // return null;
+            final DataType dataType2 = dataType;
+            DataSource dataSource = importDataSourceFromFile(dataFile, dataType2);
+        }
     }
 
     public Pair<DataType, DataSource> autoAddDataSource(File dataFile) {

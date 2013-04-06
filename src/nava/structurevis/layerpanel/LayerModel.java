@@ -23,6 +23,12 @@ public class LayerModel implements Serializable {
 
     private static final long serialVersionUID = 3879990042201539258L;
     ArrayList<LayerItem> items = new ArrayList<>();
+    
+    public LayerModel()
+    {        
+        addAnnotationSource(null);
+        addDataOverlay1D("1D overlay (none)", null);
+    }
 
     public void addAnnotationSource(AnnotationSource annotationSource) {
         items.add(new LayerItem(LayerType.ANNOTATIONS, "Sequence annotations", annotationSource));
@@ -42,6 +48,7 @@ public class LayerModel implements Serializable {
     public void setDataOverlay1D(int index, String label, DataOverlay1D dataOverlay1D) {
         items.set(index, new LayerItem(LayerType.DATAOVERLAY_1D, label, dataOverlay1D));
         fireLayerModelEvent(ListDataEvent.CONTENTS_CHANGED, index, index);
+
     }
     transient EventListenerList listenerList = new EventListenerList();
 
@@ -76,7 +83,7 @@ public class LayerModel implements Serializable {
     }
 }
 
-class LayerItem {
+class LayerItem implements Serializable {
 
     enum LayerType {
 

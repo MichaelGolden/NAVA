@@ -24,10 +24,7 @@ import javax.swing.text.StyledDocument;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import nava.ui.MainFrame;
-import nava.ui.ProjectController;
-import nava.ui.ProjectModel;
-import nava.ui.ProjectView;
+import nava.ui.*;
 
 /**
  *
@@ -68,35 +65,60 @@ public class NavigatorPanel extends javax.swing.JPanel implements ActionListener
             public synchronized void drop(DropTargetDropEvent evt) {
                 try {
                     evt.acceptDrop(DnDConstants.ACTION_COPY);
-                    List<File> droppedFiles = (List<File>) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
-                    for (int i = 0; i < droppedFiles.size(); i++) {
-                        NavigatorPanel.this.projectController.autoAddDataSourceWithAmbiguityResolution(droppedFiles.get(i));
-                        if (droppedFiles.get(i).isDirectory()) {
-                            System.err.println("TODO this file is a folder. How should we handle this?");
+                    final List<File> droppedFiles = (List<File>) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+                    Thread taskThread = new Thread() {
+
+                        public void run() {
+                            try {
+                                SwingUtilities.invokeAndWait(new Runnable() {
+
+                                    public void run() {
+                                        if (droppedFiles.size() == 1) {
+                                            MainFrame.progressBarMonitor.set(true, ProgressBarMonitor.IMPORT_DATASOURCE, 0);
+                                        } else {
+                                            MainFrame.progressBarMonitor.set(true, ProgressBarMonitor.IMPORT_DATASOURCES, 0);
+                                        }
+                                        MainFrame.self.setEnabled(false);
+                                    }
+                                });
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+
+                            for (int i = 0; i < droppedFiles.size(); i++) {
+                                NavigatorPanel.this.projectController.autoAddDataSourceWithAmbiguityResolution(droppedFiles.get(i));
+                                if (droppedFiles.get(i).isDirectory()) {
+                                    System.err.println("TODO this file is a folder. How should we handle this?");
+                                }
+                            }
+
+                            MainFrame.progressBarMonitor.set(false, ProgressBarMonitor.INACTIVE, ProgressBarMonitor.INACTIVE_VALUE);
+                            MainFrame.self.setEnabled(true);
                         }
-                    }
+                    };
+                    taskThread.start();
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
             }
         });
 
-        
+
         JTextArea textArea = new JTextArea("Drop and drag a file into the area above to import or click 'Import file'.");
         textArea.setFont(textArea.getFont().deriveFont(Font.ITALIC));
         textArea.setLineWrap(true);
         textArea.setEditable(false);
-        textArea.setBorder(new EmptyBorder(1,4,3,3));
+        textArea.setBorder(new EmptyBorder(1, 4, 3, 3));
         textArea.setOpaque(false);
-        textArea.setBackground(new Color(0,0,0,0));
+        textArea.setBackground(new Color(0, 0, 0, 0));
         textArea.setWrapStyleWord(true);
         this.addDataSourcePanel.add(textArea, BorderLayout.CENTER);
-        
+
         importButton.addActionListener(this);
         importButton.setIconTextGap(8);
         //importButton.setHorizontalAlignment(SwingConstants.LEFT);
         this.addDataSourcePanel.add(importButton, BorderLayout.SOUTH);
-        
+
         importFileChooser.setApproveButtonText("Import");
         importFileChooser.setMultiSelectionEnabled(true);
     }
@@ -219,12 +241,35 @@ public class NavigatorPanel extends javax.swing.JPanel implements ActionListener
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        importFileChooser.setSelectedFile(MainFrame.browseDialog.getCurrentDirectory());                
+        importFileChooser.setSelectedFile(MainFrame.browseDialog.getCurrentDirectory());
         importFileChooser.showOpenDialog(this);
-        File [] files = importFileChooser.getSelectedFiles();
-        for(File file : files)
-        {
-            NavigatorPanel.this.projectController.autoAddDataSourceWithAmbiguityResolution(file);
-        }
+        final File[] files = importFileChooser.getSelectedFiles();
+        Thread taskThread = new Thread() {
+            public void run() {
+                try {
+                    SwingUtilities.invokeAndWait(new Runnable() {
+
+                        public void run() {
+                            if (files.length == 1) {
+                                MainFrame.progressBarMonitor.set(true, ProgressBarMonitor.IMPORT_DATASOURCE, 0);
+                            } else {
+                                MainFrame.progressBarMonitor.set(true, ProgressBarMonitor.IMPORT_DATASOURCES, 0);
+                            }
+                            MainFrame.self.setEnabled(false);
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                
+                for (File file : files) {
+                    NavigatorPanel.this.projectController.autoAddDataSourceWithAmbiguityResolution(file);
+                }
+
+                MainFrame.progressBarMonitor.set(false, ProgressBarMonitor.INACTIVE, ProgressBarMonitor.INACTIVE_VALUE);
+                MainFrame.self.setEnabled(true);
+            }
+        };
+        taskThread.start();
     }
 }

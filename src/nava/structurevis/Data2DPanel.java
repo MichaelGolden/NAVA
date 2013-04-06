@@ -155,7 +155,7 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
         this.jIndexTextField.addKeyListener(this);
 
         this.dataLegendPanel.add(dataLegend, BorderLayout.CENTER);
-        dataLegend.setLegend("Example", new DataTransform(0, 1, DataTransform.TransformType.LINEAR), new ColorGradient(Color.white, Color.red), new ColorGradient(Color.white, Color.red),true,true,0,1, null);
+        dataLegend.setLegend("Example", new DataTransform(0, 1, DataTransform.TransformType.LINEAR), new ColorGradient(Color.white, Color.red), new ColorGradient(Color.white, Color.red), true, true, 0, 1, null);
         dataLegend.showEditMode();
 
         this.naturalRadioButtonOneOffset.addItemListener(this);
@@ -243,15 +243,17 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
             } else {
                 valueField.setText("A(" + i + ", " + j + ") " + "is empty.");
             }
+
+
+            if (mappingSource != null && (dataSource2D.dataMatrix.n != mappingSource.getLength() || dataSource2D.dataMatrix.m != mappingSource.getLength())) {
+                mappingSourceTextArea.setForeground(Color.red);
+                mappingSourceTextArea.setText("The length of the mapping source (" + mappingSource.getLength() + ") does not match the length of the data source (" + dataSource2D.dataMatrix.n + ", " + dataSource2D.dataMatrix.m + ")");
+            } else {
+                mappingSourceTextArea.setForeground(Color.green);
+                mappingSourceTextArea.setText("The length of the mapping source (" + mappingSource.getLength() + ") matches the length of the data source (" + values.size() + ")");
+            }
         }
 
-        if (mappingSource != null && (dataSource2D.dataMatrix.n != mappingSource.getLength() || dataSource2D.dataMatrix.m != mappingSource.getLength())) {
-            mappingSourceTextArea.setForeground(Color.red);
-            mappingSourceTextArea.setText("The length of the mapping source (" + mappingSource.getLength() + ") does not match the length of the data source (" + dataSource2D.dataMatrix.n + ", " + dataSource2D.dataMatrix.m + ")");
-        } else {
-            mappingSourceTextArea.setForeground(Color.green);
-            mappingSourceTextArea.setText("The length of the mapping source (" + mappingSource.getLength() + ") matches the length of the data source (" + values.size() + ")");
-        }
     }
 
     public void setDataSource2D(DataOverlay2D dataSource2D) {
@@ -805,7 +807,6 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         selectBestAlignment();
     }//GEN-LAST:event_jButton1ActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton clampedRadioButton;
     private javax.swing.JCheckBox codonCheckButton;

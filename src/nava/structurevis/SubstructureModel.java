@@ -42,6 +42,9 @@ public class SubstructureModel implements Serializable {
     transient DistanceMatrix distanceMatrix = null;
     transient DistanceMatrix structureDistanceMatrix = null;
     int maxDistance = -1;
+    
+    
+    protected transient EventListenerList listeners = new EventListenerList();
     /*
      * boolean useLowerThreshold1D = false; boolean useUpperThreshold1D = false;
      * boolean useLowerThreshold2D = false; boolean useUpperThreshold2D = false;
@@ -53,7 +56,6 @@ public class SubstructureModel implements Serializable {
     public SubstructureModel(StructureVisController structureVisController) {
         this.structureVisController = structureVisController;
     }
-    protected transient EventListenerList listeners = new EventListenerList();
 
     public void initialise(StructureVisController structureVisController) {
         listeners = new EventListenerList();

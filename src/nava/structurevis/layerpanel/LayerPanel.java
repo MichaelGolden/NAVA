@@ -10,24 +10,28 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.Scrollable;
+import javax.swing.event.ListDataEvent;
 import nava.structurevis.StructureVisController;
-import nava.structurevis.data.AnnotationSource;
-import nava.structurevis.data.DataOverlay1D;
+import nava.structurevis.StructureVisModel;
+import nava.structurevis.StructureVisView;
+import nava.structurevis.SubstructureModelListener;
+import nava.structurevis.data.*;
 import nava.structurevis.layerpanel.LayerItem.LayerType;
 import nava.ui.ProjectController;
+import nava.ui.ProjectModel;
+import nava.ui.ProjectView;
 
 /**
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class LayerPanel extends javax.swing.JPanel implements Scrollable, LayerModelListener {
-    
+public class LayerPanel extends javax.swing.JPanel implements Scrollable, LayerModelListener, StructureVisView, SubstructureModelListener {
+
     int width = 1000;
     boolean trackWidth = true;
     int height = 0;
-    
     ArrayList<Layer> layers = new ArrayList<>();
-    LayerModel layerModel;
+    //LayerModel layerModel;
     StructureVisController structureVisController;
     ProjectController projectController;
 
@@ -37,17 +41,21 @@ public class LayerPanel extends javax.swing.JPanel implements Scrollable, LayerM
     public LayerPanel(StructureVisController structureVisController, ProjectController projectController) {
         initComponents();
         jSplitPane1.setDividerLocation(150);
+        this.structureVisController = structureVisController;
+        this.projectController = projectController;
+        this.structureVisController.addView(this);
+        structureVisController.structureVisModel.substructureModel.addSubstructureModelListener(this);
     }
-    
+
     public void setLayerModel(LayerModel layerModel) {
-        if (this.layerModel != null) {
-            this.layerModel.removeLayerModelListener(this);
+        if (structureVisController.structureVisModel.layerModel != null) {
+            structureVisController.structureVisModel.layerModel.removeLayerModelListener(this);
         }
-        this.layerModel = layerModel;
-        this.layerModel.addLayerModelListener(this);
+        structureVisController.structureVisModel.layerModel = layerModel;
+        structureVisController.structureVisModel.layerModel.addLayerModelListener(this);
         resetLayerModel();
     }
-    
+
     public void updatePanel() {
         /*
          * removeAllLayers(); if (genomeLayer != null) { genomeLayer.canPin =
@@ -56,7 +64,7 @@ public class LayerPanel extends javax.swing.JPanel implements Scrollable, LayerM
          * i++) { if (!pinnedLayers.get(i).equals(graphLayer1D)) { if
          * (pinnedLayers.get(i).isPinned) { addLayer(pinnedLayers.get(i)); } } }
          */
-        
+
         refresh();
         revalidate();
         repaint();
@@ -64,7 +72,7 @@ public class LayerPanel extends javax.swing.JPanel implements Scrollable, LayerM
          * for (int i = 0; i < layers.size(); i++) { layers.get(i).redraw(); }
          */
     }
-    
+
     public void refresh() {
         //leftPanel.removeAll();
         //rightPanel.removeAll();
@@ -77,7 +85,7 @@ public class LayerPanel extends javax.swing.JPanel implements Scrollable, LayerM
         }
         this.setPreferredSize(new Dimension(this.getPreferredSize().width, height));
     }
-    
+
     public void addLayer(Layer layer, boolean add) {
         layer.parent = this;
         layer.refresh();
@@ -86,12 +94,12 @@ public class LayerPanel extends javax.swing.JPanel implements Scrollable, LayerM
         }
         layer.getLeft().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
         leftPanel.add(layer.getLeft());
-        
+
         layer.getRight().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
         rightPanel.add(layer.getRight());
-        
+
         height += layer.getLeft().getPreferredSize().height;
-        
+
     }
 
     /**
@@ -127,48 +135,48 @@ public class LayerPanel extends javax.swing.JPanel implements Scrollable, LayerM
         return this.getPreferredSize();
         // return new Dimension(1000,100);
     }
-    
+
     public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
         return -1;
     }
-    
+
     public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
         return -1;
     }
-    
+
     public boolean getScrollableTracksViewportWidth() {
         return trackWidth;
     }
-    
+
     public boolean getScrollableTracksViewportHeight() {
         return false;
     }
-    
+
     public void autofitWidth() {
         trackWidth = true;
         this.revalidate();
         width = getWidth();
     }
-    
+
     public void resizeWidth(int width) {
         trackWidth = false;
         this.setPreferredSize(new Dimension(width, height));
         this.revalidate();
     }
-    
+
     public void zoomIn() {
         width = (int) ((double) getWidth() * 1.5);
         resizeWidth(width);
     }
-    
+
     public void zoomOut() {
         width = (int) ((double) getWidth() / 1.5);
         resizeWidth(width);
     }
-    
+
     public void addItems(int index0, int index1) {
         for (int i = index0; i <= index1; i++) {
-            LayerItem item = layerModel.items.get(i);
+            LayerItem item = structureVisController.structureVisModel.layerModel.items.get(i);
             if (item.type == LayerType.ANNOTATIONS) {
                 AnnotationSource annotationSource = (AnnotationSource) item.object;
                 AnnotationsLayer annotationsLayer = new AnnotationsLayer(null, structureVisController, projectController);
@@ -187,27 +195,74 @@ public class LayerPanel extends javax.swing.JPanel implements Scrollable, LayerM
         }
         refresh();
     }
-    
-    public void resetLayerModel()
-    {
-         this.leftPanel.removeAll();
+
+    public void resetLayerModel() {
+        this.leftPanel.removeAll();
         this.rightPanel.removeAll();
         height = 0;
-        addItems(0,layerModel.items.size()-1);
+        addItems(0, structureVisController.structureVisModel.layerModel.items.size() - 1);
     }
-    
+
     @Override
     public void intervalAdded(int index0, int index1) {
         addItems(index0, index1);
     }
-    
+
     @Override
     public void intervalRemoved(int index0, int index1) {
         //throw new UnsupportedOperationException("Not supported yet.");
     }
-    
+
     @Override
     public void contentsChanged(int index0, int index1) {
-       resetLayerModel();
+        resetLayerModel();
+    }
+
+    @Override
+    public void dataSource1DChanged(DataOverlay1D dataSource1D) {
+        System.out.println("LayerPanel.dataSource1DChanged " + dataSource1D);
+        if (structureVisController.structureVisModel.layerModel != null) {
+            if (dataSource1D == null) {
+                structureVisController.structureVisModel.layerModel.setDataOverlay1D(1, "1D overlay (none)", null);
+            } else {
+                structureVisController.structureVisModel.layerModel.setDataOverlay1D(1, dataSource1D.title, dataSource1D);
+            }
+        }
+    }
+
+    @Override
+    public void dataSource2DChanged(DataOverlay2D dataSource2D) {
+    }
+
+    @Override
+    public void structureSourceChanged(StructureOverlay structureSource) {
+    }
+
+    @Override
+    public void annotationSourceChanged(AnnotationSource annotationSource) {
+    }
+
+    @Override
+    public void nucleotideSourceChanged(NucleotideComposition nucleotideSource) {
+    }
+
+    @Override
+    public void structureVisModelChanged(StructureVisModel newStructureVisModel) {
+        this.structureVisController.structureVisModel.substructureModel.removeSubstructureModelListener(this);
+        structureVisController.structureVisModel = newStructureVisModel;
+        newStructureVisModel.substructureModel.addSubstructureModelListener(this);
+        this.setLayerModel(newStructureVisModel.layerModel);
+    }
+
+    @Override
+    public void dataOverlayAdded(Overlay overlay) {
+    }
+
+    @Override
+    public void dataOverlayRemoved(Overlay overlay) {
+    }
+
+    @Override
+    public void dataOverlayChanged(Overlay oldOverlay, Overlay newOverlay) {
     }
 }

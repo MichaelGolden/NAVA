@@ -11,6 +11,7 @@ import javax.swing.event.EventListenerList;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import nava.structurevis.data.*;
+import nava.structurevis.layerpanel.LayerModel;
 import nava.structurevis.navigator.DataOverlayTreeModel;
 import nava.ui.ProjectController;
 import nava.utils.Mapping;
@@ -30,10 +31,10 @@ public class StructureVisModel implements Serializable {
     public SafeListModel<AnnotationSource> annotationSources = new SafeListModel<>();
     public SafeListModel<NucleotideComposition> nucleotideSources = new SafeListModel<>();
     public DataOverlayTreeModel overlayNavigatorTreeModel;
-    // protected transient EventListenerList listeners = new EventListenerList();
-    public  SubstructureModel substructureModel;
-    Hashtable<Pair<MappingSource, MappingSource>, Mapping> mappings = new Hashtable<>(); // data mapping source, structure mapping source
-    //public File structureVisModelFile = null;
+    public  SubstructureModel substructureModel;    
+    public LayerModel layerModel;
+    Hashtable<Pair<MappingSource, MappingSource>, Mapping> mappings = new Hashtable<>(); // structure mapping source, data mapping source
+
 
 
     public void saveStructureVisModel(File outFile) {
@@ -79,7 +80,11 @@ public class StructureVisModel implements Serializable {
         }
         if (overlayNavigatorTreeModel == null) {
             overlayNavigatorTreeModel = new DataOverlayTreeModel(new DefaultMutableTreeNode(), structureVisController);
-        }        
+        }
+        if(layerModel == null)
+        {
+            layerModel = new LayerModel();
+        }
         substructureModel.initialise(structureVisController);
         structureVisController.addView(overlayNavigatorTreeModel);
         structureVisDataOverlays1D.addSafeListListener(structureVisController);

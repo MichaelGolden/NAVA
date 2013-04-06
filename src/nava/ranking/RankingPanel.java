@@ -11,6 +11,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Objects;
@@ -191,15 +192,10 @@ public class RankingPanel extends javax.swing.JPanel {
 
                     //System.out.println(ranking.zScore + "\t" + StatUtil.erf(Math.abs(ranking.zScore/2)) + "\t" + StatUtil.erfc(Math.abs(ranking.zScore))+ "\t" + StatUtil.erfcx(Math.abs(ranking.zScore))+ "\t" + StatUtil.getInvCDF(Math.abs(ranking.zScore), true)+"\t"+RankingAnalyses.NormalZ(Math.abs(ranking.zScore))/2);
                     final Object[] row = {new Integer(i + 1), structure.name, new Location(structure.startPosition, structure.startPosition + structure.length), new Integer(structure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore), ranking};
-                    SwingUtilities.invokeLater(
-                            new Runnable() {
 
-                                @Override
-                                public void run() {
-                                    rankingTable.tableDataModel.addRow(row);
-                                    rankingTable.repaint();
-                                }
-                            });
+                    rankingTable.tableDataModel.addRow(row);
+                    rankingTable.repaint();
+
                 }
 
                 ArrayList<Object[]> clone = new ArrayList<>();
@@ -222,8 +218,8 @@ public class RankingPanel extends javax.swing.JPanel {
                         Logger.getLogger(RankingPanel.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-                
-                double [] fullGenomeValues = RankingAnalyses.toDoubleArray(fullGenomeList);
+
+                double[] fullGenomeValues = RankingAnalyses.toDoubleArray(fullGenomeList);
                 NHistogramClass fullHist = new NHistogramClass("Full", Color.red, fullGenomeList);
                 fullHist.calculate(dataOverlay2D.minValue, dataOverlay2D.maxValue, 30, dataOverlay2D.dataTransform);
                 for (int i = rows.size(); running && i < structures.size(); i++) {
@@ -235,15 +231,9 @@ public class RankingPanel extends javax.swing.JPanel {
                         ranking = RankingAnalyses.rankSequenceData2D(dataOverlay2D, structureVisController.getMapping(structureOverlay.mappingSource, dataOverlay2D.mappingSource), structure, structureOverlay.pairedSites, paired, unpaired, fullGenomeList, fullGenomeValues, fullHist, i + 1);
 
                         final Object[] row = {new Integer(i + 1), structure.name, new Location(structure.startPosition, structure.startPosition + structure.length), new Integer(structure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore), ranking};
-                        SwingUtilities.invokeLater(
-                                new Runnable() {
 
-                                    @Override
-                                    public void run() {
-                                        rankingTable.tableDataModel.addRow(row);
-                                        rankingTable.repaint();
-                                    }
-                                });
+                        rankingTable.tableDataModel.addRow(row);
+                        rankingTable.repaint();
 
                     } catch (IOException ex) {
                         Logger.getLogger(RankingPanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -287,9 +277,9 @@ public class RankingPanel extends javax.swing.JPanel {
         kill();
 
         if (dataOverlayBox.getSelectedIndex() >= 0) {
-            Overlay dataOverlay = dataOverlays.get(dataOverlayBox.getSelectedIndex());            
+            Overlay dataOverlay = dataOverlays.get(dataOverlayBox.getSelectedIndex());
             StructureOverlay structureOverlay = (StructureOverlay) structureOverlayComboBox.getSelectedItem();
-            if (dataOverlay != null && structureOverlay != null) {  
+            if (dataOverlay != null && structureOverlay != null) {
                 nHistPanel.setNHistogram(null);
                 structureOverlay.loadData();
                 currentThread = new RankingThread(dataOverlay, structureOverlay);

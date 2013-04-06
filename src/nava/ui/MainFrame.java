@@ -38,6 +38,9 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
     public static PropertyResourceBundle resources = (PropertyResourceBundle) ResourceBundle.getBundle("resources.text.text");
     public static TaskManager taskManager;
     public static DataSourceCache dataSourceCache = new DataSourceCache();
+    public static ProgressBarMonitor progressBarMonitor = new ProgressBarMonitor();
+    public static ProgressMonitor progressMonitor;
+    public static MainFrame self;
     ProjectController projectController;
     ApplicationController appController;
     NavigatorPanel navigatorPanel;
@@ -51,6 +54,8 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
     public static File workspaceDirectory = new File("workspace" + File.separator);
 
     public void startup() {
+        MainFrame.self = this;
+        progressMonitor = new ProgressMonitor(this, "", "", 0, 100);;
         try {
             fontLiberationSans = Font.createFont(Font.PLAIN, ClassLoader.getSystemResourceAsStream("resources/fonts/LiberationSans-Regular.ttf")).deriveFont(12.0f);
             fontDroidSansMono = Font.createFont(Font.PLAIN, ClassLoader.getSystemResourceAsStream("resources/fonts/DroidSansMono.ttf")).deriveFont(12.0f);
@@ -118,9 +123,9 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
                 if (structureVisModelFile.exists()) {
                     structureVisPanel.structureVisController.openStructureVisModel(StructureVisModel.loadProject(structureVisModelFile, structureVisPanel.structureVisController));
                 } else {
-                    StructureVisModel model = new StructureVisModel();                                    
+                    StructureVisModel model = new StructureVisModel();
                     model.initialise(structureVisPanel.structureVisController);
-                    structureVisPanel.structureVisController.openStructureVisModel(model);    
+                    structureVisPanel.structureVisController.openStructureVisModel(model);
                 }
             } else {
                 projectController.openProject(new ProjectModel(projectDirectory.getAbsolutePath()));
@@ -278,6 +283,7 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
 
     public void close() {
         projectController.saveProject();
+        taskManager.stopTaskManager();
         structureVisPanel.structureVisController.structureVisModel.saveStructureVisModel(new File(structureVisPanel.structureVisController.structureVisModel.getStructureVisModelPathString(structureVisPanel.structureVisController)));
         System.exit(0);
     }
@@ -287,6 +293,7 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
+
         JFrame frame = new JFrame("Structure ranking");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setIconImage(getIconImage());

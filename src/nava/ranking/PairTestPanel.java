@@ -162,7 +162,7 @@ public class PairTestPanel extends javax.swing.JPanel {
                 PairTestKey key = new PairTestKey(dataOverlay1D, structureOverlay);
                 ArrayList rows = getListFromCache(key);
                 pairTable.tableDataModel.addRows(rows);
-                ArrayList<Substructure> structures = new ArrayList<>();                
+                ArrayList<Substructure> structures = new ArrayList<>();
                 structures.add(new Substructure(0, structureOverlay.pairedSites));
                 structures.addAll(structureOverlay.substructureList.substructures);
                 for (int i = rows.size(); running && i < structures.size(); i++) {
@@ -180,15 +180,9 @@ public class PairTestPanel extends javax.swing.JPanel {
                     } else {
                         row = row1;
                     }
-                    SwingUtilities.invokeLater(
-                            new Runnable() {
+                    pairTable.tableDataModel.addRow(row);
+                    pairTable.repaint();
 
-                                @Override
-                                public void run() {
-                                    pairTable.tableDataModel.addRow(row);
-                                    pairTable.repaint();
-                                }
-                            });
                 }
 
                 ArrayList<Object[]> clone = new ArrayList<>();
@@ -202,7 +196,7 @@ public class PairTestPanel extends javax.swing.JPanel {
                 PairTestKey key = new PairTestKey(dataOverlay2D, structureOverlay);
                 ArrayList rows = getListFromCache(key);
                 pairTable.tableDataModel.addRows(rows);
-                ArrayList<Substructure> structures = new ArrayList<>();                
+                ArrayList<Substructure> structures = new ArrayList<>();
                 structures.add(new Substructure(0, structureOverlay.pairedSites));
                 structures.addAll(structureOverlay.substructureList.substructures);
                 for (int i = rows.size(); running && i < structures.size(); i++) {
@@ -221,15 +215,9 @@ public class PairTestPanel extends javax.swing.JPanel {
                         } else {
                             row = row1;
                         }
-                        SwingUtilities.invokeLater(
-                                new Runnable() {
 
-                                    @Override
-                                    public void run() {
-                                        pairTable.tableDataModel.addRow(row);
-                                        pairTable.repaint();
-                                    }
-                                });
+                        pairTable.tableDataModel.addRow(row);
+                        pairTable.repaint();
 
                     } catch (IOException ex) {
                         Logger.getLogger(PairTestPanel.class.getName()).log(Level.SEVERE, null, ex);

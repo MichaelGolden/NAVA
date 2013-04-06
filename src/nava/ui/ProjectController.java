@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.TreeModelListener;
@@ -261,27 +262,50 @@ public class ProjectController implements SafeListListener {
         return p;
     }
 
-    public Pair<DataType, DataSource> autoAddDataSourceWithAmbiguityResolution(File dataFile) {
-        ArrayList<DataType> possibleDataTypes = null;
-        if (dataFile.isFile()) {
-            possibleDataTypes = FileImport.getPossibleDataTypes(dataFile);
-        }
-        if (possibleDataTypes != null && possibleDataTypes.size() > 0) {
-            if (possibleDataTypes.size() == 1) {
-                DataSource dataSource = importDataSourceFromFile(dataFile, possibleDataTypes.get(0));
-                return new Pair(possibleDataTypes.get(0), dataSource);
-            } else {
-                ResolveImportAmbiguityDialog resolveDialog = new ResolveImportAmbiguityDialog(null, true, dataFile, possibleDataTypes);
-                resolveDialog.setIconImage(new ImageIcon(ClassLoader.getSystemResource("resources/icons/icon-32x32.png")).getImage());
-                GraphicsUtils.centerWindowOnScreen(resolveDialog);
-                resolveDialog.setVisible(true);
+    public void autoAddDataSourceWithAmbiguityResolution(final File dataFile) {
+        final Runnable progressBarThread = new Runnable() {
 
-                DataSource dataSource = importDataSourceFromFile(dataFile, resolveDialog.getSelectedDataType());
-                return new Pair(resolveDialog.getSelectedDataType(), dataSource);
+            public void run() {
+                MainFrame.progressBarMonitor.set(true, ProgressBarMonitor.IMPORT_DATASOURCE, 0);
+                MainFrame.self.setEnabled(false);
             }
-        }
+        };
+        Thread taskThread = new Thread() {
 
-        return null;
+            public void run() {
+                try {
+                    SwingUtilities.invokeAndWait(progressBarThread);
+
+                    ArrayList<DataType> possibleDataTypes = null;
+                    if (dataFile.isFile()) {
+                        possibleDataTypes = FileImport.getPossibleDataTypes(dataFile);
+                    }
+                    if (possibleDataTypes != null && possibleDataTypes.size() > 0) {
+                        if (possibleDataTypes.size() == 1) {
+                            DataSource dataSource = importDataSourceFromFile(dataFile, possibleDataTypes.get(0));
+                            //return new Pair(possibleDataTypes.get(0), dataSource);
+                        } else {
+                            ResolveImportAmbiguityDialog resolveDialog = new ResolveImportAmbiguityDialog(null, true, dataFile, possibleDataTypes);
+                            resolveDialog.setIconImage(new ImageIcon(ClassLoader.getSystemResource("resources/icons/icon-32x32.png")).getImage());
+                            GraphicsUtils.centerWindowOnScreen(resolveDialog);
+                            resolveDialog.setVisible(true);
+
+                            DataSource dataSource = importDataSourceFromFile(dataFile, resolveDialog.getSelectedDataType());
+                            //return new Pair(resolveDialog.getSelectedDataType(), dataSource);
+                        }
+                    }
+
+                    MainFrame.progressBarMonitor.set(false, ProgressBarMonitor.INACTIVE, ProgressBarMonitor.INACTIVE_VALUE);
+                    MainFrame.self.setEnabled(true);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        taskThread.start();
+
+        // return null;
     }
 
     public Pair<DataType, DataSource> autoAddDataSource(File dataFile) {

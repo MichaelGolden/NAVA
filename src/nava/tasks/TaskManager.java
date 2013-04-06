@@ -79,10 +79,7 @@ public class TaskManager extends Thread {
                     }
                 } else {
                     if (task.getStatus() == Status.STOPPED) {
-                        
-                    }
-                    else
-                    {
+                    } else {
                         task.setStatus(Status.FINISHED);
                     }
                 }
@@ -127,6 +124,14 @@ public class TaskManager extends Thread {
         }
     }
 
+    public void stopTaskManager() {
+        running = false;
+
+        for (Task t : runQueue) {
+            t.cancelTask();
+        }
+    }
+
     /*
      * public void queueUITask(UITask task) { task.taskManager = this;
      *
@@ -135,15 +140,23 @@ public class TaskManager extends Thread {
      * uiTaskQueue.add(task); task.setStatus(Status.QUEUED); task.queueTime =
      * System.currentTimeMillis(); } }
      */
+    boolean running = true;
 
     @Override
     public void run() {
-        while (true) {
+        while (running) {
+            if (!running) {
+                // cancel all tasks
+                for (Task t : runQueue) {
+                    t.cancelTask();
+                }
+                break;
+            }
+
             availableSlots = totalSlots - usedSlots;
             /*
              * if (availableSlots > 0 && uiTaskQueue.size() > 0) { UITask task =
-             * uiTaskQueue.removeFirst(); runTask(task);
-            }
+             * uiTaskQueue.removeFirst(); runTask(task); }
              */
 
             if (availableSlots <= 0 && generalTaskQueue.size() > 0) {
@@ -186,7 +199,7 @@ public class TaskManager extends Thread {
     public void fireTaskStatusChanged(Task task, Status oldStatus, Status newStatus) {
         if (newStatus == Status.FINISHED || newStatus == Status.STOPPED) {
             dequeTask(task);
-            
+
         }
 
         Object[] listeners = this.listeners.getListenerList();

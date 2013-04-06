@@ -6,10 +6,16 @@ package nava.structurevis;
 
 import java.awt.Color;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
 import javax.swing.event.EventListenerList;
 import nava.structurevis.data.*;
 import nava.structurevis.navigator.DataOverlayTreeModel;
+import nava.ui.MainFrame;
+import nava.ui.ProgressBarMonitor;
 import nava.utils.Mapping;
 
 /**
@@ -17,9 +23,8 @@ import nava.utils.Mapping;
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
 public class SubstructureModel implements Serializable {
-    
+
     private static final long serialVersionUID = -6779025860776191876L;
-    
     public static Color missingDataColor = Color.gray;
     public static Color filteredDataColor = Color.darkGray;
     int sequenceLength;
@@ -37,16 +42,12 @@ public class SubstructureModel implements Serializable {
     transient DistanceMatrix distanceMatrix = null;
     transient DistanceMatrix structureDistanceMatrix = null;
     int maxDistance = -1;
-   /* 
-    boolean useLowerThreshold1D = false;
-    boolean useUpperThreshold1D = false;
-    boolean useLowerThreshold2D = false;
-    boolean useUpperThreshold2D = false;
-    double thresholdMin1D;
-    double thresholdMax1D;
-    double thresholdMin2D;
-    double thresholdMax2D;
-    */
+    /*
+     * boolean useLowerThreshold1D = false; boolean useUpperThreshold1D = false;
+     * boolean useLowerThreshold2D = false; boolean useUpperThreshold2D = false;
+     * double thresholdMin1D; double thresholdMax1D; double thresholdMin2D;
+     * double thresholdMax2D;
+     */
     transient StructureVisController structureVisController;
 
     public SubstructureModel(StructureVisController structureVisController) {
@@ -82,17 +83,43 @@ public class SubstructureModel implements Serializable {
         } else if (overlay instanceof NucleotideComposition) {
             this.setNucleotideOverlay((NucleotideComposition) overlay);
         }
-        
+
     }
 
-    public void setOverlay1D(DataOverlay1D dataSource1D) {
-        if (dataSource1D != null) {
-            dataSource1D.loadData();
-        }
+    public void setOverlay1D(final DataOverlay1D dataSource1D) {
+
         this.data1D = dataSource1D;
-        if (data1D != null && data1D.mappingSource != null && structureOverlay != null && structureOverlay.mappingSource != null) {
-            mapping1D = structureVisController.getMapping(structureOverlay.mappingSource, data1D.mappingSource);
-        }
+
+        final Runnable progressBarThread = new Runnable() {
+
+            public void run() {
+                MainFrame.progressBarMonitor.set(true, ProgressBarMonitor.CREATE_MAPPING, 0);
+                MainFrame.self.setEnabled(false);
+            }
+        };
+
+        Thread taskThread = new Thread() {
+
+            public void run() {
+                try {
+                    SwingUtilities.invokeAndWait(progressBarThread);
+
+                    if (dataSource1D != null) {
+                        dataSource1D.loadData();
+                    }
+                    if (data1D != null && data1D.mappingSource != null && structureOverlay != null && structureOverlay.mappingSource != null) {
+                        mapping1D = structureVisController.getMapping(structureOverlay.mappingSource, data1D.mappingSource);
+                    }
+                    fireDataOverlay1DChanged(dataSource1D);
+
+                    MainFrame.progressBarMonitor.set(false, ProgressBarMonitor.INACTIVE, ProgressBarMonitor.INACTIVE_VALUE);
+                    MainFrame.self.setEnabled(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        taskThread.start();
 
         // set selection state
         for (int i = 0; i < structureVisController.structureVisModel.structureVisDataOverlays1D.size(); i++) {
@@ -102,17 +129,39 @@ public class SubstructureModel implements Serializable {
                 structureVisController.structureVisModel.structureVisDataOverlays1D.get(i).setState(Overlay.OverlayState.UNSELECTED);
             }
         }
-        fireDataOverlay1DChanged(dataSource1D);
     }
 
-    public void setOverlay2D(DataOverlay2D dataSource2D) {
-        if (dataSource2D != null) {
-            dataSource2D.loadData();
-        }
+    public void setOverlay2D(final DataOverlay2D dataSource2D) {
+
         this.data2D = dataSource2D;
-        if (data2D != null && data2D.mappingSource != null && structureOverlay != null && structureOverlay.mappingSource != null) {
-            mapping2D = structureVisController.getMapping(structureOverlay.mappingSource, data2D.mappingSource);
-        }
+
+        final Runnable progressBarThread = new Runnable() {
+
+            public void run() {
+                MainFrame.progressBarMonitor.set(true, ProgressBarMonitor.CREATE_MAPPING, 0);
+                MainFrame.self.setEnabled(false);
+            }
+        };
+
+        Thread taskThread = new Thread() {
+
+            public void run() {
+                try {
+                    SwingUtilities.invokeAndWait(progressBarThread);
+
+                    if (data2D != null && data2D.mappingSource != null && structureOverlay != null && structureOverlay.mappingSource != null) {
+                        mapping2D = structureVisController.getMapping(structureOverlay.mappingSource, data2D.mappingSource);
+                    }
+                    fireDataOverlay2DChanged(dataSource2D);
+
+                    MainFrame.progressBarMonitor.set(false, ProgressBarMonitor.INACTIVE, ProgressBarMonitor.INACTIVE_VALUE);
+                    MainFrame.self.setEnabled(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        taskThread.start();
 
         // set selection state
         for (int i = 0; i < structureVisController.structureVisModel.structureVisDataOverlays2D.size(); i++) {
@@ -122,28 +171,52 @@ public class SubstructureModel implements Serializable {
                 structureVisController.structureVisModel.structureVisDataOverlays2D.get(i).setState(Overlay.OverlayState.UNSELECTED);
             }
         }
-        fireDataOverlay2DChanged(dataSource2D);
     }
 
-    public void setStructureOverlay(StructureOverlay structureOverlay) {
-        System.out.println("setStructureOverlay\t"+structureOverlay);
-        if (structureOverlay != null) {
-            structureOverlay.loadData();
-        }
-        this.structureOverlay = structureOverlay;
-        if (structureOverlay != null) {
+    public void setStructureOverlay(final StructureOverlay structureOverlay) {
 
-            this.sequenceLength = structureOverlay.pairedSites.length;
-            if (data1D != null && data1D.mappingSource != null && structureOverlay.mappingSource != null) {
-                mapping1D = structureVisController.getMapping(structureOverlay.mappingSource, data1D.mappingSource);
+        this.structureOverlay = structureOverlay;
+        
+        final Runnable progressBarThread = new Runnable() {
+            public void run() {
+                MainFrame.progressBarMonitor.set(true, ProgressBarMonitor.CREATE_MAPPING, 0);
+                MainFrame.self.setEnabled(false);
             }
-            if (data2D != null && data2D.mappingSource != null && structureOverlay.mappingSource != null) {
-                mapping2D = structureVisController.getMapping(structureOverlay.mappingSource, data2D.mappingSource);
+        };
+
+        Thread taskThread = new Thread() {
+            public void run() {
+                try {
+                    SwingUtilities.invokeAndWait(progressBarThread);
+
+                    if (structureOverlay != null) {
+                        structureOverlay.loadData();
+                    }
+
+
+                    if (structureOverlay != null) {
+
+                        SubstructureModel.this.sequenceLength = structureOverlay.pairedSites.length;
+                        if (data1D != null && data1D.mappingSource != null && structureOverlay.mappingSource != null) {
+                            mapping1D = structureVisController.getMapping(structureOverlay.mappingSource, data1D.mappingSource);
+                        }
+                        if (data2D != null && data2D.mappingSource != null && structureOverlay.mappingSource != null) {
+                            mapping2D = structureVisController.getMapping(structureOverlay.mappingSource, data2D.mappingSource);
+                        }
+                        if (nucleotideSource != null && nucleotideSource.mappingSource != null) {
+                            nucleotideMapping = structureVisController.getMapping(structureOverlay.mappingSource, nucleotideSource.mappingSource);
+                        }
+                    }
+                    fireStructureOverlayChanged(structureOverlay);
+
+                    MainFrame.progressBarMonitor.set(false, ProgressBarMonitor.INACTIVE, ProgressBarMonitor.INACTIVE_VALUE);
+                    MainFrame.self.setEnabled(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-            if (nucleotideSource != null && nucleotideSource.mappingSource != null) {
-                nucleotideMapping = structureVisController.getMapping(structureOverlay.mappingSource, nucleotideSource.mappingSource);
-            }
-        }
+        };
+        taskThread.start();
 
         for (int i = 0; i < structureVisController.structureVisModel.structureSources.size(); i++) {
             if (structureVisController.structureVisModel.structureSources.get(i).equals(structureOverlay)) {
@@ -152,14 +225,37 @@ public class SubstructureModel implements Serializable {
                 structureVisController.structureVisModel.structureSources.get(i).setState(Overlay.OverlayState.UNSELECTED);
             }
         }
-        fireStructureOverlayChanged(structureOverlay);
     }
 
-    public void setNucleotideOverlay(NucleotideComposition nucleotideOverlay) {
+    public void setNucleotideOverlay(final NucleotideComposition nucleotideOverlay) {
         this.nucleotideSource = nucleotideOverlay;
         if (nucleotideOverlay != null && nucleotideOverlay.mappingSource != null && structureOverlay != null) {
-            nucleotideMapping = structureVisController.getMapping(structureOverlay.mappingSource, nucleotideOverlay.mappingSource);
+
+            final Runnable progressBarThread = new Runnable() {
+                public void run() {
+                    MainFrame.progressBarMonitor.set(true, ProgressBarMonitor.CREATE_MAPPING, 0);
+                    MainFrame.self.setEnabled(false);
+                }
+            };
+            Thread taskThread = new Thread() {
+                public void run() {
+                    try {
+                        SwingUtilities.invokeAndWait(progressBarThread);
+
+                        nucleotideMapping = structureVisController.getMapping(structureOverlay.mappingSource, nucleotideOverlay.mappingSource);
+                        fireNucleotideOverlayChanged(nucleotideOverlay);
+
+                        MainFrame.progressBarMonitor.set(false, ProgressBarMonitor.INACTIVE, ProgressBarMonitor.INACTIVE_VALUE);
+                        MainFrame.self.setEnabled(true);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            taskThread.start();
         }
+
         for (int i = 0; i < structureVisController.structureVisModel.nucleotideSources.size(); i++) {
             if (structureVisController.structureVisModel.nucleotideSources.get(i).equals(nucleotideOverlay)) {
                 structureVisController.structureVisModel.nucleotideSources.get(i).setState(Overlay.OverlayState.PRIMARY_SELECTED);
@@ -167,7 +263,6 @@ public class SubstructureModel implements Serializable {
                 structureVisController.structureVisModel.nucleotideSources.get(i).setState(Overlay.OverlayState.UNSELECTED);
             }
         }
-        fireNucleotideOverlayChanged(nucleotideOverlay);
     }
 
     public AnnotationSource getAnnotationSource() {
@@ -223,7 +318,7 @@ public class SubstructureModel implements Serializable {
         // and the second is the listener instance
         for (int i = 0; i < listeners.length; i += 2) {
             if (listeners[i] == SubstructureModelListener.class) {
-                System.out.println("fireStructureOverlayChanged "+((SubstructureModelListener) listeners[i + 1]));
+                System.out.println("fireStructureOverlayChanged " + ((SubstructureModelListener) listeners[i + 1]));
                 ((SubstructureModelListener) listeners[i + 1]).structureSourceChanged(structureSource);
             }
         }

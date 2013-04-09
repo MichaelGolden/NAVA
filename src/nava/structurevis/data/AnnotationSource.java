@@ -221,7 +221,7 @@ public class AnnotationSource implements Serializable {
                 Mapping mapping = structureVisController.getMapping(structureSource.mappingSource, mappedFeature.mappingSource);
 
                 if (mapping != null) {
-                    annotationSource.mappedSequenceLength = Math.max(annotationSource.mappedSequenceLength, mapping.getBLength());
+                    annotationSource.mappedSequenceLength = Math.max(annotationSource.mappedSequenceLength, mapping.getALength());
                     mappedFeature.min = mapping.bToANearest(feature.min - 1);
                     mappedFeature.max = mapping.bToANearest(feature.max - 1);
                     if (mappedFeature.min == -1) {

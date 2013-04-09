@@ -22,6 +22,10 @@ public class RNAalifoldApplication extends Application {
     private static boolean useOldParams = false;
     private Process process = null;
 
+    public RNAalifoldApplication() {
+        this.setApplicationDialog(new RNAalifoldGUI(MainFrame.self, true));
+    }
+
     public boolean checkRNAalifold() {
         try {
             ArrayList<String> sequences = new ArrayList<String>();
@@ -125,7 +129,7 @@ public class RNAalifoldApplication extends Application {
         }
 
         try {
-            String tempPath = createTemporaryDirectory().getAbsolutePath()+File.separator;
+            String tempPath = createTemporaryDirectory().getAbsolutePath() + File.separator;
             File tempClustalFile = new File(tempPath + "temp.clustalw");
             saveClustalW(sequences, sequenceNames, tempClustalFile);
             String args = executable + " " + "-p " + arguments;
@@ -155,7 +159,10 @@ public class RNAalifoldApplication extends Application {
 
             if (exitCode == 0) {
                 File matrixFile = new File(tempPath + "rnaalifold.cmat");
-                saveBasePairProbMatrixAsCoordinateListMatrix(new File(tempPath + "alidot.ps"), sequences.get(0).length(), matrixFile);
+                File matrixOutputFile = new File(tempPath + "alidot.ps");
+                if (matrixOutputFile.exists()) {
+                    saveBasePairProbMatrixAsCoordinateListMatrix(matrixOutputFile, sequences.get(0).length(), matrixFile);
+                }
 
                 ApplicationOutput outputFile1 = new ApplicationOutput();
                 outputFile1.file = null;
@@ -166,13 +173,15 @@ public class RNAalifoldApplication extends Application {
                 outputFile1.object = new SecondaryStructureData(inputDataSource.title, sequences.get(0), RNAFoldingTools.getPairedSitesFromDotBracketString(loadDotBracketStructure(new File(tempPath + "alifold.out"))));
                 outputFiles.add(outputFile1);
 
-                ApplicationOutput outputFile2 = new ApplicationOutput();
-                outputFile2.file = matrixFile;
-                Matrix matrix = new Matrix();
-                matrix.title = inputDataSource.title;
-                matrix.parentSource = inputDataSource;
-                outputFile2.dataSource = matrix;
-                outputFiles.add(outputFile2);
+                if (matrixOutputFile.exists()) {
+                    ApplicationOutput outputFile2 = new ApplicationOutput();
+                    outputFile2.file = matrixFile;
+                    Matrix matrix = new Matrix();
+                    matrix.title = inputDataSource.title;
+                    matrix.parentSource = inputDataSource;
+                    outputFile2.dataSource = matrix;
+                    outputFiles.add(outputFile2);
+                }
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -222,7 +231,7 @@ public class RNAalifoldApplication extends Application {
                     if (split.length >= 7 && split[6].endsWith("ubox")) {
                         int x = Integer.parseInt(split[3]) - 1;
                         int y = Integer.parseInt(split[4]) - 1;
-                        double prob = Math.pow(Double.parseDouble(split[5]),2);
+                        double prob = Math.pow(Double.parseDouble(split[5]), 2);
                         matrix[x][y] = prob;
                         matrix[y][x] = prob;
                     }
@@ -269,6 +278,11 @@ public class RNAalifoldApplication extends Application {
     boolean running = false;
     boolean canceled = false;
     ArrayList<ApplicationOutput> outputFiles = new ArrayList<>();
+    String arguments = "";
+
+    public void setArguments(String arguments) {
+        this.arguments = arguments;
+    }
 
     @Override
     public void start() {
@@ -286,27 +300,28 @@ public class RNAalifoldApplication extends Application {
                 }
 
                 //result = fold(alignmentData.sequences, sequenceNames, "");
-                execute(alignmentData.sequences, sequenceNames, "");
-                /*if (result != null) {
-                    ApplicationOutput outputFile1 = new ApplicationOutput();
-
-                    outputFile1.file = null;
-                    SecondaryStructure structure = new SecondaryStructure();
-                    structure.title = inputDataSource.title;
-                    structure.parentSource = inputDataSource;
-                    outputFile1.dataSource = structure;
-                    outputFile1.object = new SecondaryStructureData(inputDataSource.title, result.firstSequence, result.pairedSites);
-                    outputFiles.add(outputFile1);
-
-                    ApplicationOutput outputFile2 = new ApplicationOutput();
-                    outputFile2.file = null;
-                    Matrix matrix = new Matrix();
-                    matrix.title = inputDataSource.title;
-                    matrix.parentSource = inputDataSource;
-                    outputFile2.dataSource = matrix;
-                    outputFile2.object = new DenseMatrixData(result.matrix);
-                    outputFiles.add(outputFile2);
-                }*/
+                execute(alignmentData.sequences, sequenceNames, arguments);
+                /*
+                 * if (result != null) { ApplicationOutput outputFile1 = new
+                 * ApplicationOutput();
+                 *
+                 * outputFile1.file = null; SecondaryStructure structure = new
+                 * SecondaryStructure(); structure.title =
+                 * inputDataSource.title; structure.parentSource =
+                 * inputDataSource; outputFile1.dataSource = structure;
+                 * outputFile1.object = new
+                 * SecondaryStructureData(inputDataSource.title,
+                 * result.firstSequence, result.pairedSites);
+                 * outputFiles.add(outputFile1);
+                 *
+                 * ApplicationOutput outputFile2 = new ApplicationOutput();
+                 * outputFile2.file = null; Matrix matrix = new Matrix();
+                 * matrix.title = inputDataSource.title; matrix.parentSource =
+                 * inputDataSource; outputFile2.dataSource = matrix;
+                 * outputFile2.object = new DenseMatrixData(result.matrix);
+                 * outputFiles.add(outputFile2);
+                }
+                 */
             } catch (Exception ex) {
                 Logger.getLogger(RNAalifoldApplication.class.getName()).log(Level.SEVERE, null, ex);
             }

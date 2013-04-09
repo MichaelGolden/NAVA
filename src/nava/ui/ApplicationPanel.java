@@ -57,7 +57,7 @@ public class ApplicationPanel extends javax.swing.JPanel implements ListSelectio
         jList1.setModel(applicationListModel);
         jList1.setCellRenderer(new ApplicationCellRenderer());
         jList1.addListSelectionListener(this);
-        
+
         runButton.setEnabled(false);
 
     }
@@ -86,12 +86,9 @@ public class ApplicationPanel extends javax.swing.JPanel implements ListSelectio
     @Override
     public void valueChanged(ListSelectionEvent e) {
         Application app = (Application) jList1.getSelectedValue();
-        if(app != null && app.canProcessDataSources(selectedDataSources))
-        {
+        if (app != null && app.canProcessDataSources(selectedDataSources)) {
             runButton.setEnabled(true);
-        }        
-        else
-        {
+        } else {
             runButton.setEnabled(false);
         }
     }
@@ -119,9 +116,9 @@ public class ApplicationPanel extends javax.swing.JPanel implements ListSelectio
             //always valid, so just use the value.)
             Application app = (Application) value;
             boolean useable = app.canProcessDataSources(selectedDataSources);
-            Color useableSelectedColor = new Color(190,255,190);
-            Color useableUnselectedColor = new Color(230,255,230);
-            
+            Color useableSelectedColor = new Color(190, 255, 190);
+            Color useableUnselectedColor = new Color(230, 255, 230);
+
             Color unusuableSelectedColor = new Color(235, 235, 255);
             Color unusueableUnselectedColor = new Color(255, 255, 255);
             ApplicationPanelItem item = new ApplicationPanelItem(app.getName(), null, app.getDescription());
@@ -216,8 +213,7 @@ public class ApplicationPanel extends javax.swing.JPanel implements ListSelectio
          * Logger.getLogger(ApplicationPanel.class.getName()).log(Level.SEVERE,
          * null, ex); } catch (IllegalAccessException ex) {
          * Logger.getLogger(ApplicationPanel.class.getName()).log(Level.SEVERE,
-         * null, ex); }
-        }
+         * null, ex); } }
          */
     }//GEN-LAST:event_runButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables

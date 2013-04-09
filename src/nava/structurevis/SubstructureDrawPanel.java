@@ -672,8 +672,8 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
         if (showBonds) {
             //System.out.println("here");
             for (int i = 0; i < nucleotidePositions.length; i++) {
-                int a = i;
-                int b = edit.pairedSites[i] - 1;
+                int a = i  % subtructureModel.structureOverlay.pairedSites.length;
+                int b = edit.pairedSites[i] - 1 % subtructureModel.structureOverlay.pairedSites.length;
                 if (i + 1 < edit.pairedSites[i]) {
                     Line2D bond = new Line2D.Double(nucleotidePositions[a], nucleotidePositions[b]);
                     g.setStroke(new BasicStroke(bondThickness));

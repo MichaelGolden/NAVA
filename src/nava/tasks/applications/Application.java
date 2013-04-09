@@ -7,11 +7,14 @@ package nava.tasks.applications;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JDialog;
 import nava.data.types.DataSource;
 import nava.tasks.Task;
+import nava.ui.MainFrame;
 import nava.ui.console.ConsoleBuffer;
 import nava.ui.console.ConsoleDatabase;
 import nava.ui.console.ConsoleInputHandler;
+import nava.utils.GraphicsUtils;
 
 /**
  *
@@ -27,6 +30,7 @@ public abstract class Application extends Task {
     
     private ConsoleInputHandler consoleInputHandler;
     private ConsoleInputHandler consoleErrorHandler;
+    private JDialog dialog;
 
     
     //BufferedWriter standardBuffer;
@@ -42,6 +46,14 @@ public abstract class Application extends Task {
         combinedBuffer = new ConsoleBuffer(consoleDatabase, taskInstanceId, null);
         //consoleInputBuffer = new ConsoleBuffer(consoleDatabase, appInstanceId, "standard_out");
         //consoleErrorBuffer = new ConsoleBuffer(consoleDatabase, appInstanceId, "standard_err");
+    }
+    
+    public void setApplicationDialog(JDialog dialog)
+    {
+        if(dialog instanceof ApplicationDialog)
+        {
+            this.dialog = dialog;
+        }
     }
     
     
@@ -106,6 +118,14 @@ public abstract class Application extends Task {
     
     @Override
     public void before() {
+        if(dialog != null && dialog instanceof ApplicationDialog)
+        {
+            ApplicationDialog appDialog = (ApplicationDialog)dialog;
+            appDialog.setupApplication(this);
+            GraphicsUtils.centerWindowOnWindow(dialog, MainFrame.self);
+            dialog.setVisible(true);
+        }
+        
         if (combinedBuffer != null) {
             combinedBuffer.bufferedWrite("Started.", taskInstanceId, "console");
         }
@@ -113,7 +133,10 @@ public abstract class Application extends Task {
 
     @Override
     public void task() {
-        start();
+        if(shouldRun())
+        {
+            start();
+        }
     }
 
     @Override
@@ -135,5 +158,14 @@ public abstract class Application extends Task {
         File tempDir = new File(System.getProperty("java.io.tmpdir") + "/" + taskInstanceId+"/");
         tempDir.mkdirs();
         return tempDir;
+    }
+    
+    public boolean shouldRun()
+    {
+        if(dialog != null && dialog instanceof ApplicationDialog)
+        {
+            return ((ApplicationDialog)dialog).shouldRunOnDialogClose();
+        }
+        return true;
     }
 }

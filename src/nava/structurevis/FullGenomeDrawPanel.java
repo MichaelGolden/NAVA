@@ -4,36 +4,23 @@
  */
 package nava.structurevis;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.*;
+import java.awt.event.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
-import nava.structurevis.data.*;
+import nava.structurevis.data.Overlay;
 import nava.structurevis.data.PersistentSparseMatrix.Element;
+import nava.structurevis.data.StructureOverlay;
+import nava.structurevis.data.Substructure;
 import nava.utils.ColorUtils;
 import nava.utils.GraphicsUtils;
 import nava.utils.RNAFoldingTools;
@@ -190,7 +177,9 @@ public class FullGenomeDrawPanel extends JPanel implements ActionListener, Mouse
             }
 
 
-            setPreferredSize(new Dimension((int) (width + 1), (int) (basePosY + lowestPosY + 1)));
+            setPreferredSize(new Dimension((int) (width + 1), (int) (basePosY + lowestPosY + 1)));            
+            revalidate();
+            System.out.println("Genome draw panel size " + getSize());
         }
     }
 

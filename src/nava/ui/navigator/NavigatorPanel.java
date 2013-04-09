@@ -13,6 +13,8 @@ import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.List;
 import javax.swing.*;
@@ -24,18 +26,27 @@ import javax.swing.text.StyledDocument;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
+import nava.data.types.DataSource;
+import nava.structurevis.data.DataOverlay1D;
+import nava.structurevis.data.Overlay;
+import nava.structurevis.navigator.DataOverlayTreeNode;
 import nava.ui.*;
+import nava.utils.GraphicsUtils;
 
 /**
  *
  * @author Michael
  */
-public class NavigatorPanel extends javax.swing.JPanel implements ActionListener, TreeSelectionListener, TreeModelListener, ProjectView {
+public class NavigatorPanel extends javax.swing.JPanel implements ActionListener, TreeSelectionListener, TreeModelListener, ProjectView, MouseListener {
 
     public static final ImageIcon addIcon = new ImageIcon(ClassLoader.getSystemResource("resources/icons/add-16x16.png"));
     JButton importButton = new JButton("Import file", addIcon);
     ProjectController projectController;
     JFileChooser importFileChooser = new JFileChooser();
+    JPopupMenu popupMenu = new JPopupMenu();
+    //JPopupMenu popupMenu2 = new JPopupMenu();
+    JMenuItem exportItem = new JMenuItem("Export");
+    JMenuItem deleteItem = new JMenuItem("Delete");
 
     /**
      * Creates new form NavigatorPanel
@@ -60,6 +71,7 @@ public class NavigatorPanel extends javax.swing.JPanel implements ActionListener
         navigationTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         navigationTree.addTreeSelectionListener(this);
 
+        navigationTree.addMouseListener(this);
         navigationTree.setDropTarget(new DropTarget() {
 
             public synchronized void drop(DropTargetDropEvent evt) {
@@ -122,6 +134,11 @@ public class NavigatorPanel extends javax.swing.JPanel implements ActionListener
 
         importFileChooser.setApproveButtonText("Import");
         importFileChooser.setMultiSelectionEnabled(true);
+
+        exportItem.addActionListener(this);
+        popupMenu.add(exportItem);
+        deleteItem.addActionListener(this);
+        popupMenu.add(deleteItem);
     }
 
     /**
@@ -242,36 +259,77 @@ public class NavigatorPanel extends javax.swing.JPanel implements ActionListener
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        importFileChooser.setSelectedFile(MainFrame.browseDialog.getCurrentDirectory());
-        importFileChooser.showOpenDialog(this);
-        final File[] files = importFileChooser.getSelectedFiles();
-        Thread taskThread = new Thread() {
+        if (e.getSource().equals(this.importButton)) {
+            importFileChooser.setSelectedFile(MainFrame.browseDialog.getCurrentDirectory());
+            importFileChooser.showOpenDialog(this);
+            final File[] files = importFileChooser.getSelectedFiles();
+            Thread taskThread = new Thread() {
 
-            public void run() {
-                try {
-                    SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    try {
+                        SwingUtilities.invokeAndWait(new Runnable() {
 
-                        public void run() {
-                            if (files.length == 1) {
-                                MainFrame.progressBarMonitor.set(true, ProgressBarMonitor.IMPORT_DATASOURCE, 0);
-                            } else {
-                                MainFrame.progressBarMonitor.set(true, ProgressBarMonitor.IMPORT_DATASOURCES, 0);
+                            public void run() {
+                                if (files.length == 1) {
+                                    MainFrame.progressBarMonitor.set(true, ProgressBarMonitor.IMPORT_DATASOURCE, 0);
+                                } else {
+                                    MainFrame.progressBarMonitor.set(true, ProgressBarMonitor.IMPORT_DATASOURCES, 0);
+                                }
+                                MainFrame.self.setEnabled(false);
                             }
-                            MainFrame.self.setEnabled(false);
-                        }
-                    });
-                } catch (Exception e) {
-                    e.printStackTrace();
+                        });
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    for (File file : files) {
+                        NavigatorPanel.this.projectController.autoAddDataSourceWithAmbiguityResolution(file);
+                    }
+
+                    MainFrame.progressBarMonitor.set(false, ProgressBarMonitor.INACTIVE, ProgressBarMonitor.INACTIVE_VALUE);
+                    MainFrame.self.setEnabled(true);
+                }
+            };
+            taskThread.start();
+        }
+        else
+        if(e.getSource().equals(exportItem))
+        {
+            DataSource dataSource = ((NavigatorTreeNode) navigationTree.getSelectionPath().getLastPathComponent()).dataSource;
+            ExportDataDialog exportDialog = new ExportDataDialog(MainFrame.self, true, projectController, dataSource);
+            GraphicsUtils.centerWindowOnWindow(exportDialog, MainFrame.self);
+            exportDialog.setVisible(true);
+        }
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        if (SwingUtilities.isRightMouseButton(e)) {
+            TreePath tp = navigationTree.getClosestPathForLocation(e.getX(), e.getY());
+            DataSource dataSource = ((NavigatorTreeNode) tp.getLastPathComponent()).dataSource;
+            if (dataSource != null) {
+                if (tp != null) {
+                    navigationTree.setSelectionPath(tp);
                 }
 
-                for (File file : files) {
-                    NavigatorPanel.this.projectController.autoAddDataSourceWithAmbiguityResolution(file);
-                }
-
-                MainFrame.progressBarMonitor.set(false, ProgressBarMonitor.INACTIVE, ProgressBarMonitor.INACTIVE_VALUE);
-                MainFrame.self.setEnabled(true);
+                popupMenu.show(e.getComponent(), e.getX(), e.getY());
             }
-        };
-        taskThread.start();
+        }
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
     }
 }

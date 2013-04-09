@@ -240,7 +240,6 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
             minorTickMark = chooseBestTickMarkSize(annotationData.mappedSequenceLength);
             majorTickMark = minorTickMark * 2;
 
-            System.out.println("Length: " + annotationData.mappedSequenceLength);
             // draw ruler
             g2.setFont(annotationsFont.deriveFont(12.0f));
             for (int i = 0; i < annotationData.mappedSequenceLength; i++) {

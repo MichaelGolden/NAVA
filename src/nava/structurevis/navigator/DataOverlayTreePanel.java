@@ -42,7 +42,7 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
 
     ProjectController projectController;
     StructureVisController structureVisController;
-    JPopupMenu popupMenu1 = new JPopupMenu();
+    JPopupMenu popupMenu = new JPopupMenu();
     //JPopupMenu popupMenu2 = new JPopupMenu();
     JMenuItem setAsOverlayItem = new JMenuItem("View");
     JMenuItem editItem = new JMenuItem("Edit");
@@ -126,11 +126,11 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
         });
 
         setAsOverlayItem.addActionListener(this);
-        popupMenu1.add(setAsOverlayItem);
+        popupMenu.add(setAsOverlayItem);
         editItem.addActionListener(this);
-        popupMenu1.add(editItem);
+        popupMenu.add(editItem);
         deleteItem.addActionListener(this);
-        popupMenu1.add(deleteItem);
+        popupMenu.add(deleteItem);
 
         /*
          * popupMenu2.add(setAsOverlayItem); editItem.addActionListener(this);
@@ -138,7 +138,7 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
          * popupMenu2.add(deleteItem);
          */
         saveItem.addActionListener(this);
-        popupMenu1.add(saveItem);
+        popupMenu.add(saveItem);
 
         overlayTree.addMouseListener(this);
     }
@@ -175,7 +175,7 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
         listeners.remove(DataOverlayTreeListener.class, listener);
     }
 
-    public void fireDataSourceSelectionChanged(DataOverlayTreeEvent evt) {
+    public void fireDataOverlaySelectionChanged(DataOverlayTreeEvent evt) {
         Object[] listeners = this.listeners.getListenerList();
         // Each listener occupies two elements - the first is the listener class
         // and the second is the listener instance
@@ -198,7 +198,7 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
                 }
             }
 
-            this.fireDataSourceSelectionChanged(navigationEvent);
+            this.fireDataOverlaySelectionChanged(navigationEvent);
         }
     }
 
@@ -236,7 +236,7 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
                 } else {
                     this.saveItem.setEnabled(false);
                 }
-                popupMenu1.show(e.getComponent(), e.getX(), e.getY());
+                popupMenu.show(e.getComponent(), e.getX(), e.getY());
                 switch (selectedOverlay.getState()) {
                     case PRIMARY_SELECTED:
                     case SECONDARY_SELECTED:

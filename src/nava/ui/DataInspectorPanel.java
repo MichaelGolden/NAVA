@@ -4,24 +4,10 @@
  */
 package nava.ui;
 
-import java.awt.Desktop;
-import java.awt.FlowLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import nava.data.io.DataExport;
-import nava.data.io.DataExport.ExportableFormat;
 import nava.data.types.DataSource;
-import nava.structurevis.StructureVisController;
-import nava.utils.CustomJCheckBoxItem;
-import nava.utils.WrapLayout;
 
 /**
  *
@@ -30,10 +16,6 @@ import nava.utils.WrapLayout;
 public class DataInspectorPanel extends javax.swing.JPanel implements ItemListener {
 
     ArrayList<DataSource> selectedDataSources = new ArrayList<>();
-    DataExport dataExport = new DataExport();
-    ArrayList<ExportableFormat> exportableFormats = new ArrayList<>();
-    ArrayList<CustomJCheckBoxItem> exportCheckBoxes = new ArrayList<>();
-    String defaultExportPrefix = "export";
     ProjectController projectController;
 
     /**
@@ -42,13 +24,10 @@ public class DataInspectorPanel extends javax.swing.JPanel implements ItemListen
     public DataInspectorPanel(ProjectController projectController) {
         initComponents();
         this.projectController = projectController;
-        browseField.setText(System.getProperty("user.dir") + File.separator + defaultExportPrefix);
-        WrapLayout wrapLayout = new WrapLayout(WrapLayout.LEFT);
-        wrapLayout.setHgap(8);
-        exportPanel.setLayout(wrapLayout);
+       // WrapLayout wrapLayout = new WrapLayout(WrapLayout.LEFT);
+        //wrapLayout.setHgap(8);
+        //exportPanel.setLayout(wrapLayout);
         editTitle();
-
-        exportButton.setEnabled(false);
     }
 
     public void updatePanel(DataSource dataSource) {
@@ -56,30 +35,14 @@ public class DataInspectorPanel extends javax.swing.JPanel implements ItemListen
         editTitleButton.setSelected(false);
         selectedDataSources.clear();
         selectedDataSources.add(dataSource);
-        exportableFormats = dataExport.getExportableFormats(dataSource);
-
-        exportPanel.removeAll();
-        exportCheckBoxes.clear();
         dataTypeLabel.setIcon(dataSource.getIcon());
         dataTypeLabel.setText(dataSource.getTypeName());
         titleField.setText(dataSource.title);
-        if (exportableFormats.size() > 0) {
-            for (ExportableFormat exportableFormat : exportableFormats) {
-                CustomJCheckBoxItem<ExportableFormat> checkbox = new CustomJCheckBoxItem(exportableFormat.exportFormat.toString() + " (." + exportableFormat.exportFormat.getExtension() + ")");
-                checkbox.addItemListener(this);
-                checkbox.setObject(exportableFormat);
-                exportPanel.add(checkbox);
-                exportCheckBoxes.add(checkbox);
-                browseField.setText(System.getProperty("user.dir") + File.separator + exportableFormat.groupName);
-            }
-        } else {
-            exportPanel.add(new JLabel("No export options are available for this item."));
-            exportButton.setEnabled(false);
-        }
-        exportPanel.revalidate();
-        exportPanel.repaint();
-        jPanel2.revalidate();
-        jPanel2.repaint();
+        
+       // exportPanel.revalidate();
+        //exportPanel.repaint();
+        //jPanel2.revalidate();
+        //jPanel2.repaint();
         editTitle();
     }
 
@@ -98,16 +61,6 @@ public class DataInspectorPanel extends javax.swing.JPanel implements ItemListen
         jLabel3 = new javax.swing.JLabel();
         titleField = new javax.swing.JTextField();
         editTitleButton = new javax.swing.JToggleButton();
-        jPanel2 = new javax.swing.JPanel();
-        exportPanel = new javax.swing.JPanel();
-        exportButton = new javax.swing.JButton();
-        browseButton = new javax.swing.JButton();
-        browseField = new javax.swing.JTextField();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        titleAsNameButton = new javax.swing.JButton();
-        jLabel2 = new javax.swing.JLabel();
-        openFolderButton = new javax.swing.JButton();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Properties"));
 
@@ -142,7 +95,7 @@ public class DataInspectorPanel extends javax.swing.JPanel implements ItemListen
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(dataTypeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(titleField)
+                        .addComponent(titleField, javax.swing.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(editTitleButton)
                         .addGap(58, 58, 58)))
@@ -160,199 +113,21 @@ public class DataInspectorPanel extends javax.swing.JPanel implements ItemListen
                     .addComponent(jLabel3)
                     .addComponent(titleField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(editTitleButton))
-                .addContainerGap(42, Short.MAX_VALUE))
-        );
-
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Export Options"));
-
-        javax.swing.GroupLayout exportPanelLayout = new javax.swing.GroupLayout(exportPanel);
-        exportPanel.setLayout(exportPanelLayout);
-        exportPanelLayout.setHorizontalGroup(
-            exportPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        exportPanelLayout.setVerticalGroup(
-            exportPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 88, Short.MAX_VALUE)
-        );
-
-        exportButton.setText("Export");
-        exportButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                exportButtonActionPerformed(evt);
-            }
-        });
-
-        browseButton.setText("Browse...");
-        browseButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                browseButtonActionPerformed(evt);
-            }
-        });
-
-        browseField.setText("jTextField2");
-
-        jLabel4.setText("Export prefix");
-
-        jLabel5.setText("Files are exported with the specified extension.");
-
-        titleAsNameButton.setText("Use title as name");
-        titleAsNameButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                titleAsNameButtonActionPerformed(evt);
-            }
-        });
-
-        jLabel2.setText("Select the format(s) you would like to export to:");
-
-        openFolderButton.setText("Open folder");
-        openFolderButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                openFolderButtonActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(jLabel4)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(browseField))
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(openFolderButton)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(titleAsNameButton)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(exportButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(browseButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addComponent(exportPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 449, Short.MAX_VALUE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addGap(5, 5, 5)
-                .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(exportPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel5)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(browseButton)
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(browseField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel4)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(exportButton)
-                    .addComponent(titleAsNameButton)
-                    .addComponent(openFolderButton))
-                .addContainerGap())
+                .addContainerGap(155, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
     static int id = 0;
-    private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
-
-        final String className = id + "_" + System.currentTimeMillis();
-        id++;
-        final DataExportDialog exportDialog = new DataExportDialog(null, true, className, "out");
-        exportDialog.setTitle("Export output");
-        exportDialog.setSize(640, 480);
-        exportDialog.closeButton.setEnabled(false);
-
-        new Thread() {
-
-            public void run() {
-                File file = new File(browseField.getText());
-                File directory = file;
-                if (!file.isDirectory()) {
-                    directory = file.getParentFile();
-                } else {
-                    browseField.setText(browseField.getText() + defaultExportPrefix);
-                }
-                if (!directory.exists() && directory.mkdir()) {
-                    JOptionPane.showMessageDialog(DataInspectorPanel.this, "Export failed, the specified directory does not exist.", "Export failed", JOptionPane.WARNING_MESSAGE);
-                } else {
-                    for (CustomJCheckBoxItem<ExportableFormat> checkbox : exportCheckBoxes) {
-                        ExportableFormat f = checkbox.getObject();
-                        for (DataSource dataSource : selectedDataSources) {
-                            if (checkbox.isSelected()) {
-                                File outFile = new File(browseField.getText() + "." + f.exportFormat.getExtension());
-                                int i = 2;
-                                while (outFile.exists()) {
-                                    outFile = new File(browseField.getText() + "_" + i + "." + f.exportFormat.getExtension());
-                                    i++;
-                                }
-                                exportDialog.consoleBuffer.bufferedWrite("Exporting " + dataSource.getTypeName().toLowerCase() + " '" + dataSource.getTitle() + "' to path: '" + outFile.getAbsolutePath() + "' in '" + f.exportFormat.toString() + "' format.", className, "out");
-                                try {
-                                    dataExport.export(dataSource, f.exportFormat, outFile);
-                                    exportDialog.consoleBuffer.bufferedWrite("Completed successfully.", className, "out", true);
-                                    exportDialog.consoleBuffer.bufferedWrite("", className, "out", true);
-                                } catch (Exception ex) {
-                                    exportDialog.consoleBuffer.bufferedWrite("Failed.", className, "out", true);
-                                    exportDialog.consoleBuffer.bufferedWrite("", className, "out", true);
-                                    Logger.getLogger(DataInspectorPanel.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-                            }
-                        }
-                    }
-                }
-                
-                exportDialog.closeButton.setEnabled(true);
-            }
-        }.start();
-
-        exportDialog.setVisible(true);
-    }//GEN-LAST:event_exportButtonActionPerformed
-
-    private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
-        MainFrame.browseDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        File currentFile = new File(browseField.getText());
-        MainFrame.browseDialog.setSelectedFile(currentFile);
-        String suffix = currentFile.getName();
-        if (currentFile.isDirectory()) {
-            suffix = "export";
-            for (CustomJCheckBoxItem<ExportableFormat> checkbox : exportCheckBoxes) {
-                ExportableFormat f = checkbox.getObject();
-                suffix = f.groupName;
-                break;
-            }
-        }
-        int ret = MainFrame.browseDialog.showDialog(this, "Select folder");
-        if (ret == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = MainFrame.browseDialog.getSelectedFile();
-            browseField.setText(selectedFile.getAbsolutePath() + File.separatorChar + suffix);
-            browseField.setSelectionStart(browseField.getText().length() - suffix.length());
-            browseField.setSelectionEnd(browseField.getText().length());
-        }
-    }//GEN-LAST:event_browseButtonActionPerformed
-
     public void editTitle() {
         editTitleButton.setEnabled(true);
         if (selectedDataSources.size() == 1) {
@@ -378,73 +153,16 @@ public class DataInspectorPanel extends javax.swing.JPanel implements ItemListen
         editTitle();
     }//GEN-LAST:event_editTitleButtonActionPerformed
 
-    private void titleAsNameButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_titleAsNameButtonActionPerformed
-        if (selectedDataSources.size() == 1) {
-            File file = new File(browseField.getText());
-            File directory = file;
-            if (!file.isDirectory()) {
-                directory = file.getParentFile();
-            }
-
-            browseField.setText(directory.getAbsolutePath() + File.separator + selectedDataSources.get(0));
-        }
-
-    }//GEN-LAST:event_titleAsNameButtonActionPerformed
-
-    private void openFolderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openFolderButtonActionPerformed
-        File folder = new File(browseField.getText()); // path to the directory to be opened
-        folder = (folder.isDirectory() ? folder : folder.getParentFile());
-        Desktop desktop = null;
-        System.out.println("openFolderButtonActionPerformed 1");
-        if (Desktop.isDesktopSupported()) {
-             System.out.println("openFolderButtonActionPerformed 2");
-            desktop = Desktop.getDesktop();
-            try {
-                 System.out.println("openFolderButtonActionPerformed 3");
-                if (folder.exists()) {
-                    System.out.println("openFolderButtonActionPerformed 4 "+folder);
-                    desktop.open(folder);
-                    System.out.println("openFolderButtonActionPerformed 5");
-                } else {
-                    // TODO error dialog
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            System.out.println("openFolderButtonActionPerformed 7");
-        }
-    }//GEN-LAST:event_openFolderButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton browseButton;
-    private javax.swing.JTextField browseField;
     private javax.swing.JLabel dataTypeLabel;
     private javax.swing.JToggleButton editTitleButton;
-    private javax.swing.JButton exportButton;
-    private javax.swing.JPanel exportPanel;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JButton openFolderButton;
-    private javax.swing.JButton titleAsNameButton;
     private javax.swing.JTextField titleField;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void itemStateChanged(ItemEvent e) {
-        int sel = 0;
-        for (CustomJCheckBoxItem<ExportableFormat> checkbox : exportCheckBoxes) {
-            if (checkbox.isSelected()) {
-                sel++;
-            }
-        }
-        if (sel == 0) {
-            exportButton.setEnabled(false);
-        } else {
-            exportButton.setEnabled(true);
-        }
     }
 }

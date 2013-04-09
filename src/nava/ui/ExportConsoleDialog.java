@@ -13,7 +13,7 @@ import nava.ui.console.ConsolePanel;
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class DataExportDialog extends javax.swing.JDialog {
+public class ExportConsoleDialog extends javax.swing.JDialog {
 
     ConsolePanel consolePanel = new ConsolePanel();
     ConsoleBuffer consoleBuffer;
@@ -21,7 +21,7 @@ public class DataExportDialog extends javax.swing.JDialog {
     /**
      * Creates new form DataExportDialog
      */
-    public DataExportDialog(java.awt.Frame parent, boolean modal, String className, String typeName) {
+    public ExportConsoleDialog(java.awt.Frame parent, boolean modal, String className, String typeName) {
         super(parent, modal);
         initComponents();
         consoleBuffer = new ConsoleBuffer(new ConsoleDatabase(),className, "out");
@@ -97,13 +97,13 @@ public class DataExportDialog extends javax.swing.JDialog {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(DataExportDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ExportConsoleDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(DataExportDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ExportConsoleDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(DataExportDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ExportConsoleDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(DataExportDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ExportConsoleDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
@@ -113,7 +113,7 @@ public class DataExportDialog extends javax.swing.JDialog {
         java.awt.EventQueue.invokeLater(new Runnable() {
 
             public void run() {
-                DataExportDialog dialog = new DataExportDialog(new javax.swing.JFrame(), true, null, null);
+                ExportConsoleDialog dialog = new ExportConsoleDialog(new javax.swing.JFrame(), true, null, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
 
                     @Override

@@ -5,8 +5,10 @@
 package nava.structurevis;
 
 import javax.swing.ImageIcon;
+import nava.ui.MainFrame;
 import nava.ui.ProjectController;
 import nava.ui.ProjectModel;
+import nava.utils.GraphicsUtils;
 
 /**
  *
@@ -136,6 +138,7 @@ public class AddDataOverlayDialog extends javax.swing.JDialog {
         this.dispose();
         NucleotideCompositionDialog d = new NucleotideCompositionDialog(null, true, projectController.projectModel, structureVisController);
         d.setSize(600, 150);
+        GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
         d.setEditMode(null);
         d.setVisible(true);
     }//GEN-LAST:event_addNucleotideButtonActionPerformed
@@ -144,6 +147,7 @@ public class AddDataOverlayDialog extends javax.swing.JDialog {
         this.dispose();
         Data1DDialog d = new Data1DDialog(null, true, projectController.projectModel, structureVisController);
         d.setSize(920, 690);
+        GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
         d.setEditMode(null);
         d.setVisible(true);
     }//GEN-LAST:event_add1DButtonActionPerformed
@@ -152,6 +156,7 @@ public class AddDataOverlayDialog extends javax.swing.JDialog {
         this.dispose();
         Data2DDialog d = new Data2DDialog(null, true, projectController.projectModel, structureVisController);
         d.setSize(750, 690);
+        GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
         d.setEditMode(null);
         d.setVisible(true);
     }//GEN-LAST:event_add2DButtonActionPerformed
@@ -160,6 +165,7 @@ public class AddDataOverlayDialog extends javax.swing.JDialog {
         this.dispose();
         StructureOverlayDialog d = new StructureOverlayDialog(null, true, projectController.projectModel, structureVisController);
         d.setSize(640, 580);
+        GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
         d.setEditMode(null);
         d.setVisible(true);
     }//GEN-LAST:event_addStructureButtonActionPerformed

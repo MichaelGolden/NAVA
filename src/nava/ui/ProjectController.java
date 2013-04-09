@@ -263,7 +263,7 @@ public class ProjectController implements SafeListListener {
         return p;
     }
 
-    public void autoAddDataSourceWithAmbiguityResolution(final File dataFile) {
+    public  Pair<DataType, DataSource> autoAddDataSourceWithAmbiguityResolution(final File dataFile) {
         DataType dataType = null;
 
         ArrayList<DataType> possibleDataTypes = null;
@@ -288,7 +288,9 @@ public class ProjectController implements SafeListListener {
 
             final DataType dataType2 = dataType;
             DataSource dataSource = importDataSourceFromFile(dataFile, dataType2);
+            return new Pair<>(dataType2,dataSource);
         }
+        return null;
     }
 
     public Pair<DataType, DataSource> autoAddDataSource(File dataFile) {

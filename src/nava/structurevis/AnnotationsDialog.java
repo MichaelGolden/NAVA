@@ -18,6 +18,7 @@ public class AnnotationsDialog extends javax.swing.JDialog {
     StructureVisController structureVisController;
     ProjectModel projectModel;
     AnnotationsPanel annotationsPanel;
+    public AnnotationSource annotationSource;
 
     /**
      * Creates new form AnnotationsDialog
@@ -83,18 +84,7 @@ public class AnnotationsDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
-        AnnotationSource annotationSource = annotationsPanel.getAnnotationsSource();
-        //structureVisController.addAnnotationsSource(annotationSource);
-        if (structureVisController.structureVisModel.substructureModel.getAnnotationSource() == null) {
-            structureVisController.addAnnotationsSource(annotationSource);
-            structureVisController.structureVisModel.substructureModel.setAnnotationSource(annotationSource);
-        } else {
-            //structureVisController.addAnnotationsSource(annotationSource);
-            //structureVisController.substructureModel.setAnnotationSource(annotationSource);
-            structureVisController.structureVisModel.substructureModel.getAnnotationSource().addAnnotations(annotationSource);
-            structureVisController.structureVisModel.substructureModel.setAnnotationSource( structureVisController.structureVisModel.substructureModel.getAnnotationSource());
-        }
-
+       this.annotationSource = annotationsPanel.getAnnotationsSource();
         this.dispose();
     }//GEN-LAST:event_addButtonActionPerformed
 

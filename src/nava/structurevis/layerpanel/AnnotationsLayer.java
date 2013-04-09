@@ -1,10 +1,9 @@
 package nava.structurevis.layerpanel;
 
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * To change this template, choose Tools | Templates and open the template in
+ * the editor.
  */
-
 import nava.structurevis.layerpanel.Layer;
 import java.awt.*;
 import java.awt.event.*;
@@ -145,6 +144,7 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
     };
 
     public void setAnnotationData(AnnotationSource annotationData, boolean map) {
+        System.out.println("setAnnotationData GACACAF " + annotationData);
         if (annotationData != null) {
             if (map) {
                 MainFrame.taskManager.queueTask(new AnnotationMappingTask(annotationData, structureVisController.structureVisModel.substructureModel.structureOverlay, structureVisController, this), true);
@@ -188,6 +188,8 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
             this.parent.refresh();
             this.parent.parent.updatePanel();
         }
+        showAnnotations();
+        System.out.println("ABITAHFAHAFA " + annotationData);
         revalidate();
         repaint();
     }
@@ -578,14 +580,20 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
              * parent.updatePanel(); }
              */
         } else if (e.getSource().equals(this.addAnnotationFromSourceItem)) {
-            System.out.println("A"+projectController);
-            System.out.println("B"+projectController.projectModel);
-            System.out.println("C"+structureVisController);
-            
             AnnotationsDialog d = new AnnotationsDialog(null, true, projectController.projectModel, structureVisController);
-            //d.setSize(640, 480);
-            // d.editMode = false;
             d.setVisible(true);
+            
+            if (structureVisController.structureVisModel.substructureModel.getAnnotationSource() == null) {
+                structureVisController.addAnnotationsSource(d.annotationSource);
+                structureVisController.structureVisModel.substructureModel.setAnnotationSource(d.annotationSource);
+                this.setAnnotationData(structureVisController.structureVisModel.substructureModel.getAnnotationSource());
+            } else {
+                structureVisController.structureVisModel.substructureModel.getAnnotationSource().addAnnotations(d.annotationSource);
+                structureVisController.structureVisModel.substructureModel.setAnnotationSource(structureVisController.structureVisModel.substructureModel.getAnnotationSource());
+                this.setAnnotationData(structureVisController.structureVisModel.substructureModel.getAnnotationSource());
+            }
+            // this.setAnnotationData(structureVisController.structureVisModel.substructureModel.getAnnotationSource());
+
         } else if (e.getActionCommand().equals("REMOVE_FEATURE")) {
             CustomJMenuItem<Feature> removeItem = (CustomJMenuItem<Feature>) e.getSource();
             int index = annotationData.mappedFeatures.indexOf(removeItem.getObject());

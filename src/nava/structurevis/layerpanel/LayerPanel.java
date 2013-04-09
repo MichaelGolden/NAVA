@@ -75,22 +75,26 @@ public class LayerPanel extends javax.swing.JPanel implements Scrollable, LayerM
 
     public void refresh() {
         //leftPanel.removeAll();
-        //rightPanel.removeAll();
-        height = 0;
-        for (Layer layer : layers) {
-            layer.refresh();
-            //addLayer(layer,false);
-            height += layer.getLeft().getPreferredSize().height;
-            layer.getRight().setPreferredSize(layer.getLeft().getPreferredSize());
+        //rightPanel.removeAll();        
+        synchronized (layers) {
+            height = 0;
+            for (Layer layer : layers) {
+                layer.refresh();
+                height += layer.getLeft().getPreferredSize().height;
+                layer.getRight().setPreferredSize(layer.getLeft().getPreferredSize());
+            }
+            this.setPreferredSize(new Dimension(this.getPreferredSize().width, height));
         }
-        this.setPreferredSize(new Dimension(this.getPreferredSize().width, height));
     }
 
     public void addLayer(Layer layer, boolean add) {
         layer.parent = this;
         layer.refresh();
         if (add) {
-            layers.add(layer);
+            synchronized(layers)
+            {
+                layers.add(layer);
+            }
         }
         layer.getLeft().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
         leftPanel.add(layer.getLeft());
@@ -240,6 +244,14 @@ public class LayerPanel extends javax.swing.JPanel implements Scrollable, LayerM
 
     @Override
     public void annotationSourceChanged(AnnotationSource annotationSource) {
+        System.out.println("LayerPanel.annotationSource " + annotationSource);
+        if (structureVisController.structureVisModel.layerModel != null) {
+            if (annotationSource == null) {
+                structureVisController.structureVisModel.layerModel.setAnnotationSource(null);
+            } else {
+                structureVisController.structureVisModel.layerModel.setAnnotationSource(annotationSource);
+            }
+        }
     }
 
     @Override

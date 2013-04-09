@@ -209,8 +209,7 @@ public class AnnotationSource implements Serializable {
     }
 
     public static AnnotationSource getMappedAnnotations(AnnotationSource annotationSource, StructureOverlay structureSource, StructureVisController structureVisController) {
-        if(annotationSource == null)
-        {
+        if (annotationSource == null) {
             annotationSource = new AnnotationSource();
         }
         annotationSource.mappedFeatures = new ArrayList<>();
@@ -221,10 +220,10 @@ public class AnnotationSource implements Serializable {
             if (structureSource != null && structureVisController != null) {
                 Mapping mapping = structureVisController.getMapping(structureSource.mappingSource, mappedFeature.mappingSource);
 
-                if (mapping != null) {                   
+                if (mapping != null) {
                     annotationSource.mappedSequenceLength = Math.max(annotationSource.mappedSequenceLength, mapping.getBLength());
-                    mappedFeature.min = mapping.aToBNearest(feature.min - 1);
-                    mappedFeature.max = mapping.aToBNearest(feature.max - 1);
+                    mappedFeature.min = mapping.bToANearest(feature.min - 1);
+                    mappedFeature.max = mapping.bToANearest(feature.max - 1);
                     if (mappedFeature.min == -1) {
                         mappedFeature.min = 0;
                     }
@@ -232,8 +231,8 @@ public class AnnotationSource implements Serializable {
                         mappedFeature.max = mappedFeature.min + 1;
                     }
                     for (Block block : mappedFeature.blocks) {
-                        block.min = mapping.aToBNearest(block.min - 1);
-                        block.max = mapping.aToBNearest(block.max - 1);
+                        block.min = mapping.bToANearest(block.min - 1);
+                        block.max = mapping.bToANearest(block.max - 1);
                         if (block.min == -1) {
                             block.min = 0;
                         }
@@ -262,20 +261,22 @@ public class AnnotationSource implements Serializable {
      * @param a2
      */
     public void addAnnotations(AnnotationSource a2) {
-        int maxRow = -1;
-        for (Feature feature : this.features) {
-            maxRow = Math.max(feature.row, maxRow);
-        }
-        maxRow++;
-        for (Feature feature : a2.features) {
-            Feature clone = feature.clone();
-            clone.row += maxRow;
-            this.features.add(clone);
-        }
-        for (Feature feature : a2.mappedFeatures) {
-            Feature clone = feature.clone();
-            clone.row += maxRow;
-            this.mappedFeatures.add(clone);
+        if (a2 != null) {
+            int maxRow = -1;
+            for (Feature feature : this.features) {
+                maxRow = Math.max(feature.row, maxRow);
+            }
+            maxRow++;
+            for (Feature feature : a2.features) {
+                Feature clone = feature.clone();
+                clone.row += maxRow;
+                this.features.add(clone);
+            }
+            for (Feature feature : a2.mappedFeatures) {
+                Feature clone = feature.clone();
+                clone.row += maxRow;
+                this.mappedFeatures.add(clone);
+            }
         }
     }
 

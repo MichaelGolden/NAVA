@@ -50,4 +50,10 @@ public class GraphicsUtils {
         final int y = (screenSize.height - d.getHeight()) / 2;
         d.setLocation(x, y);
     }
+    
+    public static void centerWindowOnWindow(Window d, Window w) {
+        final int x = w.getX() + ((w.getWidth() - d.getWidth())/ 2);
+        final int y = w.getY() + ((w.getHeight() - d.getHeight())/ 2);
+        d.setLocation(x, y);
+    }
 }

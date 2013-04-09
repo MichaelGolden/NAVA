@@ -32,12 +32,12 @@ public class SubstructureModel implements Serializable {
     public static Color missingDataColor = Color.gray;
     public static Color filteredDataColor = Color.darkGray;
     int sequenceLength;
-    private AnnotationSource annotationSource = null;
-    DataOverlay1D data1D = null;
+    AnnotationSource annotationSource = null;
+    public DataOverlay1D data1D = null;
     Mapping mapping1D = null;
-    DataOverlay2D data2D = null;
+    public DataOverlay2D data2D = null;
     Mapping mapping2D = null;
-    NucleotideComposition nucleotideSource = null;
+    public NucleotideComposition nucleotideSource = null;
     Mapping nucleotideMapping = null;
     NucleotideComposition.Type nucleotideCompositionType = NucleotideComposition.Type.FREQUENCY;
     public StructureOverlay structureOverlay = null;
@@ -113,6 +113,7 @@ public class SubstructureModel implements Serializable {
                     if (data1D != null && data1D.mappingSource != null && structureOverlay != null && structureOverlay.mappingSource != null) {
                         mapping1D = structureVisController.getMapping(structureOverlay.mappingSource, data1D.mappingSource);
                     }
+
                     fireDataOverlay1DChanged(dataSource1D);
 
                     MainFrame.progressBarMonitor.set(false, ProgressBarMonitor.INACTIVE, ProgressBarMonitor.INACTIVE_VALUE);
@@ -132,7 +133,7 @@ public class SubstructureModel implements Serializable {
                 structureVisController.structureVisModel.structureVisDataOverlays1D.get(i).setState(Overlay.OverlayState.UNSELECTED);
             }
         }
-        
+
     }
 
     public void setOverlay2D(final DataOverlay2D dataSource2D) {
@@ -213,6 +214,10 @@ public class SubstructureModel implements Serializable {
                             nucleotideMapping = structureVisController.getMapping(structureOverlay.mappingSource, nucleotideSource.mappingSource);
                         }
                     }
+                    if (annotationSource != null) {
+                        annotationSource = AnnotationSource.getMappedAnnotations(annotationSource, structureOverlay, structureVisController);
+                        fireAnnotationSourceChanged(annotationSource);
+                    }
                     fireStructureOverlayChanged(structureOverlay);
 
                     MainFrame.progressBarMonitor.set(false, ProgressBarMonitor.INACTIVE, ProgressBarMonitor.INACTIVE_VALUE);
@@ -278,7 +283,7 @@ public class SubstructureModel implements Serializable {
     }
 
     public void setAnnotationSource(AnnotationSource annotationSource) {
-        //this.annotationSource = AnnotationSource.getMappedAnnotations(annotationSource, structureSource, structureVisController);
+        this.annotationSource = AnnotationSource.getMappedAnnotations(annotationSource, structureOverlay, structureVisController);
         fireAnnotationSourceChanged(annotationSource);
     }
 
@@ -355,21 +360,23 @@ public class SubstructureModel implements Serializable {
     }
 
     public void saveDataOverlay1DAndStructure(DataOverlay1D dataOverlay1D, File outFile) throws IOException {
-        BufferedWriter buffer = new BufferedWriter(new FileWriter(outFile));
-        SecondaryStructureData structure = structureOverlay.structure.getObject(ProjectModel.path, MainFrame.dataSourceCache);
-        buffer.write("Structure position,Paired position,Data position,Data value\n");
+        if (structureOverlay != null) {
+            BufferedWriter buffer = new BufferedWriter(new FileWriter(outFile));
+            SecondaryStructureData structure = structureOverlay.structure.getObject(ProjectModel.path, MainFrame.dataSourceCache);
+            buffer.write("Structure position,Paired position,Data position,Data value\n");
 
-        Mapping mapping = structureVisController.getMapping(structureOverlay.mappingSource, dataOverlay1D.mappingSource);
-        dataOverlay1D.loadData();
-        for (int i = 0; i < structure.pairedSites.length; i++) {
+            Mapping mapping = structureVisController.getMapping(structureOverlay.mappingSource, dataOverlay1D.mappingSource);
+            dataOverlay1D.loadData();
+            for (int i = 0; i < structure.pairedSites.length; i++) {
 
-            int dataPos = mapping.aToB(i);
-            if (dataPos != -1) {
-                buffer.write((i + 1) + "," + (structure.pairedSites[i] == 0 ? "-" : structure.pairedSites[i] +1) + "," + (dataPos+1) + "," + dataOverlay1D.data[i] + "\n");
-            } else {
-                buffer.write((i + 1) + "," + (structure.pairedSites[i] == 0 ? "-" : structure.pairedSites[i] +1) + "," + "," + "\n");
+                int dataPos = mapping.aToB(i);
+                if (dataPos != -1) {
+                    buffer.write((i + 1) + "," + (structure.pairedSites[i] == 0 ? "-" : structure.pairedSites[i] + 1) + "," + (dataPos + 1) + "," + dataOverlay1D.data[i] + "\n");
+                } else {
+                    buffer.write((i + 1) + "," + (structure.pairedSites[i] == 0 ? "-" : structure.pairedSites[i] + 1) + "," + "," + "\n");
+                }
             }
+            buffer.close();
         }
-        buffer.close();
     }
 }

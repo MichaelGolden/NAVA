@@ -86,9 +86,10 @@ public class NavigatorPanel extends javax.swing.JPanel implements ActionListener
                             }
 
                             for (int i = 0; i < droppedFiles.size(); i++) {
-                                NavigatorPanel.this.projectController.autoAddDataSourceWithAmbiguityResolution(droppedFiles.get(i));
                                 if (droppedFiles.get(i).isDirectory()) {
                                     System.err.println("TODO this file is a folder. How should we handle this?");
+                                } else {
+                                    NavigatorPanel.this.projectController.autoAddDataSourceWithAmbiguityResolution(droppedFiles.get(i));
                                 }
                             }
 
@@ -245,6 +246,7 @@ public class NavigatorPanel extends javax.swing.JPanel implements ActionListener
         importFileChooser.showOpenDialog(this);
         final File[] files = importFileChooser.getSelectedFiles();
         Thread taskThread = new Thread() {
+
             public void run() {
                 try {
                     SwingUtilities.invokeAndWait(new Runnable() {
@@ -261,7 +263,7 @@ public class NavigatorPanel extends javax.swing.JPanel implements ActionListener
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                
+
                 for (File file : files) {
                     NavigatorPanel.this.projectController.autoAddDataSourceWithAmbiguityResolution(file);
                 }

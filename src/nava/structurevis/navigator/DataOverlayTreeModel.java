@@ -183,7 +183,8 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
     }
 
     @Override
-    public void dataOverlayChanged(Overlay oldOverlay, Overlay newOverlay) {
+    public void dataOverlayChanged(Overlay oldOverlay, Overlay newOverlay) {        
+        System.out.println("DataOverlayTreeModel.dataOverlayChanged"+oldOverlay+"\t"+newOverlay);
         DataOverlayTreeNode node = this.findNode(oldOverlay);
         node.overlay = newOverlay;
         DataOverlayTreeNode parent = (DataOverlayTreeNode) node.getParent();

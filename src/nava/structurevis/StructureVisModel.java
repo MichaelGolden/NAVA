@@ -74,6 +74,7 @@ public class StructureVisModel implements Serializable {
     }
 
     public void initialise(StructureVisController structureVisController) {
+        structureVisController.structureVisModel = this;
         if(substructureModel == null)
         {
             substructureModel = new SubstructureModel(structureVisController);
@@ -91,5 +92,6 @@ public class StructureVisModel implements Serializable {
         structureVisDataOverlays2D.addSafeListListener(structureVisController);
         nucleotideSources.addSafeListListener(structureVisController);
         structureSources.addSafeListListener(structureVisController);
+        annotationSources.addSafeListListener(structureVisController);
     }
 }

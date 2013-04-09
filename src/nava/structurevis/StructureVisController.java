@@ -29,8 +29,8 @@ import nava.utils.*;
 public class StructureVisController implements SafeListListener, ProjectView {
 
     public StructureVisModel structureVisModel;
-    transient ProjectController projectController;
-    transient ProjectModel projectModel;
+    ProjectController projectController;
+    ProjectModel projectModel;
 
     public StructureVisController(ProjectController projectController, ProjectModel projectModel) {
         this.projectController = projectController;
@@ -41,15 +41,13 @@ public class StructureVisController implements SafeListListener, ProjectView {
     }
 
     public void openStructureVisModel(StructureVisModel structureVisModel) {
-        this.structureVisModel = structureVisModel;
-        //structureVisModel.substructureModel = new SubstructureModel(this);\
+        this.structureVisModel = structureVisModel;        
         if (structureVisModel.substructureModel == null) {
             structureVisModel.substructureModel = new SubstructureModel(this);
         } else {
             this.structureVisModel.substructureModel.structureVisController = this;
         }
-        //structureVisModel.structureVisModelFile = new File(getWorkingDirectory().getAbsolutePath() + File.separatorChar + "structurevis.model");
-        System.out.println(structureVisModel.overlayNavigatorTreeModel);
+        
         structureVisModel.substructureModel.loadData();
         for (int i = 0; i < structureVisViews.size(); i++) {
             structureVisViews.get(i).structureVisModelChanged(structureVisModel);

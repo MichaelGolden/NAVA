@@ -98,6 +98,24 @@ public class Mapping implements Serializable {
         }
     }
 
+    public int aToBNearestLowerBound(int i) {
+        int l = 0;
+        while (i - l >= 0 && aToB(i - l) == -1) {
+            l++;
+        }
+
+        return aToB(i - l);
+    }
+
+    public int aToBNearestUpperBound(int i) {
+        int u = 0;
+        while (i + u < getALength() && aToB(i + u) == -1) {
+            u++;
+        }
+
+        return aToB(i + u);
+    }
+
     public int bToA(int i) {
         return refToA(bToRef(i));
     }
@@ -339,9 +357,7 @@ public class Mapping implements Serializable {
 
                         mapping = getMappingFromAlignedStrings(alignedA0, alignedB0, reverseComplementB);
                     }
-                }
-                else
-                {
+                } else {
                     p.destroy();
                 }
             }

@@ -22,9 +22,11 @@ import javax.swing.event.ListDataEvent;
 import nava.data.types.*;
 import nava.structurevis.data.*;
 import nava.structurevis.layerpanel.*;
+import nava.ui.MainFrame;
 import nava.ui.ProjectController;
 import nava.ui.ProjectModel;
 import nava.ui.ProjectView;
+import nava.utils.GraphicsUtils;
 import org.biojava.bio.BioException;
 
 /**
@@ -98,22 +100,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
 
         substructurePanel.refresh();
 
-        if (structureVisController.structureVisModel.substructureModel.getAnnotationSource() == null) {
-            try {
-                AnnotationSource annotationData = AnnotationSource.stackFeatures(AnnotationSource.readAnnotations(new File("examples/annotations/refseq.gb")));
-
-                structureVisController.structureVisModel.substructureModel.setAnnotationSource(annotationData);
-                layerModel.setAnnotationSource(structureVisController.structureVisModel.substructureModel.getAnnotationSource());              
-                //layerPanel.updatePanel();
-            } catch (BioException ex) {
-                Logger.getLogger(StructureVisPanel.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                Logger.getLogger(StructureVisPanel.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } else {
-            layerModel.setAnnotationSource(structureVisController.structureVisModel.substructureModel.getAnnotationSource());          
-            //layerPanel.updatePanel();
-        }
+        layerModel.setAnnotationSource(structureVisController.structureVisModel.substructureModel.getAnnotationSource());
         structureVisController.structureVisModel.substructureModel.addSubstructureModelListener(this);
     }
 
@@ -154,24 +141,28 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
             Data1DDialog d = new Data1DDialog(parent, true, projectModel, structureVisController);
             d.data1DPanel.dataSourceComboBoxModel.setSelectedItem(selectedDataSource);
             d.setEditMode(null);
+            GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
             d.setSize(920, 690);
             d.setVisible(true);
         } else if (selectedDataSource instanceof Matrix) {
             Data2DDialog d = new Data2DDialog(null, true, projectModel, structureVisController);
             d.data2DPanel.dataMatrixComboBoxModel.setSelectedItem(selectedDataSource);
             d.setSize(750, 690);
+            GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
             d.setEditMode(null);
             d.setVisible(true);
         } else if (selectedDataSource instanceof SecondaryStructure) {
             StructureOverlayDialog d = new StructureOverlayDialog(null, true, projectModel, structureVisController);
             d.structureDataPanel.structureComboBoxModel.setSelectedItem(selectedDataSource);
             d.setSize(640, 580);
+            GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
             d.setEditMode(null);
             d.setVisible(true);
         } else if (selectedDataSource instanceof Alignment) {
             NucleotideCompositionDialog d = new NucleotideCompositionDialog(null, true, projectModel, structureVisController);
             d.nucleotidePanel.nucleotideAlignmentComboBoxModel.setSelectedItem(selectedDataSource);
             d.setSize(600, 150);
+            GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
             d.setEditMode(null);
             d.setVisible(true);
         }
@@ -184,24 +175,28 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
                 d.data1DPanel.setDataSource1D((DataOverlay1D) overlay);
                 d.setEditMode(overlay);
                 d.setSize(920, 690);
+                GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
                 d.setVisible(true);
             } else if (overlay instanceof DataOverlay2D) {
                 Data2DDialog d = new Data2DDialog(parent, true, projectModel, structureVisController);
                 d.data2DPanel.setDataSource2D((DataOverlay2D) overlay);
                 d.setEditMode(overlay);
                 d.setSize(750, 690);
+                GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
                 d.setVisible(true);
             } else if (overlay instanceof NucleotideComposition) {
                 NucleotideCompositionDialog d = new NucleotideCompositionDialog(parent, true, projectModel, structureVisController);
                 d.setEditMode(overlay);
                 d.nucleotidePanel.setNucleotideSource((NucleotideComposition) overlay);
                 d.setSize(600, 150);
+                GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
                 d.setVisible(true);
             } else if (overlay instanceof StructureOverlay) {
                 StructureOverlayDialog d = new StructureOverlayDialog(parent, true, projectModel, structureVisController);
                 d.setEditMode(overlay);
                 d.structureDataPanel.setStructureSource((StructureOverlay) overlay);
                 d.setSize(640, 580);
+                GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
                 d.setVisible(true);
             }
         }
@@ -335,14 +330,6 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
      */
     @Override
     public void dataSource1DChanged(DataOverlay1D dataSource1D) {
-        if(dataSource1D == null)
-        {
-             layerModel.setDataOverlay1D(1, "No data", null);          
-        }
-        else
-        {
-           layerModel.setDataOverlay1D(1, dataSource1D.title, dataSource1D);          
-        }
     }
 
     @Override

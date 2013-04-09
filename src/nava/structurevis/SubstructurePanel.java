@@ -18,6 +18,7 @@ import nava.structurevis.navigator.DataOverlayTreePanel;
 import nava.ui.MainFrame;
 import nava.ui.ProjectController;
 import nava.utils.CustomItem;
+import nava.utils.GraphicsUtils;
 
 /**
  *
@@ -30,6 +31,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
     StructureVisController structureVisController;
     ProjectController projectController;
     public SubstructureDrawPanel structureDrawPanel;
+    public FullGenomeDrawPanel fullGenomeDrawPanel;
     DataLegend dataLegend1D = new DataLegend();
     DataLegend dataLegend2D = new DataLegend();
 
@@ -42,6 +44,8 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         this.projectController = projectController;
 
         structureDrawPanel = new SubstructureDrawPanel(structureVisController.structureVisModel.substructureModel);
+        fullGenomeDrawPanel = new FullGenomeDrawPanel(structureVisController);
+        
         structureVisController.structureVisModel.substructureModel.addSubstructureModelListener(this);
         topScrollPane.setViewportView(structureDrawPanel);
 
@@ -118,6 +122,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         jLabel4 = new javax.swing.JLabel();
         filler3 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 32767));
         jProgressBar = new javax.swing.JProgressBar();
+        viewToggleButton = new javax.swing.JToggleButton();
 
         jSplitPane1.setDividerLocation(150);
 
@@ -161,7 +166,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(treePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
+                .addComponent(treePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton2))
         );
@@ -189,6 +194,13 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
 
         jProgressBar.setPreferredSize(new java.awt.Dimension(146, 20));
 
+        viewToggleButton.setText("Full view");
+        viewToggleButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                viewToggleButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -208,11 +220,13 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
                 .addComponent(distanceSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(distanceLabel)
-                .addGap(18, 18, 18)
+                .addGap(97, 97, 97)
                 .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 360, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 222, Short.MAX_VALUE)
                 .addComponent(filler3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(24, 24, 24)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(viewToggleButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jProgressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -243,9 +257,11 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(distanceLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, 22, Short.MAX_VALUE)
-                            .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(jProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(viewToggleButton)
+                                .addComponent(distanceLabel)))))
                 .addGap(0, 0, 0))
         );
 
@@ -259,7 +275,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 332, Short.MAX_VALUE)
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -267,8 +283,23 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         AddDataOverlayDialog dialog = new AddDataOverlayDialog(null, true, projectController, structureVisController);
+        GraphicsUtils.centerWindowOnWindow(dialog, MainFrame.self);
         dialog.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void viewToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewToggleButtonActionPerformed
+        if(viewToggleButton.isSelected())
+        {
+            this.topScrollPane.setViewportView(fullGenomeDrawPanel);
+            this.viewToggleButton.setText("Substructure view");
+        }
+        else
+        {
+            this.topScrollPane.setViewportView(structureDrawPanel);
+            this.viewToggleButton.setText("Full view");
+        }
+    }//GEN-LAST:event_viewToggleButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel distanceLabel;
     private javax.swing.JSlider distanceSlider;
@@ -289,6 +320,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
     private javax.swing.JComboBox substructureComboBox;
     private javax.swing.JScrollPane topScrollPane;
     private javax.swing.JPanel treePanel;
+    private javax.swing.JToggleButton viewToggleButton;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -353,6 +385,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
             dataLegend1D.setLegend(dataSource1D.title, dataSource1D.dataTransform, dataSource1D.colorGradient, dataSource1D.defaultColorGradient, dataSource1D.useLowerThreshold, dataSource1D.useUpperThreshold, dataSource1D.thresholdMinPerc, dataSource1D.thresholdMaxPerc, dataSource1D);
         }
         structureDrawPanel.redraw();
+        fullGenomeDrawPanel.redraw();
     }
 
     @Override
@@ -365,6 +398,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         }
 
         structureDrawPanel.redraw();
+        fullGenomeDrawPanel.redraw();
     }
 
     @Override
@@ -382,7 +416,6 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         } else {
             structureDrawPanel.openSubstructure(null);
         }
-        structureDrawPanel.redraw();
         DataOverlay1D dataOverlay1D = structureVisController.structureVisModel.substructureModel.data1D;
         if (dataOverlay1D != null) {
             this.dataLegend1D.setLegend(dataOverlay1D.title, dataOverlay1D.dataTransform, dataOverlay1D.colorGradient, dataOverlay1D.defaultColorGradient, dataOverlay1D.useLowerThreshold, dataOverlay1D.useUpperThreshold, dataOverlay1D.thresholdMinPerc, dataOverlay1D.thresholdMaxPerc, dataOverlay1D);
@@ -392,16 +425,22 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         if (dataOverlay2D != null) {
             this.dataLegend2D.setLegend(dataOverlay2D.title, dataOverlay2D.dataTransform, dataOverlay2D.colorGradient, dataOverlay2D.defaultColorGradient, dataOverlay2D.useLowerThreshold, dataOverlay2D.useUpperThreshold, dataOverlay2D.thresholdMinPerc, dataOverlay2D.thresholdMaxPerc, dataOverlay2D);
         }
+        
+        structureDrawPanel.redraw();
+        fullGenomeDrawPanel.initialise(structureVisController.structureVisModel.substructureModel.structureOverlay, fullGenomeDrawPanel.maxSubstructureSize);
+        fullGenomeDrawPanel.redraw();
     }
 
     @Override
     public void annotationSourceChanged(AnnotationSource annotationSource) {
         structureDrawPanel.redraw();
+        fullGenomeDrawPanel.redraw();
     }
 
     @Override
     public void nucleotideSourceChanged(NucleotideComposition nucleotideSource) {
         structureDrawPanel.redraw();
+        fullGenomeDrawPanel.redraw();
     }
 
     public void setDistanceLimit(int value) {
@@ -450,6 +489,12 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         structureDrawPanel.setModel(newStructureVisModel.substructureModel);
         structureVisController.structureVisModel.substructureModel.addSubstructureModelListener(this);
         setDistanceLimit(structureVisController.structureVisModel.substructureModel.maxDistance);
+        if (newStructureVisModel.substructureModel.data1D == null) {
+            dataLegend1D.setVisible(false);
+        }
+        if (newStructureVisModel.substructureModel.data2D == null) {
+            dataLegend2D.setVisible(false);
+        }
         refresh();
     }
 }

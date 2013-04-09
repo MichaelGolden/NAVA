@@ -14,10 +14,12 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
 import nava.tasks.applications.ApplicationController;
 import nava.data.types.DataSourceCache;
 import nava.ranking.PairTestPanel;
 import nava.ranking.RankingPanel;
+import nava.structurevis.FullGenomeDrawPanel;
 import nava.structurevis.StructureVisModel;
 import nava.structurevis.StructureVisPanel;
 import nava.tasks.TaskManager;
@@ -94,7 +96,7 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
         jPanel1.add(dataPanel, BorderLayout.CENTER);
         structureVisPanel = new StructureVisPanel(projectController);
         jPanel2.add(structureVisPanel, BorderLayout.CENTER);
-       
+ 
         //projectDialog.setFileFilter(new ProjectFileFilter());
         projectDialog.setFileView(new ProjectFileView());
         projectDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -108,6 +110,9 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
             projectDirectory.mkdirs();
             projectController.openProject(new ProjectModel(projectDirectory.getAbsolutePath()));
             StartupDialog.addProjectFileToRecentProjects(projectDirectory);
+            StructureVisModel model = new StructureVisModel();
+            model.initialise(structureVisPanel.structureVisController);
+            structureVisPanel.structureVisController.openStructureVisModel(model);          
         }
     }
 
@@ -202,12 +207,12 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
 
         jMenu2.setText("Open recently used");
         jMenu2.addMenuListener(new javax.swing.event.MenuListener() {
-            public void menuDeselected(javax.swing.event.MenuEvent evt) {
-            }
             public void menuCanceled(javax.swing.event.MenuEvent evt) {
             }
             public void menuSelected(javax.swing.event.MenuEvent evt) {
                 jMenu2MenuSelected(evt);
+            }
+            public void menuDeselected(javax.swing.event.MenuEvent evt) {
             }
         });
         jMenu2.addActionListener(new java.awt.event.ActionListener() {

@@ -66,7 +66,7 @@ public class SafeListModel<T> implements Serializable {
 
     public T set(int index, T element) {
         T previousElement = data.set(index, element);
-        fireSafeListEvent(this, ListDataEvent.CONTENTS_CHANGED, index, index, previousElement,element);
+        fireSafeListEvent(this, ListDataEvent.CONTENTS_CHANGED, index, index, previousElement, element);
         return previousElement;
     }
 
@@ -102,23 +102,27 @@ public class SafeListModel<T> implements Serializable {
     }
 
     public void fireSafeListEvent(Object source, int type, int index0, int index1, Object oldElement, Object newElement) {
-        Object[] listeners = this.listenerList.getListenerList();
-        // Each listener occupies two elements - the first is the listener class
-        // and the second is the listener instance
-        for (int i = 0; i < listeners.length; i += 2) {
-            if (listeners[i] == SafeListListener.class) {
-                switch (type) {
-                    case ListDataEvent.INTERVAL_ADDED:
-                        ((SafeListListener) listeners[i + 1]).intervalAdded(new SafeListEvent(source, type, index0, index1, oldElement, newElement));
-                        break;
-                    case ListDataEvent.INTERVAL_REMOVED:
-                        ((SafeListListener) listeners[i + 1]).intervalRemoved(new SafeListEvent(source, type, index0, index1, oldElement, newElement));
-                        break;
-                    case ListDataEvent.CONTENTS_CHANGED:
-                        ((SafeListListener) listeners[i + 1]).contentsChanged(new SafeListEvent(source, type, index0, index1, oldElement, newElement));
-                        break;
+        if (this.listenerList != null) {
+            Object[] listeners = this.listenerList.getListenerList();
+            // Each listener occupies two elements - the first is the listener class
+            // and the second is the listener instance
+            for (int i = 0; i < listeners.length; i += 2) {
+                if (listeners[i] == SafeListListener.class) {
+                    switch (type) {
+                        case ListDataEvent.INTERVAL_ADDED:
+                            ((SafeListListener) listeners[i + 1]).intervalAdded(new SafeListEvent(source, type, index0, index1, oldElement, newElement));
+                            break;
+                        case ListDataEvent.INTERVAL_REMOVED:
+                            ((SafeListListener) listeners[i + 1]).intervalRemoved(new SafeListEvent(source, type, index0, index1, oldElement, newElement));
+                            break;
+                        case ListDataEvent.CONTENTS_CHANGED:
+                            ((SafeListListener) listeners[i + 1]).contentsChanged(new SafeListEvent(source, type, index0, index1, oldElement, newElement));
+                            break;
+                    }
                 }
             }
+        } else {
+            System.err.println("No listeners for this list.");
         }
     }
 

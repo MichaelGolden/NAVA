@@ -48,7 +48,6 @@ public class TaskManager extends Thread {
             runQueue.add(task);
             execute(task);
         }
-
         checkQueue();
     }
 
@@ -113,7 +112,7 @@ public class TaskManager extends Thread {
         task.taskManager = this;
 
         if (runQueue.contains(task) || generalTaskQueue.contains(task) || deferrableTaskQueue.contains(task)) {
-            System.err.println("Task is already queued.");
+            System.err.println("Task is already queued: "+task.getClass().toString());
         } else {
             task.before();
             if (task.deferrable) {
@@ -124,6 +123,7 @@ public class TaskManager extends Thread {
             task.setStatus(Status.QUEUED);
             task.queueTime = System.currentTimeMillis();
         }
+        checkQueue();
     }
 
     public void stopTaskManager() {

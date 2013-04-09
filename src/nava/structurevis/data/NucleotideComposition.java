@@ -87,6 +87,18 @@ public class NucleotideComposition extends Overlay implements Serializable {
         }
         return 0;
     }
+    
+    public char getMappedCharAtNucleotide(Mapping mapping, int structurePos) {
+        if (mapping != null) {
+            int mappedPos = mapping.aToB(structurePos);
+           // System.out.println("MFAN" + mappedPos + "->" + structurePos);
+
+            if (mappedPos != -1 && mappedPos < frequencyComposition.length) {
+                return consensus.charAt(mappedPos);
+            }
+        }
+        return '-';
+    }
 
     public void calculateFrequencies(ArrayList<String> sequences, ArrayList<String> sequenceNames) {
         if (sequences.size() > 1500) {

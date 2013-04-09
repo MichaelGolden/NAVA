@@ -30,10 +30,8 @@ import nava.data.types.DataType;
 import nava.data.types.Tabular;
 import nava.structurevis.*;
 import nava.structurevis.data.*;
-import nava.ui.MainFrame;
-import nava.ui.ProjectController;
-import nava.ui.ProjectModel;
-import nava.ui.ProjectView;
+import nava.ui.*;
+import nava.ui.navigator.NavigatorPanel;
 import nava.utils.Pair;
 
 /**
@@ -81,12 +79,46 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
             public synchronized void drop(DropTargetDropEvent evt) {
                 try {
                     evt.acceptDrop(DnDConstants.ACTION_COPY);
-                    List<File> droppedFiles = (List<File>) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+                    final List<File> droppedFiles = (List<File>) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
                     if (droppedFiles.size() == 1) {
-                        Pair<DataType, DataSource> dataTypeAndSource = DataOverlayTreePanel.this.projectController.autoAddDataSource(droppedFiles.get(0));
-                        DataSource dataSource = dataTypeAndSource.getRight();
-                        StructureVisPanel.showAddDialog(null, DataOverlayTreePanel.this.projectController.projectModel, DataOverlayTreePanel.this.structureVisController, dataSource);
+                        Thread taskThread = new Thread() {
+
+                            public void run() {
+                                try {
+                                    SwingUtilities.invokeAndWait(new Runnable() {
+
+                                        public void run() {
+                                            MainFrame.progressBarMonitor.set(true, ProgressBarMonitor.IMPORT_DATASOURCE, 0);
+                                            MainFrame.self.setEnabled(false);
+                                        }
+                                    });
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+
+                                for (int i = 0; i < droppedFiles.size(); i++) {
+                                    if (droppedFiles.get(i).isDirectory()) {
+                                        System.err.println("TODO this file is a folder. How should we handle this?");
+                                    } else {
+                                        Pair<DataType, DataSource> dataTypeAndSource = DataOverlayTreePanel.this.projectController.autoAddDataSourceWithAmbiguityResolution(droppedFiles.get(i));
+                                        if (dataTypeAndSource != null) {
+                                            DataSource dataSource = dataTypeAndSource.getRight();
+                                            StructureVisPanel.showAddDialog(null, DataOverlayTreePanel.this.projectController.projectModel, DataOverlayTreePanel.this.structureVisController, dataSource);
+                                        }
+                                    }
+                                }
+
+                                MainFrame.progressBarMonitor.set(false, ProgressBarMonitor.INACTIVE, ProgressBarMonitor.INACTIVE_VALUE);
+                                MainFrame.self.setEnabled(true);
+                            }
+                        };
+                        taskThread.start();
+
+
+
                     }
+
+
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -199,7 +231,7 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
                 if (tp != null) {
                     overlayTree.setSelectionPath(tp);
                 }
-                if (selectedOverlay instanceof DataOverlay1D) {
+                if (selectedOverlay instanceof DataOverlay1D && structureVisController.structureVisModel.substructureModel.structureOverlay != null) {
                     this.saveItem.setEnabled(true);
                 } else {
                     this.saveItem.setEnabled(false);
@@ -238,26 +270,31 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(setAsOverlayItem)) {
             Overlay overlay = ((DataOverlayTreeNode) overlayTree.getSelectionPath().getLastPathComponent()).overlay;
+            Overlay oldOverlay = null;
 
             if (overlay instanceof DataOverlay1D) {
+                oldOverlay = structureVisController.structureVisModel.substructureModel.data1D;
                 if (overlay.getState() == Overlay.OverlayState.PRIMARY_SELECTED) {
                     structureVisController.structureVisModel.substructureModel.setOverlay1D(null);
                 } else {
                     structureVisController.structureVisModel.substructureModel.setOverlay1D((DataOverlay1D) overlay);
                 }
             } else if (overlay instanceof DataOverlay2D) {
+                oldOverlay = structureVisController.structureVisModel.substructureModel.data2D;
                 if (overlay.getState() == Overlay.OverlayState.PRIMARY_SELECTED) {
                     structureVisController.structureVisModel.substructureModel.setOverlay2D(null);
                 } else {
                     structureVisController.structureVisModel.substructureModel.setOverlay2D((DataOverlay2D) overlay);
                 }
             } else if (overlay instanceof NucleotideComposition) {
+                oldOverlay = structureVisController.structureVisModel.substructureModel.nucleotideSource;
                 if (overlay.getState() == Overlay.OverlayState.PRIMARY_SELECTED) {
                     structureVisController.structureVisModel.substructureModel.setNucleotideOverlay(null);
                 } else {
                     structureVisController.structureVisModel.substructureModel.setNucleotideOverlay((NucleotideComposition) overlay);
                 }
             } else if (overlay instanceof StructureOverlay) {
+                oldOverlay = structureVisController.structureVisModel.substructureModel.structureOverlay;
                 if (overlay.getState() == Overlay.OverlayState.PRIMARY_SELECTED) {
                     structureVisController.structureVisModel.substructureModel.setStructureOverlay(null);
                 } else {
@@ -267,6 +304,9 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
             }
 
             // update node icons on tree
+            if (oldOverlay != null) {
+                structureVisController.structureVisModel.overlayNavigatorTreeModel.valueForPathChanged(new TreePath(structureVisController.structureVisModel.overlayNavigatorTreeModel.findNode(oldOverlay).getPath()), oldOverlay);
+            }
             structureVisController.structureVisModel.overlayNavigatorTreeModel.valueForPathChanged(overlayTree.getSelectionPath(), overlay);
         } else if (e.getSource().equals(editItem)) {
             Overlay overlay = ((DataOverlayTreeNode) overlayTree.getSelectionPath().getLastPathComponent()).overlay;
@@ -297,10 +337,9 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
             File saveFile = MainFrame.saveDialog.getSelectedFile();
             if (saveFile != null) {
                 try {
-                    Overlay overlay =  ((DataOverlayTreeNode) overlayTree.getSelectionPath().getLastPathComponent()).overlay;
-                    if(overlay instanceof DataOverlay1D)
-                    {
-                        structureVisController.structureVisModel.substructureModel.saveDataOverlay1DAndStructure((DataOverlay1D)overlay, saveFile);
+                    Overlay overlay = ((DataOverlayTreeNode) overlayTree.getSelectionPath().getLastPathComponent()).overlay;
+                    if (overlay instanceof DataOverlay1D) {
+                        structureVisController.structureVisModel.substructureModel.saveDataOverlay1DAndStructure((DataOverlay1D) overlay, saveFile);
                     }
                 } catch (IOException ex) {
                     Logger.getLogger(DataOverlayTreePanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -331,7 +370,7 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
 
     @Override
     public void structureVisModelChanged(StructureVisModel newStructureVisModel) {
-        // this.overlayTree.removeAll();
+        System.out.println("DataOverlayTreePanel structureVisModelChanged aaxcaf");
         this.overlayTree.setModel(newStructureVisModel.overlayNavigatorTreeModel);
         newStructureVisModel.overlayNavigatorTreeModel.addTreeModelListener(this);
     }

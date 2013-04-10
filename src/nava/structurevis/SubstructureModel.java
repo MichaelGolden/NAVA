@@ -42,9 +42,9 @@ public class SubstructureModel implements Serializable {
     NucleotideComposition.Type nucleotideCompositionType = NucleotideComposition.Type.FREQUENCY;
     public StructureOverlay structureOverlay = null;
     int numbering = 0;
-    Substructure structure = null;
-    transient DistanceMatrix distanceMatrix = null;
-    transient DistanceMatrix structureDistanceMatrix = null;
+    Substructure substructure = null;
+    transient DistanceMatrix fullDistanceMatrix = null;
+    transient DistanceMatrix substructureDistanceMatrix = null;
     int maxDistance = -1;
     protected transient EventListenerList listeners = new EventListenerList();
     /*
@@ -213,6 +213,7 @@ public class SubstructureModel implements Serializable {
                         if (nucleotideSource != null && nucleotideSource.mappingSource != null) {
                             nucleotideMapping = structureVisController.getMapping(structureOverlay.mappingSource, nucleotideSource.mappingSource);
                         }
+                     
                     }
                     if (annotationSource != null) {
                         annotationSource = AnnotationSource.getMappedAnnotations(annotationSource, structureOverlay, structureVisController);

@@ -165,7 +165,7 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
         repaint();
     }
 
-    public void setAnnotationData(AnnotationSource annotationData) {
+    public synchronized void setAnnotationData(AnnotationSource annotationData) {
         this.annotationData = annotationData;
         ArrayList<Feature> features = annotationData.mappedFeatures;
         removeItem.removeAll();

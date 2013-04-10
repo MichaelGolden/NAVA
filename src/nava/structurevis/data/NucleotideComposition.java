@@ -81,7 +81,7 @@ public class NucleotideComposition extends Overlay implements Serializable {
     public int getMappedNonGapCountAtNucleotide(Mapping mapping, int structurePos) {
         if (mapping != null) {
             int mappedPos = mapping.bToA(structurePos);
-            if (mappedPos != -1) {
+            if (mappedPos != -1 && mappedPos < nonGapCount.length) {
                 return nonGapCount[mappedPos];
             }
         }

@@ -100,6 +100,7 @@ public class FullGenomeDrawPanel extends JPanel implements ActionListener, Mouse
             double pairedDistance = 15;
             double unpairedLength = 100;
             double maxXcoordinate = 0;
+            width = 0;
 
             // determine full genome structure coordinates
 
@@ -177,9 +178,12 @@ public class FullGenomeDrawPanel extends JPanel implements ActionListener, Mouse
             }
 
 
-            setPreferredSize(new Dimension((int) (width + 1), (int) (basePosY + lowestPosY + 1)));            
+            setPreferredSize(new Dimension((int) (width + 1), (int) (basePosY + lowestPosY + 1)));
             revalidate();
-            System.out.println("Genome draw panel size " + getSize());
+
+            substructureModel.fullDistanceMatrix = new DistanceMatrix(DistanceMatrix.getBestBinSize(structureOverlay.pairedSites.length, 2000), 2000, structureOverlay.pairedSites);
+            //System.out.println("Genome draw panel size 1 " + new Dimension((int) (width + 1), (int) (basePosY + lowestPosY + 1)));
+            //System.out.println("Genome draw panel size 2 " + getSize());
         }
     }
 
@@ -202,9 +206,8 @@ public class FullGenomeDrawPanel extends JPanel implements ActionListener, Mouse
 
         g.setColor(Color.white);
         g.fillRect(viewableArea.x, viewableArea.y, viewableArea.width, viewableArea.height);
-        
-        if(substructureModel.structureOverlay == null || substructureModel.structureOverlay.pairedSites == null)
-        {
+
+        if (substructureModel.structureOverlay == null || substructureModel.structureOverlay.pairedSites == null) {
             return;
         }
 
@@ -242,7 +245,7 @@ public class FullGenomeDrawPanel extends JPanel implements ActionListener, Mouse
 
                 if (posi != -1 && posj != -1) {
                     if (((!substructureModel.data2D.useLowerThreshold || val >= substructureModel.data2D.thresholdMin) && (!substructureModel.data2D.useUpperThreshold || val <= substructureModel.data2D.thresholdMax))) {
-                        if (fullCoordinates[posi] != null && fullCoordinates[posj] != null) {
+                        if (fullCoordinates[posi] != null && fullCoordinates[posj] != null && (substructureModel.fullDistanceMatrix == null || substructureModel.maxDistance == -1 || substructureModel.fullDistanceMatrix.getDistance(posi, posj) <= substructureModel.maxDistance)) {
                             Line2D.Double line = new Line2D.Double(fullCoordinates[posi].x, fullCoordinates[posi].y + basePosY, fullCoordinates[posj].x, fullCoordinates[posj].y + basePosY);
                             Color c = substructureModel.data2D.colorGradient.getColor((float) substructureModel.data2D.dataTransform.transform(val));
                             g.setColor(c);

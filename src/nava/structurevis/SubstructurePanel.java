@@ -45,7 +45,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
 
         structureDrawPanel = new SubstructureDrawPanel(structureVisController.structureVisModel.substructureModel);
         fullGenomeDrawPanel = new FullGenomeDrawPanel(structureVisController);
-        
+
         structureVisController.structureVisModel.substructureModel.addSubstructureModelListener(this);
         topScrollPane.setViewportView(structureDrawPanel);
 
@@ -66,7 +66,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
 
         distanceSlider.addChangeListener(this);
         //jProgressBar1.
-         MainFrame.progressBarMonitor.addJProgressBar(jProgressBar);
+        MainFrame.progressBarMonitor.addJProgressBar(jProgressBar);
         //populateStructureComboBox(Collections.list(projectController.projectModel.dataSources.elements()));
     }
 
@@ -288,18 +288,14 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void viewToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewToggleButtonActionPerformed
-        if(viewToggleButton.isSelected())
-        {
+        if (viewToggleButton.isSelected()) {
             this.topScrollPane.setViewportView(fullGenomeDrawPanel);
             this.viewToggleButton.setText("Substructure view");
-        }
-        else
-        {
+        } else {
             this.topScrollPane.setViewportView(structureDrawPanel);
             this.viewToggleButton.setText("Full view");
         }
     }//GEN-LAST:event_viewToggleButtonActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel distanceLabel;
     private javax.swing.JSlider distanceSlider;
@@ -425,7 +421,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         if (dataOverlay2D != null) {
             this.dataLegend2D.setLegend(dataOverlay2D.title, dataOverlay2D.dataTransform, dataOverlay2D.colorGradient, dataOverlay2D.defaultColorGradient, dataOverlay2D.useLowerThreshold, dataOverlay2D.useUpperThreshold, dataOverlay2D.thresholdMinPerc, dataOverlay2D.thresholdMaxPerc, dataOverlay2D);
         }
-        
+
         structureDrawPanel.redraw();
         fullGenomeDrawPanel.initialise(structureVisController.structureVisModel.substructureModel.structureOverlay, fullGenomeDrawPanel.maxSubstructureSize);
         fullGenomeDrawPanel.redraw();
@@ -444,11 +440,10 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
     }
 
     public void setDistanceLimit(int value) {
-        if(!(distanceSlider.getValue() == value || value == -1 && distanceSlider.getValue() == distanceSlider.getMaximum()))
-        {
-             distanceSlider.setValue(value == -1 ? distanceSlider.getMaximum() : value);
+        if (!(distanceSlider.getValue() == value || value == -1 && distanceSlider.getValue() == distanceSlider.getMaximum())) {
+            distanceSlider.setValue(value == -1 ? distanceSlider.getMaximum() : value);
         }
-        
+
         if (value == distanceSlider.getMaximum() || value == -1) {
             structureVisController.structureVisModel.substructureModel.maxDistance = -1;
             distanceLabel.setText("No limit");
@@ -456,6 +451,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
             structureVisController.structureVisModel.substructureModel.maxDistance = value;
             distanceLabel.setText(value + "");
             structureDrawPanel.redraw();
+            fullGenomeDrawPanel.redraw();
         }
     }
 
@@ -464,7 +460,8 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         if (e.getSource().equals(distanceSlider)) {
             setDistanceLimit(distanceSlider.getValue());
         }
-        this.structureDrawPanel.redraw();
+        structureDrawPanel.redraw();
+        fullGenomeDrawPanel.redraw();
     }
 
     @Override

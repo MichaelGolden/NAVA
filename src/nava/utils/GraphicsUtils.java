@@ -56,4 +56,20 @@ public class GraphicsUtils {
         final int y = w.getY() + ((w.getHeight() - d.getHeight())/ 2);
         d.setLocation(x, y);
     }
+    
+    
+    
+
+    public static String getHexString(Color color) {
+        return Integer.toHexString((color.getRGB() & 0xffffff) | 0x1000000).substring(1);
+    }
+    
+    
+
+    public static String getRGBAString(Color color) {
+        //return "rgba("+color.getRed()+","+color.getGreen()+","+color.getBlue()+","+(1f - ((float)color.getAlpha()/255f))+")";
+        return "rgb("+color.getRed()+","+color.getGreen()+","+color.getBlue()+");opacity:"+(((float)color.getAlpha()/255f));
+        
+        //return "rgb("+color.getRed()+","+color.getGreen()+","+color.getBlue()+")";
+    }
 }

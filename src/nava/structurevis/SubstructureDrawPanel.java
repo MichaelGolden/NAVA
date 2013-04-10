@@ -35,7 +35,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import nava.ui.MainFrame;
 import nava.utils.ColorUtils;
+import nava.utils.GraphicsUtils;
 import nava.utils.RNAFoldingTools;
 import net.hanjava.svg.SVG2EMF;
 
@@ -125,7 +127,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
 
     public void setModel(SubstructureModel substructureModel) {
         this.subtructureModel = substructureModel;
-        this.openSubstructure(substructureModel.structure);
+        this.openSubstructure(substructureModel.substructure);
     }
 
     //public boolean drawUsingSVG = false; // if true draw graphic using SVG, otherwise use native java graphics
@@ -235,11 +237,11 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             repaint();
         } else {
             this.noStructure = false;
-            subtructureModel.structure = s;
-            if (subtructureModel.structure.length < 500) {
-                subtructureModel.structureDistanceMatrix = new DistanceMatrix(subtructureModel.structure.pairedSites);
+            subtructureModel.substructure = s;
+            if (subtructureModel.substructure.length < 500) {
+                subtructureModel.substructureDistanceMatrix = new DistanceMatrix(subtructureModel.substructure.pairedSites);
             } else {
-                subtructureModel.structureDistanceMatrix = null;
+                subtructureModel.substructureDistanceMatrix = null;
             }
 
             if (showDNA) {
@@ -262,7 +264,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
      * structure.length); } computeAndDraw(); }
      */
     public void computeAndDraw() {
-        computeStructureToBeDrawn(subtructureModel.structure);
+        computeStructureToBeDrawn(subtructureModel.substructure);
         repaint = true;
         repaint();
     }
@@ -344,16 +346,12 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
          */
     }
 
-    public static String getHexString(Color color) {
-        return Integer.toHexString((color.getRGB() & 0xffffff) | 0x1000000).substring(1);
-    }
-
     public String drawStructure(boolean drawSequenceLogo) {
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
 
-        if (subtructureModel.structure == null || nucleotidePositions == null) {
+        if (subtructureModel.substructure == null || subtructureModel.structureOverlay == null || subtructureModel.structureOverlay.pairedSites == null || nucleotidePositions == null) {
             return null;
         }
 
@@ -370,14 +368,15 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             pw.println("<g>");
             for (int i = 0; i < nucleotidePositions.length; i++) {
                 int a = i;
-                int b = edit.pairedSites[i] - edit.pairedSites[0];
-                if (i < edit.pairedSites[i]) {
+                int b = edit.pairedSites[i] - 1;
+                if (i + 1 < edit.pairedSites[i]) {
                     /*
                      * Line2D bond = new Line2D.Double(nucleotidePositions[a],
                      * nucleotidePositions[b]); g.setStroke(new BasicStroke(2));
                      * g.setColor(Color.gray); g.draw(bond);
                      */
-                    pw.println("    <line id=\"bond_" + i + "\" x1=\"" + nucleotidePositions[a].x + "\" y1=\"" + nucleotidePositions[a].y + "\"  x2=\"" + nucleotidePositions[b].x + "\" y2=\"" + nucleotidePositions[b].y + "\" style=\"stroke-width:\"" + bondThickness + "\";stroke:#" + getHexString(bondColor) + "\"/>");
+                    pw.println("    <line id=\"bond_" + i + "\" x1=\"" + nucleotidePositions[a].x + "\" y1=\"" + nucleotidePositions[a].y + "\"  x2=\"" + nucleotidePositions[b].x + "\" y2=\"" + nucleotidePositions[b].y + "\" style=\"stroke-width:" + bondThickness + ";stroke:" + GraphicsUtils.getRGBAString(bondColor) + "\"/>");
+                    //pw.println("    <polyline id=\"bond_" + i + "\" points=\"" + nucleotidePositions[a].x + " " + nucleotidePositions[a].y + " " + nucleotidePositions[b].x + " " + nucleotidePositions[b].y + "\" style=\"stroke-width:\"" + bondThickness + "\";stroke:#" + getHexString(bondColor) + "\"/>");
                 }
             }
             pw.println("</g>");
@@ -385,15 +384,15 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
 
         // draw two-dimensional data
         pw.println("<g>");
-        int length = subtructureModel.structure.length;
+        int length = subtructureModel.substructure.length;
         covariationInteractions.clear();
         if (show2DData && subtructureModel.data2D != null) {
-            for (int i = subtructureModel.structure.getStartPosition(); i < subtructureModel.structure.getEndPosition(); i++) {
-                for (int j = subtructureModel.structure.getStartPosition(); j < subtructureModel.structure.getEndPosition(); j++) {
-                    int k = i - subtructureModel.structure.getStartPosition();
-                    int l = j - subtructureModel.structure.getStartPosition();
+            for (int i = subtructureModel.substructure.getStartPosition(); i < subtructureModel.substructure.getEndPosition(); i++) {
+                for (int j = subtructureModel.substructure.getStartPosition(); j < subtructureModel.substructure.getEndPosition(); j++) {
+                    int k = i - subtructureModel.substructure.getStartPosition();
+                    int l = j - subtructureModel.substructure.getStartPosition();
 
-                    if (subtructureModel.maxDistance == -1 || (subtructureModel.structureDistanceMatrix != null && subtructureModel.structureDistanceMatrix.getDistance(k, l) <= subtructureModel.maxDistance) || (subtructureModel.structureDistanceMatrix == null && subtructureModel.structureDistanceMatrix.getDistance(i - 1, j - 1) <= subtructureModel.maxDistance)) {
+                    if (subtructureModel.maxDistance == -1 || (subtructureModel.substructureDistanceMatrix != null && subtructureModel.substructureDistanceMatrix.getDistance(k, l) <= subtructureModel.maxDistance) || (subtructureModel.substructureDistanceMatrix == null && subtructureModel.substructureDistanceMatrix.getDistance(i, j) <= subtructureModel.maxDistance)) {
                         Color c = null;
 
                         double value = subtructureModel.data2D.get(i, j, subtructureModel.mapping2D);
@@ -407,7 +406,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                             }
                         }
 
-                        if (c != null && nucleotidePositions.length == subtructureModel.structure.length) { // TODO strange error where the array length is different from the structure length, probably a race condition
+                        if (c != null && nucleotidePositions.length == subtructureModel.substructure.length) { // TODO strange error where the array length is different from the structure length, probably a race condition
 
                             double x1 = nucleotidePositions[k].getX();
                             double y1 = nucleotidePositions[k].getY();
@@ -430,7 +429,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                              */
 
                             Shape shape = null;
-                            int structureMidpoint = subtructureModel.structure.getStartPosition() + (subtructureModel.structure.length / 2);
+                            int structureMidpoint = subtructureModel.substructure.getStartPosition() + (subtructureModel.substructure.length / 2);
 
                             /*
                              * if (i >= structure.gapStartA && i <=
@@ -456,7 +455,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                                 shape = new Line2D.Double(nucleotidePositions[k], nucleotidePositions[l]);
                             }
                             covariationInteractions.add(new Interaction(shape, i, j));
-                            pw.println("    <polyline id=\"2d_data_" + i + "_" + j + "\" points=\"" + x1 + " " + y1 + " " + x2 + " " + y2 + "\" style=\"stroke-width:5;stroke:#" + getHexString(c) + "\"/>");
+                            pw.println("    <polyline id=\"2d_data_" + i + "_" + j + "\" points=\"" + x1 + " " + y1 + " " + x2 + " " + y2 + "\" style=\"stroke-width:5;stroke:" + GraphicsUtils.getRGBAString(c) + "\"/>");
                             //  pw.println("    <metadata><value>" + value + "</value></metadata>");
                         }
                     }
@@ -469,7 +468,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
         // draw the nucleotides
         pw.println("<g>");
         for (int i = 0; i < nucleotidePositions.length; i++) {
-            int structurePos = (subtructureModel.structure.startPosition + i) % subtructureModel.sequenceLength;
+            int structurePos = (subtructureModel.substructure.startPosition + i) % subtructureModel.sequenceLength;
             int pos = structurePos;
             if (subtructureModel.mapping1D != null) {
                 int pos2 = subtructureModel.mapping1D.aToB(pos);
@@ -488,7 +487,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             }
 
             // pw.println("<g transform=\"scale(1,0.5)\">");
-            pw.println("    <circle id=\"nucleotide_" + (subtructureModel.structure.startPosition + i) + "\" cx=\"" + nucleotidePositions[i].getX() + "\" cy=\"" + nucleotidePositions[i].getY() + "\" r=\"" + nucleotideDiameter / 2 + "\" style=\"stroke-width:2;stroke:black;fill:#" + getHexString(nucleotideBackgroundColor) + "\"/>");
+            pw.println("    <circle id=\"nucleotide_" + (subtructureModel.substructure.startPosition + i) + "\" cx=\"" + nucleotidePositions[i].getX() + "\" cy=\"" + nucleotidePositions[i].getY() + "\" r=\"" + nucleotideDiameter / 2 + "\" style=\"stroke-width:2;stroke:black;fill:" + GraphicsUtils.getRGBAString(nucleotideBackgroundColor) + "\"/>");
             //pw.println("</g>");
 
             // draw the information
@@ -529,12 +528,12 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                             for (int k = 0; k < 4; k++) {
                                 fa[k] = fa[k] / 2;
                             }
-                            pw.print(drawSequenceLogoSVG("logo_" + (subtructureModel.structure.startPosition + i), nucleotidePositions[i].getX(), nucleotidePositions[i].getY() - (nucleotideDiameter / 2) + 4, nucleotideDiameter, nucleotideDiameter - 8, fa, bestColor));
+                            pw.print(drawSequenceLogoSVG("logo_" + (subtructureModel.substructure.startPosition + i), nucleotidePositions[i].getX(), nucleotidePositions[i].getY() - (nucleotideDiameter / 2) + 4, nucleotideDiameter, nucleotideDiameter - 8, fa, bestColor));
                         }
                     } else if (subtructureModel.nucleotideCompositionType == NucleotideComposition.Type.FREQUENCY) {
                         double[] nucfa = subtructureModel.nucleotideSource.getMappedFrequencyAtNucleotide(subtructureModel.nucleotideMapping, structurePos);
                         if (nucfa != null) {
-                            pw.print(drawSequenceLogoSVG("logo_" + (subtructureModel.structure.startPosition + i), nucleotidePositions[i].getX(), nucleotidePositions[i].getY() - (nucleotideDiameter / 2) + 4, nucleotideDiameter, nucleotideDiameter - 8, nucfa, bestColor));
+                            pw.print(drawSequenceLogoSVG("logo_" + (subtructureModel.substructure.startPosition + i), nucleotidePositions[i].getX(), nucleotidePositions[i].getY() - (nucleotideDiameter / 2) + 4, nucleotideDiameter, nucleotideDiameter - 8, nucfa, bestColor));
                         }
                     }
                 }
@@ -557,7 +556,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             }
 
             if (nucleotidePositions[i] != null) {
-                int pos = (subtructureModel.structure.getStartPosition() + i - 1) % subtructureModel.sequenceLength + 1;
+                int pos = (subtructureModel.substructure.getStartPosition() + i - 1) % subtructureModel.sequenceLength + 1;
                 double fontSize = 11;
                 if (subtructureModel.numbering != 0 && pos % subtructureModel.numbering == 0) {
                     pw.println("    <text id=\"nucleotide_position_" + pos + "\" x=\"" + (offsetx + nucleotidePositions[i].getX()) + "\" y=\"" + (nucleotidePositions[i].getY() + (fontSize / 2)) + "\" style=\"font-size:" + fontSize + "px;stroke:none;fill:black\" text-anchor=\"" + textanchor + "\" >");
@@ -623,7 +622,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                 xf /= scale;
                 yf /= fontHeightScale * scale;
                 pw.println("    <g transform=\"scale(" + scale + "," + fontHeightScale * scale + ")\">");
-                pw.print("        <text x=\"" + xf + "\" y=\"" + yf + "\" id=\"" + id + "_" + i + "\"  style=\"font-size:" + (int) fontHeight + "px;stroke:none;fill:#" + getHexString(textColor) + ";text-anchor:middle;\">");
+                pw.print("        <text x=\"" + xf + "\" y=\"" + yf + "\" id=\"" + id + "_" + i + "\"  style=\"font-size:" + (int) fontHeight + "px;stroke:none;fill:" + GraphicsUtils.getRGBAString(textColor) + ";text-anchor:middle;\">");
                 pw.println("            <tspan id=\"base\">" + b + "</tspan>");
                 pw.println("</text>");
                 pw.println("    </g>");
@@ -636,37 +635,18 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
     public BufferedImage bufferedImage = null;
 
     public void drawStructureNative(Graphics graphics) {
-        if (subtructureModel.structure == null || nucleotidePositions == null) {
-            return;
-        }
-
         int panelWidth = (int) ((maxx - minx) * horizontalScale + xoffset * 2);
         int panelHeight = (int) ((maxy - miny) * verticalScale + 100);
         Dimension d = new Dimension((int) (panelWidth * zoomScale), (int) (panelHeight * zoomScale));
-        /*
-         * try { if (d.width > 0 && d.height > 0) { if ((bufferedImage == null
-         * || d.width != bufferedImage.getWidth() || d.height !=
-         * bufferedImage.getHeight())) { bufferedImage = (BufferedImage)
-         * (this.createImage(d.width, d.height)); } } } catch (Exception ex) {
-         * //System.out.println(ex); JOptionPane.showMessageDialog(this.mainapp,
-         * ex.getMessage(), "Exception", JOptionPane.ERROR_MESSAGE); return; }
-         * catch (Error e) { JOptionPane.showMessageDialog(this.mainapp,
-         * e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE); return; }
-         *
-         * if (bufferedImage == null) { return; }
-         *
-         *
-         * g = (Graphics2D) bufferedImage.getGraphics(); //g = (Graphics2D)
-         * graphics;
-         *
-         */
-
         g = (Graphics2D) graphics;
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.scale(zoomScale, zoomScale);
         g.setColor(Color.white);
         g.fillRect(0, 0, panelWidth, panelHeight);
 
+        if (subtructureModel.substructure == null || subtructureModel.structureOverlay == null || subtructureModel.structureOverlay.pairedSites == null || nucleotidePositions == null) {
+            return;
+        }
 
         // draw the base pair interactions
         if (showBonds) {
@@ -699,14 +679,14 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
 
 
         g.setColor(Color.black);
-        int length = subtructureModel.structure.length;
+        int length = subtructureModel.substructure.length;
         covariationInteractions.clear();
         if (show2DData && subtructureModel.data2D != null) {
-            for (int i = subtructureModel.structure.getStartPosition(); i < subtructureModel.structure.getEndPosition(); i++) {
-                for (int j = subtructureModel.structure.getStartPosition(); j < subtructureModel.structure.getEndPosition(); j++) {
-                    int k = i - subtructureModel.structure.getStartPosition();
-                    int l = j - subtructureModel.structure.getStartPosition();
-                    if (subtructureModel.maxDistance == -1 || (subtructureModel.structureDistanceMatrix != null && subtructureModel.structureDistanceMatrix.getDistance(k, l) <= subtructureModel.maxDistance) || (subtructureModel.structureDistanceMatrix == null && subtructureModel.distanceMatrix.getDistance(i - 1, j - 1) <= subtructureModel.maxDistance)) {
+            for (int i = subtructureModel.substructure.getStartPosition(); i < subtructureModel.substructure.getEndPosition(); i++) {
+                for (int j = subtructureModel.substructure.getStartPosition(); j < subtructureModel.substructure.getEndPosition(); j++) {
+                    int k = i - subtructureModel.substructure.getStartPosition();
+                    int l = j - subtructureModel.substructure.getStartPosition();
+                    if (subtructureModel.maxDistance == -1 || (subtructureModel.substructureDistanceMatrix != null && subtructureModel.substructureDistanceMatrix.getDistance(k, l) <= subtructureModel.maxDistance) || (subtructureModel.substructureDistanceMatrix == null && subtructureModel.substructureDistanceMatrix.getDistance(i, j) <= subtructureModel.maxDistance)) {
                         Color c = null;
                         //double p = model.data2D.emptyValue;
                         double p = subtructureModel.data2D.get(i, j, subtructureModel.mapping2D);
@@ -729,7 +709,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                             double y2 = nucleotidePositions[l].getY();
 
                             Shape shape = null;
-                            int structureMidpoint = subtructureModel.structure.getStartPosition() + (subtructureModel.structure.length / 2);
+                            int structureMidpoint = subtructureModel.substructure.getStartPosition() + (subtructureModel.substructure.length / 2);
 
                             /*
                              * if (i >= structure.gapStartA && i <=
@@ -784,7 +764,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
 
         // draw the nucleotides
         for (int i = 0; i < nucleotidePositions.length; i++) {
-            int structurePos = (subtructureModel.structure.startPosition + i) % subtructureModel.sequenceLength;
+            int structurePos = (subtructureModel.substructure.startPosition + i) % subtructureModel.sequenceLength;
             int pos = structurePos;
             if (subtructureModel.mapping1D != null) {
                 int pos2 = subtructureModel.mapping1D.aToB(pos);
@@ -870,7 +850,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             if (nucleotidePositions[i] != null) {
                 g.setColor(Color.black);
                 g.setFont(f2);
-                int pos = (subtructureModel.structure.getStartPosition() + i - 1) % subtructureModel.sequenceLength + 1;
+                int pos = (subtructureModel.substructure.getStartPosition() + i - 1) % subtructureModel.sequenceLength + 1;
                 if (subtructureModel.numbering != 0 && pos % subtructureModel.numbering == 0) {
                     drawStringCentred(g, offsetx + nucleotidePositions[i].getX(), nucleotidePositions[i].getY() - 2, "" + pos);
                     g.setColor(Color.black);
@@ -1022,7 +1002,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
      * }
      */
     public int drawComplexStructure() {
-        if (subtructureModel.structure == null || nucleotidePositions == null) {
+        if (subtructureModel.substructure == null || nucleotidePositions == null) {
             return 0;
         }
 
@@ -1032,7 +1012,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             return DRAW_NATIVE_GRAPHIC;
         }
 
-        if (subtructureModel.structure.length <= 200) {
+        if (subtructureModel.substructure.length <= 200) {
             createStructureSVG();
             return DRAW_SVG_GRAPHIC;
         } else {
@@ -1284,12 +1264,12 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                 g.setColor(Color.blue);
                 g.setStroke(new BasicStroke((float) 4));
 
-                int nucX = selectedNucleotideX - subtructureModel.structure.startPosition + 1;
+                int nucX = selectedNucleotideX - subtructureModel.substructure.startPosition + 1;
                 if (nucX >= 0 && nucX < nucleotidePositions.length) {
                     g.drawOval((int) nucleotidePositions[nucX].x - (nucleotideDiameter / 2), (int) nucleotidePositions[nucX].y - (nucleotideDiameter / 2), (int) (nucleotideDiameter), (int) (nucleotideDiameter));
                 }
 
-                int nucY = selectedNucleotideY - subtructureModel.structure.startPosition + 1;
+                int nucY = selectedNucleotideY - subtructureModel.substructure.startPosition + 1;
                 if (nucY >= 0 && nucY < nucleotidePositions.length) {
                     g.drawOval((int) nucleotidePositions[nucY].x - (nucleotideDiameter / 2), (int) nucleotidePositions[nucY].y - (nucleotideDiameter / 2), (int) (nucleotideDiameter), (int) (nucleotideDiameter));
                 }
@@ -1303,7 +1283,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                 g.setColor(Color.orange);
                 g.setStroke(new BasicStroke((float) 3));
 
-                int nucX = i - subtructureModel.structure.startPosition;
+                int nucX = i - subtructureModel.substructure.startPosition;
                 if (nucX >= 0 && nucX < nucleotidePositions.length) {
                     g.drawOval((int) nucleotidePositions[nucX].x - (nucleotideDiameter / 2), (int) nucleotidePositions[nucX].y - (nucleotideDiameter / 2), (int) (nucleotideDiameter), (int) (nucleotideDiameter));
                 }
@@ -1369,7 +1349,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
         double x = e.getPoint().x / zoomScale;
         double y = e.getPoint().y / zoomScale;
 
-        if (subtructureModel.structure != null && nucleotidePositions != null) {
+        if (subtructureModel.substructure != null && nucleotidePositions != null) {
             // 1D interactions
             int minIndex = -1;
             double minDistance = Double.MAX_VALUE;
@@ -1386,7 +1366,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                 nucleotide = minIndex;
             }
 
-            int pos = (subtructureModel.structure.getStartPosition() + nucleotide - 1) % subtructureModel.sequenceLength;
+            int pos = (subtructureModel.substructure.getStartPosition() + nucleotide - 1) % subtructureModel.sequenceLength;
 
             if (subtructureModel.nucleotideSource != null && nucleotide != -1) {
                 double[] nucfa = subtructureModel.nucleotideSource.getMappedFrequencyAtNucleotide(subtructureModel.nucleotideMapping, pos);
@@ -1597,47 +1577,46 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
     }
 
     public void actionPerformed(ActionEvent e) {
-        /*
-         * if (e.getSource().equals(saveAsPNGItem)) { String name = "structure";
-         * MainApp.fileChooserSave.setDialogTitle("Save as PNG");
-         * MainApp.fileChooserSave.setSelectedFile(new
-         * File(MainApp.fileChooserSave.getCurrentDirectory().getPath() + "/" +
-         * name + ".png")); int returnVal =
-         * MainApp.fileChooserSave.showSaveDialog(this); if (returnVal ==
-         * JFileChooser.APPROVE_OPTION) {
-         * setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-         * saveAsPNG(MainApp.fileChooserSave.getSelectedFile());
-         * setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)); }
-         * MainApp.fileChooserSave.setDialogTitle("Open"); } else if
-         * (e.getSource().equals(saveAsSVGItem)) {
-         * MainApp.fileChooserSave.setDialogTitle("Save as SVG"); String name =
-         * "structure"; MainApp.fileChooserSave.setSelectedFile(new
-         * File(MainApp.fileChooserSave.getCurrentDirectory().getPath() + "/" +
-         * name + ".svg")); int returnVal =
-         * MainApp.fileChooserSave.showSaveDialog(this); if (returnVal ==
-         * JFileChooser.APPROVE_OPTION) {
-         * setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR)); try {
-         * saveAsSVG(MainApp.fileChooserSave.getSelectedFile()); } catch
-         * (IOException ex) {
-         * Logger.getLogger(StructureDrawPanel.class.getName()).log(Level.SEVERE,
-         * null, ex); }
-         * setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)); }
-         * MainApp.fileChooserSave.setDialogTitle("Open"); } else if
-         * (e.getSource().equals(saveAsEMFItem)) {
-         * MainApp.fileChooserSave.setDialogTitle("Save as EMF"); String name =
-         * "structure"; MainApp.fileChooserSave.setSelectedFile(new
-         * File(MainApp.fileChooserSave.getCurrentDirectory().getPath() + "/" +
-         * name + ".emf")); int returnVal =
-         * MainApp.fileChooserSave.showSaveDialog(this); if (returnVal ==
-         * JFileChooser.APPROVE_OPTION) {
-         * setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR)); try {
-         * saveAsEMF(MainApp.fileChooserSave.getSelectedFile()); } catch
-         * (IOException ex) {
-         * Logger.getLogger(StructureDrawPanel.class.getName()).log(Level.SEVERE,
-         * null, ex); }
-         * setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)); }
-         * MainApp.fileChooserSave.setDialogTitle("Open"); } else
-         */ if (e.getSource().equals(dnaMenuItem)) {
+         if (e.getSource().equals(saveAsPNGItem)) {
+            String name = "structure";
+            MainFrame.saveDialog.setDialogTitle("Save as PNG");
+            MainFrame.saveDialog.setSelectedFile(new File(MainFrame.saveDialog.getCurrentDirectory().getPath() + "/" + name + ".png"));
+            int returnVal = MainFrame.saveDialog.showSaveDialog(this);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                saveAsPNG(MainFrame.saveDialog.getSelectedFile());
+                setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            }
+        } else if (e.getSource().equals(saveAsSVGItem)) {
+            MainFrame.saveDialog.setDialogTitle("Save as SVG");
+            String name = "structure";
+            MainFrame.saveDialog.setSelectedFile(new File(MainFrame.saveDialog.getCurrentDirectory().getPath() + "/" + name + ".svg"));
+            int returnVal = MainFrame.saveDialog.showSaveDialog(this);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                try {
+                    saveAsSVG(MainFrame.saveDialog.getSelectedFile());
+                } catch (IOException ex) {
+                    Logger.getLogger(SubstructureDrawPanel.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            }
+        } else if (e.getSource().equals(saveAsEMFItem)) {
+            MainFrame.saveDialog.setDialogTitle("Save as EMF");
+            String name = "structure";
+            MainFrame.saveDialog.setSelectedFile(new File(MainFrame.saveDialog.getCurrentDirectory().getPath() + "/" + name + ".emf"));
+            int returnVal = MainFrame.saveDialog.showSaveDialog(this);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                try {
+                    saveAsEMF(MainFrame.saveDialog.getSelectedFile());
+                } catch (IOException ex) {
+                    Logger.getLogger(SubstructureDrawPanel.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            }
+        } else
+        if (e.getSource().equals(dnaMenuItem)) {
             showDNA = true;
             redraw();
         } else if (e.getSource().equals(rnaMenuItem)) {

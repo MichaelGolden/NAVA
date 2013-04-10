@@ -24,7 +24,7 @@ import nava.utils.Utils;
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class SimpleNucleotideDiversity extends Application {
+public class SimpleNucleotideDiversityApplication extends Application {
     
     Alignment inputDataSource = null;
     ArrayList<ApplicationOutput> outputFiles = new ArrayList<>();
@@ -63,7 +63,7 @@ public class SimpleNucleotideDiversity extends Application {
         if (dataSources.size() == 1) {
             if (dataSources.get(0) instanceof Alignment) {
                 Alignment al = (Alignment) (dataSources.get(0));
-                if(al.type == AlignmentType.NUCLEOTIDE_ALIGNMENT || al.type == AlignmentType.CODON_ALIGNMENT)
+                if(al.alignmentType == AlignmentType.NUCLEOTIDE_ALIGNMENT || al.alignmentType == AlignmentType.CODON_ALIGNMENT)
                 {
                     return true;
                 }

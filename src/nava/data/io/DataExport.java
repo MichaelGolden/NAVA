@@ -33,9 +33,10 @@ public class DataExport {
         exportableFormats.add(new ExportableFormat("tabular", Tabular.class, FileFormat.CSV));
         exportableFormats.add(new ExportableFormat("structure", SecondaryStructure.class, FileFormat.VIENNA_DOT_BRACKET));
         exportableFormats.add(new ExportableFormat("structure", SecondaryStructure.class, FileFormat.CONNECT_FILE));
-       // exportableFormats.add(new ExportableFormat("structure", SecondaryStructure.class, FileFormat.BPSEQ));
+        // exportableFormats.add(new ExportableFormat("structure", SecondaryStructure.class, FileFormat.BPSEQ));
         exportableFormats.add(new ExportableFormat("matrix", Matrix.class, FileFormat.COORDINATE_LIST_MATRIX));
         exportableFormats.add(new ExportableFormat("matrix", Matrix.class, FileFormat.DENSE_MATRIX));
+        exportableFormats.add(new ExportableFormat("tree", Tree.class, FileFormat.NEWICK_TREE));
     }
 
     public ArrayList<ExportableFormat> getExportableFormats(DataSource dataSource) {
@@ -75,15 +76,17 @@ public class DataExport {
             //case BPSEQ:
             //    break;
             case COORDINATE_LIST_MATRIX:
-                if(dataSource instanceof Matrix)
-                {
-                    ((Matrix)dataSource).getObject(ProjectModel.path,MainFrame.dataSourceCache).saveAsCoordinateListMatrix(outputFile);
+                if (dataSource instanceof Matrix) {
+                    ((Matrix) dataSource).getObject(ProjectModel.path, MainFrame.dataSourceCache).saveAsCoordinateListMatrix(outputFile);
                 }
                 break;
-             case DENSE_MATRIX:
-                if(dataSource instanceof Matrix)
-                {
-                    ((Matrix)dataSource).getObject(ProjectModel.path,MainFrame.dataSourceCache).saveAsDenseMatrix(outputFile);
+            case DENSE_MATRIX:
+                if (dataSource instanceof Matrix) {
+                    ((Matrix) dataSource).getObject(ProjectModel.path, MainFrame.dataSourceCache).saveAsDenseMatrix(outputFile);
+                }
+            case NEWICK_TREE:
+                if (dataSource instanceof Tree) {
+                    Files.copy(Paths.get(dataSource.getImportedDataSourcePath(ProjectModel.path)), Paths.get(outputFile.getAbsolutePath()));
                 }
                 break;
         }

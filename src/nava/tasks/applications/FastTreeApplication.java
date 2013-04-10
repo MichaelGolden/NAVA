@@ -12,7 +12,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import nava.data.types.Alignment;
 import nava.data.types.DataSource;
+import nava.data.types.Tree;
 import nava.ui.ProjectModel;
+import nava.utils.AlignmentType;
 
 /**
  *
@@ -37,10 +39,17 @@ public class FastTreeApplication extends Application {
         File tempDir = createTemporaryDirectory();
 
         File inFastaFile = new File(inputDataSource.getImportedDataSourcePath(ProjectModel.path));
-        File outFastaFile = new File(tempDir.getAbsolutePath() + File.separator + "temp.nwk");
+        File outNewickFile = new File(tempDir.getAbsolutePath() + File.separator + "temp.nwk");
+        
+        String nucleotideAlignmentParam = "";
+        if(inputDataSource.alignmentType == AlignmentType.NUCLEOTIDE_ALIGNMENT)
+        {
+            nucleotideAlignmentParam = " -nt ";
+        }
+        arguments += nucleotideAlignmentParam;
 
         try {
-            String cmd = new File(FAST_TREE_EXECUTABLE).getAbsolutePath() + " " + arguments + " " + inFastaFile.getAbsolutePath() + " > " + outFastaFile.getAbsolutePath() ;
+            String cmd = "cmd /c "+new File(FAST_TREE_EXECUTABLE).getAbsolutePath() + " " + arguments + " " + inFastaFile.getAbsolutePath() + " > " + outNewickFile.getAbsolutePath();
             System.out.println("cmd "+cmd);
             process = Runtime.getRuntime().exec(cmd, null, tempDir);
 
@@ -51,15 +60,13 @@ public class FastTreeApplication extends Application {
             if (exitCode == 0) {
                 ApplicationOutput outputFile1 = new ApplicationOutput();
 
-                outputFile1.file = null;
-                Alignment alignment = new Alignment();
-                alignment.title = inputDataSource.title + "_muscle_aligned";
-                alignment.originalFile = outFastaFile;
-                outputFile1.dataSource = alignment;
+                outputFile1.file = outNewickFile;
+                Tree tree = new Tree();
+                tree.title = inputDataSource.title + "_fast_tree";
+                tree.originalFile = outNewickFile;
+                outputFile1.dataSource = tree;
                 outputFiles.add(outputFile1);
-            } else {
             }
-
         } catch (InterruptedException ex) {
             Logger.getLogger(FastTreeApplication.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -102,7 +109,7 @@ public class FastTreeApplication extends Application {
 
     @Override
     public String getName() {
-        return "MUSCLE alignment";
+        return "FastTree";
     }
 
     @Override

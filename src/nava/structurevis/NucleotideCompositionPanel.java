@@ -47,7 +47,7 @@ public class NucleotideCompositionPanel extends javax.swing.JPanel {
         for (DataSource dataSource : dataSources) {
             if (dataSource instanceof Alignment) {
                 Alignment al = (Alignment) dataSource;
-                if (al.type == AlignmentType.NUCLEOTIDE_ALIGNMENT || al.type == AlignmentType.CODON_ALIGNMENT) {
+                if (al.alignmentType == AlignmentType.NUCLEOTIDE_ALIGNMENT || al.alignmentType == AlignmentType.CODON_ALIGNMENT) {
                     nucleotideAlignmentComboBoxModel.addElement(al);
                 }
             }

@@ -20,14 +20,14 @@ import nava.utils.AlignmentType;
 public class Alignment extends DataSource {
     private static final long serialVersionUID = 2751887600835071870L;
 
-    public AlignmentType type = AlignmentType.PROTEIN_ALIGNMENT;
+    public AlignmentType alignmentType = AlignmentType.PROTEIN_ALIGNMENT;
     public boolean aligned = false;
     public int numSequences = 0;
     public int length = 0;
 
     @Override
     public Icon getIcon() {
-        switch (type) {
+        switch (alignmentType) {
             case NUCLEOTIDE_ALIGNMENT:
                 return new ImageIcon(ClassLoader.getSystemResource("resources/icons/nucleotide-alignment-16x16.png"));
             case CODON_ALIGNMENT:

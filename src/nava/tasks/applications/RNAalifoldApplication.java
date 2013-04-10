@@ -350,7 +350,7 @@ public class RNAalifoldApplication extends Application {
         if (dataSources.size() == 1) {
             if (dataSources.get(0) instanceof Alignment) {
                 Alignment al = (Alignment) (dataSources.get(0));
-                if (al.type == nava.utils.AlignmentType.NUCLEOTIDE_ALIGNMENT || al.type == nava.utils.AlignmentType.CODON_ALIGNMENT) {
+                if (al.alignmentType == nava.utils.AlignmentType.NUCLEOTIDE_ALIGNMENT || al.alignmentType == nava.utils.AlignmentType.CODON_ALIGNMENT) {
                     return true;
                 }
             }

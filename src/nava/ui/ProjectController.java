@@ -166,7 +166,7 @@ public class ProjectController implements SafeListListener {
                     ArrayList<String> sequences = new ArrayList<>();
                     ArrayList<String> sequenceNames = new ArrayList<>();
                     IO.loadFastaSequences(dataFile, sequences, sequenceNames, 1000);
-                    al.type = AlignmentUtils.guessAlignmentType(sequences);
+                    al.alignmentType = AlignmentUtils.guessAlignmentType(sequences);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
@@ -237,7 +237,7 @@ public class ProjectController implements SafeListListener {
                 Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-            alignment.type = AlignmentUtils.guessAlignmentType(sequences);
+            alignment.alignmentType = AlignmentUtils.guessAlignmentType(sequences);
 
             projectModel.dataSources.addElement(alignment);
         } else if (outputFile.dataSource instanceof Tabular) {
@@ -256,6 +256,18 @@ public class ProjectController implements SafeListListener {
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
+        } else if (outputFile.dataSource instanceof Tree) {
+            Tree tree = new Tree();
+            tree.setImportId(getNextImportId());
+            tree.originalDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "orig.nwk").toString();
+            tree.importedDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "nwk").toString();
+            tree.title = outputFile.dataSource.title;
+
+            IO.copyFile(outputFile.dataSource.originalFile, new File(tree.getOriginalDataSourcePath(projectModel.getProjectPathString())));
+            IO.copyFile(outputFile.dataSource.originalFile, new File(tree.getImportedDataSourcePath(projectModel.getProjectPathString())));
+            tree.fileSize = new FileSize(Paths.get(tree.getImportedDataSourcePath(projectModel.getProjectPathString())).toFile().length());
+
+            projectModel.dataSources.addElement(tree);
         }
 
     }

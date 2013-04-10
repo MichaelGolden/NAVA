@@ -100,8 +100,6 @@ public class ExportDataDialog extends javax.swing.JDialog implements ItemListene
 
         jLabel4.setText("Export prefix");
 
-        browseField.setText("jTextField2");
-
         openFolderButton.setText("Open folder");
         openFolderButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

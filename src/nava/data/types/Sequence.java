@@ -21,7 +21,7 @@ public class Sequence extends DataSource {
     @Override
     public Icon getIcon() {
         if (parentAlignment != null) {
-            switch (parentAlignment.type) {
+            switch (parentAlignment.alignmentType) {
                 case NUCLEOTIDE_ALIGNMENT:
                     return new ImageIcon(ClassLoader.getSystemResource("resources/icons/nucleotide-alignment-16x16.png"));
                 case CODON_ALIGNMENT:

@@ -109,9 +109,6 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="browseField">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="jTextField2"/>
-      </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="openFolderButton">
       <Properties>

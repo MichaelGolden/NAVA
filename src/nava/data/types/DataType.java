@@ -11,16 +11,16 @@ import java.io.Serializable;
  * @author Michael
  */
 public class DataType implements Serializable {
+
     private static final long serialVersionUID = -6001358785173256742L;
 
     /*
-    public enum StructureFormat {
-
-        CONNECT_FILE, VIENNA_DOT_BRACKET, DOT_BRACKET_ONLY, BPSEQ, TAB_DELIMITTED_HELIX
-    };
-    * 
-    */
-
+     * public enum StructureFormat {
+     *
+     * CONNECT_FILE, VIENNA_DOT_BRACKET, DOT_BRACKET_ONLY, BPSEQ,
+     * TAB_DELIMITTED_HELIX };
+     *
+     */
     public enum TabularFormat {
 
         EXCEL, CSV
@@ -33,7 +33,7 @@ public class DataType implements Serializable {
 
     public enum Primary {
 
-        UNKNOWN, SECONDARY_STRUCTURE, ALIGNMENT, ANNOTATION_DATA, TABULAR_DATA, MATRIX;
+        UNKNOWN, SECONDARY_STRUCTURE, ALIGNMENT, ANNOTATION_DATA, TABULAR_DATA, MATRIX, PHYLOGENETIC_TREE;
 
         @Override
         public String toString() {
@@ -56,6 +56,8 @@ public class DataType implements Serializable {
                     break;
                 case MATRIX:
                     s = "Matrix";
+                case PHYLOGENETIC_TREE:
+                    s = "Phylogenetic tree";
                     break;
             }
             return s;
@@ -69,7 +71,8 @@ public class DataType implements Serializable {
         CONNECT_FILE(Primary.SECONDARY_STRUCTURE), VIENNA_DOT_BRACKET(Primary.SECONDARY_STRUCTURE), DOT_BRACKET_ONLY(Primary.SECONDARY_STRUCTURE), BPSEQ(Primary.SECONDARY_STRUCTURE), TAB_DELIMITTED_HELIX(Primary.SECONDARY_STRUCTURE),
         GENBANK(Primary.ANNOTATION_DATA),
         EXCEL(Primary.TABULAR_DATA), CSV(Primary.TABULAR_DATA),
-        COORDINATE_LIST_MATRIX(Primary.MATRIX), DENSE_MATRIX(Primary.MATRIX);
+        COORDINATE_LIST_MATRIX(Primary.MATRIX), DENSE_MATRIX(Primary.MATRIX),
+        NEWICK_TREE(Primary.PHYLOGENETIC_TREE);
         public Primary primaryType = Primary.UNKNOWN;
 
         FileFormat(Primary primaryType) {
@@ -108,6 +111,8 @@ public class DataType implements Serializable {
                     return "cmt";
                 case DENSE_MATRIX:
                     return "mt";
+                case NEWICK_TREE:
+                    return "nwk";
                 default:
                     return "dat";
             }
@@ -146,6 +151,8 @@ public class DataType implements Serializable {
                     return "Co-ordinate list matrix";
                 case DENSE_MATRIX:
                     return "Dense matrix";
+                case NEWICK_TREE:
+                    return "Newick tree";
                 default:
                     return "Unknown";
             }
@@ -194,5 +201,4 @@ public class DataType implements Serializable {
         hash = 53 * hash + (this.fileFormat != null ? this.fileFormat.hashCode() : 0);
         return hash;
     }
-    
 }

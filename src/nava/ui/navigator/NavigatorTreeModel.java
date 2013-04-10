@@ -31,6 +31,7 @@ public class NavigatorTreeModel extends DefaultTreeModel implements Serializable
     DefaultMutableTreeNode matricesNode = null;
     DefaultMutableTreeNode structuresNode = null;
     DefaultMutableTreeNode tabularNode = null;
+    DefaultMutableTreeNode treesNode = null;
 
     public NavigatorTreeModel(DefaultMutableTreeNode root, ProjectModel projectModel) {
         super(root);
@@ -72,6 +73,10 @@ public class NavigatorTreeModel extends DefaultTreeModel implements Serializable
         if (dataSource instanceof Tabular || dataSource instanceof TabularField) {
             insertNodeInto(new NavigatorTreeNode(dataSource), tabularNode, tabularNode.getChildCount());
         }
+        
+        if (dataSource instanceof Tree || dataSource instanceof Tree) {
+            insertNodeInto(new NavigatorTreeNode(dataSource), treesNode, treesNode.getChildCount());
+        }
     }
 
     public void setup() {
@@ -97,6 +102,9 @@ public class NavigatorTreeModel extends DefaultTreeModel implements Serializable
 
         tabularNode = NavigatorTreeNode.createFolderNode("Tabular data");
         dataNode.add(tabularNode);
+        
+        treesNode = NavigatorTreeNode.createFolderNode("Phylogenies");
+        dataNode.add(treesNode);
     }
 
     /*

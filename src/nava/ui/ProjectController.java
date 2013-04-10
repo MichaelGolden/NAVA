@@ -25,6 +25,7 @@ import nava.data.io.*;
 import nava.data.types.*;
 import nava.structurevis.data.PersistentSparseMatrix;
 import nava.tasks.applications.ApplicationOutput;
+import nava.utils.AlignmentUtils;
 import nava.utils.GraphicsUtils;
 import nava.utils.Pair;
 import nava.utils.SafeListEvent;
@@ -161,6 +162,11 @@ public class ProjectController implements SafeListListener {
                     AlignmentMetadata metadata = IO.getAlignmentMetadata(Paths.get(al.getImportedDataSourcePath(projectModel.getProjectPathString())).toFile());
                     al.numSequences = metadata.numSequences;
                     al.length = metadata.maxSequenceLength;
+
+                    ArrayList<String> sequences = new ArrayList<>();
+                    ArrayList<String> sequenceNames = new ArrayList<>();
+                    IO.loadFastaSequences(dataFile, sequences, sequenceNames, 1000);
+                    al.type = AlignmentUtils.guessAlignmentType(sequences);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
@@ -223,6 +229,16 @@ public class ProjectController implements SafeListListener {
             IO.saveToFASTAfile(sequences, sequenceNames, new File(alignment.getImportedDataSourcePath(projectModel.getProjectPathString())));
             alignment.fileSize = new FileSize(Paths.get(alignment.getImportedDataSourcePath(projectModel.getProjectPathString())).toFile().length());
 
+            try {
+                AlignmentMetadata metadata = IO.getAlignmentMetadata(Paths.get(alignment.getImportedDataSourcePath(projectModel.getProjectPathString())).toFile());
+                alignment.numSequences = metadata.numSequences;
+                alignment.length = metadata.maxSequenceLength;
+            } catch (IOException ex) {
+                Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            alignment.type = AlignmentUtils.guessAlignmentType(sequences);
+
             projectModel.dataSources.addElement(alignment);
         } else if (outputFile.dataSource instanceof Tabular) {
             try {
@@ -263,14 +279,12 @@ public class ProjectController implements SafeListListener {
         return p;
     }
 
-    public  Pair<DataType, DataSource> autoAddDataSourceWithAmbiguityResolution(final File dataFile) {
+    public Pair<DataType, DataSource> autoAddDataSourceWithAmbiguityResolution(final File dataFile) {
         DataType dataType = null;
 
         ArrayList<DataType> possibleDataTypes = null;
         if (dataFile.isFile()) {
-            System.out.println("FILE:" + dataFile);
             possibleDataTypes = FileImport.getPossibleDataTypes(dataFile);
-            System.out.println("TYPE:" + possibleDataTypes);
         }
         if (possibleDataTypes != null && possibleDataTypes.size() > 0) {
             if (possibleDataTypes.size() == 1) {
@@ -288,7 +302,7 @@ public class ProjectController implements SafeListListener {
 
             final DataType dataType2 = dataType;
             DataSource dataSource = importDataSourceFromFile(dataFile, dataType2);
-            return new Pair<>(dataType2,dataSource);
+            return new Pair<>(dataType2, dataSource);
         }
         return null;
     }

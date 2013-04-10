@@ -26,7 +26,13 @@ public class MAFFTApplication extends Application {
     public static String MAFFT_EXECUTABLE = "bin/mafft-6.952-win64/mafft-win/mafft.bat";
     Alignment inputDataSource = null;
     ArrayList<ApplicationOutput> outputFiles = new ArrayList<>();
+    
+    public MAFFTApplication()
+    {
+        setApplicationPanel(new MAFFTPanel());
+    }
 
+    String arguments = "";
     public ArrayList<String> align(ArrayList<String> inSequences) throws Exception {
         File tempDir = createTemporaryDirectory();
 
@@ -40,7 +46,7 @@ public class MAFFTApplication extends Application {
         writer.close();
 
         //String cmd = new File(MAFFT_EXECUTABLE).getAbsolutePath() + " --auto " + inFastaFile.getAbsolutePath() + " > " + outFastaFile.getAbsolutePath();
-        String cmd = new File(MAFFT_EXECUTABLE).getAbsolutePath() + " --retree 5 --maxiterate 25 " + inFastaFile.getAbsolutePath() + " > " + outFastaFile.getAbsolutePath();
+        String cmd = new File(MAFFT_EXECUTABLE).getAbsolutePath() + " "+arguments +" " + inFastaFile.getAbsolutePath() + " > " + outFastaFile.getAbsolutePath();
         process = Runtime.getRuntime().exec(cmd, null, tempDir);
 
         Application.nullOutput(process.getInputStream());

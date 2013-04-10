@@ -22,11 +22,11 @@ public class Sequence extends DataSource {
     public Icon getIcon() {
         if (parentAlignment != null) {
             switch (parentAlignment.type) {
-                case NUCLEOTIDE:
+                case NUCLEOTIDE_ALIGNMENT:
                     return new ImageIcon(ClassLoader.getSystemResource("resources/icons/nucleotide-alignment-16x16.png"));
-                case CODING:
+                case CODON_ALIGNMENT:
                     return new ImageIcon(ClassLoader.getSystemResource("resources/icons/coding-alignment-16x16.png"));
-                case PROTEIN:
+                case PROTEIN_ALIGNMENT:
                     return new ImageIcon(ClassLoader.getSystemResource("resources/icons/protein-alignment-16x16.png"));
                 default:
                     return null;

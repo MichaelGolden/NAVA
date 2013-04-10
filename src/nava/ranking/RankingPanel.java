@@ -5,6 +5,7 @@
 package nava.ranking;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedWriter;
@@ -17,14 +18,12 @@ import java.util.Hashtable;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JFrame;
-import javax.swing.JTable;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import nava.structurevis.StructureVisController;
 import nava.structurevis.data.*;
+import nava.ui.MainFrame;
 import nava.utils.Mapping;
 import nava.utils.Pair;
 
@@ -382,8 +381,12 @@ public class RankingPanel extends javax.swing.JPanel {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(626, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 75, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 541, Short.MAX_VALUE)
                 .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(saveAsCSVButton)
@@ -396,10 +399,7 @@ public class RankingPanel extends javax.swing.JPanel {
                         .addGroup(jPanel2Layout.createSequentialGroup()
                             .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addGroup(jPanel2Layout.createSequentialGroup()
-                                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jLabel1)
-                                        .addComponent(jLabel3))
-                                    .addGap(18, 18, 18)
+                                    .addGap(80, 80, 80)
                                     .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addGroup(jPanel2Layout.createSequentialGroup()
                                             .addComponent(structureOverlayComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -420,21 +420,21 @@ public class RankingPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(saveAsCSVButton)
-                    .addComponent(statusLabel))
-                .addGap(265, 265, 265))
+                    .addComponent(statusLabel)
+                    .addComponent(jLabel3))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel1)
+                .addContainerGap())
             .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel2Layout.createSequentialGroup()
                     .addContainerGap()
                     .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel3)
                         .addComponent(structureOverlayComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(allSitesButton)
                         .addComponent(unpairedOnlyButton)
                         .addComponent(pairedOnlyButton))
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(dataOverlayBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel1))
+                    .addComponent(dataOverlayBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                     .addComponent(jLabel2)
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -473,30 +473,23 @@ public class RankingPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_unpairedOnlyButtonActionPerformed
 
     private void saveAsCSVButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveAsCSVButtonActionPerformed
+        
+        String name = ((Overlay) dataOverlayBox.getSelectedItem()).title;
+        if (RankingPanel.this.pairedOnlyButton.isSelected()) {
+            name = name + "-paired_only";
+        } else if (RankingPanel.this.unpairedOnlyButton.isSelected()) {
+            name = name + "-unpaired_only";
+        }
 
-        /*
-         * String name = ((SequenceData1D)
-         * sequenceData.get(dataSourceBox.getSelectedIndex())).name; if
-         * (RankingPanel.this.pairedOnlyButton.isSelected()) { name = name +
-         * "-paired_only"; } else if
-         * (RankingPanel.this.unpairedOnlyButton.isSelected()) { name = name +
-         * "-unpaired_only"; }
-         *
-         * File outFile = new
-         * File(MainApp.fileChooserSave.getCurrentDirectory().getPath() + "/" +
-         * name + "-ranking.csv"); MainApp.fileChooserSave.setDialogTitle("Save
-         * CSV"); MainApp.fileChooserSave.setSelectedFile(outFile); int
-         * returnVal = MainApp.fileChooserSave.showSaveDialog(this); if
-         * (returnVal == JFileChooser.APPROVE_OPTION) {
-         * setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-         * saveAsCSV(MainApp.fileChooserSave.getSelectedFile());
-         * setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)); }
-         * MainApp.fileChooserSave.setDialogTitle("Open");
-         *
-         * System.out.println(name + "\t" +
-         * rankingTable.tableDataModel.rows.size());
-         *
-         */
+        File outFile = new File(MainFrame.saveDialog.getCurrentDirectory().getPath() + "/" + name + "-ranking.csv");
+        MainFrame.saveDialog.setDialogTitle("Save CSV");
+        MainFrame.saveDialog.setSelectedFile(outFile);
+        int returnVal = MainFrame.saveDialog.showSaveDialog(this);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            saveAsCSV(MainFrame.saveDialog.getSelectedFile());
+            setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+        }
     }//GEN-LAST:event_saveAsCSVButtonActionPerformed
 
     private void structureOverlayComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_structureOverlayComboBoxActionPerformed

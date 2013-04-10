@@ -11,18 +11,16 @@ import java.util.ArrayList;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import nava.data.io.IO;
+import nava.utils.AlignmentType;
 
 /**
  *
  * @author Michael
  */
 public class Alignment extends DataSource {
+    private static final long serialVersionUID = 2751887600835071870L;
 
-    public enum Type implements Serializable {
-
-        NUCLEOTIDE, CODING, PROTEIN
-    };
-    public Type type = Type.NUCLEOTIDE;
+    public AlignmentType type = AlignmentType.PROTEIN_ALIGNMENT;
     public boolean aligned = false;
     public int numSequences = 0;
     public int length = 0;
@@ -30,11 +28,11 @@ public class Alignment extends DataSource {
     @Override
     public Icon getIcon() {
         switch (type) {
-            case NUCLEOTIDE:
+            case NUCLEOTIDE_ALIGNMENT:
                 return new ImageIcon(ClassLoader.getSystemResource("resources/icons/nucleotide-alignment-16x16.png"));
-            case CODING:
+            case CODON_ALIGNMENT:
                 return new ImageIcon(ClassLoader.getSystemResource("resources/icons/coding-alignment-16x16.png"));
-            case PROTEIN:
+            case PROTEIN_ALIGNMENT:
                 return new ImageIcon(ClassLoader.getSystemResource("resources/icons/protein-alignment-16x16.png"));
             default:
                 return null;

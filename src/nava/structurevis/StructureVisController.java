@@ -41,13 +41,13 @@ public class StructureVisController implements SafeListListener, ProjectView {
     }
 
     public void openStructureVisModel(StructureVisModel structureVisModel) {
-        this.structureVisModel = structureVisModel;        
+        this.structureVisModel = structureVisModel;
         if (structureVisModel.substructureModel == null) {
             structureVisModel.substructureModel = new SubstructureModel(this);
         } else {
             this.structureVisModel.substructureModel.structureVisController = this;
         }
-        
+
         structureVisModel.substructureModel.loadData();
         for (int i = 0; i < structureVisViews.size(); i++) {
             structureVisViews.get(i).structureVisModelChanged(structureVisModel);
@@ -84,19 +84,21 @@ public class StructureVisController implements SafeListListener, ProjectView {
             for (int j = 0; j < structureVisModel.structureVisDataOverlays2D.size(); j++) {
                 DataOverlay2D dataSource = structureVisModel.structureVisDataOverlays2D.get(j);
                 if (s.mappingSource != null && dataSource.mappingSource != null) {
-                        if (!structureVisModel.mappings.containsKey(new Pair<>(s.mappingSource, dataSource.mappingSource))) {
-                            MainFrame.taskManager.queueTask(new MappingTask(this, s.mappingSource, dataSource.mappingSource), true);
-                        }
+                    if (!structureVisModel.mappings.containsKey(new Pair<>(s.mappingSource, dataSource.mappingSource))) {
+                        MainFrame.taskManager.queueTask(new MappingTask(this, s.mappingSource, dataSource.mappingSource), true);
+                    }
                 }
             }
 
             for (int j = 0; j < structureVisModel.annotationSources.size(); j++) {
                 AnnotationSource annotationSource = structureVisModel.annotationSources.get(j);
-                for (Feature f : annotationSource.features) // probably all have the same source, so this is not too slow
-                {
-                    if (s.mappingSource != null && f.mappingSource != null) {
-                        if (!structureVisModel.mappings.containsKey(new Pair<>(s.mappingSource, f.mappingSource))) {
-                            MainFrame.taskManager.queueTask(new MappingTask(this, s.mappingSource, f.mappingSource), true);
+                if (annotationSource != null) {
+                    for (Feature f : annotationSource.features) // probably all have the same source, so this is not too slow
+                    {
+                        if (s.mappingSource != null && f.mappingSource != null) {
+                            if (!structureVisModel.mappings.containsKey(new Pair<>(s.mappingSource, f.mappingSource))) {
+                                MainFrame.taskManager.queueTask(new MappingTask(this, s.mappingSource, f.mappingSource), true);
+                            }
                         }
                     }
                 }

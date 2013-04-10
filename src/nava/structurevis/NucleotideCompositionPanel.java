@@ -16,6 +16,7 @@ import nava.data.types.Tabular;
 import nava.data.types.TabularField;
 import nava.structurevis.data.NucleotideComposition;
 import nava.ui.ProjectModel;
+import nava.utils.AlignmentType;
 
 /**
  *
@@ -46,7 +47,7 @@ public class NucleotideCompositionPanel extends javax.swing.JPanel {
         for (DataSource dataSource : dataSources) {
             if (dataSource instanceof Alignment) {
                 Alignment al = (Alignment) dataSource;
-                if (al.type == Alignment.Type.NUCLEOTIDE || al.type == Alignment.Type.CODING) {
+                if (al.type == AlignmentType.NUCLEOTIDE_ALIGNMENT || al.type == AlignmentType.CODON_ALIGNMENT) {
                     nucleotideAlignmentComboBoxModel.addElement(al);
                 }
             }

@@ -8,6 +8,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JDialog;
+import javax.swing.JPanel;
 import nava.data.types.DataSource;
 import nava.tasks.Task;
 import nava.ui.MainFrame;
@@ -26,37 +27,31 @@ public abstract class Application extends Task {
     public static long appInstanceCount = 0;
     public static ConsoleDatabase consoleDatabase = new ConsoleDatabase();
     String appInstanceId;
-    
-    
     private ConsoleInputHandler consoleInputHandler;
     private ConsoleInputHandler consoleErrorHandler;
-    private JDialog dialog;
+    private JPanel applicationPanel;
+    private ApplicationPanelInterface applicationPanelInterface;
 
-    
     //BufferedWriter standardBuffer;
     //BufferedWriter errorBuffer;
-
     public Application() {
         super();
-        
+
         appInstanceCount++;
-        appInstanceId = appRuntimeID+"_"+appInstanceCount + "";
-        
-        
+        appInstanceId = appRuntimeID + "_" + appInstanceCount + "";
+
+
         combinedBuffer = new ConsoleBuffer(consoleDatabase, taskInstanceId, null);
         //consoleInputBuffer = new ConsoleBuffer(consoleDatabase, appInstanceId, "standard_out");
         //consoleErrorBuffer = new ConsoleBuffer(consoleDatabase, appInstanceId, "standard_err");
     }
-    
-    public void setApplicationDialog(JDialog dialog)
-    {
-        if(dialog instanceof ApplicationDialog)
-        {
-            this.dialog = dialog;
+
+    public void setApplicationPanel(JPanel applicationPanel) {
+        if (applicationPanel instanceof ApplicationPanelInterface) {
+            this.applicationPanel = applicationPanel;
+            this.applicationPanelInterface = (ApplicationPanelInterface) applicationPanel;
         }
     }
-    
-    
 
     public void startConsoleInputBuffer(Process process) {
         consoleInputHandler = new ConsoleInputHandler(combinedBuffer, taskInstanceId, "standard_out", process.getInputStream());
@@ -67,20 +62,17 @@ public abstract class Application extends Task {
         consoleErrorHandler = new ConsoleInputHandler(combinedBuffer, taskInstanceId, "standard_err", process.getErrorStream());
         //consoleErrorHandler = new ConsoleInputHandler(consoleInputBuffer, process.getErrorStream());        
     }
-    
-    public static void nullOutput(final InputStream inputStream)
-    {
-        new Thread()
-        {
+
+    public static void nullOutput(final InputStream inputStream) {
+        new Thread() {
+
             @Override
-            public void run()
-            {
+            public void run() {
                 try {
 
                     BufferedReader buffer = new BufferedReader(new InputStreamReader(inputStream));
                     String textline = null;
                     while ((textline = buffer.readLine()) != null) {
-
                     }
                     buffer.close();
                 } catch (IOException ex) {
@@ -88,53 +80,56 @@ public abstract class Application extends Task {
             }
         }.start();
     }
-      
+
     protected abstract void start();
 
     //public abstract boolean canProcessDataSource(DataSource dataSource);
-    
-    public boolean canProcessDataSource(DataSource dataSource)
-    {
+    public boolean canProcessDataSource(DataSource dataSource) {
         ArrayList<DataSource> dataSources = new ArrayList<>();
         dataSources.add(dataSource);
         return canProcessDataSources(dataSources);
     }
-    
+
     public abstract boolean canProcessDataSources(List<DataSource> dataSources);
 
     public abstract void setDataSource(DataSource dataSource);
 
-    /*public abstract boolean isStarted();
-
-    public abstract boolean isRunning();
-
-    public abstract boolean isCanceled();
-
-    public abstract boolean isFinished();*/
-
+    /*
+     * public abstract boolean isStarted();
+     *
+     * public abstract boolean isRunning();
+     *
+     * public abstract boolean isCanceled();
+     *
+     * public abstract boolean isFinished();
+     */
     public abstract List<ApplicationOutput> getOutputFiles();
+    boolean shouldRun = true;
 
-    
-    
     @Override
     public void before() {
-        if(dialog != null && dialog instanceof ApplicationDialog)
-        {
-            ApplicationDialog appDialog = (ApplicationDialog)dialog;
-            appDialog.setupApplication(this);
-            GraphicsUtils.centerWindowOnWindow(dialog, MainFrame.self);
-            dialog.setVisible(true);
+        if (applicationPanel != null && applicationPanel instanceof ApplicationPanelInterface) {
+            ApplicationPanelInterface appPanel = (ApplicationPanelInterface) applicationPanel;
+            ApplicationDialog d = new ApplicationDialog(MainFrame.self, true, applicationPanel);
+            GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
+            d.setVisible(true);
+            this.shouldRun = d.shouldRunOnDialogClose;            
+            appPanel.setupApplication(this);
         }
-        
+
         if (combinedBuffer != null) {
-            combinedBuffer.bufferedWrite("Started.", taskInstanceId, "console");
+            if (this.shouldRun) {
+                combinedBuffer.bufferedWrite("Started.", taskInstanceId, "console");
+            } else {
+                combinedBuffer.bufferedWrite("Cancelled.", taskInstanceId, "console");
+                setStatus(Status.STOPPED);
+            }
         }
     }
 
     @Override
     public void task() {
-        if(shouldRun())
-        {
+        if (shouldRun) {
             start();
         }
     }
@@ -146,26 +141,15 @@ public abstract class Application extends Task {
             combinedBuffer.close();
         }
     }
-    
+
     @Override
-    public List<ApplicationOutput> get ()
-    {
+    public List<ApplicationOutput> get() {
         return getOutputFiles();
     }
-    
-    public File createTemporaryDirectory()
-    {
-        File tempDir = new File(System.getProperty("java.io.tmpdir") + "/" + taskInstanceId+"/");
+
+    public File createTemporaryDirectory() {
+        File tempDir = new File(System.getProperty("java.io.tmpdir") + "/" + taskInstanceId + "/");
         tempDir.mkdirs();
         return tempDir;
-    }
-    
-    public boolean shouldRun()
-    {
-        if(dialog != null && dialog instanceof ApplicationDialog)
-        {
-            return ((ApplicationDialog)dialog).shouldRunOnDialogClose();
-        }
-        return true;
     }
 }

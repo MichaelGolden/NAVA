@@ -5,6 +5,7 @@
 package nava.ranking;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedWriter;
@@ -16,14 +17,12 @@ import java.util.Hashtable;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JFrame;
-import javax.swing.JTable;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import nava.structurevis.StructureVisController;
 import nava.structurevis.data.*;
+import nava.ui.MainFrame;
 import nava.utils.Mapping;
 import nava.utils.Pair;
 
@@ -408,30 +407,16 @@ public class PairTestPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_structureOverlayComboBoxActionPerformed
 
     private void saveAsCSVButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveAsCSVButtonActionPerformed
-
-        /*
-         * String name = ((SequenceData1D)
-         * sequenceData.get(dataSourceBox.getSelectedIndex())).name; if
-         * (RankingPanel.this.pairedOnlyButton.isSelected()) { name = name +
-         * "-paired_only"; } else if
-         * (RankingPanel.this.unpairedOnlyButton.isSelected()) { name = name +
-         * "-unpaired_only"; }
-         *
-         * File outFile = new
-         * File(MainApp.fileChooserSave.getCurrentDirectory().getPath() + "/" +
-         * name + "-ranking.csv"); MainApp.fileChooserSave.setDialogTitle("Save
-         * CSV"); MainApp.fileChooserSave.setSelectedFile(outFile); int
-         * returnVal = MainApp.fileChooserSave.showSaveDialog(this); if
-         * (returnVal == JFileChooser.APPROVE_OPTION) {
-         * setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-         * saveAsCSV(MainApp.fileChooserSave.getSelectedFile());
-         * setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)); }
-         * MainApp.fileChooserSave.setDialogTitle("Open");
-         *
-         * System.out.println(name + "\t" +
-         * rankingTable.tableDataModel.rows.size());
-         *
-         */
+        String name = ((Overlay) dataOverlayBox.getSelectedItem()).title;
+        File outFile = new File(MainFrame.saveDialog.getCurrentDirectory().getPath() + "/" + name + "-pair-ranking.csv");
+        MainFrame.saveDialog.setDialogTitle("Save CSV");
+        MainFrame.saveDialog.setSelectedFile(outFile);
+        int returnVal = MainFrame.saveDialog.showSaveDialog(this);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            saveAsCSV(MainFrame.saveDialog.getSelectedFile());
+            setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+        }
     }//GEN-LAST:event_saveAsCSVButtonActionPerformed
 
     private void dataOverlayBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataOverlayBoxActionPerformed

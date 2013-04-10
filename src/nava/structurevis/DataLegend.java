@@ -203,7 +203,7 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
             pane.setOpaque(false);
             pane.setEditable(false);
             pane.setText(label);
-            //this.add(pane);
+            this.add(pane);
             // center text
             StyledDocument doc = pane.getStyledDocument();
             SimpleAttributeSet center = new SimpleAttributeSet();

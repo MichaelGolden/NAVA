@@ -76,8 +76,7 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
      * structureVisController.structureVisDataOverlays1D.addListDataListener(this);
      * structureVisController.structureVisDataOverlays2D.addListDataListener(this);
      * structureVisController.nucleotideSources.addListDataListener(this);
-     * structureVisController.structureSources.addListDataListener(this);
-    }
+     * structureVisController.structureSources.addListDataListener(this); }
      */
     public DataOverlayTreeNode findNode(Overlay overlay) {
         Enumeration<DefaultMutableTreeNode> en = ((DefaultMutableTreeNode) getRoot()).breadthFirstEnumeration();
@@ -168,8 +167,7 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
      *
      * @Override public void intervalRemoved(ListDataEvent e) { }
      *
-     * @Override public void contentsChanged(ListDataEvent e) {
-    }
+     * @Override public void contentsChanged(ListDataEvent e) { }
      */
     @Override
     public void dataOverlayAdded(Overlay overlay) {
@@ -183,17 +181,19 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
     }
 
     @Override
-    public void dataOverlayChanged(Overlay oldOverlay, Overlay newOverlay) {        
-        System.out.println("DataOverlayTreeModel.dataOverlayChanged"+oldOverlay+"\t"+newOverlay);
+    public void dataOverlayChanged(Overlay oldOverlay, Overlay newOverlay) {
+        System.out.println("DataOverlayTreeModel.dataOverlayChanged" + oldOverlay + "\t" + newOverlay);
         DataOverlayTreeNode node = this.findNode(oldOverlay);
-        node.overlay = newOverlay;
-        DataOverlayTreeNode parent = (DataOverlayTreeNode) node.getParent();
-        int[] indices = {parent.getIndex(node)};
-        Object[] children = {node};
-        if (oldOverlay.getState() == Overlay.OverlayState.PRIMARY_SELECTED) {
-            structureVisModel.substructureModel.setAsPrimaryOverlay(newOverlay);
+        if (node != null) {
+            node.overlay = newOverlay;
+            DataOverlayTreeNode parent = (DataOverlayTreeNode) node.getParent();
+            int[] indices = {parent.getIndex(node)};
+            Object[] children = {node};
+            if (oldOverlay.getState() == Overlay.OverlayState.PRIMARY_SELECTED) {
+                structureVisModel.substructureModel.setAsPrimaryOverlay(newOverlay);
+            }
+            this.fireTreeNodesChanged(this, parent.getPath(), indices, children);
         }
-        this.fireTreeNodesChanged(this, parent.getPath(), indices, children);
     }
 
     @Override

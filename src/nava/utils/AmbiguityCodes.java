@@ -19,7 +19,7 @@ public class AmbiguityCodes {
         codes.put("C", "C");
         codes.put("G", "G");
         codes.put("T", "T");
-        codes.put("U", "T");
+        codes.put("U", "T"); 
         codes.put("Y", "CT");
         codes.put("R", "AG");
         codes.put("W", "AT");

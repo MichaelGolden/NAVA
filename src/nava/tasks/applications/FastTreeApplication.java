@@ -12,38 +12,36 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import nava.data.types.Alignment;
 import nava.data.types.DataSource;
-import nava.data.types.SecondaryStructure;
-import nava.data.types.SecondaryStructureData;
 import nava.ui.ProjectModel;
 
 /**
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class MuscleApplication extends Application {
+public class FastTreeApplication extends Application {
 
     Process process = null;
-    public static String MUSCLE_EXECUTABLE = "bin/muscle3.8.31_i86win32.exe";
+    public static String FAST_TREE_EXECUTABLE = "bin/FastTree.exe";
     Alignment inputDataSource = null;
     ArrayList<ApplicationOutput> outputFiles = new ArrayList<>();
     
-    public MuscleApplication()
+    public FastTreeApplication()
     {
-        setApplicationPanel(new MusclePanel());
+        
     }
     
-    public String extraParameters = "";
+    public String arguments = "";
 
     @Override
     protected void start() {
         File tempDir = createTemporaryDirectory();
 
         File inFastaFile = new File(inputDataSource.getImportedDataSourcePath(ProjectModel.path));
-        File outFastaFile = new File(tempDir.getAbsolutePath() + File.separator + "temp.fas");
+        File outFastaFile = new File(tempDir.getAbsolutePath() + File.separator + "temp.nwk");
 
         try {
-            String cmd = new File(MUSCLE_EXECUTABLE).getAbsolutePath() + " -in " + inFastaFile.getAbsolutePath() + " -out " + outFastaFile.getAbsolutePath() + " "+extraParameters;
- 
+            String cmd = new File(FAST_TREE_EXECUTABLE).getAbsolutePath() + " " + arguments + " " + inFastaFile.getAbsolutePath() + " > " + outFastaFile.getAbsolutePath() ;
+            System.out.println("cmd "+cmd);
             process = Runtime.getRuntime().exec(cmd, null, tempDir);
 
             startConsoleInputBuffer(process);
@@ -63,9 +61,9 @@ public class MuscleApplication extends Application {
             }
 
         } catch (InterruptedException ex) {
-            Logger.getLogger(MuscleApplication.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FastTreeApplication.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(MuscleApplication.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FastTreeApplication.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

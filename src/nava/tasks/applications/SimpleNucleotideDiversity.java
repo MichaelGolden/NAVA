@@ -16,7 +16,8 @@ import nava.data.types.DataSource;
 import nava.data.types.Tabular;
 import nava.ui.MainFrame;
 import nava.ui.ProjectModel;
-import nava.utils.AlignmentTools;
+import nava.utils.AlignmentType;
+import nava.utils.AlignmentUtils;
 import nava.utils.Utils;
 
 /**
@@ -31,7 +32,7 @@ public class SimpleNucleotideDiversity extends Application {
     @Override
     protected void start() {
         AlignmentData data = inputDataSource.getObject(ProjectModel.path, MainFrame.dataSourceCache);
-        double[] values = AlignmentTools.calculateNucleotideDiversity(data.sequences);
+        double[] values = AlignmentUtils.calculateNucleotideDiversity(data.sequences);
         File tempDir = createTemporaryDirectory();
         File csvFile = Utils.getFile(tempDir, "output.csv");
         
@@ -61,7 +62,11 @@ public class SimpleNucleotideDiversity extends Application {
     public boolean canProcessDataSources(List<DataSource> dataSources) {
         if (dataSources.size() == 1) {
             if (dataSources.get(0) instanceof Alignment) {
-                return true;
+                Alignment al = (Alignment) (dataSources.get(0));
+                if(al.type == AlignmentType.NUCLEOTIDE_ALIGNMENT || al.type == AlignmentType.CODON_ALIGNMENT)
+                {
+                    return true;
+                }
             }
         }
         return false;

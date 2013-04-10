@@ -4,7 +4,10 @@
  */
 package nava.utils;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Random;
+import nava.data.io.IO;
 
 /**
  *
@@ -186,5 +189,169 @@ public class AlignmentUtils {
         }
 
         return dist;
+    }
+
+    /*
+     * A Simple Method for Estimating Average Number of Nucleotide Substitutions
+     * Within and Between Populations From Restriction Data Masatoshi Nei and
+     * Joyce C. Miller
+     */
+    public static double[] calculateNucleotideDiversity(ArrayList<String> sequences) {
+        AmbiguityCodes ambiguityCodes = new AmbiguityCodes();
+        double[][] nucFrequency = new double[sequences.get(0).length()][5]; // A, C, G, T, gap
+        for (String sequence : sequences) {
+            for (int i = 0; i < sequence.length(); i++) {
+                double[] val = ambiguityCodes.getBaseScores(sequence.charAt(i) + "");
+                nucFrequency[i][0] += val[0];
+                nucFrequency[i][1] += val[1];
+                nucFrequency[i][2] += val[2];
+                nucFrequency[i][3] += val[3];
+                nucFrequency[i][4] += val[4];
+            }
+        }
+
+        double n = sequences.size();
+        for (int i = 0; i < nucFrequency.length; i++) {
+            nucFrequency[i][0] /= n;
+            nucFrequency[i][1] /= n;
+            nucFrequency[i][2] /= n;
+            nucFrequency[i][3] /= n;
+            nucFrequency[i][4] /= n;
+        }
+
+        double[] nucleotideDiversity = new double[nucFrequency.length];
+        for (int i = 0; i < nucleotideDiversity.length; i++) {
+            nucleotideDiversity[i] = 1;
+            for (int j = 0; j < 5; j++) {
+                nucleotideDiversity[i] -= nucFrequency[i][j] * nucFrequency[i][j];
+            }
+            nucleotideDiversity[i] *= (n / (n - 1));
+        }
+
+        return nucleotideDiversity;
+    }
+    public static final String nucleotides = "ACGTU";
+    //public static final char [] nucleotides = {'A','C','G','T','U'};
+    public static final String ambiguousNucleotides = "YRWSKMDVHBNX";
+    //char [] ambiguousNucleotides = {'Y','R','W','S','K','M','D','V','H','B','N','X'};
+    public static final String aminoAcids = "ARNDCQEGHILKMFPSTWYVX";
+    //char [] aminoAcids = {'A','R','N','D','C','Q','E',
+    public static final String validAminoAcids = "ARNDCQEGHILKMFPSTWYV";
+    public static final String stopCodon = "*";
+
+    public static AlignmentType guessAlignmentType(ArrayList<String> sequences) {
+        Random random = new Random(5129880201392134141L);
+        double standardNucCount = 0;
+        double ambiguousNucCount = 0;
+        double nucCount = 0;
+        double aminoAcidCount = 0;
+        double aminoAcidExcludingNucCount = 0;
+        double total = 0;
+        for (int j = 0 ; j < 50 ; j++) {
+            String sequence = sequences.get(random.nextInt(sequences.size()));
+            int length = sequence.length();
+            int randomStartPos = random.nextInt(length);
+            for (int i = 0; i < 1000 ; i++) {
+                int pos = (randomStartPos + i) % length;
+                String s = sequence.charAt(pos) + "";
+
+                if (s.equals("-")) {
+                    continue;
+                }
+
+                boolean isNuc = true;
+                if (nucleotides.contains(s)) {
+                    standardNucCount++;
+                    nucCount++;
+                } else if (ambiguousNucleotides.contains(s)) {
+                    ambiguousNucCount++;
+                    nucCount++;
+                } else {
+                    isNuc = false;
+                }
+
+                if (aminoAcids.contains(s)) {
+                    aminoAcidCount++;
+                    if (!isNuc) {
+                        aminoAcidExcludingNucCount++;
+                    }
+                } else if (!isNuc) {
+                    //System.out.println(s);
+                }
+
+                total++;
+            }
+        }
+        
+        if((nucCount / total) >= (aminoAcidCount / total)*0.98)
+        {
+            
+        }
+        else
+        {
+            return AlignmentType.PROTEIN_ALIGNMENT;
+        }
+
+
+        double validCodons = 0;
+        double invalidCodons = 0;
+        double stopCodons = 0;
+        double totalTriplets = 0;
+         for (int j = 0 ; j < 20 ; j++) {
+            String proteinTranslation = GeneticCode.translateNucleotideSequence(sequences.get(random.nextInt(sequences.size())));
+            int length = proteinTranslation.length();
+            int randomStartPos = random.nextInt(length);
+            for (int i = 0; i < 1000 ; i++) {
+                int pos = (randomStartPos + i) % length;
+                String s = proteinTranslation.charAt(pos) + "";
+                if (validAminoAcids.contains(s)) {
+                    validCodons++;
+                    totalTriplets++;
+                } else if ("X".equals(s)) {
+                    invalidCodons++;
+                    totalTriplets++;
+                } else if (stopCodon.contains(s)) {
+                    stopCodons++;
+                    totalTriplets++;
+                }
+
+            }
+        }
+         /*
+        System.out.println((standardNucCount / total));
+        System.out.println((ambiguousNucCount / total));
+        System.out.println((nucCount / total));
+        System.out.println((aminoAcidCount / total));
+        System.out.println((aminoAcidExcludingNucCount / total));
+        System.out.println((validCodons / totalTriplets));
+        System.out.println((invalidCodons / totalTriplets));
+        System.out.println((stopCodons / totalTriplets));
+        System.out.println(total+"\t"+totalTriplets);
+*/
+        if(validCodons / totalTriplets >= 0.90)
+        {
+            return AlignmentType.CODON_ALIGNMENT;
+        }
+        else
+        {
+            return AlignmentType.NUCLEOTIDE_ALIGNMENT;
+        }
+    }
+
+    public static void main(String[] args) {
+        ArrayList<String> sequences = new ArrayList<>();
+        ArrayList<String> sequenceNames = new ArrayList<>();
+        IO.loadFastaSequences(new File("examples/alignments/hcv_coding.fas"), sequences, sequenceNames);
+        System.out.println(AlignmentUtils.guessAlignmentType(sequences));
+        System.out.println();
+        sequences = new ArrayList<>();
+        sequenceNames = new ArrayList<>();
+        IO.loadFastaSequences(new File("examples/alignments/hiv500.fas"), sequences, sequenceNames);
+        System.out.println(AlignmentUtils.guessAlignmentType(sequences));
+        System.out.println();
+        sequences = new ArrayList<>();
+        sequenceNames = new ArrayList<>();
+        IO.loadFastaSequences(new File("examples/alignments/random_protein.fas"), sequences, sequenceNames);
+        System.out.println(AlignmentUtils.guessAlignmentType(sequences));
     }
 }

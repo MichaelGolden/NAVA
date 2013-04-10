@@ -44,7 +44,7 @@ public class NHistogramPanel extends JPanel implements ActionListener, MouseMoti
     public static DecimalFormat df = new DecimalFormat("0.00");
     public String nullText = "";
     JPopupMenu popupMenu = new JPopupMenu();
-    JMenuItem saveAsPNGItem = new JMenuItem("Save as PNG (at current zoom level)");
+    JMenuItem saveAsPNGItem = new JMenuItem("Save as PNG (at current resolution)");
     JMenuItem saveAsSVGItem = new JMenuItem("Save as SVG");
     JMenuItem saveAsEMFItem = new JMenuItem("Save as EMF");
 

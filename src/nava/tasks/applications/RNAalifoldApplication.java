@@ -23,7 +23,7 @@ public class RNAalifoldApplication extends Application {
     private Process process = null;
 
     public RNAalifoldApplication() {
-        this.setApplicationDialog(new RNAalifoldGUI(MainFrame.self, true));
+        this.setApplicationPanel(new RNAalifoldPanel());
     }
 
     public boolean checkRNAalifold() {
@@ -319,8 +319,7 @@ public class RNAalifoldApplication extends Application {
                  * matrix.title = inputDataSource.title; matrix.parentSource =
                  * inputDataSource; outputFile2.dataSource = matrix;
                  * outputFile2.object = new DenseMatrixData(result.matrix);
-                 * outputFiles.add(outputFile2);
-                }
+                 * outputFiles.add(outputFile2); }
                  */
             } catch (Exception ex) {
                 Logger.getLogger(RNAalifoldApplication.class.getName()).log(Level.SEVERE, null, ex);
@@ -350,7 +349,10 @@ public class RNAalifoldApplication extends Application {
     public boolean canProcessDataSources(List<DataSource> dataSources) {
         if (dataSources.size() == 1) {
             if (dataSources.get(0) instanceof Alignment) {
-                return true;
+                Alignment al = (Alignment) (dataSources.get(0));
+                if (al.type == nava.utils.AlignmentType.NUCLEOTIDE_ALIGNMENT || al.type == nava.utils.AlignmentType.CODON_ALIGNMENT) {
+                    return true;
+                }
             }
         }
         return false;

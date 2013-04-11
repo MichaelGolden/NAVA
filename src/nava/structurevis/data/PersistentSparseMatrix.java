@@ -295,7 +295,7 @@ public class PersistentSparseMatrix implements Serializable {
             if (firstLength == split.length) {
                 rowCount.put(k, firstLength);
                 maxRowIndex = Math.max(maxRowIndex, k);
-                maxColIndexMap.put(k, firstLength);
+                maxColIndexMap.put(k, firstLength-1); // max column index is  = length - 1
                 elements += firstLength;
 
                 for (int j = 0; j < split.length; j++) {
@@ -309,6 +309,7 @@ public class PersistentSparseMatrix implements Serializable {
             }
         }
         buffer.close();
+        
 
         int[] rowCounts = new int[maxRowIndex + 1];
         int[] rowCountsSum = new int[rowCounts.length];

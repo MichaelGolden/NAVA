@@ -23,6 +23,7 @@ import javax.swing.event.TreeModelListener;
 import nava.data.io.FileImport.ParserException;
 import nava.data.io.*;
 import nava.data.types.*;
+import nava.data.types.DataType.FileFormat;
 import nava.structurevis.data.PersistentSparseMatrix;
 import nava.tasks.applications.ApplicationOutput;
 import nava.utils.AlignmentUtils;
@@ -206,8 +207,17 @@ public class ProjectController implements SafeListListener {
                 matrix.originalDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "orig.matrix").toString();
                 matrix.importedDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "matrix").toString();
                 matrix.title = outputFile.dataSource.title;
+                System.out.println("outputFile.fileFormat"+outputFile.fileFormat);
                 try {
-                    PersistentSparseMatrix.createMatrixFromCoordinateListMatrixFile(outputFile.file, "[\\s,;]+", new File(matrix.getImportedDataSourcePath(projectModel.getProjectPathString())));
+                    if(outputFile.fileFormat == FileFormat.COORDINATE_LIST_MATRIX)
+                    {
+                        PersistentSparseMatrix.createMatrixFromCoordinateListMatrixFile(outputFile.file, "[\\s,;]+", new File(matrix.getImportedDataSourcePath(projectModel.getProjectPathString())));
+                    }
+                    else
+                    if(outputFile.fileFormat == FileFormat.DENSE_MATRIX)
+                    {
+                        PersistentSparseMatrix.createMatrixFromDenseMatrixFile(outputFile.file, "[\\s,;]+", new File(matrix.getImportedDataSourcePath(projectModel.getProjectPathString())));
+                    }
                 } catch (IOException ex) {
                     Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
                 }

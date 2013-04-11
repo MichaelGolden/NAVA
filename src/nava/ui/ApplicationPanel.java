@@ -45,6 +45,8 @@ public class ApplicationPanel extends javax.swing.JPanel implements ListSelectio
         this.appController = appController;
         this.projectController = projectController;
 
+        
+        appController.registerApplication(new PPfoldApplication());
         appController.registerApplication(new RNAalifoldApplication());
         appController.registerApplication(new PosteriorDecodingApplication());
         appController.registerApplication(new MAFFTApplication());

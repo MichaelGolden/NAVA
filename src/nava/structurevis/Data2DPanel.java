@@ -252,7 +252,7 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
                 mappingSourceTextArea.setText("The length of the mapping source (" + mappingSource.getLength() + ") does not match the length of the data source (" + dataSource2D.dataMatrix.n + ", " + dataSource2D.dataMatrix.m + ")");
             } else {
                 mappingSourceTextArea.setForeground(Color.green);
-                mappingSourceTextArea.setText("The length of the mapping source (" + mappingSource.getLength() + ") matches the length of the data source (" + values.size() + ")");
+                mappingSourceTextArea.setText("The length of the mapping source (" + mappingSource.getLength() + ") matches the length of the data source (" + dataSource2D.dataMatrix.n + ", " + dataSource2D.dataMatrix.m + ")");
             }
         }
 
@@ -858,7 +858,7 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
         int minDifference = Integer.MAX_VALUE;
         for (int i = 0; i < this.mappingSourceComboBoxModel.getSize(); i++) {
             Alignment alignment = mappingSourceComboBoxModel.getElementAt(i);
-            int difference = Math.abs(alignment.length - values.size());
+            int difference = Math.abs(alignment.length - Math.max(dataSource2D.dataMatrix.n, dataSource2D.dataMatrix.m));
             if (bestAlignment == null || difference < minDifference) {
                 bestAlignment = alignment;
                 minDifference = difference;

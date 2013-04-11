@@ -175,6 +175,7 @@ public class RNAalifoldApplication extends Application {
 
                 if (matrixOutputFile.exists()) {
                     ApplicationOutput outputFile2 = new ApplicationOutput();
+                    outputFile2.fileFormat = DataType.FileFormat.COORDINATE_LIST_MATRIX;
                     outputFile2.file = matrixFile;
                     Matrix matrix = new Matrix();
                     matrix.title = inputDataSource.title;

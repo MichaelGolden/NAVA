@@ -5,7 +5,8 @@
 package nava.data.types;
 
 /**
- *
+ * Tree data object. Stores tree as newick string.
+ * 
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
 public class TreeData {

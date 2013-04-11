@@ -6,6 +6,8 @@ package nava.tasks.applications;
 
 import java.io.File;
 import nava.data.types.DataSource;
+import nava.data.types.DataType;
+import nava.data.types.DataType.FileFormat;
 
 /**
  *
@@ -15,6 +17,7 @@ public class ApplicationOutput {
     
     // output can either be a file or an object
     public File file;    
+    public FileFormat fileFormat;
     public Object object;
     
     public String description;

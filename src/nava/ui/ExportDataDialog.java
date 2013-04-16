@@ -40,10 +40,12 @@ public class ExportDataDialog extends javax.swing.JDialog implements ItemListene
     public ExportDataDialog(java.awt.Frame parent, boolean modal, ProjectController projectController, DataSource dataSource) {
         super(parent, modal);
         initComponents();
-        
+
         this.projectController = projectController;
-        updatePanel(dataSource);
+
+        browseField.setEnabled(false);
         exportButton.setEnabled(false);
+        updatePanel(dataSource);
     }
 
     public void updatePanel(DataSource dataSource) {
@@ -62,8 +64,10 @@ public class ExportDataDialog extends javax.swing.JDialog implements ItemListene
                 exportCheckBoxes.add(checkbox);
                 browseField.setText(System.getProperty("user.dir") + File.separator + exportableFormat.groupName);
             }
+            browseField.setEnabled(true);
         } else {
             exportPanel.add(new JLabel("No export options are available for this item."));
+            browseField.setEnabled(false);
             exportButton.setEnabled(false);
         }
         exportPanel.revalidate();

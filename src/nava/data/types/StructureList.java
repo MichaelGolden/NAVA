@@ -20,11 +20,12 @@ import nava.data.io.FileImport.ParserException;
  */
 public class StructureList extends DataSource {
 
+    public ArrayList<SecondaryStructure> structures = new ArrayList<>();
+    
     public enum Type {
 
         ALIGNED, UNALIGNED
     };
-    public ArrayList<SecondaryStructure> structures = new ArrayList<>();
 
     public StructureList(String title) {
         this.title = title;
@@ -71,6 +72,7 @@ public class StructureList extends DataSource {
 
     @Override
     public void persistObject(String projectDir, Object object) {
+        // TODO create a way of persisting structure lists.
         //throw new UnsupportedOperationException("Not supported yet.");
     }
 }

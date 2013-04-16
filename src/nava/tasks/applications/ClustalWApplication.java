@@ -29,7 +29,7 @@ public class ClustalWApplication extends Application {
     protected void start() {
         File tempDir = createTemporaryDirectory();
         
-        File inFastaFile = new File(inputDataSource.getImportedDataSourcePath(ProjectModel.path));
+        File inFastaFile = new File(inputDataSource.getNormalisedDataSourcePath(ProjectModel.path));
         File outFastaFile = new File(tempDir.getAbsolutePath() + File.separator + "temp.fas");
         
         try {

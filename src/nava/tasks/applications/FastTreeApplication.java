@@ -38,7 +38,7 @@ public class FastTreeApplication extends Application {
     protected void start() {
         File tempDir = createTemporaryDirectory();
 
-        File inFastaFile = new File(inputDataSource.getImportedDataSourcePath(ProjectModel.path));
+        File inFastaFile = new File(inputDataSource.getNormalisedDataSourcePath(ProjectModel.path));
         File outNewickFile = new File(tempDir.getAbsolutePath() + File.separator + "temp.nwk");
         
         String nucleotideAlignmentParam = "";
@@ -64,6 +64,7 @@ public class FastTreeApplication extends Application {
                 Tree tree = new Tree();
                 tree.title = inputDataSource.title + "_fast_tree";
                 tree.originalFile = outNewickFile;
+                tree.parentSource = inputDataSource;
                 outputFile1.dataSource = tree;
                 outputFiles.add(outputFile1);
             }

@@ -61,7 +61,7 @@ public class ProjectController implements SafeListListener {
 
                     if (structures.size() == 1) {
                         SecondaryStructure secondaryStructure = new SecondaryStructure();
-                        createPath(secondaryStructure, dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1), dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1));
+                        createPaths(secondaryStructure, dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1), dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1));
                         secondaryStructure.originalFile = dataFile;
                         secondaryStructure.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                         secondaryStructure.dataType = dataType;
@@ -70,13 +70,27 @@ public class ProjectController implements SafeListListener {
                         secondaryStructure.length = structures.get(0).pairedSites.length;
                         dataSource = secondaryStructure;
                     } else {
-                        dataSource = new StructureList(dataFile.getName());
-                        createPath(dataSource, dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1), dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1));
-                        dataSource.originalFile = dataFile;
-                        dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
-                        dataSource.dataType = dataType;
-                        dataSource.persistObject(projectModel.getProjectPathString(), structures);
-                        dataSource.fileSize = new FileSize(dataFile.length());
+                        StructureList list = new StructureList(dataFile.getName());
+                        list = new StructureList(dataFile.getName());
+                        createPaths(list, dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1), dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1));
+                        list.originalFile = dataFile;
+                        list.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
+                        list.dataType = dataType;
+                        list.persistObject(projectModel.getProjectPathString(), structures);
+                        list.fileSize = new FileSize(dataFile.length());
+                        list.structures = new ArrayList<>();
+                        for (SecondaryStructureData s : structures) {
+                            SecondaryStructure secondaryStructure = new SecondaryStructure();
+                            createPaths(secondaryStructure, dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1), dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1));
+                            secondaryStructure.originalFile = dataFile;
+                            secondaryStructure.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
+                            secondaryStructure.dataType = dataType;
+                            secondaryStructure.persistObject(projectModel.getProjectPathString(), s);
+                            secondaryStructure.fileSize = new FileSize(dataFile.length());
+                            secondaryStructure.length = s.pairedSites.length;
+                            list.structures.add(secondaryStructure);
+                        }
+                        dataSource = list;
                     }
                 } catch (ParserException ex) {
                     Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
@@ -90,7 +104,7 @@ public class ProjectController implements SafeListListener {
                 try {
                     if (dataType.fileFormat.equals(DataType.FileFormat.EXCEL)) {
                         dataSource = ExcelIO.getTabularRepresentation(dataFile);
-                        createPath(dataSource, dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1), "csv");
+                        createPaths(dataSource, dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1), "csv");
                         dataSource.originalFile = dataFile;
                         dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                         dataSource.dataType = dataType;
@@ -99,7 +113,7 @@ public class ProjectController implements SafeListListener {
                         ExcelIO.saveAsCSV(dataFile, Paths.get(dataSource.getImportedDataSourcePath(projectModel.getProjectPathString())).toFile());
                     } else if (dataType.fileFormat.equals(DataType.FileFormat.CSV)) {
                         dataSource = CsvReader.getTabularRepresentation(dataFile);
-                        createPath(dataSource, dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1), "csv");
+                        createPaths(dataSource, dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1), "csv");
                         dataSource.originalFile = dataFile;
                         dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                         dataSource.dataType = dataType;
@@ -116,7 +130,7 @@ public class ProjectController implements SafeListListener {
             case ANNOTATION_DATA:
                 try {
                     dataSource = new Annotations();
-                    createPath(dataSource, dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1), "gb");
+                    createPaths(dataSource, dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1), "gb");
                     dataSource.originalFile = dataFile;
                     dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                     dataSource.dataType = dataType;
@@ -131,7 +145,7 @@ public class ProjectController implements SafeListListener {
                 break;
             case MATRIX:
                 dataSource = new Matrix();
-                createPath(dataSource, dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1), "matrix");
+                createPaths(dataSource, dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1), "matrix");
                 dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                 dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                 dataSource.dataType = dataType;
@@ -153,13 +167,14 @@ public class ProjectController implements SafeListListener {
                 break;
             case ALIGNMENT:
                 Alignment al = new Alignment();
-                createPath(al, dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1), "fas");
+                createPaths(al, dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1), "fas");
                 al.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
                 al.dataType = dataType;
                 al.fileSize = new FileSize(dataFile.length());
 
                 try {
                     ReadseqTools.saveAsFASTA(dataFile, Paths.get(al.getImportedDataSourcePath(projectModel.getProjectPathString())).toFile());
+                    IO.resaveAsNormalisedFasta(Paths.get(al.getImportedDataSourcePath(projectModel.getProjectPathString())).toFile(), Paths.get(al.getNormalisedDataSourcePath(projectModel.getProjectPathString())).toFile());
                     AlignmentMetadata metadata = IO.getAlignmentMetadata(Paths.get(al.getImportedDataSourcePath(projectModel.getProjectPathString())).toFile());
                     al.numSequences = metadata.numSequences;
                     al.length = metadata.maxSequenceLength;
@@ -207,15 +222,11 @@ public class ProjectController implements SafeListListener {
                 matrix.originalDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "orig.matrix").toString();
                 matrix.importedDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "matrix").toString();
                 matrix.title = outputFile.dataSource.title;
-                System.out.println("outputFile.fileFormat"+outputFile.fileFormat);
+                System.out.println("outputFile.fileFormat" + outputFile.fileFormat);
                 try {
-                    if(outputFile.fileFormat == FileFormat.COORDINATE_LIST_MATRIX)
-                    {
+                    if (outputFile.fileFormat == FileFormat.COORDINATE_LIST_MATRIX) {
                         PersistentSparseMatrix.createMatrixFromCoordinateListMatrixFile(outputFile.file, "[\\s,;]+", new File(matrix.getImportedDataSourcePath(projectModel.getProjectPathString())));
-                    }
-                    else
-                    if(outputFile.fileFormat == FileFormat.DENSE_MATRIX)
-                    {
+                    } else if (outputFile.fileFormat == FileFormat.DENSE_MATRIX) {
                         PersistentSparseMatrix.createMatrixFromDenseMatrixFile(outputFile.file, "[\\s,;]+", new File(matrix.getImportedDataSourcePath(projectModel.getProjectPathString())));
                     }
                 } catch (IOException ex) {
@@ -230,6 +241,7 @@ public class ProjectController implements SafeListListener {
             alignment.setImportId(getNextImportId());
             alignment.originalDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "orig.fas").toString();
             alignment.importedDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "fas").toString();
+            alignment.normalisedDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "norm.fas").toString();
             alignment.title = outputFile.dataSource.title;
 
             ArrayList<String> sequences = new ArrayList<>();
@@ -272,6 +284,7 @@ public class ProjectController implements SafeListListener {
             tree.originalDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "orig.nwk").toString();
             tree.importedDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "nwk").toString();
             tree.title = outputFile.dataSource.title;
+            tree.parentSource = outputFile.dataSource.parentSource;
 
             IO.copyFile(outputFile.dataSource.originalFile, new File(tree.getOriginalDataSourcePath(projectModel.getProjectPathString())));
             IO.copyFile(outputFile.dataSource.originalFile, new File(tree.getImportedDataSourcePath(projectModel.getProjectPathString())));
@@ -282,17 +295,16 @@ public class ProjectController implements SafeListListener {
 
     }
 
-    public void createPath(DataSource dataSource, String origExtension, String newExtension) {
+    public void createPaths(DataSource dataSource, String origExtension, String newExtension) {
         dataSource.setImportId(getNextImportId());
         Path p = generatePath(dataSource.getImportId(), newExtension);
-        System.out.println("here" + projectModel.getProjectPath().resolve(p));
         while (Files.exists(projectModel.getProjectPath().resolve(p))) {
             dataSource.setImportId(getNextImportId());
             p = generatePath(dataSource.getImportId(), newExtension);
-            System.out.println("q" + projectModel.getProjectPath().resolve(p));
         }
         dataSource.originalDataSourcePath = generatePath(dataSource.getImportId(), "orig." + origExtension).toString();
         dataSource.importedDataSourcePath = generatePath(dataSource.getImportId(), newExtension).toString();
+        dataSource.normalisedDataSourcePath = generatePath(dataSource.getImportId(), "norm." + newExtension).toString();
     }
 
     public Path generatePath(long id, String extension) {

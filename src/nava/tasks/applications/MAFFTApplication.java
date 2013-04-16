@@ -32,7 +32,7 @@ public class MAFFTApplication extends Application {
         setApplicationPanel(new MAFFTPanel());
     }
 
-    String arguments = "";
+    public String arguments = "";
     public ArrayList<String> align(ArrayList<String> inSequences) throws Exception {
         File tempDir = createTemporaryDirectory();
 
@@ -90,7 +90,7 @@ public class MAFFTApplication extends Application {
     protected void start() {
         File tempDir = createTemporaryDirectory();
 
-        File inFastaFile = new File(inputDataSource.getImportedDataSourcePath(ProjectModel.path));
+        File inFastaFile = new File(inputDataSource.getNormalisedDataSourcePath(ProjectModel.path));
         File outFastaFile = new File(tempDir.getAbsolutePath() + File.separator + "temp.fas");
 
         try {

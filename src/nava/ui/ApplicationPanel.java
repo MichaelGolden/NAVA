@@ -197,6 +197,7 @@ public class ApplicationPanel extends javax.swing.JPanel implements ListSelectio
         if (jList1.getSelectedValue() != null) {
             try {
                 Application app = (Application) jList1.getSelectedValue().getClass().newInstance();
+                app.setProjectController(projectController);
                 app.setDataSource(selectedDataSources.get(0));
                 MainFrame.taskManager.queueTask(app, false);
             } catch (InstantiationException ex) {

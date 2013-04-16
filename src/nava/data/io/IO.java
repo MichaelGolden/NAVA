@@ -334,7 +334,44 @@ public class IO {
         buffer.close();
 
         metadata.numSequences = n;
-        
+
         return metadata;
+    }
+
+    public static void resaveAsNormalisedFasta(File inFastaFile, File normalisedFastaFile) {
+        try {
+            BufferedReader buffer = new BufferedReader(new FileReader(inFastaFile));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(normalisedFastaFile));
+            String textline = null;
+            String sequence = "";
+            int n = 0;
+            boolean maxReached = false;
+            while ((textline = buffer.readLine()) != null) {
+                if (maxReached && textline.startsWith(">")) {
+                    break;
+                }
+
+                if (textline.startsWith(">")) {     
+                    if (!sequence.equals("")) {                        
+                        writer.write(">seq"+n+"\n");
+                        writer.write(sequence.toUpperCase()+"\n");
+                        sequence = "";
+                        n++;
+                    }
+                } else {
+                    sequence += textline.trim();
+                }
+
+            }
+            buffer.close();
+            if (!sequence.equals("")) {
+                writer.write(">seq"+n+"\n");
+                writer.write(sequence.toUpperCase());
+                sequence = "";
+            }
+            writer.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 }

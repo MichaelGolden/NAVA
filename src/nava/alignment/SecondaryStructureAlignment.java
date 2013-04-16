@@ -42,6 +42,7 @@ public class SecondaryStructureAlignment extends Alignment {
         }        
         
         MAFFTApplication mafft = new MAFFTApplication();
+        mafft.arguments = " --retree 2 --maxiterate 1000 ";
         try {
             ArrayList<String> alignedSequences = mafft.align(sequences);
             ArrayList<SecondaryStructureItem> alignedItems = new ArrayList<>();

@@ -12,6 +12,8 @@ import javax.swing.JPanel;
 import nava.data.types.DataSource;
 import nava.tasks.Task;
 import nava.ui.MainFrame;
+import nava.ui.ProjectController;
+import nava.ui.ProjectModel;
 import nava.ui.console.ConsoleBuffer;
 import nava.ui.console.ConsoleDatabase;
 import nava.ui.console.ConsoleInputHandler;
@@ -31,6 +33,7 @@ public abstract class Application extends Task {
     private ConsoleInputHandler consoleErrorHandler;
     private JPanel applicationPanel;
     private ApplicationPanelInterface applicationPanelInterface;
+    public ProjectController projectController;
 
     //BufferedWriter standardBuffer;
     //BufferedWriter errorBuffer;
@@ -44,6 +47,12 @@ public abstract class Application extends Task {
         combinedBuffer = new ConsoleBuffer(consoleDatabase, taskInstanceId, null);
         //consoleInputBuffer = new ConsoleBuffer(consoleDatabase, appInstanceId, "standard_out");
         //consoleErrorBuffer = new ConsoleBuffer(consoleDatabase, appInstanceId, "standard_err");
+    }
+    
+    public void setProjectController(ProjectController projectController)
+    {
+        this.projectController = projectController;
+        System.out.println("setting model " + projectController);
     }
 
     public void setApplicationPanel(JPanel applicationPanel) {

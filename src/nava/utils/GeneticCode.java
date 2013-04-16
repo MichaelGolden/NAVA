@@ -1,5 +1,9 @@
 package nava.utils;
 
+import java.io.File;
+import java.util.ArrayList;
+import nava.data.io.IO;
+
 /**
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
@@ -187,5 +191,18 @@ public class GeneticCode {
             translation += getAAfromCodon(nucleotideSequence.substring(i, Math.min(nucleotideSequence.length(), i + 3)));
         }
         return translation;
+    }
+    
+    public static void saveAsProteinAlignment(File inFastaFile, File outFastaFile)
+    {
+        ArrayList<String> sequences = new ArrayList<>();
+        ArrayList<String> sequenceNames = new ArrayList<>();
+        IO.loadFastaSequences(inFastaFile, sequences, sequenceNames);
+        
+        for(int i = 0 ; i < sequences.size() ; i++)
+        {
+            sequences.set(i, translateNucleotideSequence(sequences.get(i)));
+        }
+        IO.saveToFASTAfile(sequences, sequenceNames, outFastaFile);
     }
 }

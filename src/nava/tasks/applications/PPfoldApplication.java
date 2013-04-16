@@ -27,22 +27,27 @@ public class PPfoldApplication extends Application {
     public static String PPFOLD_EXECUTABLE = "bin/PPfold-v3-0.jar.";
     Alignment inputDataSource = null;
     ArrayList<ApplicationOutput> outputFiles = new ArrayList<>();
+    
+    PPfoldPanel ppfoldPanel;
 
     public PPfoldApplication() {
-        //setApplicationPanel(new MusclePanel());
+        this.slotUsage = Runtime.getRuntime().availableProcessors();
+       /// System.out.println("VALUE " + this);
+        ppfoldPanel =  new PPfoldPanel(this, inputDataSource);
+        setApplicationPanel(ppfoldPanel);
     }
-    public String extraParameters = "";
+    public String arguments = "";
 
     @Override
     protected void start() {
         File tempDir = createTemporaryDirectory();
 
         File inFastaFile = new File(tempDir.getAbsoluteFile().getAbsolutePath() + File.separator + "temp.fas");
-        IO.copyFile(new File(inputDataSource.getImportedDataSourcePath(ProjectModel.path)), inFastaFile);
+        IO.copyFile(new File(inputDataSource.getNormalisedDataSourcePath(ProjectModel.path)), inFastaFile);
 
         try {
-            String cmd = "java -jar " + new File(PPFOLD_EXECUTABLE).getAbsolutePath() + " \"" + inFastaFile.getAbsolutePath() + "\" --exports";
-
+            String cmd = "java -jar " + new File(PPFOLD_EXECUTABLE).getAbsolutePath() + " \"" + inFastaFile.getAbsolutePath() + "\" "+arguments+"  --exports";
+            System.out.println(cmd);
             process = Runtime.getRuntime().exec(cmd, null, tempDir);
 
             startConsoleInputBuffer(process);
@@ -98,6 +103,7 @@ public class PPfoldApplication extends Application {
     @Override
     public void setDataSource(DataSource dataSource) {
         this.inputDataSource = (Alignment) dataSource;
+        this.ppfoldPanel.setAlignment(inputDataSource);
     }
 
     @Override

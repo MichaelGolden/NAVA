@@ -16,7 +16,7 @@ import nava.data.io.ExcelIO;
 public class Tabular extends DataSource {
 
     public int numSheets = 0;
-    public ArrayList<TabularField> fields = new ArrayList<TabularField>();
+    public ArrayList<TabularField> fields = new ArrayList<>();
     
     @Override
     public Icon getIcon() {

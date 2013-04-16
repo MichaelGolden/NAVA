@@ -431,6 +431,17 @@ public class RankingAnalyses {
             return (x.doubleValue() + y.doubleValue()) / 2;
         }
     }
+    
+     public static double getPercentile(ArrayList<Double> list, double p) {
+         if(list.size() == 1)
+         {
+             return list.get(0);
+         }
+         else
+         {
+            return select(list, (int)Math.round(p*(double)list.size()));
+         }
+    }
 
     public static double getMedian2(ArrayList<Double> list) {
         if (list.size() == 0) {

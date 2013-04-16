@@ -66,7 +66,7 @@ public abstract class Task<T> {
     long queueTime = -1;
     long startTime = -1;
     long finishTime = -1;
-    int slotUsage = 1;
+    protected int slotUsage = 1;
 
     public abstract void before();
 

@@ -53,6 +53,8 @@ public class ReadseqTools {
         seqwriter.writeTrailer();
         seqwriter.close();
     }
+    
+    
 
     public static boolean isInFastaFormat(File file) {
         try {

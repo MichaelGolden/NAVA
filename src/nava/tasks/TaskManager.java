@@ -27,7 +27,7 @@ public class TaskManager extends Thread {
     LinkedList<Task> generalTaskQueue = new LinkedList<>();
     LinkedList<Task> deferrableTaskQueue = new LinkedList<>();
     LinkedList<UITask> uiTaskQueue = new LinkedList<>();
-    int totalSlots = Math.max(Runtime.getRuntime().availableProcessors() / 2, 1);
+    int totalSlots = Math.max(Runtime.getRuntime().availableProcessors(), 1);
     int usedSlots = 0;
     int availableSlots = totalSlots - usedSlots;
     int deferrableTasksUsedSlots = 0;

@@ -30,7 +30,10 @@ public class AutomatedFolding {
 
     public static void main(String[] args) {
        // new AutomatedFolding().performingFolding(new File("C:/dev/thesis/dengue_50x4.fas"), new File("C:/dev/thesis/dengue_50x4.dbn"));
-         new AutomatedFolding().performingFolding(new File("C:/dev/thesis/hiv_full/hiv_full.fas"), new File("C:/dev/thesis/hiv_full/hiv_full.dbn"), 4);
+        // new AutomatedFolding().performingFolding(new File("C:/dev/thesis/hiv_full/hiv_full.fas"), new File("C:/dev/thesis/hiv_full/hiv_full.dbn"), 4);
+         //new AutomatedFolding().performingFolding(new File("C:/dev/thesis/westnile/200/westnile_all_200_aligned.fas"), new File("C:/dev/thesis/westnile/westnile_all_200_aligned.dbn"), 4);
+        new AutomatedFolding().performingFolding(new File("C:/dev/thesis/jev/300/all_300_aligned.fas"), new File("C:/dev/thesis/jev/jev_all.dbn"), 4);
+        
     }
 
     public void performingFolding(File inFastaFile, File outCtFile, int threads) {

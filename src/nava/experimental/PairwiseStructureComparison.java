@@ -25,10 +25,10 @@ public class PairwiseStructureComparison {
 
     public void runComparison() {
         try {
-            int permutations = 1000;
+            int permutations = 2000;
             int windowSize = 75;
             
-            File outFile = new File("C:/dev/thesis/dengue/dengue_permutations.txt");
+            /*File outFile = new File("C:/dev/thesis/dengue/dengue_permutations2.txt");
             String[] categories = {"dengue1", "dengue2", "dengue3", "dengue4"};
             System.out.println(combinations(categories));
             ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(new File("C:/dev/thesis/dengue-alignment.dbn"), DataType.FileFormat.VIENNA_DOT_BRACKET);
@@ -41,9 +41,9 @@ public class PairwiseStructureComparison {
                     combinations.remove(i);
                     i--;
                 }
-            }
+            }*/
             
-            /*File outFile = new File("C:/dev/thesis/hiv_full/hiv_full_permutations_35_2.txt");
+           /* File outFile = new File("C:/dev/thesis/hiv_full/hiv_full_permutations_75.txt");
             String[] categories = {"hiv1b", "hiv1c", "hiv1d", "hiv1g", "hiv1o", "hiv2", "siv"};
             String[] categories_hiv1 = {"hiv1b", "hiv1c", "hiv1d", "hiv1g", "hiv1o"};
             String[] categories_hiv1_hiv2 = {"hiv1b", "hiv1c", "hiv1d", "hiv1g", "hiv1o", "hiv2"};
@@ -60,14 +60,32 @@ public class PairwiseStructureComparison {
                 }
             }
             combinations.add(new Combination(categories_hiv1));
-            combinations.add(new Combination(categories_hiv1_hiv2));
+            combinations.add(new Combination(categories_hiv1_hiv2));*/
+            
+            File outFile = new File("C:/dev/thesis/hcv/hcv_75_2.txt");
+            String[] categories = {"hcv1a", "hcv1b", "hcv2a", "hcv2b", "hcv3", "hcv4", "hcv6"};
+            //String[] categories_hiv1 = {"hiv1b", "hiv1c", "hiv1d", "hiv1g", "hiv1o"};
+           // String[] categories_hiv1_hiv2 = {"hiv1b", "hiv1c", "hiv1d", "hiv1g", "hiv1o", "hiv2"};
+            System.out.println(combinations(categories));
+            ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.dbn"), DataType.FileFormat.VIENNA_DOT_BRACKET);
 
+            ArrayList<Combination> combinations = combinations(categories);
+            for (int i = 0; i < combinations.size(); i++) {
+                Combination combination = combinations.get(i);
+                if (combination.combination.size() <= 2 || combination.combination.size() == categories.length) {
+                } else {
+                    combinations.remove(i);
+                    i--;
+                }
+            }
+
+            
             ArrayList<String> pairMustContain = new ArrayList<>();
-            //pairMustContain.add("siv");*/
+            //pairMustContain.add("siv");
+            pairMustContain.add("hcv3");
             
-            
-            //postAnalysis(outFile, outFile, categories, combinations, structureData, windowSize, pairMustContain);
-            //System.exit(0);
+            postAnalysis(outFile, outFile, categories, combinations, structureData, windowSize, pairMustContain);
+            System.exit(0);
             //ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(new File("C:/dev/thesis/dengue2/50/dengue2_all_50_aligned_partial_structurealign.fas.dbn"), DataType.FileFormat.VIENNA_DOT_BRACKET);
             //ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(new File("C:/dev/thesis/full-alignment.dbn"), DataType.FileFormat.VIENNA_DOT_BRACKET);
 

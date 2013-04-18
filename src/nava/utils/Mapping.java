@@ -18,6 +18,8 @@ import nava.tasks.ProcessReference;
 public class Mapping implements Serializable {
 
     public static String MUSCLE_EXECUTABLE = "muscle3.8.31_i86win32.exe";
+    public static String MAFFT_EXECUTABLE = "bin/mafft-6.952-win64/mafft-win/mafft.bat";
+    
     private static final long serialVersionUID = 1L;
 
     public static void setMuscleExecutable(String muscleExecutable) {
@@ -327,7 +329,9 @@ public class Mapping implements Serializable {
             buffer.close();
 
             if (Mapping.select >= 1) {
-                String cmd = MUSCLE_EXECUTABLE + " -in " + inputFile.getAbsolutePath() + " -out " + outputFile.getAbsolutePath() + " -gapopen " + gapOpen + " -gapextend " + gapExtend;
+                //String cmd = MUSCLE_EXECUTABLE + " -in " + inputFile.getAbsolutePath() + " -out " + outputFile.getAbsolutePath() + " -gapopen " + gapOpen + " -gapextend " + gapExtend;
+
+                String cmd = new File(MAFFT_EXECUTABLE).getAbsolutePath() + " --retree 2 --maxiterate 1000 " + inputFile.getAbsolutePath() + " > " + outputFile.getAbsolutePath();                
 
                 Process p = Runtime.getRuntime().exec(cmd);
                 processReference.addProcess(p);
@@ -335,7 +339,7 @@ public class Mapping implements Serializable {
                     BufferedReader reader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
                     String textline = null;
                     while ((textline = reader.readLine()) != null) {
-                        System.err.println(textline);
+                       // System.err.println(textline);
                     }
                     reader.close();
                     if (p.waitFor() == 0) {

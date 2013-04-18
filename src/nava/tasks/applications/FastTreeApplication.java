@@ -44,7 +44,7 @@ public class FastTreeApplication extends Application {
         String nucleotideAlignmentParam = "";
         if(inputDataSource.alignmentType == AlignmentType.NUCLEOTIDE_ALIGNMENT)
         {
-            nucleotideAlignmentParam = " -nt ";
+            nucleotideAlignmentParam = " -nt -gtr";
         }
         arguments += nucleotideAlignmentParam;
 

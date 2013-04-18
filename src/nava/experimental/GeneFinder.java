@@ -52,14 +52,13 @@ public class GeneFinder {
             while (seqs.hasNext()) {
                 count++;
                 RichSequence rs = seqs.nextRichSequence();
-                writer.write(">"+rs.getName()+"_"+dataset.organism+"\n");
-                writer.write(rs.seqString()+"\n");
+                writer.write(">" + rs.getName() + "_" + dataset.organism + "\n");
+                writer.write(rs.seqString() + "\n");
             }
             br.close();
             writer.close();
-            if(count < 100)
-            {
-                GeneFinder.MAFFTalignment(outFile,new File(outFile.getAbsolutePath()+"_aligned"));
+            if (count < 100) {
+                GeneFinder.MAFFTalignment(outFile, new File(outFile.getAbsolutePath() + "_aligned"));
             }
         } catch (NoSuchElementException ex) {
             Logger.getLogger(GeneFinder.class.getName()).log(Level.SEVERE, null, ex);
@@ -106,7 +105,7 @@ public class GeneFinder {
 
         // int n = 100;
         //int[] sizes = {50,100, 200, 20, 10, 300, 400};
-        int[] sizes = {300,250,200, 50,100, 20, 10};
+        int[] sizes = {300, 250, 200, 50, 100, 20, 10};
         //int[] sizes = {25, 20, 50, 100, 200, 10};
         //int[] sizes = {25};
         for (int n : sizes) {
@@ -121,12 +120,13 @@ public class GeneFinder {
             //  resaveGenbankFile(new File("C:/dev/thesis/hiv_full/1o/complete.gb"),new File("C:/dev/thesis/hiv_full/1o/complete2.gb"));
             // resaveGenbankFile(new File("C:/dev/thesis/hiv_full/2/complete.gb"),new File("C:/dev/thesis/hiv_full/2/complete2.gb"));
             //resaveGenbankFile(new File("C:/dev/thesis/hiv_full/siv/complete.gb"),new File("C:/dev/thesis/hiv_full/siv/complete2.gb"));
-           // datasets.add(new Dataset("C:/dev/thesis/hiv_full/1a/", new File("C:/dev/thesis/hiv_full/1a/complete2.gb"), "hiv1a", true));
-           // datasets.add(new Dataset("C:/dev/thesis/hiv_full/1b/", new File("C:/dev/thesis/hiv_full/1b/complete2.gb"), "hiv1b", false));
-           // datasets.add(new Dataset("C:/dev/thesis/hiv_full/1c/", new File("C:/dev/thesis/hiv_full/1c/complete2.gb"), "hiv1c", false));
-           // datasets.add(new Dataset("C:/dev/thesis/hiv_full/1d/", new File("C:/dev/thesis/hiv_full/1d/complete2.gb"), "hiv1d", true));
-           // datasets.add(new Dataset("C:/dev/thesis/hiv_full/1g/", new File("C:/dev/thesis/hiv_full/1g/complete2.gb"), "hiv1g", true));
-           // datasets.add(new Dataset("C:/dev/thesis/hiv_full/1o/", new File("C:/dev/thesis/hiv_full/1o/complete2.gb"), "hiv1o", true));
+            //datasets.add(new Dataset("C:/dev/thesis/hiv_full/hiv1/", new File("C:/dev/thesis/hiv_full/hiv1/complete.gb"), "hiv1", false));
+            //datasets.add(new Dataset("C:/dev/thesis/hiv_full/1a/", new File("C:/dev/thesis/hiv_full/1a/complete2.gb"), "hiv1a", true));
+            //datasets.add(new Dataset("C:/dev/thesis/hiv_full/1b/", new File("C:/dev/thesis/hiv_full/1b/complete2.gb"), "hiv1b", false));
+            //datasets.add(new Dataset("C:/dev/thesis/hiv_full/1c/", new File("C:/dev/thesis/hiv_full/1c/complete2.gb"), "hiv1c", false));
+            //datasets.add(new Dataset("C:/dev/thesis/hiv_full/1d/", new File("C:/dev/thesis/hiv_full/1d/complete2.gb"), "hiv1d", true));
+            //datasets.add(new Dataset("C:/dev/thesis/hiv_full/1g/", new File("C:/dev/thesis/hiv_full/1g/complete2.gb"), "hiv1g", true));
+            //datasets.add(new Dataset("C:/dev/thesis/hiv_full/1o/", new File("C:/dev/thesis/hiv_full/1o/complete2.gb"), "hiv1o", true));
             //datasets.add(new Dataset("C:/dev/thesis/hiv_full/2/", new File("C:/dev/thesis/hiv_full/2/complete2.gb"), "hiv2", true));
             //datasets.add(new Dataset("C:/dev/thesis/hiv_full/siv/", new File("C:/dev/thesis/hiv_full/siv/complete2.gb"), "siv", false));
             //   datasets.add(new Dataset("C:/dev/thesis/hcv/1/", new File("C:/dev/thesis/hcv/1/complete_a_b.gb"), "hcv1", false));
@@ -138,19 +138,20 @@ public class GeneFinder {
             //  datasets.add(new Dataset("C:/dev/thesis/hcv/3/", new File("C:/dev/thesis/hcv/3/complete.gb"), "hcv3", true));
             // datasets.add(new Dataset("C:/dev/thesis/hcv/4/", new File("C:/dev/thesis/hcv/4/complete.gb"), "hcv4", true));
             // datasets.add(new Dataset("C:/dev/thesis/hcv/6/", new File("C:/dev/thesis/hcv/6/complete.gb"), "hcv6", true));
-            //  datasets.add(new Dataset("C:/dev/thesis/norovirus/", new File("C:/dev/thesis/norovirus/complete.gb"), "norovirus", false));
-            // datasets.add(new Dataset("C:/dev/thesis/westnile/", new File("C:/dev/thesis/westnile/complete.gb"), "westnile", false));
+            //datasets.add(new Dataset("C:/dev/thesis/westnile/", new File("C:/dev/thesis/westnile/complete.gb"), "westnile", false));
+           // datasets.add(new Dataset("C:/dev/thesis/norovirus/", new File("C:/dev/thesis/norovirus/complete.gb"), "norovirus", false));
+             
 
             //  datasets.add(new Dataset("C:/dev/thesis/siv/", new File("C:/dev/thesis/siv/complete.gb"), "siv", true));
             // datasets.add(new Dataset("C:/dev/thesis/hiv/", new File("C:/dev/thesis/hiv/complete.gb"), "hiv", false));
-            datasets.add(new Dataset("C:/dev/thesis/dengue/", new File("C:/dev/thesis/dengue/complete.gb"), "dengue", false));
-            datasets.add(new Dataset("C:/dev/thesis/dengue1/", new File("C:/dev/thesis/dengue1/complete.gb"), "dengue1", false));
-            datasets.add(new Dataset("C:/dev/thesis/dengue2/", new File("C:/dev/thesis/dengue2/complete.gb"), "dengue2", false));
-             datasets.add(new Dataset("C:/dev/thesis/dengue3/", new File("C:/dev/thesis/dengue3/complete.gb"), "dengue3", false));
-            datasets.add(new Dataset("C:/dev/thesis/dengue4/", new File("C:/dev/thesis/dengue4/complete.gb"), "dengue4", false));
+            //datasets.add(new Dataset("C:/dev/thesis/dengue/", new File("C:/dev/thesis/dengue/complete.gb"), "dengue", false));
+            //datasets.add(new Dataset("C:/dev/thesis/dengue1/", new File("C:/dev/thesis/dengue1/complete.gb"), "dengue1", false));
+            //datasets.add(new Dataset("C:/dev/thesis/dengue2/", new File("C:/dev/thesis/dengue2/complete.gb"), "dengue2", false));
+            // datasets.add(new Dataset("C:/dev/thesis/dengue3/", new File("C:/dev/thesis/dengue3/complete.gb"), "dengue3", false));
+            //datasets.add(new Dataset("C:/dev/thesis/dengue4/", new File("C:/dev/thesis/dengue4/complete.gb"), "dengue4", false));
             // datasets.add(new Dataset("C:/dev/thesis/csfv/", new File("C:/dev/thesis/csfv/complete.gb"), "csfv", true));        
             //datasets.add(new Dataset("C:/dev/thesis/gb/", new File("C:/dev/thesis/gb/complete.gb"), "gb", true));
-            //  datasets.add(new Dataset("C:/dev/thesis/jev/", new File("C:/dev/thesis/jev/complete.gb"), "jev", false));
+            datasets.add(new Dataset("C:/dev/thesis/jev/", new File("C:/dev/thesis/jev/complete.gb"), "jev", false));
             // datasets.add(new Dataset("C:/dev/thesis/bvdv/", new File("C:/dev/thesis/bvdv/complete.gb"), "bvdv", true));
 
             //  boolean allowXs = true;
@@ -159,10 +160,9 @@ public class GeneFinder {
             //String organism = "bvdv";
             for (Dataset dataset : datasets) {
                 //saveGenbankFileAsFasta(dataset,new File(dataset.dir+File.separator+"complete.fas"));
-               /* if( 1!= 2)
-                {
-                    continue;
-                }*/
+               /*
+                 * if( 1!= 2) { continue; }
+                 */
                 System.out.println(dataset.organism);
                 boolean allowXs = dataset.allowXs;
                 String dir = dataset.dir + n + File.separator;
@@ -357,6 +357,7 @@ public class GeneFinder {
 
                 for (String gene : genes) {
                     new File(dir + organism + "_" + gene + "_" + n + ".fas").delete();
+                    new File(dir + organism + "_" + gene + "_" + n + "_nooverlap" + ".fas").delete();
                 }
 
 
@@ -375,6 +376,7 @@ public class GeneFinder {
                         continue;
                     }
 
+                    ArrayList<Gene> seqGenes = new ArrayList<Gene>();
                     if (selectionSet.contains(rs.getName())) {
                         while (it.hasNext()) {
                             org.biojava.bio.seq.Feature ft = it.next();
@@ -394,11 +396,22 @@ public class GeneFinder {
                                                 Location lt = blocks.next();
                                                 int start = lt.getMin() - 1;
                                                 int length = lt.getMax() - lt.getMin() + 1;
+
+
                                                 String seq = ft.getSequence().seqString().toUpperCase().substring(start, start + length);
                                                 String lastCodon = GeneticCode.translateNucleotideSequence(seq.substring(seq.length() - 3, seq.length()));
                                                 if (lastCodon.equals("*")) {
                                                     seq = seq.substring(0, seq.length() - 3);
                                                 }
+
+
+                                                Gene gene = new Gene();
+                                                gene.geneName = geneName;
+                                                gene.start = start;
+                                                gene.length = seq.length() - 3;
+                                                gene.fullSeq = ft.getSequence().seqString();
+                                                seqGenes.add(gene);
+
                                                 writer.write(seq);
                                                 //  BufferedWriter writer = new BufferedWriter(new FileWriter(dir + geneName + "_" + geneno + ".fas", true));
                                                 //writer.write(">" + rs.getName() + "_" + geneName + "\n");
@@ -434,6 +447,7 @@ public class GeneFinder {
                                                 Location lt = blocks.next();
                                                 int start = lt.getMin() - 1;
                                                 int length = lt.getMax() - lt.getMin() + 1;
+
                                                 String seq = ft.getSequence().seqString().toUpperCase().substring(start, start + length);
                                                 String lastCodon = GeneticCode.translateNucleotideSequence(seq.substring(seq.length() - 3, seq.length()));
                                                 if (lastCodon.equals("*")) {
@@ -457,6 +471,17 @@ public class GeneFinder {
                             }
                         }
                     }
+
+
+
+                    //System.out.println(seqGenes);
+                    ArrayList<Gene> noOverlap = GeneFinder.removeCodingOverlaps(seqGenes);
+                    for (Gene gene : noOverlap) {
+                        BufferedWriter writer = new BufferedWriter(new FileWriter(dir + organism + "_" + gene.geneName + "_" + n + "_nooverlap" + ".fas", true));
+                        writer.write(">" + rs.getName() + "_" + gene.geneName + "_" + organism + "\n");
+                        writer.write(gene.subSeq + "\n");
+                        writer.close();
+                    }
                 }
 
 
@@ -469,6 +494,15 @@ public class GeneFinder {
                     codonMAFFTalignment(inFastaFile, outFastaFile);
                 }
 
+                // align non-overlapping
+                for (String gene : genes) {
+                    File inFastaFile = new File(dir + organism + "_" + gene + "_" + n + "_nooverlap" + ".fas");
+                    if (inFastaFile.exists()) {
+                        File outFastaFile = new File(dir + organism + "_" + gene + "_" + n + "_nooverlap" + "_aligned.fas");
+                        codonMAFFTalignment(inFastaFile, outFastaFile);
+                    }
+                }
+
                 MAFFTalignment(allSeqFile, allSeqAlignedFile);
 
 
@@ -477,6 +511,129 @@ public class GeneFinder {
         }
     }
     static String MAFFT_EXECUTABLE = "bin/mafft-6.952-win64/mafft-win/mafft.bat";
+
+    public static class Gene {
+
+        String sequenceName;
+        String geneName;
+        String organism;
+        String fullSeq;
+        int start;
+        int length;
+        String subSeq;
+
+        @Override
+        protected Object clone() {
+            Gene gene = new Gene();
+            gene.sequenceName = sequenceName;
+            gene.geneName = geneName;
+            gene.organism = organism;
+            gene.fullSeq = fullSeq;
+            gene.start = start;
+            gene.length = length;
+            gene.subSeq = subSeq;
+            return gene;
+        }
+
+        @Override
+        public String toString() {
+            return "Gene{" + "sequenceName=" + sequenceName + ", geneName=" + geneName + ", organism=" + organism + ", start=" + start + ", length=" + length + '}';
+        }
+    }
+
+    public static ArrayList<Gene> removeCodingOverlaps(ArrayList<Gene> genes) {
+
+        ArrayList<Gene> newGenes = new ArrayList<>();
+
+        if (genes.size() > 0) {
+            int[] count = new int[genes.get(0).fullSeq.length()];
+            Gene[] geneArray = new Gene[count.length];
+
+            for (Gene gene : genes) {
+                for (int i = gene.start; i < gene.start + gene.length; i++) {
+                    count[i]++;
+                    geneArray[i] = gene;
+                }
+            }
+
+            int prev = -1;
+            int startPos = -1;
+            for (int i = 0; i < count.length; i++) {
+                Gene gene = geneArray[i];
+                Gene nextGene = null;
+                if (i < count.length - 1) {
+                    if (count[i + 1] == 1) {
+                        nextGene = geneArray[i + 1];
+                    }
+                }
+
+                if (prev != 1 && count[i] == 1) {
+                    startPos = i;
+                }
+
+                if (count[i] == 1 && !Objects.equals(gene, nextGene)) {
+                    Gene newGene = (Gene) gene.clone();
+                    newGene.start = startPos;
+                    int end = i;
+
+                    int frame = gene.start % 3;
+                    while (newGene.start % 3 != frame) {
+                        newGene.start++;
+                    }
+
+                    while ((end + 1) % 3 != frame) {
+                        end--;
+                    }
+
+
+                    newGene.length = end - newGene.start + 1;
+
+                    if (newGene.start >= 0 && newGene.start < end && newGene.start + newGene.length <= gene.fullSeq.length()) {
+                        // System.out.println(gene.geneName);
+                        // System.out.println("a" + gene.start);
+                        // System.out.println("e" + startPos);
+                        //System.out.println("b" + i);
+                        //System.out.println("c" + newGene.start);
+                        //System.out.println("d" + end);
+                        newGene.subSeq = gene.fullSeq.substring(newGene.start, newGene.start + newGene.length);
+                        newGenes.add(newGene);
+                    } else {
+                        //   System.out.println("Error" + "\t" + newGene.start + "\t" + (newGene.start + newGene.length) + "\t" + gene.fullSeq.length());
+                    }
+                }
+
+                prev = count[i];
+            }
+        }
+
+
+        //ArrayList<Gem
+        HashMap<String, Gene> geneMap = new HashMap<>();
+        for (Gene newGene : newGenes) {
+            Gene finalGene = new Gene();
+            if (geneMap.containsKey(newGene.geneName)) {
+                finalGene = geneMap.get(newGene.geneName);
+            } else {
+                finalGene.geneName = newGene.geneName;
+                finalGene.subSeq = "";
+            }
+
+            finalGene.subSeq += newGene.subSeq;
+            geneMap.put(finalGene.geneName, finalGene);
+        }
+        ArrayList<Gene> finalGenes = new ArrayList<>();
+        finalGenes.addAll(geneMap.values());
+        /*
+         * HashMap<String, Integer> mapCount = new HashMap<>(); for(Gene newGene
+         * : newGenes) {
+         * mapCount.put(newGene.geneName,(mapCount.containsKey(newGene.geneName)
+         * ? mapCount.get(newGene.geneName) : 0)+1);
+         *
+         * }
+         */
+
+        return finalGenes;
+    }
 
     public static void MAFFTalignment(File inFastaFile, File outFastaFile) {
         try {

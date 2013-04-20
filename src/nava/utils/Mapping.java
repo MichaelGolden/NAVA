@@ -40,6 +40,16 @@ public class Mapping implements Serializable {
     int[] refToAList = {};
     int[] refToBList = {};
     int refLen;
+    
+    public String mapString()
+    {
+        String ret = "";
+        for(int i = 0 ; i < aToRefList.length ; i++)
+        {
+            ret += i+"\t"+aToRefList[i]+"\t"+bToRefList[i]+"\t"+refToAList[i]+"\t"+refToBList[i]+"\n";
+        }
+        return ret;
+    }
 
     public static void setAlignmentParameters(double gapOpen, double gapExtend, int s) {
         Mapping.gapOpen = gapOpen;
@@ -327,7 +337,7 @@ public class Mapping implements Serializable {
                 //bLen = sequencesB.get(i).length();
             }
             buffer.close();
-
+            System.out.println("WE ARE HERE");
             if (Mapping.select >= 1) {
                 //String cmd = MUSCLE_EXECUTABLE + " -in " + inputFile.getAbsolutePath() + " -out " + outputFile.getAbsolutePath() + " -gapopen " + gapOpen + " -gapextend " + gapExtend;
 
@@ -342,11 +352,14 @@ public class Mapping implements Serializable {
                        // System.err.println(textline);
                     }
                     reader.close();
-                    if (p.waitFor() == 0) {
+                    int exitCode = p.waitFor();
+                    System.out.println("Exit code");
+                    if (exitCode == 0) {
                         ArrayList<String> alignedSequences = new ArrayList<String>();
                         ArrayList<String> alignedSequenceNames = new ArrayList<String>();
                         IO.loadFastaSequences(outputFile, alignedSequences, alignedSequenceNames);
 
+                        
                         String alignedA0 = null;
                         String alignedB0 = null;
                         for (int i = 0; i < alignedSequences.size(); i++) {
@@ -358,6 +371,9 @@ public class Mapping implements Serializable {
                                 alignedB0 = alignedSequences.get(i);
                             }
                         }
+                        
+                        System.out.println("Ax"+alignedA0);
+                        System.out.println("Bx"+alignedB0);
 
                         mapping = getMappingFromAlignedStrings(alignedA0, alignedB0, reverseComplementB);
                     }
@@ -396,7 +412,7 @@ public class Mapping implements Serializable {
     public static Mapping createMapping(ArrayList<String> sequencesA, ArrayList<String> sequencesNamesA, ArrayList<String> sequencesB, ArrayList<String> sequencesNamesB, int select, ProcessReference processReference) {
         // identity mapping
         if (sequencesA.equals(sequencesB)) { // if alignments are identical
-            return Mapping.getMappingFromAlignedStrings(sequencesA.get(0), sequencesA.get(0), false);
+            return Mapping.getMappingFromAlignedStrings(sequencesA.get(0).replace('-', Mapping.GAP_CHARACTER), sequencesA.get(0).replace('-', Mapping.GAP_CHARACTER), false);
         }
 
         Mapping mapping = createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, select, false, "mappingforward.fas", processReference);

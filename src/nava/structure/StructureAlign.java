@@ -591,7 +591,7 @@ public class StructureAlign {
         return sim;
     }
 
-    public static double permutationTest(int startPos, int length, double sim, int[] pairedSites1, int[] pairedSites2, int windowSize, boolean relaxed, boolean slidingSim, int permutations) {
+    public static double permutationTest(int startPos, int length, double sim, int[] pairedSites1, int [] gapCountSum, int[] pairedSites2, int windowSize, boolean relaxed, boolean slidingSim, int permutations) {
         double permCount = 0;
         double permTotal = 0;
 
@@ -611,6 +611,20 @@ public class StructureAlign {
         //System.out.println(RNAFoldingTools.getDotBracketStringFromPairedSites(subPairedSites2));
         for (int k = 0; k < pairedSites1.length - length; k++) {
             if (indices[k]) {
+                if(k != startPos)
+                {
+                    int startGap = 0;
+                    if(k > 0)
+                    {
+                        startGap = gapCountSum[k-1];
+                    }
+                    double gaps = gapCountSum[k+length] - startGap;
+                    double gapPerc = gaps / (double)length;
+                    if(gapPerc > 0.2)
+                    {
+                        continue; // if two many gaps in permuted substructure: skip
+                    }
+                }
                 //int[] permutedPairedSites1 = StructureAlign.getSubstructureRelaxed(pairedSites1, k, region.length);
                 int[] permutedPairedSites1 = null;
                 if (relaxed) {
@@ -653,14 +667,22 @@ public class StructureAlign {
             }
 
             double sim = 1 - MountainMetrics.calculateNormalizedWeightedMountainDistance(subPairedSites1, subPairedSites2);
-            pvals[i] = permutationTest(i, windowSize, sim, pairedSites1, pairedSites2, windowSize, relaxed, false, permutations);
+            int [] gapCountSum = new int[pairedSites1.length];
+            pvals[i] = permutationTest(i, windowSize, sim, pairedSites1, gapCountSum, pairedSites2, windowSize, relaxed, false, permutations);
 
         }
 
         return pvals;
     }
 
-    public double[] parallelizedPermutationTestSliding(int[] pairedSites1, int[] pairedSites2, int windowSize, boolean relaxed, int permutations) {
+    public double[] parallelizedPermutationTestSliding(int[] pairedSites1, int[] pairedSites2, String seq1, int windowSize, boolean relaxed, int permutations) {
+
+        int [] gapCountSum = new int[seq1.length()];
+        gapCountSum[0] = seq1.charAt(0) == '-' ? 1 : 0;
+        for (int i = 1; i < gapCountSum.length; i++) {
+            gapCountSum[i] = (seq1.charAt(i) == '-' ? 1 : 0) + gapCountSum[i-1];
+        }
+
         double[] pvals = new double[pairedSites1.length - windowSize];
         ArrayList<Input> inputs = new ArrayList<>();
         for (int i = 0; i < pvals.length; i++) {
@@ -676,13 +698,12 @@ public class StructureAlign {
 
             double sim = 1 - MountainMetrics.calculateNormalizedWeightedMountainDistance(subPairedSites1, subPairedSites2);
             //pvals[i] = permutationTest(i, windowSize, sim, pairedSites1, pairedSites2, windowSize, relaxed, false, permutations);
-            inputs.add(new Input(i, windowSize, sim, pairedSites1, pairedSites2, windowSize, relaxed, false, permutations));
+            inputs.add(new Input(i, windowSize, sim, pairedSites1, gapCountSum, pairedSites2, windowSize, relaxed, false, permutations));
         }
         System.out.println("here");
         try {
             List<Output> outputs = processInputs(inputs);
-            for(Output out : outputs)
-            {
+            for (Output out : outputs) {
                 pvals[out.i] = out.pval;
             }
         } catch (InterruptedException ex) {
@@ -699,18 +720,20 @@ public class StructureAlign {
         public int startPos;
         public int length;
         public double sim;
-        public int[] pairedSites1;
+        public int[] pairedSites1;        
+        public int [] gapCountSum;
         public int[] pairedSites2;
         public int windowSize;
         public boolean relaxed;
         public boolean slidingSim;
         public int permutations;
 
-        public Input(int startPos, int length, double sim, int[] pairedSites1, int[] pairedSites2, int windowSize, boolean relaxed, boolean slidingSim, int permutations) {
+        public Input(int startPos, int length, double sim, int[] pairedSites1, int [] gapCountSum, int[] pairedSites2, int windowSize, boolean relaxed, boolean slidingSim, int permutations) {
             this.startPos = startPos;
             this.length = length;
             this.sim = sim;
             this.pairedSites1 = pairedSites1;
+            this.gapCountSum = gapCountSum;
             this.pairedSites2 = pairedSites2;
             this.windowSize = windowSize;
             this.relaxed = relaxed;
@@ -738,7 +761,7 @@ public class StructureAlign {
                 public Output call() throws Exception {
                     Output output = new Output();
                     output.i = input.startPos;
-                    output.pval = permutationTest(input.startPos, input.length, input.sim, input.pairedSites1, input.pairedSites2, input.windowSize, input.relaxed, input.slidingSim, input.permutations);
+                    output.pval = permutationTest(input.startPos, input.length, input.sim, input.pairedSites1, input.gapCountSum, input.pairedSites2, input.windowSize, input.relaxed, input.slidingSim, input.permutations);
                     return output;
                 }
             };

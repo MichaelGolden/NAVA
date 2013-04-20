@@ -1,6 +1,7 @@
 package nava.structurevis.data;
 
 import java.io.Serializable;
+import nava.utils.RNAFoldingTools;
 
 /**
  * Class that represents a substructure
@@ -28,21 +29,11 @@ public class Substructure implements Serializable {
     {
         this.startPosition = startPosition;
         this.length = pairedSites.length;
-        this.pairedSites = new int[length];
+        this.pairedSites = pairedSites;
     }
 
     public String getDotBracketString() {
-        String pairString = "";
-        for (int i = 0; i < length; i++) {
-            if (pairedSites[i] == 0) {
-                pairString += ".";
-            } else if (i+1 < pairedSites[i]) {
-                pairString += "(";
-            } else {
-                pairString += ")";
-            }
-        }
-        return pairString;
+        return RNAFoldingTools.getDotBracketStringFromPairedSites(pairedSites);
     }
 
     /**

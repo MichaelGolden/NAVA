@@ -291,6 +291,7 @@ public class StructureVisController implements SafeListListener, ProjectView {
     }
 
     public Mapping createMapping(MappingSource a, MappingSource b, int select, ProcessReference processReference) {
+        //System.out.println("AFJAFK(#32");
         ArrayList<String> sequencesA = new ArrayList<>();
         ArrayList<String> sequencesNamesA = new ArrayList<>();
         ArrayList<String> sequencesB = new ArrayList<>();

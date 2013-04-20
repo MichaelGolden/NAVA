@@ -157,7 +157,7 @@ public class RankingAnalyses {
         NHistogramClass substructureHist = new NHistogramClass("Substructure #" + structureNo, Color.green, pairedValues);
         NHistogramClass fullHist = new NHistogramClass("Full sequence", Color.red, unpairedValues);
         r.nhist = new NHistogram(dataOverlay1D.minValue, dataOverlay1D.maxValue, 30, dataOverlay1D.dataTransform);
-        r.nhist.title = "Histograms comparing the " + dataOverlay1D.title + " distributions for " + "paired nucleotides and unpaired nucleotides  ("+(substructure.startPosition)+"-"+(substructure.startPosition+substructure.length)+").";
+        r.nhist.title = "Histograms comparing the " + dataOverlay1D.title + " distributions for " + "paired nucleotides and unpaired nucleotides  (" + (substructure.startPosition) + "-" + (substructure.startPosition + substructure.length) + ").";
         r.nhist.add(substructureHist);
         r.nhist.add(fullHist);
         r.nhist.calculate();
@@ -199,7 +199,7 @@ public class RankingAnalyses {
         NHistogramClass substructureHist = new NHistogramClass("Paired sites" + structureNo, Color.green, pairedValues);
         NHistogramClass fullHist = new NHistogramClass("Unpaired sites", Color.red, unpairedValues);
         r.nhist = new NHistogram(dataOverlay2D.minValue, dataOverlay2D.maxValue, 30, dataOverlay2D.dataTransform);
-        r.nhist.title = "Histograms comparing the " + dataOverlay2D.title + " distributions for " + "paired nucleotides and unpaired nucleotides ("+(substructure.startPosition)+"-"+(substructure.startPosition+substructure.length)+").";
+        r.nhist.title = "Histograms comparing the " + dataOverlay2D.title + " distributions for " + "paired nucleotides and unpaired nucleotides (" + (substructure.startPosition) + "-" + (substructure.startPosition + substructure.length) + ").";
         r.nhist.add(substructureHist);
         r.nhist.add(fullHist);
         r.nhist.calculate();
@@ -338,7 +338,7 @@ public class RankingAnalyses {
     double[] fullGenomeValuesPaired = null;
     double[] fullGenomeValuesUnparedaired = null;
 
-    public static Ranking rankSequenceData2D(DataOverlay2D dataOverlay2D, Mapping mapping, Substructure substructure, int[] pairedSites, boolean paired, boolean unpaired, ArrayList<Double> fullGenomeList, double [] fullGenomeValues, NHistogramClass fullHist, int structureNo) throws IOException {
+    public static Ranking rankSequenceData2D(DataOverlay2D dataOverlay2D, Mapping mapping, Substructure substructure, int[] pairedSites, boolean paired, boolean unpaired, ArrayList<Double> fullGenomeList, double[] fullGenomeValues, NHistogramClass fullHist, int structureNo) throws IOException {
         ArrayList<Double> substructureList = getValues(dataOverlay2D, mapping, substructure, pairedSites, paired, unpaired);
 
         /*
@@ -390,8 +390,6 @@ public class RankingAnalyses {
         return r;
     }
 
-    
-
     public static double getAverage(ArrayList<Double> list) {
         double sum = 0;
         for (int i = 0; i < list.size(); i++) {
@@ -400,8 +398,8 @@ public class RankingAnalyses {
 
         return sum / (double) list.size();
     }
-    
-    public static double getAverage(double [] list) {
+
+    public static double getAverage(double[] list) {
         double sum = 0;
         for (int i = 0; i < list.length; i++) {
             sum += list[i];
@@ -422,6 +420,10 @@ public class RankingAnalyses {
     }
 
     public static double getMedian(ArrayList<Double> list) {
+        if (list.size() == 1) {
+            return list.get(0);
+        }
+
         if (list.size() % 2 == 1) {
             return select(list, list.size() / 2 + 1);
         } else {
@@ -431,16 +433,13 @@ public class RankingAnalyses {
             return (x.doubleValue() + y.doubleValue()) / 2;
         }
     }
-    
-     public static double getPercentile(ArrayList<Double> list, double p) {
-         if(list.size() == 1)
-         {
-             return list.get(0);
-         }
-         else
-         {
-            return select(list, (int)Math.round(p*(double)list.size()));
-         }
+
+    public static double getPercentile(ArrayList<Double> list, double p) {
+        if (list.size() == 1) {
+            return list.get(0);
+        } else {
+            return select(list, (int) Math.round(p * (double) list.size()));
+        }
     }
 
     public static double getMedian2(ArrayList<Double> list) {

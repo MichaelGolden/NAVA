@@ -61,8 +61,10 @@ public class NucleotideComposition extends Overlay implements Serializable {
             }
             else
             {                
-               // System.out.println(mapping);
-                System.out.println(structurePos+"\t"+mappedPos+"\t"+frequencyComposition.length);
+                //System.out.println(mapping);
+                //System.err.println(structurePos+"\t"+mappedPos+"\t"+frequencyComposition.length);
+               // System.err.println(">"+structurePos+"\t"+mapping.aToB(structurePos)+"\t"+frequencyComposition.length);
+                //System.out.println(mapping.mapString());
             }
         }
         return null;

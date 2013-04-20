@@ -5,6 +5,7 @@
 package nava.experimental;
 
 import java.io.*;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,6 +17,7 @@ import nava.ranking.RankingAnalyses;
 import nava.ranking.StatUtils;
 import nava.structure.StructureAlign;
 import nava.utils.Pair;
+import nava.utils.RNAFoldingTools;
 
 /**
  *
@@ -25,66 +27,100 @@ public class PairwiseStructureComparison {
 
     public void runComparison() {
         try {
-            int permutations = 2000;
+            int permutations = 500;
             int windowSize = 75;
-            
-            /*File outFile = new File("C:/dev/thesis/dengue/dengue_permutations2.txt");
-            String[] categories = {"dengue1", "dengue2", "dengue3", "dengue4"};
+
+            //File outFile = new File("C:/dev/thesis/dengue/dengue_permutations2.txt");
+            // String[] categories = {"dengue1", "dengue2", "dengue3", "dengue4"};
+
+            //File outFile = new File("C:/dev/thesis/westnile/westnile_permutations.txt");
+            //  String[] categories = {"westnile"};
+            //File outFile = new File("C:/dev/thesis/westnile_dengue_permutations_gap.txt");
+            //String[] categories = {"westnile", "dengue1", "dengue2", "dengue3", "dengue4"};
+            //File structureAlignment = new File("C:/dev/thesis/structure_dengue_westnile_align_400.dbn");
+
+            //File outFile = new File("C:/dev/thesis/jev_westnile_permutations3.txt");
+            //File outFile = new File("C:/dev/thesis/jev_westnile_permutations3.txt");
+            // String[] categories = {"westnile", "jev"};
+            // File structureAlignment = new File("C:/dev/thesis/structure_jev_westnile_aligned.dbn");
+
+            //File outFile = new File("C:/dev/thesis/hcv_westnile_permutations2.txt");
+            //String[] categories = {"westnile", "hcv1a", "hcv1b", "hcv2a", "hcv2b","hcv3","hcv4", "hcv6"};
+
+            File outFile = new File("C:/dev/thesis/hiv_full/hiv_not_siv_permutations2.txt");
+            String[] categories = {"hiv1b", "hiv1c", "hiv1d", "hiv1g", "hiv1o", "hiv2"};
+            File structureAlignment = new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.dbn");
+
             System.out.println(combinations(categories));
-            ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(new File("C:/dev/thesis/dengue-alignment.dbn"), DataType.FileFormat.VIENNA_DOT_BRACKET);
+            ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(structureAlignment, DataType.FileFormat.VIENNA_DOT_BRACKET);
 
             ArrayList<Combination> combinations = combinations(categories);
             for (int i = 0; i < combinations.size(); i++) {
                 Combination combination = combinations.get(i);
-                if (combination.combination.size() <= 2 || combination.combination.size() == categories.length) {
-                } else {
-                    combinations.remove(i);
-                    i--;
-                }
-            }*/
-            
-           /* File outFile = new File("C:/dev/thesis/hiv_full/hiv_full_permutations_75.txt");
-            String[] categories = {"hiv1b", "hiv1c", "hiv1d", "hiv1g", "hiv1o", "hiv2", "siv"};
-            String[] categories_hiv1 = {"hiv1b", "hiv1c", "hiv1d", "hiv1g", "hiv1o"};
-            String[] categories_hiv1_hiv2 = {"hiv1b", "hiv1c", "hiv1d", "hiv1g", "hiv1o", "hiv2"};
-            System.out.println(combinations(categories));
-            ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(new File("C:/dev/thesis/hiv_full/hiv_full_aligned.dbn"), DataType.FileFormat.VIENNA_DOT_BRACKET);
-
-            ArrayList<Combination> combinations = combinations(categories);
-            for (int i = 0; i < combinations.size(); i++) {
-                Combination combination = combinations.get(i);
-                if (combination.combination.size() <= 2 || combination.combination.size() == categories.length) {
-                } else {
-                    combinations.remove(i);
-                    i--;
-                }
-            }
-            combinations.add(new Combination(categories_hiv1));
-            combinations.add(new Combination(categories_hiv1_hiv2));*/
-            
-            File outFile = new File("C:/dev/thesis/hcv/hcv_75_2.txt");
-            String[] categories = {"hcv1a", "hcv1b", "hcv2a", "hcv2b", "hcv3", "hcv4", "hcv6"};
-            //String[] categories_hiv1 = {"hiv1b", "hiv1c", "hiv1d", "hiv1g", "hiv1o"};
-           // String[] categories_hiv1_hiv2 = {"hiv1b", "hiv1c", "hiv1d", "hiv1g", "hiv1o", "hiv2"};
-            System.out.println(combinations(categories));
-            ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.dbn"), DataType.FileFormat.VIENNA_DOT_BRACKET);
-
-            ArrayList<Combination> combinations = combinations(categories);
-            for (int i = 0; i < combinations.size(); i++) {
-                Combination combination = combinations.get(i);
-                if (combination.combination.size() <= 2 || combination.combination.size() == categories.length) {
+                // combination.combination.size() == 1 ||
+                if (combination.combination.size() == categories.length) {
                 } else {
                     combinations.remove(i);
                     i--;
                 }
             }
 
-            
-            ArrayList<String> pairMustContain = new ArrayList<>();
-            //pairMustContain.add("siv");
-            pairMustContain.add("hcv3");
-            
-            postAnalysis(outFile, outFile, categories, combinations, structureData, windowSize, pairMustContain);
+            /*
+             * File outFile = new
+             * File("C:/dev/thesis/hiv_full/hiv_full_permutations_75.txt");
+             * String[] categories = {"hiv1b", "hiv1c", "hiv1d", "hiv1g",
+             * "hiv1o", "hiv2", "siv"}; String[] categories_hiv1 = {"hiv1b",
+             * "hiv1c", "hiv1d", "hiv1g", "hiv1o"}; String[]
+             * categories_hiv1_hiv2 = {"hiv1b", "hiv1c", "hiv1d", "hiv1g",
+             * "hiv1o", "hiv2"}; System.out.println(combinations(categories));
+             * ArrayList<SecondaryStructureData> structureData =
+             * FileImport.loadStructures(new
+             * File("C:/dev/thesis/hiv_full/hiv_full_aligned.dbn"),
+             * DataType.FileFormat.VIENNA_DOT_BRACKET);
+             *
+             * ArrayList<Combination> combinations = combinations(categories);
+             * for (int i = 0; i < combinations.size(); i++) { Combination
+             * combination = combinations.get(i); if
+             * (combination.combination.size() <= 2 ||
+             * combination.combination.size() == categories.length) { } else {
+             * combinations.remove(i); i--; } } combinations.add(new
+             * Combination(categories_hiv1)); combinations.add(new
+             * Combination(categories_hiv1_hiv2));
+             */
+
+            /*
+             * File outFile = new File("C:/dev/thesis/hcv/hcv_75_2.txt");
+             * String[] categories = {"hcv1a", "hcv1b", "hcv2a", "hcv2b",
+             * "hcv3", "hcv4", "hcv6"}; //String[] categories_hiv1 = {"hiv1b",
+             * "hiv1c", "hiv1d", "hiv1g", "hiv1o"}; // String[]
+             * categories_hiv1_hiv2 = {"hiv1b", "hiv1c", "hiv1d", "hiv1g",
+             * "hiv1o", "hiv2"}; System.out.println(combinations(categories));
+             * ArrayList<SecondaryStructureData> structureData =
+             * FileImport.loadStructures(new
+             * File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.dbn"),
+             * DataType.FileFormat.VIENNA_DOT_BRACKET);
+             *
+             * ArrayList<Combination> combinations = combinations(categories);
+             * for (int i = 0; i < combinations.size(); i++) { Combination
+             * combination = combinations.get(i); if
+             * (combination.combination.size() <= 2 ||
+             * combination.combination.size() == categories.length) { } else {
+             * combinations.remove(i); i--; } }
+             */
+
+
+
+            //ArrayList<String> pairMustContain = new ArrayList<>();
+            //pairMustContain.add("");
+            //pairMustContain.add("dengue4");
+            ////pairMustContain.add("siv");
+            //pairMustContain.add("hcv6");
+            // pairMustContain.add("westnile");
+            for (int i = 0; i < categories.length; i++) {
+                ArrayList<String> pairMustContain = new ArrayList<>();
+                pairMustContain.add(categories[i]);
+                postAnalysis(outFile, outFile, categories, combinations, structureData, windowSize, pairMustContain);
+            }
             System.exit(0);
             //ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(new File("C:/dev/thesis/dengue2/50/dengue2_all_50_aligned_partial_structurealign.fas.dbn"), DataType.FileFormat.VIENNA_DOT_BRACKET);
             //ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(new File("C:/dev/thesis/full-alignment.dbn"), DataType.FileFormat.VIENNA_DOT_BRACKET);
@@ -124,12 +160,17 @@ public class PairwiseStructureComparison {
                 if (i == j || pairwiseComparisons.contains(new Pair<>(s1, s2))) {
                     continue;
                 }
+
+                boolean balance = false;
+
                 // System.out.println();
                 //System.out.println(catList+"\t"+s1.organism);
                 int cati = catList.indexOf(s1.organism);
                 int catj = catList.indexOf(s2.organism);
-                if (catPerc[cati] > catFrac || catPerc[catj] > catFrac) { // balance for the fact that we have an uneven number of sequences from each category
-                    continue;
+                if (balance) {
+                    if (catPerc[cati] > catFrac || catPerc[catj] > catFrac) { // balance for the fact that we have an uneven number of sequences from each category
+                        continue;
+                    }
                 }
 
                 catCount[cati]++;
@@ -149,7 +190,7 @@ public class PairwiseStructureComparison {
                 //double[] pairwiseSimilarity = StructureAlign.slidingWeightedMountainSimilarity(s1.pairedSites, s2.pairedSites, windowSize, true);
 
                 // double[] pairwiseSimilarity = StructureAlign.permutationTestSliding(s1.pairedSites, s2.pairedSites, windowSize, true, -1);
-                double[] pairwiseSimilarity = sal.parallelizedPermutationTestSliding(s1.pairedSites, s2.pairedSites, windowSize, true, permutations);
+                double[] pairwiseSimilarity = sal.parallelizedPermutationTestSliding(s1.pairedSites, s2.pairedSites, s1.sequence, windowSize, true, permutations);
                 String[] split1 = s1.title.split("_");
                 String[] split2 = s2.title.split("_");
                 String o1 = split1[split1.length - 1];
@@ -281,6 +322,13 @@ public class PairwiseStructureComparison {
     }
 
     public static ArrayList<Combination> combinations(String[] s) {
+        /*
+         * String [] s = new String[t.length*2]; for(int i = 0 ; i < t.length ;
+         * i++) { s[i] = t[i]; }
+         *
+         * for(int i = t.length ; i < s.length ; i++) { s[i] = t[i-t.length]; }
+         */
+
         ArrayList<Combination> possibilities = new ArrayList<>();
 
         for (int i = 1; i < Math.pow(2, s.length); i++) {
@@ -309,6 +357,17 @@ public class PairwiseStructureComparison {
 
     public void postAnalysis(File inFile, File outFile, String[] categories, ArrayList<Combination> combinations, ArrayList<SecondaryStructureData> structureData, int windowSize, ArrayList<String> pairMustContain) {
         double[] gaps = getPercentGaps(structureData, windowSize);
+        double gapPerc = 0.2;
+
+        String mustHave = "";
+
+        if (pairMustContain.size() > 0) {
+            mustHave = "_pairmusthave";
+            for (int i = 0; i < pairMustContain.size(); i++) {
+                mustHave += "_" + pairMustContain.get(i);
+            }
+        }
+
         for (Combination combination : combinations) {
             boolean mayContinue = true;
             for (int i = 0; i < pairMustContain.size(); i++) {
@@ -320,13 +379,23 @@ public class PairwiseStructureComparison {
                 continue;
             }
 
+            ArrayList<Integer> structures = new ArrayList<>();
             try {
                 BufferedReader buffer = new BufferedReader(new FileReader(inFile));
+                BufferedWriter writer2 = new BufferedWriter(new FileWriter(outFile.getAbsolutePath() + "_" + combination + mustHave + "_structures.txt"));
+                double totalPairs = 0;
                 String textline = null;
-                ArrayList<ArrayList<Double>> data = new ArrayList<>();
+                ArrayList<double[]> data = new ArrayList<>();
+                int dataLength = -1;
+                long startTime = System.currentTimeMillis();
                 while ((textline = buffer.readLine()) != null) {
                     String[] split = textline.split("(\\s)+");
-                    ArrayList<Double> values = new ArrayList<>();
+                    //ArrayList<Double> values = new ArrayList<>();
+                    dataLength = dataLength == -1 ? split.length - 2 : dataLength;
+                    double[] values = new double[dataLength];
+
+                    int x = Integer.parseInt(split[0].split("_")[0]);
+                    int y = Integer.parseInt(split[0].split("_")[1]);
 
                     String o1 = split[1].split("_")[0];
                     String o2 = split[1].split("_")[1];
@@ -347,37 +416,53 @@ public class PairwiseStructureComparison {
                     if (combination.contains(o1, o2)) {
 
                         for (int i = 2; i < split.length; i++) {
-                            values.add(Double.parseDouble(split[i]));
+                            values[i - 2] = Double.parseDouble(split[i]);
                         }
-                        if (data.size() == 0 || data.get(0).size() == values.size()) // if last line too short because of file I/O do not add
+                        if (dataLength == split.length - 2) // if last line too short because of file I/O do not add
                         {
                             data.add(values);
                         }
+
+                        writer2.write(RNAFoldingTools.getDotBracketStringFromPairedSites(structureData.get(x).pairedSites));
+                        writer2.newLine();
+                        writer2.write(RNAFoldingTools.getDotBracketStringFromPairedSites(structureData.get(y).pairedSites));
+                        writer2.newLine();
+
+                        System.out.println(combination);
+                        System.out.println(o1 + "\t" + x);
+                        System.out.println(o2 + "\t" + y);
+                        structures.add(x);
+                        structures.add(y);
+
+                        if (data.size() >= 10000) {
+                            break;
+                        }
                     }
                 }
+                long endTime = System.currentTimeMillis();
+                double elapsedTime = (double) (endTime - startTime) / 1000.0;
+                System.out.println("Elapsed time = " + data.size() + "\t" + elapsedTime);
                 buffer.close();
                 System.out.println(combination + "\t" + data.size());
 
+                ArrayList<Double> medianPvals = new ArrayList<>();
+
+
                 if (data.size() > 0) {
-                    String mustHave = "";
-                    if (pairMustContain.size() > 0) {
-                        mustHave = "_pairmusthave";
-                        for (int i = 0; i < pairMustContain.size(); i++) {
-                            mustHave += "_" + pairMustContain.get(i);
-                        }
-                    }
                     BufferedWriter writer = new BufferedWriter(new FileWriter(outFile.getAbsolutePath() + "_" + combination + mustHave));
-                    for (int i = 0; i < data.get(0).size(); i++) {
+                    for (int i = 0; i < data.get(0).length; i++) {
                         ArrayList<Double> valuesAtPos = new ArrayList<>();
                         for (int j = 0; j < data.size(); j++) {
-                            valuesAtPos.add(data.get(j).get(i));
+                            valuesAtPos.add(data.get(j)[i]);
                         }
+
                         double medianPval = RankingAnalyses.getMedian(valuesAtPos);
                         double percentile25 = StatUtils.getInvCDF(RankingAnalyses.getPercentile(valuesAtPos, 0.25) / 2, true);
                         double percentile75 = StatUtils.getInvCDF(RankingAnalyses.getPercentile(valuesAtPos, 0.75) / 2, true);
                         double percentile90 = StatUtils.getInvCDF(RankingAnalyses.getPercentile(valuesAtPos, 0.90) / 2, true);
                         double zscore = StatUtils.getInvCDF(medianPval / 2, true);
-                        writer.write(i + "\t" + gaps[i] + "\t" + medianPval + "\t" + zscore + "\t" + (gaps[i] >= 0.2 ? "1\t0\t0\t0\t0" : medianPval + "\t" + zscore + "\t" + percentile25 + "\t" + percentile75 + "\t" + percentile90));
+                        medianPvals.add(medianPval);
+                        writer.write(i + "\t" + gaps[i] + "\t" + medianPval + "\t" + zscore + "\t" + (gaps[i] >= gapPerc ? "1\t0\t0\t0\t0" : medianPval + "\t" + zscore + "\t" + percentile25 + "\t" + percentile75 + "\t" + percentile90));
                         //writer.write(i + "\t" + gaps[i] + "\t" + medianPval + "\t" + zscore + "\t" + (gaps[i] >= 0.2 ? "1\t0" : medianPval + "\t" + zscore));
 
                         writer.newLine();
@@ -386,9 +471,208 @@ public class PairwiseStructureComparison {
                     }
                     writer.close();
                 }
+
+                boolean[] inWindow = new boolean[structureData.get(0).pairedSites.length];
+                for (int i = 0; i < medianPvals.size(); i++) {
+                    if (gaps[i] < gapPerc && medianPvals.get(i) <= 0.05) {
+                        for (int j = i; j < i + windowSize; j++) {
+                            inWindow[j] = true;
+                        }
+                    }
+                }
+                for (int i = 0; i < medianPvals.size(); i++) {
+                    if (gaps[i] >= gapPerc) {
+                        writer2.write('-');
+                    } else if (medianPvals.get(i) <= 0.05) {
+                        writer2.write('*');
+                    } else {
+                        writer2.write(' ');
+                    }
+                }
+                writer2.newLine();
+
+                for (int i = 0; i < inWindow.length; i++) {
+                    if (inWindow[i]) {
+                        writer2.write('*');
+                    } else {
+                        writer2.write(' ');
+                    }
+                }
+                writer2.newLine();
+
+                int start = -1;
+                int end = -1;
+                ArrayList<Substructure> substructures = new ArrayList<>();
+                for (int i = 0; i < inWindow.length; i++) {
+                    if (inWindow[i] && (i == 0 || !inWindow[i - 1])) {
+                        start = i;
+                    }
+
+                    if (inWindow[i] && (i == inWindow.length - 1 || !inWindow[i + 1])) {
+                        end = i;
+                        int length = end - start + 1;
+                        substructures.add(new Substructure(start, length));
+                        //System.out.println(start+"-"+end);
+                    }
+                }
+
+
+                BufferedWriter substructureWriter = new BufferedWriter(new FileWriter(outFile.getAbsolutePath() + "_" + combination + mustHave + ".substructures"));
+                for (Substructure substructure : substructures) {
+                    ArrayList<Double> pvalues = new ArrayList<>();
+                    for (int i = substructure.start; i < substructure.start + substructure.length - windowSize + 1; i++) {
+                        pvalues.add(medianPvals.get(i));
+                    }
+                    int l = Math.max(0, (1000 - substructure.length) / 2);
+                    System.out.println("l=" + l + "\t" + substructure.start + "\t" + substructure.length);
+                    substructure.startMatrix = Math.max(0, substructure.start - l);
+                    int endPos = Math.min(structureData.get(0).pairedSites.length, substructure.startMatrix + substructure.length + 2 * l);
+                    substructure.matrixLength = endPos - substructure.startMatrix;
+
+                    substructure.medianPvalue = RankingAnalyses.getMedian(pvalues);
+
+                    substructure.matrix = new double[substructure.matrixLength][substructure.matrixLength];
+                    for (int a = 0; a < structures.size(); a++) {
+                        SecondaryStructureData structure = structureData.get(structures.get(a));
+                        for (int x = 0; x < structure.pairedSites.length; x++) {
+                            int y = structure.pairedSites[x] - 1;
+                            if (x - substructure.startMatrix >= 0 && x - substructure.startMatrix < substructure.matrixLength) {
+                                if (y - substructure.startMatrix >= 0 && y - substructure.startMatrix < substructure.matrixLength) {
+
+                                    substructure.matrix[x - substructure.startMatrix][y - substructure.startMatrix]++;
+                                    //System.out.println(x - substructure.start+"\t"+(y - substructure.start)+"\t"+substructure.matrix[x - substructure.start][y - substructure.start]);
+                                }
+                            }
+                        }
+                    }
+                    DecimalFormat df = new DecimalFormat("0.000");
+                    double t = structures.size();
+                    for (int x = 0; x < substructure.matrix.length; x++) {
+                        for (int y = 0; y < substructure.matrix[0].length; y++) {
+                            substructure.matrix[x][y] /= t;
+                        }
+                    }
+                    substructure.pairedSites = RNAFoldingTools.getPosteriorDecodingConsensusStructure(substructure.matrix);
+                    substructure.pairedSites = StructureAlign.getSubstructure(substructure.pairedSites, substructure.start - substructure.startMatrix, substructure.length);
+                    System.out.println(substructure.toString());
+                    substructureWriter.write(substructure.toString() + "\n");
+                }
+                substructureWriter.close();
+
+
+                BufferedWriter matrixWriter = new BufferedWriter(new FileWriter(outFile.getAbsolutePath() + "_" + combination + mustHave + ".matrix"));
+                String structure = "";
+                double[] pairingProbability = new double[structureData.get(0).pairedSites.length];
+                for (int i = 0; i < structureData.get(0).pairedSites.length; i++) {
+                    for (Substructure substructure : substructures) {
+                        if (substructure.start == i) {
+                            structure += RNAFoldingTools.getDotBracketStringFromPairedSites(substructure.pairedSites);
+
+                            for (int j = i; j < i + substructure.length; j++) {
+                                pairingProbability[j] = substructure.pairingProbability[j - i];
+                            }
+                            i += substructure.length;
+
+                            for (int x = substructure.start - substructure.startMatrix; x < substructure.start - substructure.startMatrix + substructure.length; x++) {
+                                for (int y = substructure.start - substructure.startMatrix; y < substructure.start - substructure.startMatrix + substructure.length; y++) {
+                                    //pairingProbability[x - (substructure.start - substructure.startMatrix)] += substructure.matrix[x][y];
+                                    if (substructure.matrix[x][y] != 0) {
+                                        matrixWriter.write((x + substructure.startMatrix) + "," + (y + substructure.startMatrix) + "," + substructure.matrix[x][y]);
+                                        matrixWriter.newLine();
+                                    }
+                                }
+                            }
+
+
+                            /*
+                             * for (int x = 0; x < substructure.length; x++) {
+                             * for (int y = 0; y < substructure.length; y++) {
+                             * if (substructure.matrix[x][y] != 0) {
+                             * matrixWriter.write((substructure.start + x) + ","
+                             * + (substructure.start + y) + "," +
+                             * substructure.matrix[x][y]);
+                             * matrixWriter.newLine(); } } }
+                             */
+                        }
+
+                    }
+                    structure += "#";
+                }
+
+                matrixWriter.close();
+
+
+                System.out.println(structure);
+                writer2.write(structure);
+                writer2.newLine();
+                writer2.close();
+
+                BufferedWriter csvWriter = new BufferedWriter(new FileWriter(outFile.getAbsolutePath() + "_" + combination + mustHave + ".csv"));
+                csvWriter.write("Position,Probability\n");
+                for (int i = 0; i < pairingProbability.length; i++) {
+                    csvWriter.write((i + 1) + "," + pairingProbability[i] + "\n");
+                }
+                csvWriter.close();
+
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
+        }
+    }
+
+    public static class Substructure {
+
+        int start;
+        int startMatrix;
+        int length;
+        int matrixLength;
+        double[][] matrix;
+        int[] pairedSites;
+        double medianPvalue;
+        double[] pairingProbability;
+        DecimalFormat df = new DecimalFormat("0.000");
+
+        public Substructure(int start, int length) {
+            this.start = start;
+            this.length = length;
+        }
+
+        public void calculatePairingProbability(double[][] matrix) {
+            pairingProbability = new double[length];
+
+            /*
+             * for (int i = start - startMatrix; i < start - startMatrix +
+             * length; i++) { for (int j = start - startMatrix; j < start -
+             * startMatrix + length; j++) { pairingProbability[i - (start -
+             * startMatrix)] += matrix[i][j]; } }
+             */
+
+            for (int i = 0; i < matrixLength; i++) {
+                for (int j = 0; j < matrixLength; j++) {
+                    if (i - (start - startMatrix) >= 0 && i - (start - startMatrix) < length) {
+                        pairingProbability[i - (start - startMatrix)] += matrix[i][j];
+                    }
+                }
+            }
+        }
+
+        @Override
+        public String toString() {
+            String ret = "";
+            ret = start + " - " + (start + length) + " (" + medianPvalue + ")" + " : " + RNAFoldingTools.getDotBracketStringFromPairedSites(pairedSites);
+            ret += "\n";
+            calculatePairingProbability(matrix);
+            String dbn = RNAFoldingTools.getDotBracketStringFromPairedSites(pairedSites);
+            for (int i = 0; i < pairingProbability.length; i++) {
+                int y = pairedSites[i];
+                double p = 0;
+                if (y != 0) {
+
+                    p = matrix[i + (start - startMatrix)][y - 1 + (start - startMatrix)];
+                }
+                System.out.println(i + "\t" + dbn.charAt(i) + "\t" + df.format(p) + "\t" + df.format(pairingProbability[i]));
+            }
+            return ret;
         }
     }
 

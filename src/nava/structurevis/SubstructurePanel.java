@@ -182,6 +182,11 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         jLabel2.setText("Substructure");
 
         substructureComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        substructureComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                substructureComboBoxActionPerformed(evt);
+            }
+        });
 
         jLabel3.setText("Limit nearby 2D interactions");
 
@@ -296,6 +301,11 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
             this.viewToggleButton.setText("Full view");
         }
     }//GEN-LAST:event_viewToggleButtonActionPerformed
+
+    private void substructureComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_substructureComboBoxActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_substructureComboBoxActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel distanceLabel;
     private javax.swing.JSlider distanceSlider;
@@ -435,6 +445,9 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
 
     @Override
     public void nucleotideSourceChanged(NucleotideComposition nucleotideSource) {
+        
+        System.out.println("NUCLEOTIDE SOURCE HAS CHANGED REDRAW");
+         System.out.println(nucleotideSource.toString());
         structureDrawPanel.redraw();
         fullGenomeDrawPanel.redraw();
     }

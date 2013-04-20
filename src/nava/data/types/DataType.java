@@ -56,6 +56,7 @@ public class DataType implements Serializable {
                     break;
                 case MATRIX:
                     s = "Matrix";
+                    break;
                 case PHYLOGENETIC_TREE:
                     s = "Phylogenetic tree";
                     break;

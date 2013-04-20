@@ -35,6 +35,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import nava.structure.StructureAlign;
 import nava.ui.MainFrame;
 import nava.utils.ColorUtils;
 import nava.utils.GraphicsUtils;
@@ -123,6 +124,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
     ///JPopupMenu relayoutStructureBondPopupMenu = new JPopupMenu();
     JMenuItem redrawStructureItem = new JMenuItem("Re-draw structure");
     JMenuItem resetStructureItem = new JMenuItem("Reset structure");
+    JMenuItem openSubstructureItem = new JMenuItem("Open substructure");
     SubstructureModel subtructureModel = null;
 
     public void setModel(SubstructureModel substructureModel) {
@@ -196,6 +198,9 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
         disruptBondRedrawItem.addActionListener(this);
         disruptBondPopupMenu.add(disruptBondItem);
         disruptBondPopupMenu.add(disruptBondRedrawItem);
+        
+        openSubstructureItem.addActionListener(this);
+        popupMenu.add(openSubstructureItem);
 
     }
 
@@ -271,11 +276,6 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
 
     public void redraw() {
         repaint = true;
-        if(subtructureModel.data2D != null)
-        {
-            System.out.println("changed "+!subtructureModel.data2D.useLowerThreshold+"\t"+subtructureModel.data2D.thresholdMin+"\t"+!subtructureModel.data2D.useUpperThreshold+"\t"+subtructureModel.data2D.thresholdMax);
-        }
-        //((!subtructureModel.data2D.useLowerThreshold || p >= subtructureModel.data2D.thresholdMin) && (!subtructureModel.data2D.useUpperThreshold || p <= subtructureModel.data2D.thresholdMax))
         repaint();
     }
     double horizontalScale = 2.6;
@@ -291,6 +291,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
         }
 
         //np = mainapp.getStructureCoordinates(structure.getDotBracketString());
+        System.out.println("B "+structure.getDotBracketString());
         pairedSites = RNAFoldingTools.getPairedSitesFromDotBracketString(structure.getDotBracketString());
 
         edit = new SubstructureEdit(pairedSites);
@@ -528,12 +529,12 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                             for (int k = 0; k < 4; k++) {
                                 fa[k] = fa[k] / 2;
                             }
-                            pw.print(drawSequenceLogoSVG("logo_" + (subtructureModel.substructure.startPosition + i), nucleotidePositions[i].getX(), nucleotidePositions[i].getY() - (nucleotideDiameter / 2) + 4, nucleotideDiameter, nucleotideDiameter - 8, fa, bestColor));
+                            pw.print(drawSequenceLogoSVG("logo_" + (subtructureModel.substructure.startPosition + i), nucleotidePositions[i].getX(), nucleotidePositions[i].getY() - (nucleotideDiameter / 2) + 3, nucleotideDiameter, nucleotideDiameter - 8, fa, bestColor));
                         }
                     } else if (subtructureModel.nucleotideCompositionType == NucleotideComposition.Type.FREQUENCY) {
                         double[] nucfa = subtructureModel.nucleotideSource.getMappedFrequencyAtNucleotide(subtructureModel.nucleotideMapping, structurePos);
                         if (nucfa != null) {
-                            pw.print(drawSequenceLogoSVG("logo_" + (subtructureModel.substructure.startPosition + i), nucleotidePositions[i].getX(), nucleotidePositions[i].getY() - (nucleotideDiameter / 2) + 4, nucleotideDiameter, nucleotideDiameter - 8, nucfa, bestColor));
+                            pw.print(drawSequenceLogoSVG("logo_" + (subtructureModel.substructure.startPosition + i), nucleotidePositions[i].getX(), nucleotidePositions[i].getY() - (nucleotideDiameter / 2) + 3, nucleotideDiameter, nucleotideDiameter - 8, nucfa, bestColor));
                         }
                     }
                 }
@@ -584,7 +585,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
 
-        double fontHeight = 100;
+        double fontHeight = 32;
         double scale = (height / fontHeight);
         double base = y;
         for (int i = 0; i < h.length; i++) {
@@ -616,16 +617,17 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             //base += g.getFontMetrics(tallerFont).getStringBounds(b, g).getHeight() - g.getFontMetrics().getDescent();
             //g.drawString(a, (float) (x + (-g.getFontMetrics().getStringBounds(a, g).getWidth() / 2)), (float) (base));
             base += fontHeightScale * scale * fontHeight;
+            
             if (!b.equals("X") && h[i] > 0) {
                 float xf = (float) x;
                 float yf = (float) (base);
                 xf /= scale;
                 yf /= fontHeightScale * scale;
-                pw.println("    <g transform=\"scale(" + scale + "," + fontHeightScale * scale + ")\">");
-                pw.print("        <text x=\"" + xf + "\" y=\"" + yf + "\" id=\"" + id + "_" + i + "\"  style=\"font-size:" + (int) fontHeight + "px;stroke:none;fill:" + GraphicsUtils.getRGBAString(textColor) + ";text-anchor:middle;\">");
+              //  pw.println("    <g transform=\"scale(" + scale + "," + fontHeightScale * scale + ")\">");
+                pw.print("        <text transform=\"scale(" + scale + "," + fontHeightScale * scale*1.1 + ")\" x=\"" + xf + "\" y=\"" + (yf/1.1) + "\" id=\"" + id + "_" + i + "\"  style=\"font-size:" + (int) (fontHeight)+";stroke:none;fill:" + GraphicsUtils.getRGBAString(textColor) + ";text-anchor:middle;\">");
                 pw.println("            <tspan id=\"base\">" + b + "</tspan>");
                 pw.println("</text>");
-                pw.println("    </g>");
+               // pw.println("    </g>");
             }
             //base += fontHeightScale*scale*100;
         }
@@ -725,7 +727,13 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                              * j <= structure.gapStartB) { shape = new
                              * Line2D.Double(nucleotidePositions[k],
                              * nucleotidePositions[l]); } else
-                             */ if (i <= structureMidpoint && j <= structureMidpoint) { // both on left side
+                             */ 
+                            if(subtructureModel.substructure.pairedSites[k] == l+1 )
+                            {
+                                shape = new Line2D.Double(nucleotidePositions[k], nucleotidePositions[l]);
+                            }
+                            else
+                            if (i <= structureMidpoint && j <= structureMidpoint) { // both on left side
                                 double x1p = Math.max(x1 - Math.abs((y1 - y2) / 2), 0);
                                 shape = new QuadCurve2D.Double(x1, y1, x1p, (y1 + y2) / 2, x2, y2);
                             } else if (i > structureMidpoint && j > structureMidpoint) { // both on right side
@@ -1685,8 +1693,21 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             if (n == JOptionPane.YES_OPTION) {
                 edit.reset();
             }
-        } else {
-            // else zoom levels
+        }
+        else
+        if(e.getSource().equals(this.openSubstructureItem))
+        {
+            OpenSubstructureDialog openSubstructureDialog = new OpenSubstructureDialog(MainFrame.self, true, subtructureModel.structureOverlay, subtructureModel.substructure);
+            GraphicsUtils.centerWindowOnWindow(openSubstructureDialog, MainFrame.self);
+            openSubstructureDialog.setVisible(true);            
+            int length = openSubstructureDialog.end - openSubstructureDialog.start + 1;
+            int [] substructurePairedSites = StructureAlign.getSubstructure(subtructureModel.structureOverlay.pairedSites, openSubstructureDialog.start-1, length);
+            //System.out.println("A "+RNAFoldingTools.getDotBracketStringFromPairedSites(substructurePairedSites));
+            Substructure substructure = new Substructure(openSubstructureDialog.start-1,substructurePairedSites);
+            this.openSubstructure(substructure);
+        }
+        else {
+            // else zoom rue
             for (int i = 0; i < zoomLevels.length; i++) {
                 if (e.getSource().equals(zoomMenuItems[i])) {
                     currentZoomIndex = i;

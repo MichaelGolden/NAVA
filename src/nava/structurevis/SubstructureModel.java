@@ -53,6 +53,8 @@ public class SubstructureModel implements Serializable {
      * double thresholdMin1D; double thresholdMax1D; double thresholdMin2D;
      * double thresholdMax2D;
      */
+    
+    
     transient StructureVisController structureVisController;
 
     public SubstructureModel(StructureVisController structureVisController) {
@@ -258,7 +260,7 @@ public class SubstructureModel implements Serializable {
 
                         nucleotideMapping = structureVisController.getMapping(structureOverlay.mappingSource, nucleotideOverlay.mappingSource);
                         fireNucleotideOverlayChanged(nucleotideOverlay);
-
+                        
                         MainFrame.progressBarMonitor.set(false, ProgressBarMonitor.INACTIVE, ProgressBarMonitor.INACTIVE_VALUE);
                         MainFrame.self.setEnabled(true);
 

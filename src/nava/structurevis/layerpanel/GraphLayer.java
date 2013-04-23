@@ -4,20 +4,22 @@
  */
 package nava.structurevis.layerpanel;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
+import java.io.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 import nava.structurevis.StructureVisController;
 import nava.structurevis.data.DataOverlay1D;
+import nava.ui.MainFrame;
 import nava.ui.ProjectController;
+import nava.utils.GraphicsUtils;
 
 /**
  *
@@ -37,6 +39,7 @@ public class GraphLayer extends JPanel implements ActionListener, MouseListener 
     public Layer parent;
     StructureVisController structureVisController;
     ProjectController projectController;
+    JMenuItem saveAsSVGItem = new JMenuItem("Save as SVG");
 
     public GraphLayer(Layer parent, StructureVisController structureVisController, ProjectController projectController) {
 
@@ -54,6 +57,9 @@ public class GraphLayer extends JPanel implements ActionListener, MouseListener 
         }
         slidingWindowItems[currentWindowIndex].setSelected(true);
         popupMenu.add(slidingWindowMenu);
+
+        saveAsSVGItem.addActionListener(this);
+        popupMenu.add(saveAsSVGItem);
     }
 
     public void setDataOverlay1D(DataOverlay1D dataOverlay1D) {
@@ -169,14 +175,76 @@ public class GraphLayer extends JPanel implements ActionListener, MouseListener 
     }
 
     public void actionPerformed(ActionEvent e) {
-        for (int i = 0; i < windowSizes.length; i++) {
-            if (e.getSource().equals(slidingWindowItems[i])) {
-                currentWindowIndex = i;
-                setData(dataOverlay1D, windowSizes[i]);
-                redraw();
-                break;
+        if (e.getSource().equals(saveAsSVGItem)) {
+            MainFrame.saveDialog.setDialogTitle("Save as SVG");
+            String name = "layer";
+            MainFrame.saveDialog.setSelectedFile(new File(MainFrame.saveDialog.getCurrentDirectory().getPath() + "/" + name + ".svg"));
+            int returnVal = MainFrame.saveDialog.showSaveDialog(this);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                try {
+                    saveAsSVG(MainFrame.saveDialog.getSelectedFile());
+                } catch (IOException ex) {
+                    Logger.getLogger(GraphLayer.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            }
+        } else {
+
+            for (int i = 0; i < windowSizes.length; i++) {
+                if (e.getSource().equals(slidingWindowItems[i])) {
+                    currentWindowIndex = i;
+                    setData(dataOverlay1D, windowSizes[i]);
+                    redraw();
+                    break;
+                }
             }
         }
+
+    }
+
+    public void saveAsSVG(File file) throws IOException {
+        BufferedWriter buffer = new BufferedWriter(new FileWriter(file));
+        buffer.write(getSVG());
+        buffer.close();
+    }
+
+    public String getSVG() {
+
+        int panelWidth = this.getWidth();
+        int panelHeight = this.getHeight();
+
+
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+
+        pw.println("<?xml version=\"1.0\" standalone=\"no\"?>");
+        pw.println("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \n\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">");
+        pw.println("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"" + panelWidth + "\" height=\"" + panelHeight + "\" style=\"fill:none;stroke-width:16\">");
+
+        if (dataOverlay1D != null) {
+            for (int i = 0; i < getWidth(); i++) {
+
+                int coordinate = (int) (((double) i / (double) getWidth()) * dataOverlay1D.data.length);
+                //System.out.println("i="+i+"\t"+coordinate);
+                if (dataOverlay1D != null && coordinate < slidingWindowData.length) {
+                    float x = (float) slidingWindowData[coordinate];
+                    if (x != -1) {
+                        Color c = dataOverlay1D.colorGradient.getColor(dataOverlay1D.dataTransform.transform(x));
+                        g.setColor(c);
+
+                        g.fillRect(i, 0, 1, getHeight());
+                        pw.println("<rect x=\"" + (i) + "\" y=\"" + (0) + "\" width=\"" + (2) + "\" height=\"" + (getHeight()) + "\"  style=\"fill:#" + GraphicsUtils.getHexString(c) + ";\"/>");
+                        
+                    }
+                }
+            }
+        }
+
+        pw.println("</svg>");
+        pw.close();
+        //System.out.println(sw.toString());
+        return sw.toString();
     }
     /*
      * @Override public Object clone() throws CloneNotSupportedException {

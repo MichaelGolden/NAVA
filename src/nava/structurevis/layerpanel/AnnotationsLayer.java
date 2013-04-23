@@ -9,12 +9,16 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.RoundRectangle2D;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 import nava.structurevis.AnnotationsDialog;
 import nava.structurevis.StructureVisController;
+import nava.structurevis.SubstructureDrawPanel;
 import nava.structurevis.data.AnnotationSource;
 import nava.structurevis.data.Block;
 import nava.structurevis.data.Feature;
@@ -55,6 +59,7 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
     JMenuItem autofitItem = new JMenuItem("Autofit width");
     JMenuItem zoomInItem = new JMenuItem("Zoom in");
     JMenuItem zoomOutItem = new JMenuItem("Zoom out");
+    JMenuItem saveAsSVGItem = new JMenuItem("Save as SVG");
     int minorTickMark = 500;
     int majorTickMark = 1000;
     int[] tickMarkPossibilities = {1, 5, 10, 15, 20, 25, 50, 75, 100, 200, 250, 500, 750, 1000, 1500, 2000, 2500, 5000};
@@ -108,6 +113,9 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
 
         popupMenu.add(zoomOutItem).addActionListener(this);
         popupMenu.add(zoomOutItem);
+
+        saveAsSVGItem.addActionListener(this);
+        popupMenu.add(saveAsSVGItem);
 
         ToolTipManager.sharedInstance().registerComponent(this);
     }
@@ -213,6 +221,104 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
      * g.genome.get(i).level); } setPreferredSize(new Dimension(10000,
      * rulerHeight + (maxLevel + 1) * blockHeight)); redraw(); } }
      */
+    public void saveAsSVG(File file) throws IOException {
+        BufferedWriter buffer = new BufferedWriter(new FileWriter(file));
+        buffer.write(getSVG());
+        buffer.close();
+    }
+
+    public String getSVG() {
+
+        int panelWidth = this.getWidth();
+        int panelHeight = this.getHeight();
+
+
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+
+        pw.println("<?xml version=\"1.0\" standalone=\"no\"?>");
+        pw.println("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \n\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">");
+        pw.println("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"" + panelWidth + "\" height=\"" + panelHeight + "\" style=\"fill:none;stroke-width:16\">");
+
+        minorTickMark = chooseBestTickMarkSize(annotationData.mappedSequenceLength);
+        majorTickMark = minorTickMark * 2;
+
+        // draw ruler
+        // g2.setFont(annotationsFont.deriveFont(12.0f));
+        for (int i = 0; i < annotationData.mappedSequenceLength; i++) {
+            if (i % majorTickMark == 0) {
+                double x = ((double) i / (double) annotationData.mappedSequenceLength) * (getWidth() - xoffset);
+                // g2.setColor(Color.black);
+                // Line2D.Double tick = new Line2D.Double(x + xoffset, rulerHeight - 1, x + xoffset, rulerHeight + 1);
+                //g2.draw(tick);
+                pw.println("<line x1=\"" + (x + xoffset) + "\" y1=\"" + (rulerHeight - 1) + "\" x2=\"" + (x + xoffset) + "\" y2=\"" + (rulerHeight + 1) + "\" style=\"stroke:rgb(0,0,0);stroke-width:1\"/>");
+
+                // GraphicsUtils.drawStringCentred(g2, x + xoffset, rulerHeight / 2, i + "");
+                pw.println("<text x=\"" + (x + xoffset) + "\" y=\"" + (rulerHeight / 2 + 5) + "\" style=\"font-size:" + 10 + "px;stroke:none;fill:black\" text-anchor=\"" + "middle" + "\" >");
+                pw.println("<tspan>" + i + "" + "</tspan>");
+                pw.println("</text>");
+            } else if (i % minorTickMark == 0) {
+                double x = ((double) i / (double) annotationData.mappedSequenceLength) * (getWidth() - xoffset);
+                // g2.setColor(Color.black);
+                Line2D.Double tick = new Line2D.Double(x + xoffset, rulerHeight - 1, x + xoffset, rulerHeight + 1);
+                //g2.draw(tick);
+                pw.println("<line x1=\"" + (x + xoffset) + "\" y1=\"" + (rulerHeight - 1) + "\" x2=\"" + (x + xoffset) + "\" y2=\"" + (rulerHeight + 1) + "\" style=\"stroke:rgb(0,0,0);stroke-width:1\"/>");
+            }
+        }
+
+        for (int i = 0; i < annotationData.mappedFeatures.size(); i++) {
+            Feature feature = annotationData.mappedFeatures.get(i);
+            for (int j = 0; j < feature.blocks.size(); j++) {
+                double regionLength = feature.blocks.get(j).max - feature.blocks.get(j).min;
+                double regionWidth = (regionLength / (double) annotationData.mappedSequenceLength) * (getWidth() - xoffset);
+                double x = ((double) feature.min / (double) annotationData.mappedSequenceLength) * (getWidth() - xoffset);
+                //g2.setColor(feature.blocks.get(j).color);
+                // RoundRectangle2D.Double rect = new RoundRectangle2D.Double(x + xoffset, rulerHeight + feature.row * blockHeight, regionWidth, blockHeight, 10, 10);
+                pw.println("<rect x=\"" + (x + xoffset) + "\" y=\"" + (rulerHeight + feature.row * blockHeight) + "\" rx=\"" + (5) + "\" ry=\"" + (5) + "\" width=\"" + (regionWidth) + "\" height=\"" + (blockHeight) + "\"  style=\"fill:#" + GraphicsUtils.getHexString(feature.blocks.get(j).color) + ";\"/>");
+                //featurePositions.add(new Pair(rect, feature));
+                //g2.fill(rect);
+                // g2.setColor(Color.black);
+                // scale text to block size
+
+                /*
+                 * float fontSize = 13; for (; fontSize >= 6; fontSize -= 0.25)
+                 * { if
+                 * (g2.getFontMetrics(annotationsFont.deriveFont(Font.PLAIN,
+                 * fontSize)).stringWidth(feature.name) < regionWidth * 0.95) {
+                 * break; } } if (fontSize >= 7) {
+                 * g2.setFont(annotationsFont.deriveFont(Font.PLAIN, fontSize));
+                 * GraphicsUtils.drawStringCentred(g2, x + xoffset + regionWidth
+                 * / 2, rulerHeight + feature.row * blockHeight + blockHeight /
+                 * 2, feature.name); } else {
+                 * g2.setFont(annotationsFont.deriveFont(Font.PLAIN, 10));
+                 * GraphicsUtils.drawStringCentred(g2, x + xoffset + regionWidth
+                 * / 2, rulerHeight + feature.row * blockHeight + blockHeight /
+                 * 2, ".."); }
+                 */
+            }
+        }
+
+        for (int i = 0; i < annotationData.mappedFeatures.size(); i++) {
+            Feature feature = annotationData.mappedFeatures.get(i);
+            for (int j = 0; j < feature.blocks.size(); j++) {
+                double regionLength = feature.blocks.get(j).max - feature.blocks.get(j).min;
+                double regionWidth = (regionLength / (double) annotationData.mappedSequenceLength) * (getWidth() - xoffset);
+                double x = ((double) feature.min / (double) annotationData.mappedSequenceLength) * (getWidth() - xoffset);
+
+                int fontSize = 12;
+                pw.println("<text x=\"" + (x + xoffset + regionWidth / 2) + "\" y=\"" + (rulerHeight + feature.row * blockHeight + blockHeight / 2 + (fontSize / 2)) + "\" style=\"font-size:" + fontSize + "px;stroke:none;fill:black\" text-anchor=\"" + "middle" + "\" >");
+                pw.println("<tspan>" + feature.name + "</tspan>");
+                pw.println("</text>");
+
+            }
+        }
+
+        pw.println("</svg>");
+        pw.close();
+        //System.out.println(sw.toString());
+        return sw.toString();
+    }
+
     @Override
     public void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
@@ -556,11 +662,13 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
                     int index = annotationData.mappedFeatures.indexOf(featurePosition.getRight());
                     if (index >= 0) {
                         Color retColor = JColorChooser.showDialog(this, "Select a color", annotationData.features.get(index).blocks.get(0).color);
-                        for (Block block : annotationData.features.get(index).blocks) {
-                            block.color = retColor;
-                        }
-                        for (Block block : annotationData.mappedFeatures.get(index).blocks) {
-                            block.color = retColor;
+                        if (retColor != null) {
+                            for (Block block : annotationData.features.get(index).blocks) {
+                                block.color = retColor;
+                            }
+                            for (Block block : annotationData.mappedFeatures.get(index).blocks) {
+                                block.color = retColor;
+                            }
                         }
                         break;
                     }
@@ -581,7 +689,7 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
         } else if (e.getSource().equals(this.addAnnotationFromSourceItem)) {
             AnnotationsDialog d = new AnnotationsDialog(null, true, projectController.projectModel, structureVisController);
             d.setVisible(true);
-            
+
             if (structureVisController.structureVisModel.substructureModel.getAnnotationSource() == null) {
                 structureVisController.addAnnotationsSource(d.annotationSource);
                 structureVisController.structureVisModel.substructureModel.setAnnotationSource(d.annotationSource);
@@ -607,6 +715,20 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
             this.parent.parent.zoomIn();
         } else if (e.getSource().equals(this.zoomOutItem)) {
             this.parent.parent.zoomOut();
+        } else if (e.getSource().equals(this.saveAsSVGItem)) {
+            MainFrame.saveDialog.setDialogTitle("Save as SVG");
+            String name = "annotations";
+            MainFrame.saveDialog.setSelectedFile(new File(MainFrame.saveDialog.getCurrentDirectory().getPath() + "/" + name + ".svg"));
+            int returnVal = MainFrame.saveDialog.showSaveDialog(this);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                try {
+                    saveAsSVG(MainFrame.saveDialog.getSelectedFile());
+                } catch (IOException ex) {
+                    Logger.getLogger(AnnotationsLayer.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            }
         }
     }
 }

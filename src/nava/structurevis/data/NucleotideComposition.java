@@ -18,11 +18,10 @@ import nava.utils.Mapping;
  * @author Michael Golden
  */
 public class NucleotideComposition extends Overlay implements Serializable {
-    private static final long serialVersionUID = -1872288313127430061L;
 
+    private static final long serialVersionUID = -1872288313127430061L;
     double[] weights;
     public int[] nonGapCount;
-    
     // TODO these two fields use an unusual amount of memory when serializing??
     public double[][] frequencyComposition = null;
     public double[][] shannonComposition = null;
@@ -49,7 +48,7 @@ public class NucleotideComposition extends Overlay implements Serializable {
     public double[] getMappedFrequencyAtNucleotide(Mapping mapping, int structurePos) {
         if (mapping != null) {
             int mappedPos = mapping.aToB(structurePos);
-           // System.out.println("MFAN" + mappedPos + "->" + structurePos);
+            // System.out.println("MFAN" + mappedPos + "->" + structurePos);
 
 
             for (int i = 0; i < frequencyComposition.length; i++) {
@@ -58,12 +57,10 @@ public class NucleotideComposition extends Overlay implements Serializable {
 
             if (mappedPos != -1 && mappedPos < frequencyComposition.length) {
                 return frequencyComposition[mappedPos];
-            }
-            else
-            {                
+            } else {
                 //System.out.println(mapping);
                 //System.err.println(structurePos+"\t"+mappedPos+"\t"+frequencyComposition.length);
-               // System.err.println(">"+structurePos+"\t"+mapping.aToB(structurePos)+"\t"+frequencyComposition.length);
+                // System.err.println(">"+structurePos+"\t"+mapping.aToB(structurePos)+"\t"+frequencyComposition.length);
                 //System.out.println(mapping.mapString());
             }
         }
@@ -89,11 +86,11 @@ public class NucleotideComposition extends Overlay implements Serializable {
         }
         return 0;
     }
-    
+
     public char getMappedCharAtNucleotide(Mapping mapping, int structurePos) {
         if (mapping != null) {
             int mappedPos = mapping.aToB(structurePos);
-           // System.out.println("MFAN" + mappedPos + "->" + structurePos);
+            // System.out.println("MFAN" + mappedPos + "->" + structurePos);
 
             if (mappedPos != -1 && mappedPos < frequencyComposition.length) {
                 return consensus.charAt(mappedPos);
@@ -119,6 +116,12 @@ public class NucleotideComposition extends Overlay implements Serializable {
         shannonComposition = getShannonEntropyComposition(sequences, weights);
         nonGapCount = getNumNonGappedCharacters(sequences);
 
+        System.out.println("weights=");
+        for (int i = 0; i < weights.length; i++) {
+
+            System.out.print(weights[i] + "\t");
+        }
+        System.out.println();
         consensus = "";
         // determine consensus sequence
         for (int i = 0; i < frequencyComposition.length; i++) {
@@ -128,6 +131,11 @@ public class NucleotideComposition extends Overlay implements Serializable {
                     maxFrequencyIndex = n;
                 }
             }
+
+            for (int n = 0; n < 4; n++) {
+                System.out.print(frequencyComposition[i][n] + "\t");
+            }
+            System.out.println();
 
             if (frequencyComposition[i][maxFrequencyIndex] == 0) {
                 consensus += "-";
@@ -361,13 +369,16 @@ public class NucleotideComposition extends Overlay implements Serializable {
 
     public static double[][] getDistanceMatrixFast(ArrayList<String> sequences, int sampleSize) {
         int len = sequences.size();
+        //System.out.println("SEQUENCES " + sequences.size());
         double[][] distanceMatrix = new double[len][len];
-        int count = 0;
+
         for (int i = 0; i < len; i++) {
             Arrays.fill(distanceMatrix[i], -1);
+            int count = 0;
             while (count < sampleSize) {
                 int j = random.nextInt(len);
                 if (distanceMatrix[i][j] == -1) {
+                  //  System.out.println("here" + i + "\t" + j);
                     distanceMatrix[i][j] = distanceIgnoringGaps(sequences.get(i), sequences.get(j));
                     count++;
                 }
@@ -410,6 +421,7 @@ public class NucleotideComposition extends Overlay implements Serializable {
                     if (distanceMatrix[i][j] != -1) {
                         weights[i] += distanceMatrix[i][j];
                         n++;
+                        //System.out.println(i + "\t" + weights[i] + "\t" + distanceMatrix[i][j]);
                     }
                 }
                 weights[i] /= n;

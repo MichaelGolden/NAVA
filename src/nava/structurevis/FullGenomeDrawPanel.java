@@ -182,6 +182,8 @@ public class FullGenomeDrawPanel extends JPanel implements ActionListener, Mouse
             revalidate();
 
             substructureModel.fullDistanceMatrix = new DistanceMatrix(DistanceMatrix.getBestBinSize(structureOverlay.pairedSites.length, 2000), 2000, structureOverlay.pairedSites);
+            System.out.println("Computing floyd warshall");
+            substructureModel.fullDistanceMatrix.computeFloydWarshall();
             //System.out.println("Genome draw panel size 1 " + new Dimension((int) (width + 1), (int) (basePosY + lowestPosY + 1)));
             //System.out.println("Genome draw panel size 2 " + getSize());
         }

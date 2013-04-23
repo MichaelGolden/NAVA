@@ -326,7 +326,7 @@ public class StructureVisController implements SafeListListener, ProjectView {
          * System.out.println(sequencesB); System.out.println("----------");
          */
 
-        Mapping mapping = Mapping.createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, select, processReference);
+        Mapping mapping = Mapping.createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, select, false, processReference);
         if (mapping != null) {
             structureVisModel.mappings.put(new Pair(a, b), mapping);
         }

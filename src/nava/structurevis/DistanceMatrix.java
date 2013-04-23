@@ -12,7 +12,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import nava.experimental.CorrelatedSitesTest;
+import nava.experimental.MappedData;
 
 /**
  * Given a list of paired sites this class constructs a graph (distance matrix)
@@ -96,7 +103,7 @@ public class DistanceMatrix {
 
         for (int i = 0; i < pairedSites.length; i++) {
             int x = i;
-            int y = pairedSites[i]-1;
+            int y = pairedSites[i] - 1;
             if (pairedSites[i] != 0) {
                 matrix[x][y] = 1;
                 matrix[y][x] = 1;
@@ -106,7 +113,7 @@ public class DistanceMatrix {
         for (int i = 0; i < matrix.length; i++) {
             matrix[i][i] = 0;
         }
-        
+
         this.computeFloydWarshall2();
     }
 
@@ -133,8 +140,122 @@ public class DistanceMatrix {
     public void computeFloydWarshall() {
         int diagRadius = radius / binSize;
         for (int k = 0; k < nd; k++) {
-            if (k % 10 == 0) {
-                //  System.out.println(k + " out of " + nd);
+            if (k % 100 == 0) {
+                System.out.println(k + " out of " + nd);
+            }
+
+            // j < i
+            for (int i = 0; i < nd; i++) {
+                int minj = i - diagRadius;
+                int maxj = i + diagRadius;
+
+                for (int j = minj; j < 0; j++) {
+                    int js = nd + j;
+                    // if (js < i) {
+                    matrix[i][js] = Math.min(matrix[i][js], matrix[i][k] + matrix[k][js]);
+                    //   matrix[js][i] = matrix[i][js];
+                    // }
+                }
+
+                for (int j = Math.max(minj, 0); j < Math.min(maxj, nd); j++) {
+                    //if (j < i) {
+                    matrix[i][j] = Math.min(matrix[i][j], matrix[i][k] + matrix[k][j]);
+                    //   matrix[j][i] = matrix[i][j];
+                    //  }
+                }
+
+                for (int j = nd; j < maxj; j++) {
+                    int js = j - nd;
+                    // if (js < i) {
+                    matrix[i][js] = Math.min(matrix[i][js], matrix[i][k] + matrix[k][js]);
+                    //    matrix[js][i] = matrix[i][js];
+                    // }
+                }
+            }
+        }
+    }
+
+    public void computeSubmatrix(int[][] matrix, int startx, int starty, int length) {
+        int endx = Math.min(startx + length, matrix.length);
+        int endy = Math.min(starty + length, matrix.length);
+        for (int k = 0; k < length; k++) {
+            int ik = startx + k;
+            int jk = starty + k;
+            if (jk < matrix.length && ik < matrix.length) {
+                for (int i = startx; i < endx; i++) {
+                    for (int j = starty; j < endy; j++) {
+                        int dist = matrix[i][jk] + matrix[ik][j];
+                        if (dist < matrix[i][j]) {
+                            matrix[i][j] = dist;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    class Input {
+
+        int[][] matrix;
+        int startx;
+        int starty;
+        int length;
+    }
+
+    public void processInputs(List<Input> inputs)
+            throws InterruptedException, ExecutionException {
+
+        int threads = Runtime.getRuntime().availableProcessors();
+        ExecutorService service = Executors.newFixedThreadPool(threads);
+
+        List<Future<Object>> futures = new ArrayList<>();
+        for (final Input input : inputs) {
+            Callable<Object> callable = new Callable<Object>() {
+
+                public Object call() throws Exception {
+                    computeSubmatrix(input.matrix, input.startx, input.starty, input.length);
+                    return null;
+                }
+            };
+            futures.add(service.submit(callable));
+        }
+
+        service.shutdown();
+    }
+
+    public void computeFloydWarshallParallelised() {
+        int length = (radius / binSize) * 2;
+        int shift = radius / binSize;
+        //int shift = length;
+
+        //ArrayList<Input> inputs = new ArrayList<>();
+        for (int startx = 0; startx < matrix.length; startx = startx + shift) {
+            System.out.println("progress " + startx + "/" + matrix.length);
+            for (int starty = 0; starty < matrix.length; starty = starty + shift) {
+                computeSubmatrix(matrix, startx, starty, length);
+                Input input = new Input();
+                /*input.matrix = matrix;
+                input.startx = startx;
+                input.starty = starty;
+                input.length = length;
+                inputs.add(input);*/
+            }
+        }
+        /*
+        try {
+            processInputs(inputs);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(DistanceMatrix.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ExecutionException ex) {
+            Logger.getLogger(DistanceMatrix.class.getName()).log(Level.SEVERE, null, ex);
+        }*/
+    }
+
+    public void computeFloydWarshall3() {
+        int diagRadius = radius / binSize;
+        for (int k = 0; k < nd; k++) {
+            if (k % 100 == 0) {
+                System.out.println(k + " out of " + nd);
             }
 
             // j < i

@@ -439,8 +439,8 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
 
     @Override
     public void annotationSourceChanged(AnnotationSource annotationSource) {
-        structureDrawPanel.redraw();
-        fullGenomeDrawPanel.redraw();
+        //structureDrawPanel.redraw();
+       // fullGenomeDrawPanel.redraw();
     }
 
     @Override

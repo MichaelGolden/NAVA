@@ -345,7 +345,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
 
     @Override
     public void annotationSourceChanged(AnnotationSource annotationSource) {
-       layerModel.setAnnotationSource(structureVisController.structureVisModel.substructureModel.getAnnotationSource());          
+       //TODO 888 layerModel.setAnnotationSource(structureVisController.structureVisModel.substructureModel.getAnnotationSource());          
     }
 
     @Override

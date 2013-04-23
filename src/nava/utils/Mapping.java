@@ -19,7 +19,7 @@ public class Mapping implements Serializable {
 
     public static String MUSCLE_EXECUTABLE = "muscle3.8.31_i86win32.exe";
     public static String MAFFT_EXECUTABLE = "bin/mafft-6.952-win64/mafft-win/mafft.bat";
-    
+    public static String MAFFT_PROFILE_EXECUTABLE = "bin/mafft-6.952-win64/mafft-win/ms/lib/mafft/mafft-profile.exe";
     private static final long serialVersionUID = 1L;
 
     public static void setMuscleExecutable(String muscleExecutable) {
@@ -40,13 +40,11 @@ public class Mapping implements Serializable {
     int[] refToAList = {};
     int[] refToBList = {};
     int refLen;
-    
-    public String mapString()
-    {
+
+    public String mapString() {
         String ret = "";
-        for(int i = 0 ; i < aToRefList.length ; i++)
-        {
-            ret += i+"\t"+aToRefList[i]+"\t"+bToRefList[i]+"\t"+refToAList[i]+"\t"+refToBList[i]+"\n";
+        for (int i = 0; i < aToRefList.length; i++) {
+            ret += i + "\t" + aToRefList[i] + "\t" + bToRefList[i] + "\t" + refToAList[i] + "\t" + refToBList[i] + "\n";
         }
         return ret;
     }
@@ -196,7 +194,7 @@ public class Mapping implements Serializable {
         return rev;
     }
 
-    public static Mapping createMappingWithRestrictionsAutoDirection(File alignmentA, File alignmentB, int select, int aStart, int aEnd, int bStart, int bEnd) {
+    public static Mapping createMappingWithRestrictionsAutoDirection(File alignmentA, File alignmentB, boolean useMUSCLE, int select, int aStart, int aEnd, int bStart, int bEnd) {
         ArrayList<String> sequencesA = new ArrayList<>();
         ArrayList<String> sequencesNamesA = new ArrayList<>();
         ArrayList<String> sequencesB = new ArrayList<>();
@@ -224,7 +222,7 @@ public class Mapping implements Serializable {
         IO.saveToFASTAfile(sequencesAmod, sequencesNamesA, restrictedA);
         IO.saveToFASTAfile(sequencesBmod, sequencesNamesB, restrictedB);
 
-        Mapping mapping = Mapping.createMapping(restrictedA, restrictedB, select);
+        Mapping mapping = Mapping.createMapping(restrictedA, restrictedB, select, useMUSCLE);
 
         int s = Math.min(mapping.alignedA0.length() - 1, Math.max(aStart, 0));
         int e = Math.max(s, (aEnd == -1 ? mapping.alignedA0.length() : aEnd));
@@ -245,7 +243,7 @@ public class Mapping implements Serializable {
         return s;
     }
 
-    public static Mapping createMappingWithRestrictions(File alignmentA, File alignmentB, int select, boolean reverseComplementB, String outputfileName, int aStart, int aEnd, int bStart, int bEnd) {
+    public static Mapping createMappingWithRestrictions(File alignmentA, File alignmentB, int select, boolean reverseComplementB, String outputfileName, boolean useMUSCLE, int aStart, int aEnd, int bStart, int bEnd) {
         ArrayList<String> sequencesA = new ArrayList<>();
         ArrayList<String> sequencesNamesA = new ArrayList<>();
         ArrayList<String> sequencesB = new ArrayList<>();
@@ -270,10 +268,10 @@ public class Mapping implements Serializable {
         IO.saveToFASTAfile(sequencesA, sequencesNamesA, restrictedA);
         IO.saveToFASTAfile(sequencesB, sequencesNamesB, restrictedB);
 
-        return Mapping.createMapping(restrictedA, restrictedB, select, reverseComplementB, outputfileName);
+        return Mapping.createMapping(restrictedA, restrictedB, select, reverseComplementB, outputfileName, useMUSCLE);
     }
 
-    public static Mapping createMapping(File alignmentA, File alignmentB, int select, boolean reverseComplementB, String outputfileName) {
+    public static Mapping createMapping(File alignmentA, File alignmentB, int select, boolean reverseComplementB, String outputfileName, boolean useMUSCLE) {
 
         ArrayList<String> sequencesA = new ArrayList<>();
         ArrayList<String> sequencesNamesA = new ArrayList<>();
@@ -283,10 +281,139 @@ public class Mapping implements Serializable {
         int maxSequencesToLoad = Math.max(Mapping.select, 100); // to ensure fast loading limit the number of sequences to be load
         IO.loadFastaSequences(alignmentA, sequencesA, sequencesNamesA, maxSequencesToLoad);
         IO.loadFastaSequences(alignmentB, sequencesB, sequencesNamesB, maxSequencesToLoad);
-        return createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, select, reverseComplementB, outputfileName, new ProcessReference());
+        return createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, select, reverseComplementB, outputfileName, useMUSCLE, new ProcessReference());
     }
 
-    public static Mapping createMapping(ArrayList<String> sequencesA, ArrayList<String> sequencesNamesA, ArrayList<String> sequencesB, ArrayList<String> sequencesNamesB, int select, boolean reverseComplementB, String outputfileName, ProcessReference processReference) {
+    public static Mapping createMapping(ArrayList<String> sequencesA, ArrayList<String> sequencesNamesA, ArrayList<String> sequencesB, ArrayList<String> sequencesNamesB, int select, boolean reverseComplementB, String outputfileName, boolean useMUSCLE, ProcessReference processReference) {
+        Mapping mapping = null;
+
+        File tempDir = Utils.createTempDirectory();
+        File inputFile1 = Utils.getFile(tempDir, "alignment1.fasta");
+        File inputFile2 = Utils.getFile(tempDir, "alignment2.fasta");
+        impute = false;
+        imputeRandomN = false;
+        File outputFile = Utils.getFile(tempDir, outputfileName);
+        try {
+            BufferedWriter writer1 = new BufferedWriter(new FileWriter(inputFile1));
+            BufferedWriter writer2 = new BufferedWriter(new FileWriter(inputFile2));
+            if (impute) {
+                AlignmentUtils.impute(sequencesA, Mapping.select);
+                AlignmentUtils.impute(sequencesB, Mapping.select);
+            } else if (imputeRandomN) {
+                Random random = new Random(-8813712038722450337L);
+                int N = 50;
+
+                // choose the first s sequences and make a random selection from the rest
+                while (sequencesA.size() > N && sequencesA.size() > Mapping.select) {
+                    int removeIndex = Mapping.select + random.nextInt(sequencesA.size() - Mapping.select);
+                    sequencesA.remove(removeIndex);
+                    sequencesNamesA.remove(removeIndex);
+                }
+                // choose the first s sequences and make a random selection from the rest
+                while (sequencesB.size() > N && sequencesB.size() > Mapping.select) {
+                    int removeIndex = Mapping.select + random.nextInt(sequencesB.size() - Mapping.select);
+                    sequencesB.remove(removeIndex);
+                    sequencesNamesB.remove(removeIndex);
+                }
+
+                AlignmentUtils.impute(sequencesA, Mapping.select);
+                AlignmentUtils.impute(sequencesB, Mapping.select);
+            }
+            
+            int alignmentAlength = 0;
+            int alignmentBlength = 0;
+            for(String seq : sequencesA)
+            {
+                alignmentAlength = Math.max(seq.length(), alignmentAlength);
+            }
+             for(String seq : sequencesB)
+            {
+                alignmentBlength = Math.max(seq.length(), alignmentBlength);
+            }
+
+            for (int i = 0; i < select && i < sequencesA.size(); i++) {
+                writer1.write(">a" + i);
+                writer1.newLine();
+                writer1.write(Utils.padStringLeft(sequencesA.get(i), alignmentAlength, '-').replaceAll("-", GAP_CHARACTER + ""));
+                writer1.newLine();
+                //aLen = sequencesA.get(i).length();
+            }
+            writer1.close();
+            for (int i = 0; i < select && i < sequencesB.size(); i++) {
+                writer2.write(">b" + i);
+                writer2.newLine();
+                if (reverseComplementB) {
+                    writer2.write(reverseComplement(Utils.padStringLeft(sequencesB.get(i), alignmentBlength, '-')).replaceAll("-", GAP_CHARACTER + ""));
+                } else {
+                    writer2.write(Utils.padStringLeft(sequencesB.get(i), alignmentBlength, '-').replaceAll("-", GAP_CHARACTER + ""));
+                }
+                writer2.newLine();
+                //bLen = sequencesB.get(i).length();
+            }
+            writer2.close();
+            if (Mapping.select >= 1) {
+                //String cmd = MUSCLE_EXECUTABLE + " -in " + inputFile.getAbsolutePath() + " -out " + outputFile.getAbsolutePath() + " -gapopen " + gapOpen + " -gapextend " + gapExtend;
+
+
+                String cmd = "cmd /c " + new File(MAFFT_PROFILE_EXECUTABLE).getAbsolutePath() + " \"" + inputFile1.getAbsolutePath() + "\" \"" + inputFile2.getAbsolutePath() + "\" > \"" + outputFile.getAbsolutePath() + "\"";
+                //String cmd = new File(MAFFT_EXECUTABLE).getAbsolutePath() + " --maxiterate 1000 --seed \"" + inputFile1.getAbsolutePath()+"\" --seed \""+inputFile2.getAbsolutePath() + "\" NUL > \"" + outputFile.getAbsolutePath()+"\"";                
+                //mafft --maxiterate 1000 --seed group1 --seed group2 /dev/null [> output]
+                //String cmd = new File(MAFFT_PROFILE_EXECUTABLE).getAbsolutePath() + " " + inputFile1.getAbsolutePath()+" "+inputFile2.getAbsolutePath() + " > \"" + outputFile.getAbsolutePath()+"\"";                
+                if (useMUSCLE) {
+                    //cmd = MUSCLE_EXECUTABLE + " -profile -in1 \"" + inputFile1.getAbsolutePath() + "\" -in2 \""+inputFile2.getAbsolutePath()+"\" -out \"" + outputFile.getAbsolutePath() + "\" -gapopen " + gapOpen + " -gapextend " + gapExtend;
+                    cmd = MUSCLE_EXECUTABLE + " -profile -in1 \"" + inputFile1.getAbsolutePath() + "\" -in2 \"" + inputFile2.getAbsolutePath() + "\" -out \"" + outputFile.getAbsolutePath() + "\" -gapopen " + -100.0 + " -gapextend " + -1.0;
+                    //cmd = MUSCLE_EXECUTABLE + " -in " + inputFile.getAbsolutePath() + " -out " + outputFile.getAbsolutePath() + " -gapopen " + gapOpen + " -gapextend " + gapExtend;
+                }
+                System.out.println(cmd);
+
+
+                Process p = Runtime.getRuntime().exec(cmd);
+                processReference.addProcess(p);
+                if (!processReference.cancelled) {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+                    String textline = null;
+                    while ((textline = reader.readLine()) != null) {
+                        System.err.println(textline);
+                    }
+                    reader.close();
+                    int exitCode = p.waitFor();
+
+                    if (exitCode == 0) {
+                        ArrayList<String> alignedSequences = new ArrayList<String>();
+                        ArrayList<String> alignedSequenceNames = new ArrayList<String>();
+                        IO.loadFastaSequences(outputFile, alignedSequences, alignedSequenceNames);
+
+
+                        String alignedA0 = null;
+                        String alignedB0 = null;
+                        for (int i = 0; i < alignedSequences.size(); i++) {
+                            if (alignedSequenceNames.get(i).startsWith("a")) {
+                                alignedA0 = alignedSequences.get(i);
+                            }
+
+                            if (alignedSequenceNames.get(i).startsWith("b")) {
+                                alignedB0 = alignedSequences.get(i);
+                            }
+                        }
+
+                        mapping = getMappingFromAlignedStrings(alignedA0, alignedB0, reverseComplementB);
+                    } else if (!useMUSCLE) {
+                        return createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, select, reverseComplementB, outputfileName, !useMUSCLE, processReference);
+                    }
+                } else {
+                    p.destroy();
+                }
+            }
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        return mapping;
+    }
+
+    public static Mapping createMapping2(ArrayList<String> sequencesA, ArrayList<String> sequencesNamesA, ArrayList<String> sequencesB, ArrayList<String> sequencesNamesB, int select, boolean reverseComplementB, String outputfileName, boolean useMUSCLE, ProcessReference processReference) {
         Mapping mapping = null;
 
         File tempDir = Utils.createTempDirectory();
@@ -337,11 +464,15 @@ public class Mapping implements Serializable {
                 //bLen = sequencesB.get(i).length();
             }
             buffer.close();
-            System.out.println("WE ARE HERE");
             if (Mapping.select >= 1) {
                 //String cmd = MUSCLE_EXECUTABLE + " -in " + inputFile.getAbsolutePath() + " -out " + outputFile.getAbsolutePath() + " -gapopen " + gapOpen + " -gapextend " + gapExtend;
 
-                String cmd = new File(MAFFT_EXECUTABLE).getAbsolutePath() + " --retree 2 --maxiterate 1000 " + inputFile.getAbsolutePath() + " > " + outputFile.getAbsolutePath();                
+
+                String cmd = new File(MAFFT_EXECUTABLE).getAbsolutePath() + " --retree 2 --maxiterate 1000 " + inputFile.getAbsolutePath() + " > " + outputFile.getAbsolutePath();
+                if (useMUSCLE) {
+                    cmd = MUSCLE_EXECUTABLE + " -in " + inputFile.getAbsolutePath() + " -out " + outputFile.getAbsolutePath() + " -gapopen " + gapOpen + " -gapextend " + gapExtend;
+                }
+
 
                 Process p = Runtime.getRuntime().exec(cmd);
                 processReference.addProcess(p);
@@ -349,17 +480,17 @@ public class Mapping implements Serializable {
                     BufferedReader reader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
                     String textline = null;
                     while ((textline = reader.readLine()) != null) {
-                       // System.err.println(textline);
+                        // System.err.println(textline);
                     }
                     reader.close();
                     int exitCode = p.waitFor();
-                    System.out.println("Exit code");
+
                     if (exitCode == 0) {
                         ArrayList<String> alignedSequences = new ArrayList<String>();
                         ArrayList<String> alignedSequenceNames = new ArrayList<String>();
                         IO.loadFastaSequences(outputFile, alignedSequences, alignedSequenceNames);
 
-                        
+
                         String alignedA0 = null;
                         String alignedB0 = null;
                         for (int i = 0; i < alignedSequences.size(); i++) {
@@ -371,9 +502,6 @@ public class Mapping implements Serializable {
                                 alignedB0 = alignedSequences.get(i);
                             }
                         }
-                        
-                        System.out.println("Ax"+alignedA0);
-                        System.out.println("Bx"+alignedB0);
 
                         mapping = getMappingFromAlignedStrings(alignedA0, alignedB0, reverseComplementB);
                     }
@@ -390,7 +518,7 @@ public class Mapping implements Serializable {
         return mapping;
     }
 
-    public static Mapping createMapping(File alignmentA, File alignmentB, int select) {
+    public static Mapping createMapping(File alignmentA, File alignmentB, int select, boolean useMUSCLE) {
         if (alignmentA.length() == alignmentB.length() && IO.contentEquals(alignmentA, alignmentB)) { // if files are identical
             ArrayList<String> sequencesA = new ArrayList<String>();
             ArrayList<String> sequencesNamesA = new ArrayList<String>();
@@ -406,17 +534,17 @@ public class Mapping implements Serializable {
         int maxSequencesToLoad = Math.max(Mapping.select, 100); // to ensure fast loading limit the number of sequences to be loaded
         IO.loadFastaSequences(alignmentA, sequencesA, sequencesNamesA, maxSequencesToLoad);
         IO.loadFastaSequences(alignmentB, sequencesB, sequencesNamesB, maxSequencesToLoad);
-        return Mapping.createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, select, new ProcessReference());
+        return Mapping.createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, select, useMUSCLE, new ProcessReference());
     }
 
-    public static Mapping createMapping(ArrayList<String> sequencesA, ArrayList<String> sequencesNamesA, ArrayList<String> sequencesB, ArrayList<String> sequencesNamesB, int select, ProcessReference processReference) {
+    public static Mapping createMapping(ArrayList<String> sequencesA, ArrayList<String> sequencesNamesA, ArrayList<String> sequencesB, ArrayList<String> sequencesNamesB, int select, boolean useMUSCLE, ProcessReference processReference) {
         // identity mapping
         if (sequencesA.equals(sequencesB)) { // if alignments are identical
             return Mapping.getMappingFromAlignedStrings(sequencesA.get(0).replace('-', Mapping.GAP_CHARACTER), sequencesA.get(0).replace('-', Mapping.GAP_CHARACTER), false);
         }
 
-        Mapping mapping = createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, select, false, "mappingforward.fas", processReference);
-        Mapping reverseMapping = createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, select, true, "mappingreverse.fas", processReference);
+        Mapping mapping = createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, select, false, "mappingforward.fas", useMUSCLE, processReference);
+        Mapping reverseMapping = createMapping(sequencesA, sequencesNamesA, sequencesB, sequencesNamesB, select, true, "mappingreverse.fas", useMUSCLE, processReference);
 
         if (mapping == null || reverseMapping == null) {
             return null;

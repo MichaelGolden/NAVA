@@ -155,7 +155,10 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
         System.out.println("setAnnotationData GACACAF " + annotationData);
         if (annotationData != null) {
             if (map) {
-                MainFrame.taskManager.queueTask(new AnnotationMappingTask(annotationData, structureVisController.structureVisModel.substructureModel.structureOverlay, structureVisController, this), true);
+                AnnotationSource mappedAnnotations = AnnotationSource.getMappedAnnotations(annotationData, structureVisController.structureVisModel.substructureModel.structureOverlay, structureVisController);
+                setAnnotationData(mappedAnnotations);
+                showAnnotations();
+               // MainFrame.taskManager.queueTask(new AnnotationMappingTask(annotationData, structureVisController.structureVisModel.substructureModel.structureOverlay, structureVisController, this), true);
             } else {
                 setAnnotationData(annotationData);
             }
@@ -208,7 +211,10 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
             numRows = Math.max(numRows, annotationData.mappedFeatures.get(i).row);
         }
         setPreferredSize(new Dimension(10000, rulerHeight + numRows * blockHeight + blockHeight + 5));
-        this.parent.preferredHeight = rulerHeight + numRows * blockHeight + blockHeight + 5;
+        if(this.parent != null)
+        {
+            this.parent.preferredHeight = rulerHeight + numRows * blockHeight + blockHeight + 5;
+        }
     }
 
     /*
@@ -229,7 +235,8 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
 
     public String getSVG() {
 
-        int panelWidth = this.getWidth();
+         int panelWidth = 1000;
+       // int panelWidth = this.getWidth();
         int panelHeight = this.getHeight();
 
 
@@ -247,7 +254,7 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
         // g2.setFont(annotationsFont.deriveFont(12.0f));
         for (int i = 0; i < annotationData.mappedSequenceLength; i++) {
             if (i % majorTickMark == 0) {
-                double x = ((double) i / (double) annotationData.mappedSequenceLength) * (getWidth() - xoffset);
+                double x = ((double) i / (double) annotationData.mappedSequenceLength) * (panelWidth - xoffset);
                 // g2.setColor(Color.black);
                 // Line2D.Double tick = new Line2D.Double(x + xoffset, rulerHeight - 1, x + xoffset, rulerHeight + 1);
                 //g2.draw(tick);
@@ -258,7 +265,7 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
                 pw.println("<tspan>" + i + "" + "</tspan>");
                 pw.println("</text>");
             } else if (i % minorTickMark == 0) {
-                double x = ((double) i / (double) annotationData.mappedSequenceLength) * (getWidth() - xoffset);
+                double x = ((double) i / (double) annotationData.mappedSequenceLength) * (panelWidth - xoffset);
                 // g2.setColor(Color.black);
                 Line2D.Double tick = new Line2D.Double(x + xoffset, rulerHeight - 1, x + xoffset, rulerHeight + 1);
                 //g2.draw(tick);
@@ -270,8 +277,8 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
             Feature feature = annotationData.mappedFeatures.get(i);
             for (int j = 0; j < feature.blocks.size(); j++) {
                 double regionLength = feature.blocks.get(j).max - feature.blocks.get(j).min;
-                double regionWidth = (regionLength / (double) annotationData.mappedSequenceLength) * (getWidth() - xoffset);
-                double x = ((double) feature.min / (double) annotationData.mappedSequenceLength) * (getWidth() - xoffset);
+                double regionWidth = (regionLength / (double) annotationData.mappedSequenceLength) * (panelWidth - xoffset);
+                double x = ((double) feature.min / (double) annotationData.mappedSequenceLength) * (panelWidth - xoffset);
                 //g2.setColor(feature.blocks.get(j).color);
                 // RoundRectangle2D.Double rect = new RoundRectangle2D.Double(x + xoffset, rulerHeight + feature.row * blockHeight, regionWidth, blockHeight, 10, 10);
                 pw.println("<rect x=\"" + (x + xoffset) + "\" y=\"" + (rulerHeight + feature.row * blockHeight) + "\" rx=\"" + (5) + "\" ry=\"" + (5) + "\" width=\"" + (regionWidth) + "\" height=\"" + (blockHeight) + "\"  style=\"fill:#" + GraphicsUtils.getHexString(feature.blocks.get(j).color) + ";\"/>");
@@ -302,8 +309,8 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
             Feature feature = annotationData.mappedFeatures.get(i);
             for (int j = 0; j < feature.blocks.size(); j++) {
                 double regionLength = feature.blocks.get(j).max - feature.blocks.get(j).min;
-                double regionWidth = (regionLength / (double) annotationData.mappedSequenceLength) * (getWidth() - xoffset);
-                double x = ((double) feature.min / (double) annotationData.mappedSequenceLength) * (getWidth() - xoffset);
+                double regionWidth = (regionLength / (double) annotationData.mappedSequenceLength) * (panelWidth - xoffset);
+                double x = ((double) feature.min / (double) annotationData.mappedSequenceLength) * (panelWidth - xoffset);
 
                 int fontSize = 12;
                 pw.println("<text x=\"" + (x + xoffset + regionWidth / 2) + "\" y=\"" + (rulerHeight + feature.row * blockHeight + blockHeight / 2 + (fontSize / 2)) + "\" style=\"font-size:" + fontSize + "px;stroke:none;fill:black\" text-anchor=\"" + "middle" + "\" >");

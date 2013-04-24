@@ -567,7 +567,7 @@ public class RankingAnalyses {
 
         if (Math.abs(Z) < 5.9999999) {
             if (Z == 0.0) {
-                X = 0.0;
+                return 1;
             } else {
                 Y = 0.5 * Math.abs(Z);
                 if (Y >= (Z_MAX * 0.5)) {

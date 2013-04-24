@@ -211,7 +211,8 @@ public class GraphLayer extends JPanel implements ActionListener, MouseListener 
 
     public String getSVG() {
 
-        int panelWidth = this.getWidth();
+        int panelWidth = 1000;
+        //int panelWidth = this.getWidth();
         int panelHeight = this.getHeight();
 
 
@@ -223,9 +224,9 @@ public class GraphLayer extends JPanel implements ActionListener, MouseListener 
         pw.println("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"" + panelWidth + "\" height=\"" + panelHeight + "\" style=\"fill:none;stroke-width:16\">");
 
         if (dataOverlay1D != null) {
-            for (int i = 0; i < getWidth(); i++) {
+            for (int i = 0; i < panelWidth ; i++) {
 
-                int coordinate = (int) (((double) i / (double) getWidth()) * dataOverlay1D.data.length);
+                int coordinate = (int) (((double) i / (double) panelWidth) * dataOverlay1D.data.length);
                 //System.out.println("i="+i+"\t"+coordinate);
                 if (dataOverlay1D != null && coordinate < slidingWindowData.length) {
                     float x = (float) slidingWindowData[coordinate];
@@ -233,8 +234,8 @@ public class GraphLayer extends JPanel implements ActionListener, MouseListener 
                         Color c = dataOverlay1D.colorGradient.getColor(dataOverlay1D.dataTransform.transform(x));
                         g.setColor(c);
 
-                        g.fillRect(i, 0, 1, getHeight());
-                        pw.println("<rect x=\"" + (i) + "\" y=\"" + (0) + "\" width=\"" + (2) + "\" height=\"" + (getHeight()) + "\"  style=\"fill:#" + GraphicsUtils.getHexString(c) + ";\"/>");
+                        g.fillRect(i, 0, 1, panelHeight);
+                        pw.println("<rect x=\"" + (i) + "\" y=\"" + (0) + "\" width=\"" + (2) + "\" height=\"" + (panelHeight) + "\"  style=\"fill:#" + GraphicsUtils.getHexString(c) + ";\"/>");
                         
                     }
                 }

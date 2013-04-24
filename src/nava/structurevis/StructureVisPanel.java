@@ -33,7 +33,7 @@ import org.biojava.bio.BioException;
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class StructureVisPanel extends javax.swing.JPanel implements ItemListener, ProjectView, SubstructureModelListener {
+public class StructureVisPanel extends javax.swing.JPanel implements ItemListener, ProjectView, StructureVisView, SubstructureModelListener {
 
     //DefaultComboBoxModel<Alignment> mappingSourceComboBoxModel = new DefaultComboBoxModel<>();
     DefaultComboBoxModel<DataOverlay1D> data1DComboBoxModel = new DefaultComboBoxModel<>();
@@ -41,8 +41,8 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
     ProjectController projectController;
     public StructureVisController structureVisController;
     SubstructurePanel substructurePanel;
-    LayerPanel layerPanel;
-    LayerModel layerModel;
+ LayerPanel layerPanel;
+   // LayerModel layerModel;
     //AnnotationsLayer annotationsLayerRight;
     DefaultComboBoxModel<NucleotideComposition> nucleotideComboBoxModel = new DefaultComboBoxModel<>();    
     /**
@@ -70,8 +70,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
 
 
         layerPanel = new LayerPanel(structureVisController, projectController);
-        layerModel = new LayerModel();
-        layerPanel.setLayerModel(layerModel);
+        //layerPanel.setLayerModel(structureVisController.structureVisModel.layerModel);
 
         /*
         annotationsLayerRight = new AnnotationsLayer(null, structureVisController, projectController);
@@ -97,10 +96,11 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
 
         // populateStructureComboBox(Collections.list(projectController.projectModel.dataSources.elements()));
         projectController.addView(this);
+        this.structureVisController.addView(this);
 
         substructurePanel.refresh();
 
-        layerModel.setAnnotationSource(structureVisController.structureVisModel.substructureModel.getAnnotationSource());
+        //layerModel.setAnnotationSource(structureVisController.structureVisModel.substructureModel.getAnnotationSource());
         structureVisController.structureVisModel.substructureModel.addSubstructureModelListener(this);
     }
 
@@ -339,7 +339,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
     @Override
     public void structureSourceChanged(StructureOverlay structureSource) {
         if (structureVisController.structureVisModel.substructureModel != null && structureVisController.structureVisModel.substructureModel.getAnnotationSource() != null) {
-           layerModel.setAnnotationSource(structureVisController.structureVisModel.substructureModel.getAnnotationSource());          
+           structureVisController.structureVisModel.layerModel.setAnnotationSource(structureVisController.structureVisModel.substructureModel.getAnnotationSource());          
         }
     }
 
@@ -354,5 +354,26 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
 
     @Override
     public void projectModelChanged(ProjectModel newProjectModel) {
+    }
+
+    @Override
+    public void structureVisModelChanged(StructureVisModel newStructureVisModel) {
+       // throw new UnsupportedOperationException("Not supported yet.");
+        this.layerPanel.setLayerModel(newStructureVisModel.layerModel);
+    }
+
+    @Override
+    public void dataOverlayAdded(Overlay overlay) {
+        //throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void dataOverlayRemoved(Overlay overlay) {
+        //throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void dataOverlayChanged(Overlay oldOverlay, Overlay newOverlay) {
+       // throw new UnsupportedOperationException("Not supported yet.");
     }
 }

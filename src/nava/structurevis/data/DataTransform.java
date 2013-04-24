@@ -2,6 +2,8 @@ package nava.structurevis.data;
 
 import java.io.Serializable;
 import java.text.DecimalFormat;
+import nava.ranking.RankingAnalyses;
+import nava.ranking.StatUtils;
 
 /**
  *
@@ -13,6 +15,7 @@ public class DataTransform implements Serializable {
     public enum TransformType implements Serializable {
 
         LINEAR, // transform data between 0 and 1
+        NORMSINV1, // inverse normal distribution one-tailed
         EXPLOG, // transform data using e^(logx), useful for p-values
         SQRT, // tranform by square root
         SQUARED; // transform by squaring
@@ -23,6 +26,8 @@ public class DataTransform implements Serializable {
             switch (this) {
                 case LINEAR:
                     return "Linear";
+                case NORMSINV1:
+                    return "Inverse normal distribution";
                 case EXPLOG:
                     return "Exponential logarithm";
                 //case IDENTITY:
@@ -56,6 +61,14 @@ public class DataTransform implements Serializable {
                 //return x;
             case LINEAR:
                 return (x - min) / (max - min);
+            case NORMSINV1:
+                double minz = StatUtils.getInvCDF(min/2,false);
+                double maxz = StatUtils.getInvCDF(max/2,false);
+                //double t = (StatUtils.getInvCDF(x/2,false)-mint)/(maxt-mint);
+                double t = (StatUtils.getInvCDF(x/2,false)-minz)/(maxz-minz);
+               // System.out.println("mint " + mint+"\tmaxt "+maxt);
+                //System.out.println(x+"\t"+t);
+                return t;
             case EXPLOG:
                 double q = Math.log10(1 / 255.0); // calcuate last value in colour range to display
                 double minp = (Math.log10(max) - Math.log10(min));
@@ -76,6 +89,21 @@ public class DataTransform implements Serializable {
                 //return y;
             case LINEAR:
                 return (y * (max - min)) + min;
+            case NORMSINV1:
+                double minz = StatUtils.getInvCDF(min/2,false);
+                double maxz = StatUtils.getInvCDF(max/2,false);
+                //(StatUtils.getInvCDF(x/2,false)-mint)/(maxt-mint)
+                // normalz returns p-value
+                //StatUtils.erfc(y);
+                //System.out.println("y*(maxz-minz))+minz "+maxz+"\t"+minz);
+               // System.out.println(RankingAnalyses.NormalZ(minz));
+               // System.out.println(RankingAnalyses.NormalZ(maxz));
+              //  System.out.println(RankingAnalyses.NormalZ(0));
+              //  System.out.println(RankingAnalyses.NormalZ(1));
+              //  System.out.println(RankingAnalyses.NormalZ(0.5));
+                //return RankingAnalyses.NormalZ((y*(maxz-minz))+minz);
+                return RankingAnalyses.NormalZ((y*(maxz-minz))+minz);
+               // return  StatUtils.erfc((y*(maxz-minz))+minz)*2;
             case EXPLOG:
                 double q = Math.log10(1 / 255.0); // calcuate last value in colour range to display
                 double minp = (Math.log10(max) - Math.log10(min));
@@ -100,6 +128,8 @@ public class DataTransform implements Serializable {
             case LINEAR:
                 return decimalFormat.format(val);
             case EXPLOG:
+                return exponentialFormat.format(val);
+            case NORMSINV1:
                 return exponentialFormat.format(val);
             default:
                 return decimalFormat.format(val);

@@ -36,6 +36,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import nava.structure.StructureAlign;
+import nava.structurevis.layout.RadiateView;
 import nava.ui.MainFrame;
 import nava.utils.ColorUtils;
 import nava.utils.GraphicsUtils;
@@ -126,6 +127,17 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
     JMenuItem resetStructureItem = new JMenuItem("Reset structure");
     JMenuItem openSubstructureItem = new JMenuItem("Open substructure");
     SubstructureModel substructureModel = null;
+    JMenu drawModeMenu = new JMenu("Drawing mode");
+    ButtonGroup drawingGroup = new ButtonGroup();
+    JRadioButtonMenuItem naViewMode = new JRadioButtonMenuItem("NAView");
+    JRadioButtonMenuItem radiateViewMode = new JRadioButtonMenuItem("Radiate");
+    JRadioButtonMenuItem radiateViewFlatMode = new JRadioButtonMenuItem("Radiate (Flat base)");
+
+    public enum DrawingMode {
+
+        NAVIEW, RADIATE_VIEW, RADIATE_VIEW_FLAT
+    };
+    DrawingMode drawingMode = DrawingMode.NAVIEW;
 
     public void setModel(SubstructureModel substructureModel) {
         this.substructureModel = substructureModel;
@@ -202,6 +214,22 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
         openSubstructureItem.addActionListener(this);
         popupMenu.add(openSubstructureItem);
 
+        JMenu drawModeMenu = new JMenu("Drawing mode");
+        popupMenu.add(drawModeMenu);
+
+        naViewMode.addActionListener(this);
+        drawModeMenu.add(naViewMode);
+        drawingGroup.add(naViewMode);
+
+        radiateViewMode.addActionListener(this);
+        drawModeMenu.add(radiateViewMode);
+        drawingGroup.add(radiateViewMode);
+
+        radiateViewFlatMode.addActionListener(this);
+        drawModeMenu.add(radiateViewFlatMode);
+        drawingGroup.add(radiateViewFlatMode);
+
+        naViewMode.setSelected(true);
     }
 
     public void initialise() {
@@ -246,9 +274,8 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             if (substructureModel.substructure.length < 500) {
                 substructureModel.substructureDistanceMatrix = new DistanceMatrix(substructureModel.substructure.pairedSites);
                 System.out.println("Computing floyd warshall");
-                if(substructureModel.fullDistanceMatrix != null)
-                {
-                   // substructureModel.fullDistanceMatrix.computeFloydWarshall();
+                if (substructureModel.fullDistanceMatrix != null) {
+                    // substructureModel.fullDistanceMatrix.computeFloydWarshall();
                 }
             } else {
                 substructureModel.substructureDistanceMatrix = null;
@@ -304,7 +331,22 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
     }
 
     public void computeStructureToBeDrawn(int[] pairedSites) {
-        np = NAView.naview_xy_coordinates(pairedSites);
+        try {
+            switch (drawingMode) {
+                case NAVIEW:
+                    np = NAView.naview_xy_coordinates(pairedSites);
+                    break;
+                case RADIATE_VIEW:
+                    np = RadiateView.radiateview_xy_coordinates(pairedSites, false);
+                    break;
+                case RADIATE_VIEW_FLAT:
+                    np = RadiateView.radiateview_xy_coordinates(pairedSites, true);
+                    break;
+            }
+            // 
+        } catch (Exception ex) {
+            Logger.getLogger(SubstructureDrawPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         minx = Double.MAX_VALUE;
         miny = Double.MAX_VALUE;
@@ -562,7 +604,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             }
 
             if (nucleotidePositions[i] != null) {
-                int pos = (substructureModel.substructure.getStartPosition() + i - 1) % substructureModel.sequenceLength + 1;
+                int pos = (substructureModel.substructure.getStartPosition() + i - 1) % substructureModel.sequenceLength + 2;
                 double fontSize = 11;
                 if (substructureModel.numbering != 0 && pos % substructureModel.numbering == 0) {
                     pw.println("    <text id=\"nucleotide_position_" + pos + "\" x=\"" + (offsetx + nucleotidePositions[i].getX()) + "\" y=\"" + (nucleotidePositions[i].getY() + (fontSize / 2)) + "\" style=\"font-size:" + fontSize + "px;stroke:none;fill:black\" text-anchor=\"" + textanchor + "\" >");
@@ -860,7 +902,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             if (nucleotidePositions[i] != null) {
                 g.setColor(Color.black);
                 g.setFont(f2);
-                int pos = (substructureModel.substructure.getStartPosition() + i - 1) % substructureModel.sequenceLength + 1;
+                int pos = (substructureModel.substructure.getStartPosition() + i - 1) % substructureModel.sequenceLength + 2;
                 if (substructureModel.numbering != 0 && pos % substructureModel.numbering == 0) {
                     drawStringCentred(g, offsetx + nucleotidePositions[i].getX(), nucleotidePositions[i].getY() - 2, "" + pos);
                     g.setColor(Color.black);
@@ -1698,11 +1740,23 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             OpenSubstructureDialog openSubstructureDialog = new OpenSubstructureDialog(MainFrame.self, true, substructureModel.structureOverlay, substructureModel.substructure);
             GraphicsUtils.centerWindowOnWindow(openSubstructureDialog, MainFrame.self);
             openSubstructureDialog.setVisible(true);
-            int length = openSubstructureDialog.end - openSubstructureDialog.start + 1;
+            int length = openSubstructureDialog.end - openSubstructureDialog.start + 2;
             int[] substructurePairedSites = StructureAlign.getSubstructure(substructureModel.structureOverlay.pairedSites, openSubstructureDialog.start - 1, length);
             //System.out.println("A "+RNAFoldingTools.getDotBracketStringFromPairedSites(substructurePairedSites));
             Substructure substructure = new Substructure(openSubstructureDialog.start - 1, substructurePairedSites);
             this.openSubstructure(substructure);
+        } else if (e.getSource().equals(this.naViewMode)) {
+            setDrawMode(DrawingMode.NAVIEW);
+            computeStructureToBeDrawn(substructureModel.substructure);
+            redraw();
+        } else if (e.getSource().equals(this.radiateViewMode)) {
+            setDrawMode(DrawingMode.RADIATE_VIEW);
+            computeStructureToBeDrawn(substructureModel.substructure);
+            redraw();
+        } else if (e.getSource().equals(this.radiateViewFlatMode)) {
+            setDrawMode(DrawingMode.RADIATE_VIEW_FLAT);
+            computeStructureToBeDrawn(substructureModel.substructure);
+            redraw();
         } else {
             // else zoom rue
             for (int i = 0; i < zoomLevels.length; i++) {
@@ -1767,6 +1821,21 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
 
         public String toString() {
             return nucleotidei + " <-> " + nucleotidej;
+        }
+    }
+
+    public void setDrawMode(DrawingMode drawingMode) {
+        this.drawingMode = drawingMode;
+        switch (this.drawingMode) {
+            case NAVIEW:
+                this.naViewMode.setSelected(true);
+                break;
+            case RADIATE_VIEW:
+                this.radiateViewMode.setSelected(true);
+                break;
+            case RADIATE_VIEW_FLAT:
+                this.radiateViewFlatMode.setSelected(true);
+                break;
         }
     }
 }

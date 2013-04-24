@@ -123,7 +123,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
         this.dataMaxField.addKeyListener(this);
 
         this.dataLegendPanel.add(dataLegend, BorderLayout.CENTER);
-        dataLegend.setLegend("Example", new DataTransform(0, 1, DataTransform.TransformType.LINEAR), new ColorGradient(Color.white, Color.red), new ColorGradient(Color.white, Color.red),true,true,0,1, null);
+        dataLegend.setLegend("", new DataTransform(0, 1, DataTransform.TransformType.LINEAR), new ColorGradient(Color.white, Color.red), new ColorGradient(Color.white, Color.red),true,true,0,1, null);
         dataLegend.showEditMode();
 
         this.naturalRadioButton.addItemListener(this);

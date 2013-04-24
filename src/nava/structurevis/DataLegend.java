@@ -16,6 +16,8 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.text.DecimalFormat;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -27,6 +29,7 @@ import nava.structurevis.data.DataTransform;
 import nava.structurevis.data.DataTransform.TransformType;
 import nava.structurevis.data.Histogram;
 import nava.structurevis.data.Overlay;
+import nava.ui.MainFrame;
 import nava.utils.ColorGradient;
 import net.hanjava.svg.SVG2EMF;
 
@@ -302,7 +305,9 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
         double max = transform.transform(transform.max);
         for (int i = 0; i < barHeight; i++) {
             double h = (double) i / (double) (barHeight - 1);
-            double x = transform.inverseTransform(min + h * (max - min));
+           // double x = transform.inverseTransform(min + h * (max - min));
+            
+             double x = transform.inverseTransform(h );
             if (i % 25 == 0) {
                 int xpos = (int) (barOffsetX + barWidth);
                 if (edit) {
@@ -378,7 +383,10 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
             g.setColor(Color.black);
             for (int i = 0; i < barHeight; i++) {
                 double h = (double) i / barHeight;
-                double x = transform.inverseTransform(min + h * (max - min));
+                //double x = transform.inverseTransform(min + h * (max - min));
+                double x = transform.inverseTransform(h);
+                //System.out.println(h+"\t"+transform.inverseTransform(h ));
+           // System.out.println(transform.min+"\t"+transform.inverseTransform(0)+"\t"+transform.max+"MIKE"+1+"\t"+transform.inverseTransform(1 ));
                 if (i % pixelsBetweenTickMarks == 0) {
                     int xpos = (int) (barOffsetX + barWidth);
                     if (edit) {
@@ -644,7 +652,8 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
                 sliderIndicatorPosY = e.getY();
                 double min = transform.transform(transform.min);
                 double max = transform.transform(transform.max);
-                double x = transform.inverseTransform(min + (1 - downSliderPercentY) * (max - min));
+                //double x = transform.inverseTransform(min + (1 - downSliderPercentY) * (max - min));
+                double x = transform.inverseTransform(1 - downSliderPercentY);
                 sliderIndicatorText = transform.getFormattedString(x, 2);
             } else if (sliderSelected == UP) {
                 upSliderPercentY = Math.max(Math.min((float) ((e.getY() - barOffsetY) / barHeight), 1), 0);
@@ -654,7 +663,8 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
                 sliderIndicatorPosY = e.getY();
                 double min = transform.transform(transform.min);
                 double max = transform.transform(transform.max);
-                double x = transform.inverseTransform(min + (1 - upSliderPercentY) * (max - min));
+                //double x = transform.inverseTransform(min + (1 - upSliderPercentY) * (max - min));
+                double x = transform.inverseTransform(1 - upSliderPercentY);
                 sliderIndicatorText = transform.getFormattedString(x, 2);
             }
             downSliderPosY = barOffsetY + downSliderPercentY * barHeight - arrowHeight;
@@ -757,47 +767,49 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
         } else if (e.getSource().equals(useDefaultItem)) {
             colorGradient.setColorGradientTo(defaultColorGradient.clone());
             repaint();
-        }/*
-         * else if (e.getSource().equals(saveAsPNGItem)) { String name =
-         * "legend"; MainApp.fileChooserSave.setDialogTitle("Save as PNG");
-         * MainApp.fileChooserSave.setSelectedFile(new
-         * File(MainApp.fileChooserSave.getCurrentDirectory().getPath() + "/" +
-         * name + ".png")); int returnVal =
-         * MainApp.fileChooserSave.showSaveDialog(this); if (returnVal ==
-         * JFileChooser.APPROVE_OPTION) {
-         * setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-         * saveAsPNG(MainApp.fileChooserSave.getSelectedFile());
-         * setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)); }
-         * MainApp.fileChooserSave.setDialogTitle("Open"); } else if
-         * (e.getSource().equals(saveAsSVGItem)) {
-         * MainApp.fileChooserSave.setDialogTitle("Save as SVG"); String name =
-         * "legend"; MainApp.fileChooserSave.setSelectedFile(new
-         * File(MainApp.fileChooserSave.getCurrentDirectory().getPath() + "/" +
-         * name + ".svg")); int returnVal =
-         * MainApp.fileChooserSave.showSaveDialog(this); if (returnVal ==
-         * JFileChooser.APPROVE_OPTION) {
-         * setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR)); try {
-         * saveAsSVG(MainApp.fileChooserSave.getSelectedFile()); } catch
-         * (IOException ex) {
-         * Logger.getLogger(StructureDrawPanel.class.getName()).log(Level.SEVERE,
-         * null, ex); }
-         * setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)); }
-         * MainApp.fileChooserSave.setDialogTitle("Open"); } else if
-         * (e.getSource().equals(saveAsEMFItem)) {
-         * MainApp.fileChooserSave.setDialogTitle("Save as EMF"); String name =
-         * "legend"; MainApp.fileChooserSave.setSelectedFile(new
-         * File(MainApp.fileChooserSave.getCurrentDirectory().getPath() + "/" +
-         * name + ".emf")); int returnVal =
-         * MainApp.fileChooserSave.showSaveDialog(this); if (returnVal ==
-         * JFileChooser.APPROVE_OPTION) {
-         * setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR)); try {
-         * saveAsEMF(MainApp.fileChooserSave.getSelectedFile()); } catch
-         * (IOException ex) {
-         * Logger.getLogger(StructureDrawPanel.class.getName()).log(Level.SEVERE,
-         * null, ex); }
-         * setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)); }
-         * MainApp.fileChooserSave.setDialogTitle("Open"); }
-         */
+        }
+         else if (e.getSource().equals(saveAsPNGItem)) {
+            String name = "legend";
+            MainFrame.saveDialog.setDialogTitle("Save as PNG");
+            MainFrame.saveDialog.setSelectedFile(new File(MainFrame.saveDialog.getCurrentDirectory().getPath() + "/" + name + ".png"));
+            int returnVal = MainFrame.saveDialog.showSaveDialog(this);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                saveAsPNG(MainFrame.saveDialog.getSelectedFile());
+                setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            }
+            MainFrame.saveDialog.setDialogTitle("Open");
+        } else if (e.getSource().equals(saveAsSVGItem)) {
+            MainFrame.saveDialog.setDialogTitle("Save as SVG");
+            String name = "legend";
+            MainFrame.saveDialog.setSelectedFile(new File(MainFrame.saveDialog.getCurrentDirectory().getPath() + "/" + name + ".svg"));
+            int returnVal = MainFrame.saveDialog.showSaveDialog(this);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                try {
+                    saveAsSVG(MainFrame.saveDialog.getSelectedFile());
+                } catch (IOException ex) {
+                    Logger.getLogger(DataLegend.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            }
+            MainFrame.saveDialog.setDialogTitle("Open");
+        } else if (e.getSource().equals(saveAsEMFItem)) {
+            MainFrame.saveDialog.setDialogTitle("Save as EMF");
+            String name = "legend";
+            MainFrame.saveDialog.setSelectedFile(new File(MainFrame.saveDialog.getCurrentDirectory().getPath() + "/" + name + ".emf"));
+            int returnVal = MainFrame.saveDialog.showSaveDialog(this);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                try {
+                    saveAsEMF(MainFrame.saveDialog.getSelectedFile());
+                } catch (IOException ex) {
+                    Logger.getLogger(DataLegend.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            }
+            MainFrame.saveDialog.setDialogTitle("Open");
+        }
         fireChangeEvent(new ChangeEvent(this));
     }
     double thresholdMin = 0;
@@ -807,9 +819,10 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
         if (transform != null) {
             double min = transform.transform(transform.min);
             double max = transform.transform(transform.max);
-
-            thresholdMax = transform.inverseTransform(min + (downSliderPercentY) * (max - min));
-            thresholdMin = transform.inverseTransform(min + (upSliderPercentY) * (max - min));
+            thresholdMax = transform.inverseTransform(downSliderPercentY);
+            thresholdMin = transform.inverseTransform(upSliderPercentY);
+            //thresholdMax = transform.inverseTransform(min + (downSliderPercentY) * (max - min));
+           // thresholdMin = transform.inverseTransform(min + (upSliderPercentY) * (max - min));
         }
     }
 

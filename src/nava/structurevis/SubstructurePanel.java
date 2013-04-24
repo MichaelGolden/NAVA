@@ -407,6 +407,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         fullGenomeDrawPanel.redraw();
     }
 
+   
     @Override
     public void structureSourceChanged(StructureOverlay structureSource) {
         if (structureSource != null && structureSource.mappingSource != null) {

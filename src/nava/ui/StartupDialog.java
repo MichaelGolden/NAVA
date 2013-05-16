@@ -125,6 +125,7 @@ public class StartupDialog extends javax.swing.JDialog {
 
         recentFilesComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "No recent projects available." }));
         recentFilesComboBox.setEnabled(false);
+        recentFilesComboBox.setOpaque(false);
         recentFilesComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 recentFilesComboBoxActionPerformed(evt);
@@ -285,6 +286,8 @@ class ComboBoxRenderer extends JLabel implements ListCellRenderer {
         setBorder(new EmptyBorder(2, 13, 2, 2));
         //this.setHorizontalTextPosition(SwingConstants.RIGHT);
         setHorizontalAlignment(LEFT);
+        this.setForeground(Color.BLACK);
+        this.setOpaque(false);
         //s/etVerticalAlignment(CENTER);
     }
     String tooltip;
@@ -306,7 +309,8 @@ class ComboBoxRenderer extends JLabel implements ListCellRenderer {
 
         if (isSelected) {
             setBackground(list.getSelectionBackground());
-            setForeground(list.getSelectionForeground());
+            //setForeground(list.getSelectionForeground());
+            setForeground(Color.lightGray);
         } else {
             setBackground(list.getBackground());
             setForeground(list.getForeground());

@@ -22,12 +22,12 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="verticalSplitPane" alignment="0" pref="846" max="32767" attributes="0"/>
+          <Component id="verticalSplitPane" alignment="0" pref="444" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="verticalSplitPane" alignment="0" pref="375" max="32767" attributes="0"/>
+          <Component id="verticalSplitPane" alignment="0" pref="364" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
   </Layout>

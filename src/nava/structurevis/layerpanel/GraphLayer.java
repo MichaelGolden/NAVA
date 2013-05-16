@@ -20,6 +20,7 @@ import nava.structurevis.data.DataOverlay1D;
 import nava.ui.MainFrame;
 import nava.ui.ProjectController;
 import nava.utils.GraphicsUtils;
+import nava.utils.Mapping;
 
 /**
  *
@@ -35,6 +36,7 @@ public class GraphLayer extends JPanel implements ActionListener, MouseListener 
     ButtonGroup slidingWindowGroup = new ButtonGroup();
     JRadioButtonMenuItem[] slidingWindowItems = new JRadioButtonMenuItem[windowSizes.length];
     public DataOverlay1D dataOverlay1D;
+    public Mapping data1Dmapping;
     int currentWindowIndex = 4;
     public Layer parent;
     StructureVisController structureVisController;
@@ -74,26 +76,32 @@ public class GraphLayer extends JPanel implements ActionListener, MouseListener 
     }
 
     public void setSlidingWindow(int windowSize) {
-        if (dataOverlay1D != null) {
-            slidingWindowData = new double[dataOverlay1D.data.length];
+        if (dataOverlay1D != null && structureVisController.structureVisModel.substructureModel.structureOverlay != null) {
+            data1Dmapping = structureVisController.getMapping(structureVisController.structureVisModel.substructureModel.structureOverlay.mappingSource, dataOverlay1D.mappingSource);
+
+            slidingWindowData = new double[data1Dmapping.getALength()];
             for (int i = 0; i < slidingWindowData.length; i++) {
                 double sum = 0;
                 double count = 0;
                 for (int j = 0; j < windowSize; j++) {
-                    int x = i - (windowSize / 2) + j;
-                    if (x >= 0 && x < slidingWindowData.length) {
+                    // int x = i - (windowSize / 2) + j;
+                    int x = data1Dmapping.aToB(i - (windowSize / 2) + j);
+                   // System.out.println((i - (windowSize / 2) + j) + " -> " + x +"  "+data1Dmapping.getBLength()+"  "+dataOverlay1D.used.length);
+                    if (x >= 0 && x < dataOverlay1D.used.length) {
                         if (dataOverlay1D.used[x]) {
                             sum += dataOverlay1D.data[x];
                             count++;
                         }
                     }
                 }
-                if (dataOverlay1D.used[i] && count > 0) {
+                int x = data1Dmapping.aToB(i);
+                if (x >= 0 && dataOverlay1D.used[x] && count > 0) {
                     slidingWindowData[i] = sum / count;
                 } else {
                     slidingWindowData[i] = -1;
                 }
             }
+            
         }
     }
     boolean forceRepaint = true;
@@ -129,10 +137,10 @@ public class GraphLayer extends JPanel implements ActionListener, MouseListener 
             g.fillRect(0, 0, panelWidth, panelHeight);
 
             // draw 1D data
-            if (dataOverlay1D != null) {
+            if (dataOverlay1D != null && slidingWindowData != null) {
                 for (int i = 0; i < getWidth(); i++) {
 
-                    int coordinate = (int) (((double) i / (double) getWidth()) * dataOverlay1D.data.length);
+                    int coordinate = (int) (((double) i / (double) getWidth()) *  slidingWindowData.length);
                     //System.out.println("i="+i+"\t"+coordinate);
                     if (dataOverlay1D != null && coordinate < slidingWindowData.length) {
                         float x = (float) slidingWindowData[coordinate];
@@ -223,10 +231,14 @@ public class GraphLayer extends JPanel implements ActionListener, MouseListener 
         pw.println("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \n\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">");
         pw.println("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"" + panelWidth + "\" height=\"" + panelHeight + "\" style=\"fill:none;stroke-width:16\">");
 
+        pw.println("<g>");
+        pw.println("<rect x=\"" + (0) + "\" y=\"" + (0) + "\" width=\"" + (panelWidth) + "\" height=\"" + (panelHeight) + "\"  style=\"fill:#" + GraphicsUtils.getHexString(Color.white) + ";\"/>");
+        
+        
         if (dataOverlay1D != null) {
-            for (int i = 0; i < panelWidth ; i++) {
+            for (int i = 0; i < panelWidth; i++) {
 
-                int coordinate = (int) (((double) i / (double) panelWidth) * dataOverlay1D.data.length);
+                int coordinate = (int) (((double) i / (double) panelWidth) * slidingWindowData.length);
                 //System.out.println("i="+i+"\t"+coordinate);
                 if (dataOverlay1D != null && coordinate < slidingWindowData.length) {
                     float x = (float) slidingWindowData[coordinate];
@@ -236,11 +248,12 @@ public class GraphLayer extends JPanel implements ActionListener, MouseListener 
 
                         g.fillRect(i, 0, 1, panelHeight);
                         pw.println("<rect x=\"" + (i) + "\" y=\"" + (0) + "\" width=\"" + (2) + "\" height=\"" + (panelHeight) + "\"  style=\"fill:#" + GraphicsUtils.getHexString(c) + ";\"/>");
-                        
+
                     }
                 }
             }
         }
+         pw.println("</g>");
 
         pw.println("</svg>");
         pw.close();

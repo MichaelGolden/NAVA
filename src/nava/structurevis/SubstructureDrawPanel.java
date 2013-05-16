@@ -237,7 +237,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
         nucleotidePositions = null;
         //nextStructure();
         // required! otherwise structure panel doesn't get added correctly to mainapp
-        setPreferredSize(new Dimension(800, 600));
+        setPreferredSize(new Dimension(600, 400));
         revalidate();
     }
 
@@ -714,7 +714,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                     g.draw(bond);
                 }
             }
-            if (selectedNuc1 != -1 && selectedNuc2 != -1) {
+            if (selectedNuc1 != -1 && selectedNuc2 != -1 && selectedNuc1 < nucleotidePositions.length && selectedNuc2 < nucleotidePositions.length) {
                 Line2D bond = new Line2D.Double(nucleotidePositions[selectedNuc1], nucleotidePositions[selectedNuc2]);
 
                 float dash[] = {10.0f};
@@ -827,7 +827,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             Ellipse2D stemNucleotide = getCircleCenteredAt(nucleotidePositions[i].getX(), nucleotidePositions[i].getY(), nucleotideDiameter);
             g.setColor(Color.white);
             Color nucleotideBackgroundColor = substructureModel.missingDataColor;
-            if (oneDimensionalData == SHOW && substructureModel.data1D != null && pos >= 0 && substructureModel.data1D.used[pos]) {
+            if (oneDimensionalData == SHOW && substructureModel.data1D != null && pos >= 0 && substructureModel.data1D.used != null && pos < substructureModel.data1D.used.length && substructureModel.data1D.used[pos]) {
                 double p = substructureModel.data1D.data[pos];
                 if (substructureModel.data1D.used[pos] && ((!substructureModel.data1D.useLowerThreshold || p >= substructureModel.data1D.thresholdMin) && (!substructureModel.data1D.useUpperThreshold || p <= substructureModel.data1D.thresholdMax))) {
                     nucleotideBackgroundColor = substructureModel.data1D.colorGradient.getColor(substructureModel.data1D.dataTransform.transform((float) p));

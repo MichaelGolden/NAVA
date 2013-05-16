@@ -39,6 +39,8 @@ public class Mapping implements Serializable {
     int[] bToRefList = {};
     int[] refToAList = {};
     int[] refToBList = {};
+    int[] aToBList = {};
+    int[] bToAList = {};
     int refLen;
 
     public String mapString() {
@@ -87,7 +89,12 @@ public class Mapping implements Serializable {
     }
 
     public int aToB(int i) {
-        return refToB(aToRef(i));
+        //return refToB(aToRef(i));
+        if (i >= 0 && i < aToBList.length) {
+            return aToBList[i];
+        }
+
+        return -1;
     }
 
     public int aToBNearest(int i) {
@@ -127,7 +134,13 @@ public class Mapping implements Serializable {
     }
 
     public int bToA(int i) {
-        return refToA(bToRef(i));
+        //return refToB(aToRef(i));
+        if (i >= 0 && i < bToAList.length) {
+            return bToAList[i];
+        }
+
+        return -1;
+        //return refToA(bToRef(i));
     }
 
     public int bToANearest(int i) {
@@ -319,15 +332,13 @@ public class Mapping implements Serializable {
                 AlignmentUtils.impute(sequencesA, Mapping.select);
                 AlignmentUtils.impute(sequencesB, Mapping.select);
             }
-            
+
             int alignmentAlength = 0;
             int alignmentBlength = 0;
-            for(String seq : sequencesA)
-            {
+            for (String seq : sequencesA) {
                 alignmentAlength = Math.max(seq.length(), alignmentAlength);
             }
-             for(String seq : sequencesB)
-            {
+            for (String seq : sequencesB) {
                 alignmentBlength = Math.max(seq.length(), alignmentBlength);
             }
 
@@ -523,7 +534,7 @@ public class Mapping implements Serializable {
             ArrayList<String> sequencesA = new ArrayList<String>();
             ArrayList<String> sequencesNamesA = new ArrayList<String>();
             IO.loadFastaSequences(alignmentA, sequencesA, sequencesNamesA);
-            return Mapping.getMappingFromAlignedStrings(sequencesA.get(0), sequencesA.get(0), false);
+            return Mapping.getMappingFromAlignedStrings(sequencesA.get(0).replace('-', Mapping.GAP_CHARACTER), sequencesA.get(0).replace('-', Mapping.GAP_CHARACTER), false);
         }
 
         ArrayList<String> sequencesA = new ArrayList<>();
@@ -568,7 +579,11 @@ public class Mapping implements Serializable {
             t2++;
         }
 
-        if ((m1 / t1) >= (m2 / t2)) {
+       // System.out.println("m1/t1" + (m1 / t1));
+       // System.out.println("m2/t2" + (m2 / t2));
+
+        if ((m1 / t1)*1.2 >= (m2 / t2)) {
+
             return mapping;
         } else {
             return reverseMapping;
@@ -595,6 +610,8 @@ public class Mapping implements Serializable {
         mapping.refToBList = new int[alignedA0.length()];
         mapping.aToRefList = new int[alignedA0.length()];
         mapping.bToRefList = new int[alignedA0.length()];
+        mapping.aToBList = new int[mapping.getALength()];
+        mapping.bToAList = new int[mapping.getBLength()];
         Arrays.fill(mapping.refToAList, -1);
         Arrays.fill(mapping.refToBList, -1);
         Arrays.fill(mapping.aToRefList, -1);
@@ -651,6 +668,18 @@ public class Mapping implements Serializable {
         for (int i = 0; i < mapping.refToBList.length; i++) {
             if (mapping.refToBList[i] > -1) {
                 mapping.bToRefList[mapping.refToBList[i]] = i;
+            }
+        }
+
+        for (int i = 0; i < mapping.aToBList.length; i++) {
+            if (mapping.aToRefList[i] > -1) {
+                mapping.aToBList[i] = mapping.refToBList[mapping.aToRefList[i]];
+            }
+        }
+
+        for (int i = 0; i < mapping.bToAList.length; i++) {
+            if (mapping.bToRefList[i] > -1) {
+                mapping.bToAList[i] = mapping.refToAList[mapping.bToRefList[i]];
             }
         }
 

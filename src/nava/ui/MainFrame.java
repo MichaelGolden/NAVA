@@ -96,7 +96,7 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
         jPanel1.add(dataPanel, BorderLayout.CENTER);
         structureVisPanel = new StructureVisPanel(projectController);
         jPanel2.add(structureVisPanel, BorderLayout.CENTER);
- 
+
         //projectDialog.setFileFilter(new ProjectFileFilter());
         projectDialog.setFileView(new ProjectFileView());
         projectDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -112,7 +112,7 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
             StartupDialog.addProjectFileToRecentProjects(projectDirectory);
             StructureVisModel model = new StructureVisModel();
             model.initialise(structureVisPanel.structureVisController);
-            structureVisPanel.structureVisController.openStructureVisModel(model);          
+            structureVisPanel.structureVisController.openStructureVisModel(model);
         }
     }
 
@@ -180,6 +180,7 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
         jPanel1.setLayout(new java.awt.BorderLayout());
         jTabbedPane1.addTab("Data analysis", jPanel1);
 
+        jPanel2.setPreferredSize(new java.awt.Dimension(800, 0));
         jPanel2.setLayout(new java.awt.BorderLayout());
         jTabbedPane1.addTab("Visualisation", jPanel2);
 
@@ -207,12 +208,12 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
 
         jMenu2.setText("Open recently used");
         jMenu2.addMenuListener(new javax.swing.event.MenuListener() {
+            public void menuDeselected(javax.swing.event.MenuEvent evt) {
+            }
             public void menuCanceled(javax.swing.event.MenuEvent evt) {
             }
             public void menuSelected(javax.swing.event.MenuEvent evt) {
                 jMenu2MenuSelected(evt);
-            }
-            public void menuDeselected(javax.swing.event.MenuEvent evt) {
             }
         });
         jMenu2.addActionListener(new java.awt.event.ActionListener() {
@@ -381,8 +382,20 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
          * default look and feel. For details see
          * http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
+
+        /*
+         * for (javax.swing.UIManager.LookAndFeelInfo info :
+         * javax.swing.UIManager.getInstalledLookAndFeels()) {
+         * System.out.println(info.getName()); if
+         * ("Nimbus".equals(info.getName())) {
+         * //javax.swing.UIManager.setLookAndFeel(info.getClassName()); break; }
+            }
+         */
+
         try {
+            //javax.swing.UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                System.out.println(info.getName());
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;

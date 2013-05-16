@@ -167,7 +167,7 @@ public class AnnotationSource implements Serializable {
         Namespace ns = RichObjectFactory.getDefaultNamespace();
         RichSequenceIterator seqs = RichSequence.IOTools.readGenbankDNA(br, ns);
 
-        while (seqs.hasNext()) {
+        for (int i = 0 ; seqs.hasNext() && i < 10 ; i++) {
             RichSequence rs = seqs.nextRichSequence();
             Iterator<org.biojava.bio.seq.Feature> it = rs.features();
             MappingSource mappingSequence = new MappingSource(rs.seqString());

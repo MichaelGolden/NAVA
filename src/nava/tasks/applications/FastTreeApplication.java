@@ -48,6 +48,7 @@ public class FastTreeApplication extends Application {
         }
         arguments += nucleotideAlignmentParam;
 
+        
         try {
             String cmd = "cmd /c "+new File(FAST_TREE_EXECUTABLE).getAbsolutePath() + " " + arguments + " " + inFastaFile.getAbsolutePath() + " > " + outNewickFile.getAbsolutePath();
             System.out.println("cmd "+cmd);

@@ -208,30 +208,34 @@ public class NucleotideComposition extends Overlay implements Serializable {
             double sum = 0;
             double sumUngapped = 0;
             for (int j = 0; j < sequences.size(); j++) {
-                char c = sequences.get(j).charAt(i);
-                switch (c) {
-                    case 'A':
-                        nucleotideComposition[i][0] += weights[j];
-                        break;
-                    case 'C':
-                        nucleotideComposition[i][1] += weights[j];
-                        break;
-                    case 'G':
-                        nucleotideComposition[i][2] += weights[j];
-                        break;
-                    case 'T':
-                        nucleotideComposition[i][3] += weights[j];
-                        break;
-                    case 'U':
-                        nucleotideComposition[i][3] += weights[j];
-                        break;
-                    default:
-                        nucleotideComposition[i][4] += weights[j];
-                        sumUngapped -= weights[j];
-                        break;
+                if (i < sequences.get(j).length()) {
+                    char c = sequences.get(j).charAt(i);
+                    switch (c) {
+                        case 'A':
+                            nucleotideComposition[i][0] += weights[j];
+                            break;
+                        case 'C':
+                            nucleotideComposition[i][1] += weights[j];
+                            break;
+                        case 'G':
+                            nucleotideComposition[i][2] += weights[j];
+                            break;
+                        case 'T':
+                            nucleotideComposition[i][3] += weights[j];
+                            break;
+                        case 'U':
+                            nucleotideComposition[i][3] += weights[j];
+                            break;
+                        default:
+                            nucleotideComposition[i][4] += weights[j];
+                            sumUngapped -= weights[j];
+                            break;
+                    }
+                    sum += weights[j];
+                    sumUngapped += weights[j];
+                } else {
+                    break;
                 }
-                sum += weights[j];
-                sumUngapped += weights[j];
             }
 
             if (includeGaps) {
@@ -378,7 +382,7 @@ public class NucleotideComposition extends Overlay implements Serializable {
             while (count < sampleSize) {
                 int j = random.nextInt(len);
                 if (distanceMatrix[i][j] == -1) {
-                  //  System.out.println("here" + i + "\t" + j);
+                    //  System.out.println("here" + i + "\t" + j);
                     distanceMatrix[i][j] = distanceIgnoringGaps(sequences.get(i), sequences.get(j));
                     count++;
                 }

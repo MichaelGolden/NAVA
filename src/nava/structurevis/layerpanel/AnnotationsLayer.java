@@ -60,6 +60,8 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
     JMenuItem zoomInItem = new JMenuItem("Zoom in");
     JMenuItem zoomOutItem = new JMenuItem("Zoom out");
     JMenuItem saveAsSVGItem = new JMenuItem("Save as SVG");
+    JMenuItem moveUpItem = new JMenuItem("Move up");
+    JMenuItem moveDownItem = new JMenuItem("Move down");
     int minorTickMark = 500;
     int majorTickMark = 1000;
     int[] tickMarkPossibilities = {1, 5, 10, 15, 20, 25, 50, 75, 100, 200, 250, 500, 750, 1000, 1500, 2000, 2500, 5000};
@@ -83,6 +85,12 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
 
         removeAnnotationItem.addActionListener(this);
         popupMenu.add(removeAnnotationItem);
+
+        moveUpItem.addActionListener(this);
+        popupMenu.add(moveUpItem);
+
+        moveDownItem.addActionListener(this);
+        popupMenu.add(moveDownItem);
 
         popupMenu.add(removeItem);
 
@@ -158,7 +166,7 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
                 AnnotationSource mappedAnnotations = AnnotationSource.getMappedAnnotations(annotationData, structureVisController.structureVisModel.substructureModel.structureOverlay, structureVisController);
                 setAnnotationData(mappedAnnotations);
                 showAnnotations();
-               // MainFrame.taskManager.queueTask(new AnnotationMappingTask(annotationData, structureVisController.structureVisModel.substructureModel.structureOverlay, structureVisController, this), true);
+                // MainFrame.taskManager.queueTask(new AnnotationMappingTask(annotationData, structureVisController.structureVisModel.substructureModel.structureOverlay, structureVisController, this), true);
             } else {
                 setAnnotationData(annotationData);
             }
@@ -211,8 +219,7 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
             numRows = Math.max(numRows, annotationData.mappedFeatures.get(i).row);
         }
         setPreferredSize(new Dimension(10000, rulerHeight + numRows * blockHeight + blockHeight + 5));
-        if(this.parent != null)
-        {
+        if (this.parent != null) {
             this.parent.preferredHeight = rulerHeight + numRows * blockHeight + blockHeight + 5;
         }
     }
@@ -235,8 +242,8 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
 
     public String getSVG() {
 
-         int panelWidth = 1000;
-       // int panelWidth = this.getWidth();
+        int panelWidth = 1000;
+        // int panelWidth = this.getWidth();
         int panelHeight = this.getHeight();
 
 
@@ -250,6 +257,8 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
         minorTickMark = chooseBestTickMarkSize(annotationData.mappedSequenceLength);
         majorTickMark = minorTickMark * 2;
 
+        pw.println("<g>");
+        pw.println("<rect x=\"" + (0) + "\" y=\"" + (0) + "\" width=\"" + (panelWidth) + "\" height=\"" + (panelHeight) + "\"  style=\"fill:#" + GraphicsUtils.getHexString(Color.white) + ";\"/>");
         // draw ruler
         // g2.setFont(annotationsFont.deriveFont(12.0f));
         for (int i = 0; i < annotationData.mappedSequenceLength; i++) {
@@ -278,7 +287,7 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
             for (int j = 0; j < feature.blocks.size(); j++) {
                 double regionLength = feature.blocks.get(j).max - feature.blocks.get(j).min;
                 double regionWidth = (regionLength / (double) annotationData.mappedSequenceLength) * (panelWidth - xoffset);
-                double x = ((double) feature.min / (double) annotationData.mappedSequenceLength) * (panelWidth - xoffset);
+                double x = ((double) feature.blocks.get(j).min / (double) annotationData.mappedSequenceLength) * (panelWidth - xoffset);
                 //g2.setColor(feature.blocks.get(j).color);
                 // RoundRectangle2D.Double rect = new RoundRectangle2D.Double(x + xoffset, rulerHeight + feature.row * blockHeight, regionWidth, blockHeight, 10, 10);
                 pw.println("<rect x=\"" + (x + xoffset) + "\" y=\"" + (rulerHeight + feature.row * blockHeight) + "\" rx=\"" + (5) + "\" ry=\"" + (5) + "\" width=\"" + (regionWidth) + "\" height=\"" + (blockHeight) + "\"  style=\"fill:#" + GraphicsUtils.getHexString(feature.blocks.get(j).color) + ";\"/>");
@@ -310,7 +319,7 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
             for (int j = 0; j < feature.blocks.size(); j++) {
                 double regionLength = feature.blocks.get(j).max - feature.blocks.get(j).min;
                 double regionWidth = (regionLength / (double) annotationData.mappedSequenceLength) * (panelWidth - xoffset);
-                double x = ((double) feature.min / (double) annotationData.mappedSequenceLength) * (panelWidth - xoffset);
+                double x = ((double) feature.blocks.get(j).min/ (double) annotationData.mappedSequenceLength) * (panelWidth - xoffset);
 
                 int fontSize = 12;
                 pw.println("<text x=\"" + (x + xoffset + regionWidth / 2) + "\" y=\"" + (rulerHeight + feature.row * blockHeight + blockHeight / 2 + (fontSize / 2)) + "\" style=\"font-size:" + fontSize + "px;stroke:none;fill:black\" text-anchor=\"" + "middle" + "\" >");
@@ -319,7 +328,7 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
 
             }
         }
-
+        pw.println("</g>");
         pw.println("</svg>");
         pw.close();
         //System.out.println(sw.toString());
@@ -355,6 +364,7 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
 
             // draw ruler
             g2.setFont(annotationsFont.deriveFont(12.0f));
+            System.out.println("annotationData.mappedSequenceLength=" + annotationData.mappedSequenceLength);
             for (int i = 0; i < annotationData.mappedSequenceLength; i++) {
                 if (i % majorTickMark == 0) {
                     double x = ((double) i / (double) annotationData.mappedSequenceLength) * (getWidth() - xoffset);
@@ -378,7 +388,7 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
                 for (int j = 0; j < feature.blocks.size(); j++) {
                     double regionLength = feature.blocks.get(j).max - feature.blocks.get(j).min;
                     double regionWidth = (regionLength / (double) annotationData.mappedSequenceLength) * (getWidth() - xoffset);
-                    double x = ((double) feature.min / (double) annotationData.mappedSequenceLength) * (getWidth() - xoffset);
+                    double x = ((double) feature.blocks.get(j).min / (double) annotationData.mappedSequenceLength) * (getWidth() - xoffset);
                     g2.setColor(feature.blocks.get(j).color);
                     RoundRectangle2D.Double rect = new RoundRectangle2D.Double(x + xoffset, rulerHeight + feature.row * blockHeight, regionWidth, blockHeight, 10, 10);
                     featurePositions.add(new Pair(rect, feature));
@@ -657,6 +667,30 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
                     if (index >= 0) {
                         annotationData.features.remove(index);
                         annotationData.mappedFeatures.remove(index);
+                    }
+                    setAnnotationData(annotationData, false);
+                    break;
+                }
+            }
+        } else if (e.getSource().equals(moveUpItem)) {
+            for (Pair<Shape, Feature> featurePosition : featurePositions) {
+                if (featurePosition.getLeft().contains(popupMenuX, popupMenuY)) {
+                    int index = annotationData.mappedFeatures.indexOf(featurePosition.getRight());
+                    if (index >= 0) {
+                        annotationData.features.get(index).row = Math.max(0, annotationData.features.get(index).row - 1);
+                        annotationData.mappedFeatures.get(index).row = Math.max(0, annotationData.mappedFeatures.get(index).row - 1);
+                    }
+                    setAnnotationData(annotationData, false);
+                    break;
+                }
+            }
+        } else if (e.getSource().equals(moveDownItem)) {
+            for (Pair<Shape, Feature> featurePosition : featurePositions) {
+                if (featurePosition.getLeft().contains(popupMenuX, popupMenuY)) {
+                    int index = annotationData.mappedFeatures.indexOf(featurePosition.getRight());
+                    if (index >= 0) {
+                        annotationData.features.get(index).row++;
+                        annotationData.mappedFeatures.get(index).row++;
                     }
                     setAnnotationData(annotationData, false);
                     break;

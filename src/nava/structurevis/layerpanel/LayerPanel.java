@@ -27,7 +27,7 @@ import nava.ui.ProjectView;
  */
 public class LayerPanel extends javax.swing.JPanel implements Scrollable, LayerModelListener, StructureVisView, SubstructureModelListener {
 
-    int width = 1000;
+    int width = 600;
     boolean trackWidth = true;
     int height = 0;
     ArrayList<Layer> layers = new ArrayList<>();
@@ -121,6 +121,7 @@ public class LayerPanel extends javax.swing.JPanel implements Scrollable, LayerM
 
         setLayout(new java.awt.BorderLayout());
 
+        leftPanel.setPreferredSize(new java.awt.Dimension(100, 100));
         leftPanel.setLayout(new javax.swing.BoxLayout(leftPanel, javax.swing.BoxLayout.PAGE_AXIS));
         jSplitPane1.setLeftComponent(leftPanel);
 
@@ -209,7 +210,8 @@ public class LayerPanel extends javax.swing.JPanel implements Scrollable, LayerM
 
     @Override
     public void intervalAdded(int index0, int index1) {
-        addItems(index0, index1);
+        //addItems(index0, index1);
+        resetLayerModel();
     }
 
     @Override

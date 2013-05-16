@@ -91,7 +91,8 @@ public class RankingAnalyses {
                 int y = mapping.bToA(element.j);
                 if (x >= 0 && y >= 0) {
                     if (x >= substructure.startPosition && x < substructure.startPosition + substructure.length && y >= substructure.startPosition && y < substructure.startPosition + substructure.length) {
-                        boolean ispaired = pairedSites[x % genomeLength] != 0;
+                        //boolean ispaired = pairedSites[x % genomeLength] != 0;
+                        boolean ispaired = pairedSites[x % genomeLength] == (y% genomeLength)+1;
                         if (ispaired) {
                             pairedValues.add(element.value);
                         } else {
@@ -99,7 +100,8 @@ public class RankingAnalyses {
                         }
                     } else // deal with wrap around
                     if (x >= substructure.startPosition && (x + length < substructure.startPosition + substructure.length || x < substructure.startPosition + substructure.length) && y >= substructure.startPosition && (y + length < substructure.startPosition + substructure.length || y < substructure.startPosition + substructure.length)) {
-                        boolean ispaired = pairedSites[x % genomeLength] != 0;
+                       // boolean ispaired = pairedSites[x % genomeLength] != 0;
+                        boolean ispaired = pairedSites[x % genomeLength] == (y% genomeLength)+1;
                         if (ispaired) {
                             pairedValues.add(element.value);
                         } else {
@@ -420,6 +422,11 @@ public class RankingAnalyses {
     }
 
     public static double getMedian(ArrayList<Double> list) {
+        if(list.size() == 0)
+        {
+            return Double.NaN;
+        }
+        
         if (list.size() == 1) {
             return list.get(0);
         }

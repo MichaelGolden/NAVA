@@ -155,7 +155,7 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
         this.jIndexTextField.addKeyListener(this);
 
         this.dataLegendPanel.add(dataLegend, BorderLayout.CENTER);
-        dataLegend.setLegend("", new DataTransform(0, 1, DataTransform.TransformType.LINEAR), new ColorGradient(Color.white, Color.red), new ColorGradient(Color.white, Color.red), true, true, 0, 1, null);
+        dataLegend.setLegend(null, new DataTransform(0, 1, DataTransform.TransformType.LINEAR), new ColorGradient(Color.white, Color.red), new ColorGradient(Color.white, Color.red), true, true, 0, 1, null);
         dataLegend.showEditMode();
 
         this.naturalRadioButtonOneOffset.addItemListener(this);
@@ -268,7 +268,7 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
         this.missingDataRadioButton.setSelected(dataSource2D.excludeValuesOutOfRange);
         this.clampedRadioButton.setSelected(!dataSource2D.excludeValuesOutOfRange);
         this.transformComboBoxModel.setSelectedItem(dataSource2D.dataTransform.type);
-        this.dataLegend.setLegend(dataSource2D.title, dataSource2D.dataTransform, dataSource2D.colorGradient, dataSource2D.defaultColorGradient, dataSource2D.useLowerThreshold, dataSource2D.useUpperThreshold, dataSource2D.thresholdMinPerc, dataSource2D.thresholdMaxPerc, dataSource2D);
+        this.dataLegend.setLegend(null, dataSource2D.dataTransform, dataSource2D.colorGradient, dataSource2D.defaultColorGradient, dataSource2D.useLowerThreshold, dataSource2D.useUpperThreshold, dataSource2D.thresholdMinPerc, dataSource2D.thresholdMaxPerc, dataSource2D);
         this.mappingSourceComboBoxModel.setSelectedItem(dataSource2D.mappingSource.alignmentSource);
 
     }

@@ -646,7 +646,7 @@ public class PersistentSparseMatrix implements Serializable {
                         j = ((j + cacheLineSize) / cacheLineSize) * cacheLineSize;
                     }
 
-                    for (; i < endXExc; i++) {
+                    for (; i < endXExc && i < maxColIndexInRow.length; i++) {
                         int upper = Math.min(maxColIndexInRow[i] + 1, endYExc);
                         //System.out.println("upper"+upper);
                         for (; j < upper; j += cacheLineSize) {
@@ -922,10 +922,14 @@ public class PersistentSparseMatrix implements Serializable {
         Random random = new Random(4920275133465331511L);
         ArrayList<Double> sample = new ArrayList<>();
         int lines = 0;
-        while (sample.size() < sampleSize || lines < 10) {
+        int iters = 0;
+        long maxIters = sampleSize*sampleSize;
+        long maxLines = sampleSize * 10;
+        while ((sample.size() < sampleSize || lines < 10) && iters < maxIters && lines < maxLines){
             int i = random.nextInt(n);
             int j = random.nextInt(m);
-
+            
+           // System.out.println("Lines: "+lines);
             // int j1 = (j / cacheLineSize) * cacheLineSize;
             //int j2 = j1 + cacheLineSize;
             CachedLine cachedLine = getCachedLineForPosition(i, j);
@@ -936,7 +940,7 @@ public class PersistentSparseMatrix implements Serializable {
                 if (val != emptyValue) {
                     sample.add(val);
                 }
-
+                iters++;
             }
             lines++;
             /*

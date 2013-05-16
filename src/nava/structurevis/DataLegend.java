@@ -290,8 +290,8 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
         pw.println("<linearGradient id=\"grad1\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\">");
         for (int i = 0; i < colorGradient.colours.length; i++) {
             double perc = colorGradient.positions[i] * 100;
-            Color c = colorGradient.colours[i];
-            pw.println("<stop offset=\"" + perc + "%\" style=\"stop-color:rgb(" + c.getRed() + "," + c.getGreen() + "," + c.getBlue() + ");stop-opacity:" + (((double) c.getAlpha()) / 255.0) + "\" />");
+            Color c = colorGradient.colours[colorGradient.colours.length-i-1];
+            pw.println("<stop offset=\"" + (perc) + "%\" style=\"stop-color:rgb(" + c.getRed() + "," + c.getGreen() + "," + c.getBlue() + ");stop-opacity:" + (((double) c.getAlpha()) / 255.0) + "\" />");
         }
         pw.println("</linearGradient>");
         pw.println("</defs>");
@@ -299,6 +299,7 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
 
 
         // if (!edit) {
+        
 
 
         double min = transform.transform(transform.min);
@@ -307,7 +308,7 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
             double h = (double) i / (double) (barHeight - 1);
            // double x = transform.inverseTransform(min + h * (max - min));
             
-             double x = transform.inverseTransform(h );
+             double x = transform.inverseTransform(1-h);
             if (i % 25 == 0) {
                 int xpos = (int) (barOffsetX + barWidth);
                 if (edit) {

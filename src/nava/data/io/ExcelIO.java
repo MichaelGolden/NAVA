@@ -40,6 +40,10 @@ public class ExcelIO {
         } catch (IOException ex) {
         } catch (InvalidFormatException ex) {
         }
+        catch(Exception ex)
+        {
+            
+        }
 
         return false;
     }

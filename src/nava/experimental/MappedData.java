@@ -55,6 +55,12 @@ public class MappedData {
 
         return mappedData;
     }
+    
+    public static MappedData getMappedData(File referenceAlignment, MappableData mappableData, int select, boolean useMUSCLE) {
+        ArrayList<MappableData> list = new ArrayList<>();
+        list.add(mappableData);
+        return getMappedData(referenceAlignment, list, select, useMUSCLE);
+    }
 
     public static MappedData getMappedData(File referenceAlignment, ArrayList<MappableData> mappableData, int select, boolean useMUSCLE) {
         try {
@@ -64,7 +70,7 @@ public class MappedData {
             for (MappableData data : mappableData) {
                 mappedData.add(getMappedData(referenceAlignment, data.inputAlignment, data.values, data.codon, data.name, select, useMUSCLE));
             }
-
+            
             MappedData finalData = new MappedData();
             finalData.values = new double[mappedData.get(0).values.length];
             finalData.codon = new int[mappedData.get(0).values.length];

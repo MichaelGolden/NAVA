@@ -11,10 +11,12 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import nava.data.io.CsvReader;
 import nava.data.io.FileImport;
 import nava.data.io.FileImport.ParserException;
 import nava.data.types.DataType;
 import nava.data.types.SecondaryStructureData;
+import nava.ranking.MyMannWhitney;
 import nava.ranking.RankingAnalyses;
 import nava.ranking.StatUtils;
 import nava.structure.MountainMetrics;
@@ -24,6 +26,7 @@ import nava.structurevis.data.DataTransform.TransformType;
 import nava.structurevis.data.Feature;
 import nava.utils.ColorGradient;
 import nava.utils.GraphicsUtils;
+import nava.utils.Mapping;
 import nava.utils.Pair;
 import nava.utils.RNAFoldingTools;
 
@@ -33,14 +36,79 @@ import nava.utils.RNAFoldingTools;
  */
 public class PairwiseStructureComparison {
 
+    public MappedData hivMapping(File referenceAlignment) throws IOException, ParserException, Exception {
+
+        ArrayList<MappableData> mappableData = new ArrayList<>();
+
+        File envCsv = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_env_300_nooverlap_aligned.csv");
+        File envAlignment = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_env_300_nooverlap_aligned.fas");
+        ArrayList<String> envValues = CsvReader.getColumn(envCsv, 1);
+        envValues.remove(0);
+        mappableData.add(new MappableData(envAlignment, envValues, true, "env"));
+
+        File gagCsv = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_gag_300_nooverlap_aligned.csv");
+        File gagAlignment = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_gag_300_nooverlap_aligned.fas");
+        ArrayList<String> gagValues = CsvReader.getColumn(gagCsv, 1);
+        gagValues.remove(0);
+        mappableData.add(new MappableData(gagAlignment, gagValues, true, "gag"));
+
+        File nefCsv = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_nef_300_nooverlap_aligned.csv");
+        File nefAlignment = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_nef_300_nooverlap_aligned.fas");
+        ArrayList<String> nefValues = CsvReader.getColumn(nefCsv, 1);
+        nefValues.remove(0);
+        mappableData.add(new MappableData(nefAlignment, nefValues, true, "nef"));
+
+        File polCsv = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_pol_300_nooverlap_aligned.csv");
+        File polAlignment = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_pol_300_nooverlap_aligned.fas");
+        ArrayList<String> polValues = CsvReader.getColumn(polCsv, 1);
+        polValues.remove(0);
+        mappableData.add(new MappableData(polAlignment, polValues, true, "pol"));
+
+        File tatCsv = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_tat_300_nooverlap_aligned.csv");
+        File tatAlignment = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_tat_300_nooverlap_aligned.fas");
+        ArrayList<String> tatValues = CsvReader.getColumn(tatCsv, 1);
+        tatValues.remove(0);
+        //mappableData.add(new MappableData(tatAlignment, tatValues, true, "tat"));
+
+        File vifCsv = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_vif_300_nooverlap_aligned.csv");
+        File vifAlignment = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_vif_300_nooverlap_aligned.fas");
+        ArrayList<String> vifValues = CsvReader.getColumn(vifCsv, 1);
+        vifValues.remove(0);
+        // mappableData.add(new MappableData(vifAlignment, vifValues, true, "vif"));
+
+        File vprCsv = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_vpr_300_nooverlap_aligned.csv");
+        File vprAlignment = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_vpr_300_nooverlap_aligned.fas");
+        ArrayList<String> vprValues = CsvReader.getColumn(vprCsv, 1);
+        vprValues.remove(0);
+        mappableData.add(new MappableData(vprAlignment, vprValues, true, "vpr"));
+
+
+        File vpuCsv = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_vpu_300_nooverlap_aligned.csv");
+        File vpuAlignment = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_vpu_300_nooverlap_aligned.fas");
+        ArrayList<String> vpuValues = CsvReader.getColumn(vpuCsv, 1);
+        vpuValues.remove(0);
+        mappableData.add(new MappableData(vpuAlignment, vpuValues, true, "vpu"));
+
+        MappedData mappedData = MappedData.getMappedData(referenceAlignment, mappableData, 1000, false);
+        return mappedData;
+    }
+
     public void runComparison() {
         try {
-            int permutations = 3000;
+            int permutations = 1000;
             int windowSize = 75;
             boolean balance = true;
 
-            //File outFile = new File("C:/dev/thesis/dengue/dengue_permutations2.txt");
-            // String[] categories = {"dengue1", "dengue2", "dengue3", "dengue4"};
+          //  File outFile = new File("C:/dev/thesis/dengue/dengue_permutations2.txt");
+          //  String[] categories = {"dengue1", "dengue2", "dengue3", "dengue4"};
+          //  File structureAlignment = new File("C:/dev/thesis/dengue/dengue-alignment.dbn");
+          //  ArrayList<MappedData> dataSources = new ArrayList<>();
+          //  File sequenceFile = new File("C:/dev/thesis/dengue/dengue-alignment.fas");
+          //  File referenceFile = new File("C:/dev/thesis/dengue/dengue_refseq.fasta");
+          //  MappableData synDataDengue = new MappableData(new File("C:/dev/thesis/dengue/300/dengue_polyprotein_300_aligned.fas"), new File("C:/dev/thesis/dengue/300/dengue_polyprotein_300_aligned.csv"), 1, 1, true, "Syn rates dengue");
+          //  dataSources.add(MappedData.getMappedData(sequenceFile, synDataDengue, 1000, false));
+          //  MappableData nucDataDengue = new MappableData(new File("C:/dev/thesis/dengue/300/dengue_all_300_aligned.fas"), new File("C:/dev/thesis/dengue/300/site rates.csv"), 1, 1, true, "Nuc rates dengue");
+           // dataSources.add(MappedData.getMappedData(sequenceFile, nucDataDengue, 1000, false));
 
             //File outFile = new File("C:/dev/thesis/westnile/westnile_permutations.txt");
             //  String[] categories = {"westnile"};
@@ -48,21 +116,77 @@ public class PairwiseStructureComparison {
             //String[] categories = {"westnile", "dengue1", "dengue2", "dengue3", "dengue4"};
             //File structureAlignment = new File("C:/dev/thesis/structure_dengue_westnile_align_400.dbn");
 
-            //File outFile = new File("C:/dev/thesis/jev_westnile_permutations3.txt");
-            //File outFile = new File("C:/dev/thesis/jev_westnile_permutations3.txt");
-            // String[] categories = {"westnile", "jev"};
-            // File structureAlignment = new File("C:/dev/thesis/structure_jev_westnile_aligned.dbn");
+
+
+            //  File outFile = new File("C:/dev/thesis/jev_westnile_permutations2.txt");
+            //  String[] categories = {"westnile", "jev"};
+            //  File structureAlignment = new File("C:/dev/thesis/structure_jev_westnile_aligned.dbn");
+            //  ArrayList<MappedData> dataSources = new ArrayList<>();
+            //  File sequenceFile = new File("C:/dev/thesis/structure_jev_westnile_aligned.fas");
+            // File referenceFile = new File("C:/dev/thesis/structure_jev_westnile_aligned.fas");
+
+            // File outFile = new File("C:/dev/thesis/dengue/dengue_permutations2.txt");
+            //String[] categories = {"dengue1", "dengue2", "dengue3","dengue4"};
+            //File structureAlignment = new File("C:/dev/thesis/dengue/dengue-alignment.dbn");
+            //ArrayList<MappedData> dataSources = new ArrayList<>();
+            //File sequenceFile = new File("C:/dev/thesis/dengue/dengue-alignment.fas");
+            //File referenceFile = new File("C:/dev/thesis/dengue/dengue-alignment.fas");
+
+
+           File outFile = new File("C:/dev/thesis/jev_tbv_westnile/jev_tbv_westnile_permutations_1000_2.txt");
+           String[] categories = {"jev", "tbv", "westnile"};
+          File structureAlignment = new File("C:/dev/thesis/jev_tbv_westnile/jev_westnile_tbv_aligned.dbn");
+          ArrayList<MappedData> dataSources = new ArrayList<>();
+          File sequenceFile = new File("C:/dev/thesis/jev_tbv_westnile/jev_westnile_tbv_aligned.fas");
+           File referenceFile = new File("C:/dev/thesis/jev_tbv_westnile/visualisation/westnile_reference.fasta");
+         MappableData synDataJEV= new MappableData(new File("C:/dev/thesis/jev_tbv_westnile/visualisation/jev_polyprotein_300_aligned.fas"), new File("C:/dev/thesis/jev_tbv_westnile/visualisation/jev_polyprotein_300_aligned.csv"), 1, 1, true, "Syn rates JEV");
+          dataSources.add(MappedData.getMappedData(sequenceFile, synDataJEV, 1000, false));
+          MappableData synDataTBV= new MappableData(new File("C:/dev/thesis/jev_tbv_westnile/visualisation/tbv_polyprotein_300_aligned.fas"), new File("C:/dev/thesis/jev_tbv_westnile/visualisation/tbv_polyprotein_300_aligned.csv"), 1, 1, true, "Syn rates TBV");
+          dataSources.add(MappedData.getMappedData(sequenceFile, synDataTBV, 1000, false));
+          MappableData synDataWestnile= new MappableData(new File("C:/dev/thesis/jev_tbv_westnile/visualisation/westnile_polyprotein_300_aligned.fas"), new File("C:/dev/thesis/jev_tbv_westnile/visualisation/westnile_polyprotein_300_aligned.csv"), 1, 1, true, "Syn rates westnile");
+          dataSources.add(MappedData.getMappedData(sequenceFile, synDataWestnile, 1000, false));
 
             //File outFile = new File("C:/dev/thesis/hcv_westnile_permutations2.txt");
             //String[] categories = {"westnile", "hcv1a", "hcv1b", "hcv2a", "hcv2b","hcv3","hcv4", "hcv6"};
-
-            File outFile = new File("C:/dev/thesis/hcv/hcv_permutations2.txt");
-            String[] categories = {"hcv1a", "hcv1b", "hcv2a", "hcv2b", "hcv3", "hcv4", "hcv6"};
-            File structureAlignment = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.dbn");
-
-            //File outFile = new File("C:/dev/thesis/hiv_full/hiv_not_siv_permutations2.txt");
+           //  File outFile = new File("C:/dev/thesis/hcv/hcv_permutations2.txt"); 
+           //  String[] categories = {"hcv1a", "hcv1b", "hcv2a", "hcv2b", "hcv3", "hcv4", "hcv6"};
+          //   File structureAlignment = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.dbn"); 
+          //   File sequenceFile = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.fas"); 
+          //  File referenceFile = new File("C:/dev/thesis/hcv/visualisation/H77_reference.fasta");
+          //  MappableData nucleotideData = new MappableData(sequenceFile, new File("C:/dev/thesis/hcv/conservation/rates.csv"), 0, 1, false,"Nucleotide rates"); 
+          //   MappableData synDataHCV1 = new MappableData(new File("C:/dev/thesis/hcv/1/300/hcv1_polyprotein_300_aligned.fas"), new File("C:/dev/thesis/hcv/1/300/hcv1_polyprotein_300_aligned.csv"), 1, 1, true, "Syn rates hcv 1"); 
+          //  MappableData synDataHCV1a = new MappableData(new File("C:/dev/thesis/hcv/1a/300/hcv1a_polyprotein_300_aligned.fas"), new File("C:/dev/thesis/hcv/1a/300/hcv1a_polyprotein_300_aligned.csv"), 1, 1, true, "Syn rates hcv 1a"); 
+           // MappableData synDataHCV1b = new  MappableData(new File("C:/dev/thesis/hcv/1b/300/hcv1b_polyprotein_300_aligned.fas"), new File("C:/dev/thesis/hcv/1b/300/hcv1b_polyprotein_300_aligned.csv"), 1, 1, true, "Syn rates hcv 1b"); 
+          //   MappableData synDataHCV2 = new MappableData(new File("C:/hcv/2_coding_alignment_100.fas"), new File("C:/hcv/2_coding_alignment_100.nex.csv"), 1, 1, true, "Syn rates hcv 2"); 
+          //   MappableData synDataHCV3 = new MappableData(new File("C:/hcv/3_coding_alignment_48.fas_DNA.fasta"), new File("C:/hcv/3_coding_alignment_48.fas_DNA.nex.csv"), 1, 1, true, "Syn rates hcv 3"); 
+          //  MappableData synDataHCV4 = new MappableData(new File("C:/hcv/4_coding_macse.fas_DNA.fasta"), new File("C:/hcv/4_coding_macse.fas_DNA.fasta.nex.csv"), 1, 1, true, "Syn rates hcv 4"); 
+          //   MappableData synDataHCV6 = new MappableData(new File("C:/hcv/6_coding_alignment_77.fas"), new File("C:/hcv/6_coding_alignment_77.nex.csv"), 1, 1, true, "Syn rates hcv 6"); 
+          //   ArrayList<MappedData> dataSources = new ArrayList<>();
+          // dataSources.add(MappedData.getMappedData(sequenceFile,nucleotideData, 1000, false));
+          //   dataSources.add(MappedData.getMappedData(sequenceFile,synDataHCV1, 1000, false));
+          //  dataSources.add(MappedData.getMappedData(sequenceFile, synDataHCV1a, 1000, false));
+          //  dataSources.add(MappedData.getMappedData(sequenceFile,synDataHCV1b, 1000, false));
+          //  dataSources.add(MappedData.getMappedData(sequenceFile,synDataHCV2, 1000, false));
+           // dataSources.add(MappedData.getMappedData(sequenceFile, synDataHCV3, 1000, false));
+           // dataSources.add(MappedData.getMappedData(sequenceFile,synDataHCV4, 1000, false));
+           // dataSources.add(MappedData.getMappedData(sequenceFile, synDataHCV6, 1000, false));
+            
+            //ArrayList<MappedData> dataSources = new ArrayList<>();
+            // File outFile = new File("C:/dev/thesis/hiv_full/hiv_not_siv_permutations2.txt");
             // String[] categories = {"hiv1b", "hiv1c", "hiv1d", "hiv1g", "hiv1o", "hiv2"};
             //File structureAlignment = new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.dbn");
+            // File sequenceFile = new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.fas");
+            //File referenceFile = new File("C:/dev/thesis/hiv_full/hiv1-reference.fasta");
+            //dataSources.add(hivMapping(sequenceFile));
+
+          //   ArrayList<MappedData> dataSources = new ArrayList<>();
+            // File outFile = new File("C:/dev/thesis/bvdv_csfv/bvdv_and_csfv_permutations.txt");
+            // String[] categories = {"bvdv", "csfv"};
+          //  File structureAlignment = new File("C:/dev/thesis/bvdv_csfv/bvdv_and_csfv.dbn");
+           // File sequenceFile = new File("C:/dev/thesis/bvdv_csfv/bvdv_and_csfv.fas");
+           // File referenceFile = new File("C:/dev/thesis/bvdv_csfv/bvdv_and_csfv.fas");
+            //dataSources.add(hivMapping(sequenceFile));
+
 
             System.out.println(combinations(categories));
             ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(structureAlignment, DataType.FileFormat.VIENNA_DOT_BRACKET);
@@ -81,8 +205,8 @@ public class PairwiseStructureComparison {
             ArrayList<Combination> combinations = combinations(categories);
             for (int i = 0; i < combinations.size(); i++) {
                 Combination combination = combinations.get(i);
-                // combination.combination.size() == 1 ||
-                if (combination.combination.size() == 1 || combination.combination.size() == categories.length) {
+                if (combination.combination.size() <10) {
+                    //if (combination.combination.size() == 4) {
                 } else {
                     combinations.remove(i);
                     i--;
@@ -144,10 +268,10 @@ public class PairwiseStructureComparison {
             for (int i = 0; i < categories.length; i++) {
                 pairMustContain = new ArrayList<>();
                 pairMustContain.add(categories[i]);
-                postAnalysis(outFile, outFile, categories, combinations, structureData, windowSize, pairMustContain);
+                postAnalysis(outFile, outFile, categories, combinations, structureData, windowSize, pairMustContain, sequenceFile, referenceFile, dataSources);
             }
             pairMustContain = new ArrayList<>();
-            postAnalysis(outFile, outFile, categories, combinations, structureData, windowSize, pairMustContain);
+            postAnalysis(outFile, outFile, categories, combinations, structureData, windowSize, pairMustContain, sequenceFile, referenceFile, dataSources);
             System.exit(0);
             //ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(new File("C:/dev/thesis/dengue2/50/dengue2_all_50_aligned_partial_structurealign.fas.dbn"), DataType.FileFormat.VIENNA_DOT_BRACKET);
             //ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(new File("C:/dev/thesis/full-alignment.dbn"), DataType.FileFormat.VIENNA_DOT_BRACKET);
@@ -380,9 +504,13 @@ public class PairwiseStructureComparison {
         return possibilities;
     }
 
-    public void postAnalysis(File inFile, File outFile, String[] categories, ArrayList<Combination> combinations, ArrayList<SecondaryStructureData> structureData, int windowSize, ArrayList<String> pairMustContain) {
-        double[] gaps = getPercentGaps(structureData, windowSize);
+    public void postAnalysis(File inFile, File outFile, String[] categories, ArrayList<Combination> combinations, ArrayList<SecondaryStructureData> structureData, int windowSize, ArrayList<String> pairMustContain, File sequenceFile, File referenceFile, ArrayList<MappedData> dataSources) {
+
+
         double gapPerc = 0.3;
+        double pvalCutoff = 0.05;
+
+        Mapping alignmentToReference = Mapping.createMapping(sequenceFile, referenceFile, 1000, false);
 
         String mustHave = "";
 
@@ -394,6 +522,22 @@ public class PairwiseStructureComparison {
         }
 
         for (Combination combination : combinations) {
+            ArrayList<SecondaryStructureData> structureData2 = (ArrayList<SecondaryStructureData>) structureData.clone();
+            for (SecondaryStructureData d : structureData) {
+                StructureItem item = new StructureItem();
+                item.pairedSites = d.pairedSites;
+                item.sequence = d.sequence;
+                item.title = d.title;
+                String[] split = d.title.split("_");
+                item.organism = split[split.length - 1];
+                if (!combination.contains((item.organism))) {
+                    // System.out.println("Removing " + d.title + "\t" + item.organism);
+                    structureData2.remove(d);
+                }
+            }
+
+            double[] gaps = getPercentGaps(structureData2, windowSize);
+
             boolean mayContinue = true;
             for (int i = 0; i < pairMustContain.size(); i++) {
                 if (!combination.contains(pairMustContain.get(i))) {
@@ -407,7 +551,7 @@ public class PairwiseStructureComparison {
             ArrayList<Integer> structures = new ArrayList<>();
             try {
                 BufferedReader buffer = new BufferedReader(new FileReader(inFile));
-                BufferedWriter writer2 = new BufferedWriter(new FileWriter(outFile.getAbsolutePath() + "_" + combination + mustHave + "_structures.txt"));
+                BufferedWriter writer2 = new BufferedWriter(new FileWriter(outFile.getAbsolutePath() + "_" + combination + mustHave + "_" + pvalCutoff + "_structures.txt"));
                 double totalPairs = 0;
                 String textline = null;
                 ArrayList<double[]> data = new ArrayList<>();
@@ -474,7 +618,7 @@ public class PairwiseStructureComparison {
 
 
                 if (data.size() > 0) {
-                    BufferedWriter writer = new BufferedWriter(new FileWriter(outFile.getAbsolutePath() + "_" + combination + mustHave));
+                    BufferedWriter writer = new BufferedWriter(new FileWriter(outFile.getAbsolutePath() + "_" + combination + mustHave + "_" + pvalCutoff));
                     for (int i = 0; i < data.get(0).length; i++) {
                         ArrayList<Double> valuesAtPos = new ArrayList<>();
                         for (int j = 0; j < data.size(); j++) {
@@ -499,7 +643,7 @@ public class PairwiseStructureComparison {
 
                 boolean[] inWindow = new boolean[structureData.get(0).pairedSites.length];
                 for (int i = 0; i < medianPvals.size(); i++) {
-                    if (gaps[i] < gapPerc && medianPvals.get(i) <= 0.05) {
+                    if (gaps[i] < gapPerc && medianPvals.get(i) <= pvalCutoff) {
                         for (int j = i; j < i + windowSize; j++) {
                             inWindow[j] = true;
                         }
@@ -508,7 +652,7 @@ public class PairwiseStructureComparison {
                 for (int i = 0; i < medianPvals.size(); i++) {
                     if (gaps[i] >= gapPerc) {
                         writer2.write('-');
-                    } else if (medianPvals.get(i) <= 0.05) {
+                    } else if (medianPvals.get(i) <= pvalCutoff) {
                         writer2.write('*');
                     } else {
                         writer2.write(' ');
@@ -542,13 +686,14 @@ public class PairwiseStructureComparison {
                 }
 
 
-                BufferedWriter substructureWriter = new BufferedWriter(new FileWriter(outFile.getAbsolutePath() + "_" + combination + mustHave + ".substructures"));
+                //DecimalFormat df = new DecimalFormat("0.000");
+                BufferedWriter substructureWriter = new BufferedWriter(new FileWriter(outFile.getAbsolutePath() + "_" + combination + mustHave + "_" + pvalCutoff + ".substructures"));
                 for (Substructure substructure : substructures) {
                     ArrayList<Double> pvalues = new ArrayList<>();
                     for (int i = substructure.start; i < substructure.start + substructure.length - windowSize + 1; i++) {
                         pvalues.add(medianPvals.get(i));
                     }
-                    int l = Math.max(0, (1000 - substructure.length) / 2);
+                    int l = Math.max(0, (1250 - substructure.length) / 2);
                     System.out.println("l=" + l + "\t" + substructure.start + "\t" + substructure.length);
                     substructure.startMatrix = Math.max(0, substructure.start - l);
                     int endPos = Math.min(structureData.get(0).pairedSites.length, substructure.startMatrix + substructure.length + 2 * l);
@@ -577,19 +722,47 @@ public class PairwiseStructureComparison {
                             substructure.matrix[x][y] /= t;
                         }
                     }
-                    substructure.pairedSites = RNAFoldingTools.getPosteriorDecodingConsensusStructure(substructure.matrix);
+                    System.out.println("Start posterior decoding " + substructure.matrix.length);
+                    substructure.pairedSites = PosteriorDecodingTool.getPosteriorDecodingConsensusStructure(substructure.matrix);
                     substructure.pairedSites = StructureAlign.getSubstructure(substructure.pairedSites, substructure.start - substructure.startMatrix, substructure.length);
+                    System.out.println("End posterior decoding " + substructure.matrix.length);
                     System.out.println(substructure.toString());
-                    substructureWriter.write(substructure.toString() + "\n");
+                    substructureWriter.write(substructure.toString());
+                    int startMapped = alignmentToReference.aToBNearest(substructure.start) + 1;
+                    int endMapped = alignmentToReference.aToBNearest(substructure.start + substructure.length);
+                    substructureWriter.write(startMapped + "-" + endMapped + "\n");
+                    substructureWriter.write("p-value=" + df.format(substructure.medianPvalue) + "\n");
+                    substructureWriter.write("z-score=" + df.format(StatUtils.getInvCDF(substructure.medianPvalue / 2, true)) + "\n");
+                    for (MappedData mappedData : dataSources) {
+                        ArrayList<Double> values = new ArrayList<>();
+                        ArrayList<Double> allValues = new ArrayList<>();
+                        for (int i = substructure.start; i < substructure.start + substructure.length; i++) {
+                            if (mappedData.used[i]) {
+                                values.add(mappedData.values[i]);
+                            }
+                        }
+                        for (int i = 0; i < mappedData.used.length; i++) {
+                            if (mappedData.used[i]) {
+                                allValues.add(mappedData.values[i]);
+                            }
+                        }
+
+                        substructureWriter.write(mappedData.name + "\n");
+                        substructureWriter.write(df.format(RankingAnalyses.getMedian(values)) + "\n");
+                        substructureWriter.write(df.format(RankingAnalyses.getMedian(allValues)) + "\n");
+                        MyMannWhitney mw = new MyMannWhitney(values, allValues);
+                        substructureWriter.write(df.format(mw.getZ()) + "\n");
+                    }
+                    substructureWriter.newLine();
                 }
                 substructureWriter.close();
 
-                BufferedWriter svgWriter = new BufferedWriter(new FileWriter(outFile.getAbsolutePath() + "_" + combination + mustHave + ".svg"));
+                BufferedWriter svgWriter = new BufferedWriter(new FileWriter(outFile.getAbsolutePath() + "_" + combination + mustHave + "_" + pvalCutoff + ".svg"));
                 svgWriter.write(getSVGRepresentationSubstructure(substructures, structureData.get(0).pairedSites.length, combination.toString() + mustHave));
                 svgWriter.close();
 
 
-                BufferedWriter matrixWriter = new BufferedWriter(new FileWriter(outFile.getAbsolutePath() + "_" + combination + mustHave + ".matrix"));
+                BufferedWriter matrixWriter = new BufferedWriter(new FileWriter(outFile.getAbsolutePath() + "_" + combination + mustHave + "_" + pvalCutoff + ".matrix"));
                 String structure = "";
                 double[] pairingProbability = new double[structureData.get(0).pairedSites.length];
                 for (int i = 0; i < structureData.get(0).pairedSites.length; i++) {
@@ -636,14 +809,14 @@ public class PairwiseStructureComparison {
                 writer2.newLine();
                 writer2.close();
 
-                BufferedWriter csvWriter = new BufferedWriter(new FileWriter(outFile.getAbsolutePath() + "_" + combination + mustHave + ".csv"));
+                BufferedWriter csvWriter = new BufferedWriter(new FileWriter(outFile.getAbsolutePath() + "_" + combination + mustHave + "_" + pvalCutoff + ".csv"));
                 csvWriter.write("Position,Probability\n");
                 for (int i = 0; i < pairingProbability.length; i++) {
                     csvWriter.write((i + 1) + "," + pairingProbability[i] + "\n");
                 }
                 csvWriter.close();
 
-                BufferedWriter allWriter = new BufferedWriter(new FileWriter(outFile.getAbsolutePath() + "_summary.txt", true));
+                BufferedWriter allWriter = new BufferedWriter(new FileWriter(outFile.getAbsolutePath() + "_" + pvalCutoff + "_summary.txt", true));
                 allWriter.write(">" + combination + mustHave);
                 allWriter.newLine();
                 allWriter.write(structure);
@@ -713,7 +886,7 @@ public class PairwiseStructureComparison {
 
     public static String getSVGRepresentationSubstructure(ArrayList<Substructure> substructures, int length, String label) {
         int panelWidth = 1000;
-        int panelHeight = 12;
+        int panelHeight = 11;
 
 
         StringWriter sw = new StringWriter();

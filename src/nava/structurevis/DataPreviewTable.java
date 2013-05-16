@@ -62,7 +62,7 @@ public class DataPreviewTable extends JPanel {
                 int j = 1;
 
                 for (int i = 0; i < dataSource1D.dataOffsetCorrected; i++) {
-                    if (!dataSource1D.codonPositions || i % 3 == 0) {
+                    if ((!dataSource1D.codonPositions || i % 3 == 0) && i < dataSource1D.stringData.length) {
                         Object[] row = {-1, "?", dataSource1D.stringData[i] == null ? "" : dataSource1D.stringData[i]};
                         if (dataSource1D.mappingSequence != null && i < dataSource1D.mappingSequence.length()) {
                             row[1] = dataSource1D.mappingSequence.charAt(i) + "";

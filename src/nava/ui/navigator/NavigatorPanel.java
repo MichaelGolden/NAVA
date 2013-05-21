@@ -16,6 +16,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -32,6 +33,7 @@ import nava.structurevis.data.Overlay;
 import nava.structurevis.navigator.DataOverlayTreeNode;
 import nava.ui.*;
 import nava.utils.GraphicsUtils;
+import nava.utils.SafeListModel;
 
 /**
  *
@@ -255,6 +257,13 @@ public class NavigatorPanel extends javax.swing.JPanel implements ActionListener
 
     @Override
     public void dataSourcesContentsChanged(ListDataEvent e) {
+        SafeListModel<DataSource> dataSources = projectController.projectModel.dataSources;
+        for(int i = e.getIndex0() ; i <= e.getIndex1() ; i++)
+        {
+           NavigatorTreeNode node = projectController.projectModel.navigatorTreeModel.findNode(dataSources.get(i));
+           projectController.projectModel.navigatorTreeModel.nodeChanged(node);
+           
+        }
     }
 
     @Override

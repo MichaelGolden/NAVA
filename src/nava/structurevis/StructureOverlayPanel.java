@@ -23,6 +23,7 @@ import nava.ui.MainFrame;
 import nava.ui.ProjectController;
 import nava.ui.ProjectModel;
 import nava.ui.ProjectView;
+import nava.utils.GraphicsUtils;
 
 /**
  *
@@ -57,7 +58,7 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
         //this.maxSpinner.setModel(this.maxSpinnerModel);
         //this.maxSpinner.addChangeListener(this);
         circularRadioButton.addItemListener(this);
-        
+
         populateStructureComboBox(projectModel.dataSources.getArrayListShallowCopy());
         populateAlignmentComboBox(projectModel.dataSources.getArrayListShallowCopy());
     }
@@ -298,20 +299,20 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
     }//GEN-LAST:event_fromAlignmentRadioButtonActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        if(structureOverlay != null && structureOverlay.structure != null)
-        {
-            if(structureOverlay.substructureList == null)
-            {
+        if (structureOverlay != null && structureOverlay.structure != null) {
+            if (structureOverlay.substructureList == null) {
                 structureOverlay.substructureList = new SubstructureList(structureOverlay);
             }
-            SubstructureListDialog dialog = new SubstructureListDialog(new javax.swing.JFrame(), true, structureOverlay.substructureList.clone());        
+            SubstructureListDialog dialog = new SubstructureListDialog(new javax.swing.JFrame(), true, structureOverlay.substructureList.clone());
+            GraphicsUtils.centerWindowOnScreen(dialog);
             dialog.setVisible(true);
-            if(dialog.save)
-            {
+            if (dialog.save) {
+                System.out.println("saving list");
                 structureOverlay.substructureList = dialog.substructureList;
+                System.out.println("isRecusrive?"+structureOverlay.substructureList.recursive);
                 jLabel8.setText("You have defined a list. Click to edit.");
             }
-            
+
         }
         System.out.println(structureOverlay.substructureList);
     }//GEN-LAST:event_jButton3ActionPerformed
@@ -372,19 +373,18 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
 
 
             // = new StructureOverlay(structure, mappingSource);
-            if(structureOverlay != null && structureOverlay.structure != null)
-            {
+            if (structureOverlay != null && structureOverlay.structure != null &&  structureOverlay.substructureList == null) {
                 structureOverlay.substructureList = new SubstructureList(structureOverlay);
-              //  if(this.circularRadioButton.isSelected() != structureOverlay.circular  || !structureOverlay.structure.equals(structure))
-              //  {
-                    // if either parameter has changed need to regenerate list
-                    structureOverlay.substructureList = new SubstructureList(structureOverlay);
-                 //   jLabel8.setText("A new list has been generated.");
-               // }
+                //  if(this.circularRadioButton.isSelected() != structureOverlay.circular  || !structureOverlay.structure.equals(structure))
+                //  {
+                // if either parameter has changed need to regenerate list
+              //  structureOverlay.substructureList = new SubstructureList(structureOverlay);
+                //   jLabel8.setText("A new list has been generated.");
+                // }
             }
             structureOverlay.setStructureAndMapping(structure, mappingSource);
-           // structureOverlay.minStructureSize = (Integer) this.minSpinnerModel.getValue();
-           // structureOverlay.maxStructureSize = (Integer) this.maxSpinnerModel.getValue();
+            // structureOverlay.minStructureSize = (Integer) this.minSpinnerModel.getValue();
+            // structureOverlay.maxStructureSize = (Integer) this.maxSpinnerModel.getValue();
             //structureOverlay.nonOverlappingSubstructures = this.jCheckBox1.isSelected();
 
             if (this.embeddSequenceRadioButton.isSelected()) {
@@ -397,9 +397,7 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
 
             structureOverlay.addMappingSourceAsNucleotideOverlay = addMappingAlignmentAsOverlayCheckBox.isSelected();
 
-            if (this.circularRadioButton.isSelected()) {
-                structureOverlay.circular = true;
-            }
+            structureOverlay.circular = circularRadioButton.isSelected();
         }
     }
 
@@ -407,10 +405,9 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
         update();
         structureOverlay.loadData();
         if (structureOverlay != null && structureOverlay.pairedSites != null) {
-           if(structureOverlay.substructureList == null)
-           {
-               structureOverlay.substructureList = new SubstructureList(structureOverlay);
-           }
+            if (structureOverlay.substructureList == null) {
+                structureOverlay.substructureList = new SubstructureList(structureOverlay);
+            }
         }
     }
 
@@ -445,19 +442,12 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
     public void stateChanged(ChangeEvent e) {
         update();
         /*
-        int min = (Integer) minSpinner.getValue();
-        int max = (Integer) maxSpinner.getValue();
-        if (e.getSource().equals(minSpinner)) {
-            if (min > max) {
-                maxSpinnerModel.setValue(min);
-            }
-        }
-        if (e.getSource().equals(maxSpinner)) {
-            if (min > max) {
-                minSpinnerModel.setValue(max);
-            }
-        }
-        * 
-        */
+         * int min = (Integer) minSpinner.getValue(); int max = (Integer)
+         * maxSpinner.getValue(); if (e.getSource().equals(minSpinner)) { if
+         * (min > max) { maxSpinnerModel.setValue(min); } } if
+         * (e.getSource().equals(maxSpinner)) { if (min > max) {
+         * minSpinnerModel.setValue(max); } }
+         *
+         */
     }
 }

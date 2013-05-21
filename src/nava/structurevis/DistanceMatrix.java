@@ -103,7 +103,8 @@ public class DistanceMatrix {
 
         for (int i = 0; i < pairedSites.length; i++) {
             int x = i;
-            int y = pairedSites[i] - 1;
+            System.out.println(pairedSites[i]+"\t"+pairedSites.length);
+            int y = (pairedSites[i] - 1) % pairedSites.length;
             if (pairedSites[i] != 0) {
                 matrix[x][y] = 1;
                 matrix[y][x] = 1;

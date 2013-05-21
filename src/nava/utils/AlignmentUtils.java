@@ -247,9 +247,11 @@ public class AlignmentUtils {
         double aminoAcidCount = 0;
         double aminoAcidExcludingNucCount = 0;
         double total = 0;
+        int maxSequenceLength = 0;
         for (int j = 0 ; j < 50 ; j++) {
             String sequence = sequences.get(random.nextInt(sequences.size()));
             int length = sequence.length();
+            maxSequenceLength = Math.max(maxSequenceLength, length);
             int randomStartPos = random.nextInt(length);
             for (int i = 0; i < 1000 ; i++) {
                 int pos = (randomStartPos + i) % length;
@@ -328,7 +330,12 @@ public class AlignmentUtils {
         System.out.println((stopCodons / totalTriplets));
         System.out.println(total+"\t"+totalTriplets);
 */
-        if(validCodons / totalTriplets >= 0.90)
+        double codonPercentCutoff = ((double)(maxSequenceLength-3)/(double)(maxSequenceLength));
+        if(maxSequenceLength < 100)
+        {
+            codonPercentCutoff = 0.9;
+        }
+        if(validCodons / totalTriplets >= codonPercentCutoff)
         {
             return AlignmentType.CODON_ALIGNMENT;
         }

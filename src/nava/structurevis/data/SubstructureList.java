@@ -64,12 +64,12 @@ public class SubstructureList implements Serializable {
         boolean[] covered = new boolean[pairedSites.length];
         for (Substructure s : substructures) {
             for (int i = s.startPosition; i < s.startPosition + s.length; i++) {
-                covered[i] = true;
+                covered[i%pairedSites.length] = true;
             }
         }
         int count = 0;
         for (int i = 0; i < covered.length; i++) {
-            count += covered[i] ? 1 : 0;
+            count += covered[i%pairedSites.length] ? 1 : 0;
         }
 
         return count;

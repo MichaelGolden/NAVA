@@ -7,16 +7,20 @@ package nava.ui;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
+import javax.swing.event.ListDataEvent;
+import nava.data.types.Alignment;
 import nava.data.types.DataSource;
+import nava.ui.navigator.NavigatorTreeNode;
 
 /**
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class DataInspectorPanel extends javax.swing.JPanel implements ItemListener {
+public class DataInspectorPanel extends javax.swing.JPanel implements ItemListener, ProjectView {
 
     ArrayList<DataSource> selectedDataSources = new ArrayList<>();
     ProjectController projectController;
+    //DataInspectorAlignmentPanel alignmentPanel = new DataInspectorAlignmentPanel();
 
     /**
      * Creates new form DataInspectorPanel
@@ -27,6 +31,7 @@ public class DataInspectorPanel extends javax.swing.JPanel implements ItemListen
        // WrapLayout wrapLayout = new WrapLayout(WrapLayout.LEFT);
         //wrapLayout.setHgap(8);
         //exportPanel.setLayout(wrapLayout);
+        projectController.addView(this);
         editTitle();
     }
 
@@ -39,6 +44,17 @@ public class DataInspectorPanel extends javax.swing.JPanel implements ItemListen
         dataTypeLabel.setText(dataSource.getTypeName());
         titleField.setText(dataSource.title);
         
+        
+        if(dataSource instanceof Alignment)
+        {
+            this.holderPanel.removeAll();
+            this.holderPanel.add(new DataInspectorAlignmentPanel(projectController, (Alignment)dataSource));
+            this.holderPanel.revalidate();
+        }
+        else
+        {
+           this.holderPanel.removeAll();
+        }
        // exportPanel.revalidate();
         //exportPanel.repaint();
         //jPanel2.revalidate();
@@ -61,6 +77,7 @@ public class DataInspectorPanel extends javax.swing.JPanel implements ItemListen
         jLabel3 = new javax.swing.JLabel();
         titleField = new javax.swing.JTextField();
         editTitleButton = new javax.swing.JToggleButton();
+        holderPanel = new javax.swing.JPanel();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Properties"));
 
@@ -82,6 +99,8 @@ public class DataInspectorPanel extends javax.swing.JPanel implements ItemListen
             }
         });
 
+        holderPanel.setLayout(new java.awt.BorderLayout());
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -95,11 +114,12 @@ public class DataInspectorPanel extends javax.swing.JPanel implements ItemListen
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(dataTypeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(titleField, javax.swing.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)
+                        .addComponent(titleField, javax.swing.GroupLayout.DEFAULT_SIZE, 268, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(editTitleButton)
                         .addGap(58, 58, 58)))
                 .addContainerGap())
+            .addComponent(holderPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -113,7 +133,8 @@ public class DataInspectorPanel extends javax.swing.JPanel implements ItemListen
                     .addComponent(jLabel3)
                     .addComponent(titleField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(editTitleButton))
-                .addContainerGap(155, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(holderPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -156,6 +177,7 @@ public class DataInspectorPanel extends javax.swing.JPanel implements ItemListen
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel dataTypeLabel;
     private javax.swing.JToggleButton editTitleButton;
+    private javax.swing.JPanel holderPanel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
@@ -164,5 +186,30 @@ public class DataInspectorPanel extends javax.swing.JPanel implements ItemListen
 
     @Override
     public void itemStateChanged(ItemEvent e) {
+    }
+
+    @Override
+    public void projectModelChanged(ProjectModel newProjectModel) {
+    }
+
+    @Override
+    public void dataSourcesLoaded() {
+    }
+
+    @Override
+    public void dataSourcesIntervalAdded(ListDataEvent e) {
+    }
+
+    @Override
+    public void dataSourcesIntervalRemoved(ListDataEvent e) {
+    }
+
+    @Override
+    public void dataSourcesContentsChanged(ListDataEvent e) {
+        
+        for(DataSource d : selectedDataSources)
+        {
+             this.updatePanel(d);
+        }
     }
 }

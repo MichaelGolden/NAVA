@@ -186,7 +186,6 @@ public class RecombinationFoldDisruption {
         RecombinationEvent newEvent = event.clone();
         newEvent.start = newStart;
         if (simplePermutation) {
-            
         } else {
             InformativeSiteCalculation infCalc = new InformativeSiteCalculation(event.minorParentSequence, event.majorParentSequence);
             int informativeSitesReal = infCalc.getNumberOfInformativeSites(event.start, event.length);
@@ -255,7 +254,8 @@ public class RecombinationFoldDisruption {
             ArrayList<RecombinationEvent> recombinationEvents = loadRecombinationEvents(alignmentFile, rdpCSVFile, true);
             ArrayList<RecombinationEvent> selectedRecombinationEvents = new ArrayList<>();
             for (RecombinationEvent event : recombinationEvents) {
-                if (!event.breakpointUndetermined && event.circulationCount >= 0  && event.recombinantName.matches("SN[0-9]+_.+")) {
+              //if (!event.breakpointUndetermined && event.circulationCount >= 0 && event.recombinantName.matches("SN[0-9]+_.+")) {
+                 if (!event.breakpointUndetermined) {
                     selectedRecombinationEvents.add(event);
 
                     System.out.println(selectedRecombinationEvents.size() + "_" + event);
@@ -269,7 +269,7 @@ public class RecombinationFoldDisruption {
                  * event); }
                  */
                 // System.out.println(selectedRecombinationEvents.size() + "_" + event);
-                if (selectedRecombinationEvents.size() >= 20) {
+                if (selectedRecombinationEvents.size() >= 1000) {
                     break;
                 }
 
@@ -329,12 +329,15 @@ public class RecombinationFoldDisruption {
                     //System.out.println(m+"> "+getBasePairCount(minorAligned, permutedEvent2));
                     //System.out.println(m+"> "+getBasePairCount(majorAligned, realEvent));
                     //System.out.println(m+"> "+getBasePairCount(majorAligned, permutedEvent2));
-                    
-                    countBasePairsReal += getBasePairCount(minorAligned, realEvent);
-                    countBasePairsPermuted += getBasePairCount(minorAligned, permutedEvent2);
 
-                    countBasePairsReal += getBasePairCount(majorAligned, realEvent);
-                    countBasePairsPermuted += getBasePairCount(majorAligned, permutedEvent2);
+                    countBasePairsReal += getBasePairProportion(realAligned, realEvent,50);
+                   countBasePairsPermuted += getBasePairProportion(realAligned, permutedEvent2,50);
+
+                   //countBasePairsReal += getBasePairProportion(majorAligned, realEvent,50);
+                    //countBasePairsPermuted += getBasePairProportion(majorAligned, permutedEvent2,50);
+                    
+                    //countBasePairsReal += getBasePairProportion(realAligned, realEvent,50);
+                   //countBasePairsPermuted += getBasePairProportion(realAligned, permutedEvent2,50);
                 }
 
                 if (realDisruption >= permutedDisruption) {
@@ -354,7 +357,7 @@ public class RecombinationFoldDisruption {
                 double parentalSimilarityPval = countParentalSimilarity / total;
                 //double basePairCount = 
                 System.out.println(realEvent.id + ", " + realEvent.start + ", " + permutedEvent.start + ": " + realRecombinantFold.freeEnergy + "\t" + permutedRecombinantFold.freeEnergy + "\t" + energyPval + "\t" + realDisruption + "\t" + permutedDisruption + "\t" + disruptionPval + "\t" + realSimilarityToParents + "\t" + permutedSimilarityToParents + "\t" + parentalSimilarityPval + "\t" + (sumDisruptionReal / (sumDisruptionReal + sumDisruptionPermuted)) + "\t" + countBasePairsReal + "/" + (countBasePairsReal + countBasePairsPermuted) + "\t" + (countBasePairsReal / (countBasePairsReal + countBasePairsPermuted)));
-                if (i % 3 == 0) {
+                if (i % 20 == 0) {
                     saveFoldCache();
                 }
             }
@@ -368,13 +371,43 @@ public class RecombinationFoldDisruption {
     public int getBasePairCount(String recombinantDotBracket, RecombinationEvent event) {
         int count = 0;
         int[] recombinantSites = RNAFoldingTools.getPairedSitesFromDotBracketString(recombinantDotBracket);
-        if (recombinantSites[event.start] != 0) {
-            count++;
-        }
-        if (recombinantSites[(event.start + event.length) % recombinantSites.length] != 0) {
+       
+        if (recombinantSites[event.start] != 0) 
+        { 
+            count++; 
+        } 
+        if(recombinantSites[(event.start + event.length) % recombinantSites.length] != 0) { 
             count++;
         }
         return count;
+    }
+
+    public double getBasePairProportion(String recombinantDotBracket, RecombinationEvent event, int windowSize) {
+        double count = 0;
+        double total = 0;
+        int[] recombinantSites = RNAFoldingTools.getPairedSitesFromDotBracketString(recombinantDotBracket);
+        /*
+         * if (recombinantSites[event.start] != 0) { count++; } if
+         * (recombinantSites[(event.start + event.length) %
+         * recombinantSites.length] != 0) { count++;
+        }
+         */
+
+        for (int i = recombinantSites.length + event.start - (windowSize / 2); i < recombinantSites.length + event.start + (windowSize / 2); i++) {
+            if (recombinantSites[i%recombinantSites.length] != 0) {
+                count++;
+            }
+            //System.out.println(event.id+" 1= "+(i%recombinantSites.length)+"\t"+recombinantSites[i%recombinantSites.length]);
+            total++;
+        }
+         for (int i = recombinantSites.length + event.start + event.length - (windowSize / 2); i < recombinantSites.length + event.start + event.length + (windowSize / 2); i++) {
+            if (recombinantSites[i%recombinantSites.length] != 0) {
+                count++;
+            }
+            //System.out.println(event.id+" 1= "+(i%recombinantSites.length)+"\t"+recombinantSites[i%recombinantSites.length]);
+            total++;
+        }
+        return count/total;
     }
 
     public int getDisruptionScore(String minorParentDotBracket, String majorParentDotBracket, String recombinantDotBracket, boolean useAND) {

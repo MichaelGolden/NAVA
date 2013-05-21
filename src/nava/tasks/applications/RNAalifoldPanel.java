@@ -52,6 +52,7 @@ public class RNAalifoldPanel extends javax.swing.JPanel implements ApplicationPa
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        conformationGroup = new javax.swing.ButtonGroup();
         partionFunctionCheckBox = new javax.swing.JCheckBox();
         circularRadioButton = new javax.swing.JRadioButton();
         jRadioButton1 = new javax.swing.JRadioButton();
@@ -66,8 +67,10 @@ public class RNAalifoldPanel extends javax.swing.JPanel implements ApplicationPa
         partionFunctionCheckBox.setSelected(true);
         partionFunctionCheckBox.setText("Generate base-pairing probability matrix (calculate partition function)");
 
+        conformationGroup.add(circularRadioButton);
         circularRadioButton.setText("Circular");
 
+        conformationGroup.add(jRadioButton1);
         jRadioButton1.setSelected(true);
         jRadioButton1.setText("Linear");
 
@@ -133,6 +136,7 @@ public class RNAalifoldPanel extends javax.swing.JPanel implements ApplicationPa
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton circularRadioButton;
+    private javax.swing.ButtonGroup conformationGroup;
     private javax.swing.JSpinner covarianceSpinner;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

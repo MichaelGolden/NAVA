@@ -160,8 +160,10 @@ public class DataOverlay1D extends Overlay implements Serializable {
             }
         }
 
+        System.out.println("dataOffsetCorrected "+dataOffsetCorrected);
         for (int i = 0; i < dataOffsetCorrected && i < used.length; i++) {
-            used[i] = false;
+            //used[i] = false;
+            System.out.println(i+"\t"+used[i]);
         }
     }
 

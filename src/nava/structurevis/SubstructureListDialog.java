@@ -43,9 +43,11 @@ public class SubstructureListDialog extends javax.swing.JDialog implements Chang
         this.maxSpinner.setModel(this.maxSpinnerModel);
         this.maxSpinner.addChangeListener(this);
         
+           this.setIconImage(new ImageIcon(ClassLoader.getSystemResource("resources/icons/icon-32x32.png")).getImage());
+           
         update();
         
-        this.setIconImage(new ImageIcon(ClassLoader.getSystemResource("resources/icons/icon-32x32.png")).getImage());
+     
     }
 
     public void setSubstructureList(SubstructureList substructureList) {

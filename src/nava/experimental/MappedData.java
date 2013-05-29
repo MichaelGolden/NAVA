@@ -107,7 +107,8 @@ public class MappedData {
 
     public static MappedData getMappedData(File referenceAlignment, File inputAlignment, ArrayList<String> values, boolean codon, String name, int select, boolean useMUSCLE) {
         Mapping mapping = Mapping.createMapping(referenceAlignment, inputAlignment, select, useMUSCLE);
-
+        System.out.println("REVERSE="+mapping.bReversedComplemented);
+        
         MappedData mappedData = new MappedData();
 
         mappedData.values = new double[mapping.getALength()];

@@ -46,6 +46,7 @@ public class AutomatedFolding {
         String sequence;
         int [] pairedSites;
         double freeEnergy;
+        boolean cached;
 
         @Override
         public String toString() {
@@ -131,7 +132,7 @@ public class AutomatedFolding {
 
                 Process p = Runtime.getRuntime().exec(cmd, null, workingDir);
                 Application.nullOutput(p.getInputStream());
-                Application.nullOutput(p.getErrorStream());;
+                Application.nullOutput(p.getErrorStream());
                 int code = p.waitFor();
                 System.out.println(code);
                 if (code == 0) {

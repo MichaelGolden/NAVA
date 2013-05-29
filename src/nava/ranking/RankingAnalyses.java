@@ -9,10 +9,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
+import java.util.*;
 import nava.structurevis.data.*;
 import nava.structurevis.data.PersistentSparseMatrix.Element;
 import nava.utils.Mapping;
@@ -390,6 +387,16 @@ public class RankingAnalyses {
         substructureHist.setMedian(substructureMedian);
 
         return r;
+    }
+    
+    public static double [] getArray(List<Double> values)
+    {
+        double [] ret = new double[values.size()];
+        for(int i = 0 ; i < ret.length ; i++)
+        {
+            ret[i] = values.get(i);
+        }
+        return ret;
     }
 
     public static double getAverage(ArrayList<Double> list) {

@@ -36,7 +36,7 @@ import nava.utils.RNAFoldingTools;
  */
 public class PairwiseStructureComparison {
 
-    public MappedData hivMapping(File referenceAlignment) throws IOException, ParserException, Exception {
+    public static MappedData hivMapping(File referenceAlignment) throws IOException, ParserException, Exception {
 
         ArrayList<MappableData> mappableData = new ArrayList<>();
 

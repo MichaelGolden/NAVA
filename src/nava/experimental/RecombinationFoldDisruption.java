@@ -9,11 +9,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import nava.data.io.CsvReader;
 import nava.data.io.IO;
 import nava.experimental.AutomatedFolding.Fold;
+import nava.experimental.CorrelatedSitesTest.PairedSitesPermutationTestResult;
 import nava.ranking.MyMannWhitney;
 import nava.ranking.RankingAnalyses;
 import nava.ranking.StatUtils;
@@ -46,6 +48,11 @@ public class RecombinationFoldDisruption {
         String majorParentSequence;
         double rdpPval;
         boolean breakpointUndetermined = false;
+        boolean startBreakpointUndetermined = false;
+        boolean endBreakpointUndetermined = false;
+        boolean bothParentsKnown = false;
+        boolean majorParentKnown = false;
+        boolean minorParentKnown = false;
         int circulationCount = 0;
 
         @Override
@@ -80,6 +87,13 @@ public class RecombinationFoldDisruption {
             clone.rdpPval = rdpPval;
             clone.breakpointUndetermined = breakpointUndetermined;
             clone.circulationCount = circulationCount;
+            clone.breakpointUndetermined = breakpointUndetermined;
+            clone.startBreakpointUndetermined = startBreakpointUndetermined;
+            clone.endBreakpointUndetermined = endBreakpointUndetermined;
+            clone.bothParentsKnown = bothParentsKnown;
+            clone.majorParentKnown = majorParentKnown;
+            clone.minorParentKnown = minorParentKnown;
+
             return clone;
         }
     }
@@ -166,11 +180,22 @@ public class RecombinationFoldDisruption {
                 }
 
 
-                if (split[2].contains("*") || split[3].contains("*")) {
+                if (split[2].contains("*")) {
                     event.breakpointUndetermined = true;
+                    event.startBreakpointUndetermined = true;
                 }
 
-                if (onlyWhereBothParentsAreKnown && !event.minorParentName.startsWith("Unknown") && !event.majorParentName.startsWith("Unknown")) {
+                if (split[3].contains("*")) {
+                    event.breakpointUndetermined = true;
+                    event.endBreakpointUndetermined = true;
+                }
+
+                event.minorParentKnown = !event.minorParentName.startsWith("Unknown");
+                event.majorParentKnown = !event.majorParentName.startsWith("Unknown");
+                event.bothParentsKnown = event.minorParentKnown && event.majorParentKnown;
+
+
+                if (onlyWhereBothParentsAreKnown && event.bothParentsKnown) {
                     events.add(event);
                 } else if (!onlyWhereBothParentsAreKnown) {
                     events.add(event);
@@ -305,35 +330,48 @@ public class RecombinationFoldDisruption {
 
 
         Random random = new Random(7920171293137101310L);
-        Random random2 = new Random(3811018041148014014L);
-        File alignmentFile = new File("C:/dev/thesis/hiv_full/test/darren_hiv.fas");
-         File rdpCSVFile = new File("C:/dev/thesis/hiv_full/test/darren_hiv.csv");
-        //  File alignmentFile = new File("C:/dev/thesis/porcine/300/porcine_all_300_aligned.fas");
+        Random random2 = new Random(301201013337101310L);
+        // File alignmentFile = new File("C:/dev/thesis/hiv_full/test/darren_hiv.fas");
+        //File rdpCSVFile = new File("C:/dev/thesis/hiv_full/test/darren_hiv.csv");
+        //File alignmentFile = new File("C:/dev/thesis/porcine/300/porcine_all_300_aligned.fas");
         // File rdpCSVFile = new File("C:/dev/thesis/porcine/300/porcine.csv");
-        //  File alignmentFile = new File("C:/dev/thesis/hiv_full/hiv1/200/hiv1_all_200_aligned.fas");
-        // File rdpCSVFile = new File("C:/dev/thesis/hiv_full/hiv1/200/recombination.csv");
-        //File alignmentFile = new File("C:/dev/thesis/norovirus/200/norovirus.fas");
-        // File rdpCSVFile = new File("C:/dev/thesis/norovirus/200/norovirus.csv");
-        //File alignmentFile = new File("C:/dev/thesis/hcv/1/300/hcv1_all_300_aligned.fas");
-        //File rdpCSVFile = new File("C:/dev/thesis/hcv/1/300/hcv.csv");
-       // File alignmentFile = new File("C:/dev/thesis/dengue/400/all_400_aligned_curated.fas");
-        //File rdpCSVFile = new File("C:/dev/thesis/dengue/400/all_400_aligned_curated.csv");
+        //File alignmentFile = new File("C:/dev/thesis/hiv_full/hiv1/200/hiv1_all_200_aligned.fas");
+        //File rdpCSVFile = new File("C:/dev/thesis/hiv_full/hiv1/200/recombination.csv");
+        // File alignmentFile = new File("C:/dev/thesis/norovirus/200/norovirus.fas");
+        //File rdpCSVFile = new File("C:/dev/thesis/norovirus/200/norovirus.csv");
+        //File alignmentFile = new File("C:/dev/thesis/hepe/400/hepe_all_400_aligned_upper.fas");
+        //  File rdpCSVFile = new File("C:/dev/thesis/hepe/400/hepe_all_400_aligned_upper.csv");
+        //File alignmentFile = new File("C:/dev/thesis/enteroa/400/enteroa_all_400_aligned_upper.fas");
+        // File rdpCSVFile = new File("C:/dev/thesis/enteroa/400/enteroa_all_400_aligned_upper.csv");
+      //File alignmentFile = new File("C:/dev/thesis/hcv/1/300/hcv1_all_300_aligned.fas");
+       //File rdpCSVFile = new File("C:/dev/thesis/hcv/1/300/hcv.csv");
+        File alignmentFile = new File("C:/dev/thesis/enterob/250/enterob_all_250_aligned_upper.fas");
+        File rdpCSVFile = new File("C:/dev/thesis/enterob/250/enterob_all_250_aligned_upper.csv");
+        //File alignmentFile = new File("C:/dev/thesis/dengue/400/all_400_aligned_curated.fas");
+       // File rdpCSVFile = new File("C:/dev/thesis/dengue/400/all_400_aligned_curated.csv");
+        //   File alignmentFile = new File("C:/dev/thesis/hepe/400/hepe_all_400_aligned_upper.fas");
+        // File rdpCSVFile = new File("C:/dev/thesis/hepe/400/all_400_aligned_curated.csv");
+        // File alignmentFile = new File("C:/dev/thesis/jev/300/jev_all_300_aligned_upper.fas");
+        //File rdpCSVFile = new File("C:/dev/thesis/jev/300/jev_all_300_aligned_upper.csv");
         ArrayList<String> sequences = new ArrayList<>();
         ArrayList<String> sequenceNames = new ArrayList<>();
 
         IO.loadFastaSequences(alignmentFile, sequences, sequenceNames);
         loadFoldCache();
         double[] count = new double[sequences.get(0).length()];
+        double[] nongaps = new double[sequences.get(0).length()];
         double t = 0;
         double[] pairingProbability = new double[count.length];
         for (int i = 0; i < sequences.size(); i++) {
             System.out.println((i + 1) + " / " + sequences.size());
-            int seqno = random.nextInt(sequences.size());
+            //int seqno = random2.nextInt(sequences.size());
+            int seqno = i;
+            // System.out.println("no=" + seqno);
             String seq = sequences.get(seqno);
             Fold f = fold(seq, 8);
             if (!f.cached) {
                 try {
-                    saveFoldCache(10);
+                    saveFoldCache(15);
                 } catch (IOException ex) {
                     Logger.getLogger(RecombinationFoldDisruption.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -343,11 +381,13 @@ public class RecombinationFoldDisruption {
             int[] pairedSites = RNAFoldingTools.getPairedSitesFromDotBracketString(dbs_aligned);
             for (int j = 0; j < pairedSites.length; j++) {
                 count[j] += pairedSites[j] != 0 ? 1 : 0;
+                nongaps[j] += sequences.get(i).charAt(j) == '-' ? 0 : 1;
             }
             t++;
-            for (int j = 0; j < count.length; j++) {
-                pairingProbability[j] = count[j] / t;
-            }
+        }
+
+        for (int j = 0; j < count.length; j++) {
+            pairingProbability[j] = count[j] / nongaps[j];
         }
 
         ArrayList<String> values = null;
@@ -358,12 +398,13 @@ public class RecombinationFoldDisruption {
         }
         values.remove(0);
 
-        MappedData mappedData = MappedData.getMappedData(alignmentFile, new File("C:/dev/NL4-3-shape-alignment.fas"), values, false, "", 1000, false);
+//        MappedData mappedData = MappedData.getMappedData(alignmentFile, new File("C:/dev/NL4-3-shape-alignment.fas"), values, false, "", 1000, false);
         //pairingProbability= mappedData.values;
         double[] pairingProbabilityWindow = new double[pairingProbability.length];
+        //double [] pairingProbabilityWindow = pairingProbability;
         int window = 20;
 
-        boolean fast = true;
+        boolean fast = false;
         for (int i = 0; i < pairingProbabilityWindow.length; i++) {
             double c = 0;
             for (int j = Math.max(0, i - window); j < Math.min(pairingProbabilityWindow.length, i + window); j++) {
@@ -374,14 +415,21 @@ public class RecombinationFoldDisruption {
         }
         try {
             loadFoldCache();
-            ArrayList<RecombinationEvent> recombinationEvents = loadRecombinationEvents(alignmentFile, rdpCSVFile, true);
+            ArrayList<RecombinationEvent> recombinationEvents = loadRecombinationEvents(alignmentFile, rdpCSVFile, false);
             ArrayList<RecombinationEvent> selectedRecombinationEvents = new ArrayList<>();
             for (RecombinationEvent event : recombinationEvents) {
-                // if (!event.breakpointUndetermined && event.circulationCount >= 0 && event.recombinantName.matches("SN[0-9]+_.+")) {
-               if (!event.breakpointUndetermined && event.circulationCount >= 0) {
-                    selectedRecombinationEvents.add(event);
+              //if (!event.breakpointUndetermined && event.circulationCount >= 0 && event.recombinantName.matches("SN[0-9]+_.+"))
+                if (!event.breakpointUndetermined && event.circulationCount >= 0) 
+               // if (!event.breakpointUndetermined && event.circulationCount >= 1) //if (!event.breakpointUndetermined && event.circulationCount >= 0 && !event.recombinantName.matches("SN[0-9]+_.+"))
+                //if (!event.breakpointUndetermined && event.circulationCount == 0 && !event.recombinantName.matches("SN[0-9]+_.+"))
+                {
+                    //if (event.length >= 75) 
+                    {
+                        selectedRecombinationEvents.add(event);
 
-                    System.out.println(selectedRecombinationEvents.size() + "_" + event);
+                        System.out.println(selectedRecombinationEvents.size() + "_" + event);
+                    }
+
                 }
                 /*
                  * if (!event.breakpointUndetermined && event.circulationCount
@@ -403,8 +451,31 @@ public class RecombinationFoldDisruption {
                 recombinationCount[r.start]++;
                 recombinationCount[(r.start + r.length) % recombinationCount.length]++;
             }
+            try {
+                int [] recombinantPairs = new int[recombinationCount.length];
+                for (RecombinationEvent r : selectedRecombinationEvents) {
+                     recombinantPairs[r.start] = r.start + r.length+1;
+                }
+                CorrelatedSitesTest.PairedSitesPermutationTestResult result = new  CorrelatedSitesTest().pairedSitesCorrelationPermutationTest(new MappedData(pairingProbability), recombinantPairs, 8);
+                System.out.println("correlation "+result.r+"\t"+result.pval+"\t"+result.permutation);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(RecombinationFoldDisruption.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ExecutionException ex) {
+                Logger.getLogger(RecombinationFoldDisruption.class.getName()).log(Level.SEVERE, null, ex);
+            }
 
-            for (int j = 0; j <= 0; j++) {
+            boolean doshift = false;
+            int start = 0;
+            int end = 0;
+            int iterations = 100000;
+            if (doshift) {
+                start = -4000;
+                end = 4000;
+                iterations = 5;
+                fast =true;
+            }
+
+            for (int j = start; j <= end; j++) {
 
                 ArrayList<Double> realPairingValues = new ArrayList<>();
                 ArrayList<Double> permutedPairingValues = new ArrayList<>();
@@ -417,21 +488,29 @@ public class RecombinationFoldDisruption {
                 ArrayList<Double> permutedEnergyValues = new ArrayList<>();
                 ArrayList<Double> realSimilarityValues = new ArrayList<>();
                 ArrayList<Double> permutedSimilarityValues = new ArrayList<>();
-                ArrayList<Double> realDisruptionValues = new ArrayList<>();
-                ArrayList<Double> permutedDisruptionValues = new ArrayList<>();
+                ArrayList<Double> realMinorSimilarityValues = new ArrayList<>();
+                ArrayList<Double> permutedMinorSimilarityValues = new ArrayList<>();
+                ArrayList<Double> realMajorSimilarityValues = new ArrayList<>();
+                ArrayList<Double> permutedMajorSimilarityValues = new ArrayList<>();
+                ArrayList<Double> realDisruptionANDValues = new ArrayList<>();
+                ArrayList<Double> permutedDisruptionANDValues = new ArrayList<>();
+                ArrayList<Double> realDisruptionORValues = new ArrayList<>();
+                ArrayList<Double> permutedDisruptionORValues = new ArrayList<>();
+                ArrayList<Double> realDisruptionSimpleValues = new ArrayList<>();
+                ArrayList<Double> permutedDisruptionSimpleValues = new ArrayList<>();
                 long[][] observedCountsOR = new long[2][2];
                 long[][] observedCountsAND = new long[2][2];
                 int UNPAIRED = 0, PAIRED = 1;
                 int PERMUTED = 0, REAL = 1;
 
-                for (int i = 0; i < 10000; i++) {
+                for (int i = 0; i < iterations ; i++) {
                     int randomOffset = random.nextInt(pairingProbability.length);
                     for (int h = 0; h < selectedRecombinationEvents.size(); h++) {
                         RecombinationEvent realEvent = selectedRecombinationEvents.get(h).clone();
                         realEvent.start = (realEvent.start + j + pairingProbabilityWindow.length) % pairingProbabilityWindow.length;
                         // RecombinationEvent permutedEvent2 = generatePermutedRecombinationEvent(random, realEvent2, false);
 
-                        RecombinationEvent permutedEvent = generatePermutedRecombinationEvent(random, (realEvent.start + randomOffset) % pairingProbability.length, realEvent, false);
+                        RecombinationEvent permutedEvent = generatePermutedRecombinationEvent(random, (realEvent.start + randomOffset) % pairingProbability.length, realEvent, true);
 
                         Fold minorParentFold = null;
                         Fold majorParentFold = null;
@@ -445,19 +524,21 @@ public class RecombinationFoldDisruption {
                         int[] majorPairedSites = null;
 
                         if (!fast) {
-                            minorParentFold = fold(realEvent.minorParentSequence, 8);
-                            majorParentFold = fold(realEvent.majorParentSequence, 8);
-                            realRecombinantFold = fold(realEvent.getRecombinant(), 8);
-                            permutedRecombinantFold = fold(permutedEvent.getRecombinant(), 8);
+                            if (realEvent.bothParentsKnown) {
+                                minorParentFold = fold(realEvent.minorParentSequence, 8);
+                                majorParentFold = fold(realEvent.majorParentSequence, 8);
+                                realRecombinantFold = fold(realEvent.getRecombinant(), 8);
+                                permutedRecombinantFold = fold(permutedEvent.getRecombinant(), 8);
 
-                            minorAligned = StructureAlign.mapStringToAlignedSequence(RNAFoldingTools.getDotBracketStringFromPairedSites(minorParentFold.pairedSites), realEvent.minorParentSequence, "-");
-                            majorAligned = StructureAlign.mapStringToAlignedSequence(RNAFoldingTools.getDotBracketStringFromPairedSites(majorParentFold.pairedSites), realEvent.majorParentSequence, "-");
-                            realAligned = StructureAlign.mapStringToAlignedSequence(RNAFoldingTools.getDotBracketStringFromPairedSites(realRecombinantFold.pairedSites), realEvent.getRecombinant(), "-");
-                            permutedAligned = StructureAlign.mapStringToAlignedSequence(RNAFoldingTools.getDotBracketStringFromPairedSites(permutedRecombinantFold.pairedSites), permutedEvent.getRecombinant(), "-");
+                                minorAligned = StructureAlign.mapStringToAlignedSequence(RNAFoldingTools.getDotBracketStringFromPairedSites(minorParentFold.pairedSites), realEvent.minorParentSequence, "-");
+                                majorAligned = StructureAlign.mapStringToAlignedSequence(RNAFoldingTools.getDotBracketStringFromPairedSites(majorParentFold.pairedSites), realEvent.majorParentSequence, "-");
+                                realAligned = StructureAlign.mapStringToAlignedSequence(RNAFoldingTools.getDotBracketStringFromPairedSites(realRecombinantFold.pairedSites), realEvent.getRecombinant(), "-");
+                                permutedAligned = StructureAlign.mapStringToAlignedSequence(RNAFoldingTools.getDotBracketStringFromPairedSites(permutedRecombinantFold.pairedSites), permutedEvent.getRecombinant(), "-");
 
-                            minorPairedSites = RNAFoldingTools.getPairedSitesFromDotBracketString(minorAligned);
-                            majorPairedSites = RNAFoldingTools.getPairedSitesFromDotBracketString(majorAligned);
-                            saveFoldCache(10);
+                                minorPairedSites = RNAFoldingTools.getPairedSitesFromDotBracketString(minorAligned);
+                                majorPairedSites = RNAFoldingTools.getPairedSitesFromDotBracketString(majorAligned);
+                            }
+                            saveFoldCache(15);
                         }
                         // real += pairingProbabilityWindow[realEvent2.start];
                         // perm += pairingProbabilityWindow[permutedEvent2.start];
@@ -477,14 +558,20 @@ public class RecombinationFoldDisruption {
                             }
 
                             if (!fast) {
-                                observedCountsOR[REAL][isPaired(minorPairedSites, majorPairedSites, realEvent.start, false) ? 1 : 0]++;
-                                observedCountsOR[REAL][isPaired(minorPairedSites, majorPairedSites, (realEvent.start + realEvent.length) % pairingProbability.length, false) ? 1 : 0]++;
-                                observedCountsAND[REAL][isPaired(minorPairedSites, majorPairedSites, realEvent.start, true) ? 1 : 0]++;
-                                observedCountsAND[REAL][isPaired(minorPairedSites, majorPairedSites, (realEvent.start + realEvent.length) % pairingProbability.length, true) ? 1 : 0]++;
+                                if (realEvent.bothParentsKnown) {
+                                    observedCountsOR[REAL][isPaired(minorPairedSites, majorPairedSites, realEvent.start, false) ? 1 : 0]++;
+                                    observedCountsOR[REAL][isPaired(minorPairedSites, majorPairedSites, (realEvent.start + realEvent.length) % pairingProbability.length, false) ? 1 : 0]++;
+                                    observedCountsAND[REAL][isPaired(minorPairedSites, majorPairedSites, realEvent.start, true) ? 1 : 0]++;
+                                    observedCountsAND[REAL][isPaired(minorPairedSites, majorPairedSites, (realEvent.start + realEvent.length) % pairingProbability.length, true) ? 1 : 0]++;
 
-                                realEnergyValues.add(realRecombinantFold.freeEnergy);
-                                realSimilarityValues.add(averageSimilarityToParents(minorAligned, majorAligned, realAligned));
-                                realDisruptionValues.add((double) getDisruptionScore(minorAligned, majorAligned, realAligned, true));
+                                    realEnergyValues.add(realRecombinantFold.freeEnergy);
+                                    realSimilarityValues.add(averageSimilarityToParents(minorAligned, majorAligned, realAligned));
+                                    realMinorSimilarityValues.add(similarity(minorAligned, realAligned));
+                                    realMajorSimilarityValues.add(similarity(majorAligned, realAligned));
+                                    realDisruptionANDValues.add((double) getDisruptionScore(minorAligned, majorAligned, realAligned, true));
+                                    realDisruptionORValues.add((double) getDisruptionScore(minorAligned, majorAligned, realAligned, false));
+                                    realDisruptionSimpleValues.add((double) getDisruptionScoreSimple(minorAligned, majorAligned, realAligned));
+                                }
                             }
 
 
@@ -501,61 +588,90 @@ public class RecombinationFoldDisruption {
                         }
 
                         if (!fast) {
-                            observedCountsOR[PERMUTED][isPaired(minorPairedSites, majorPairedSites, permutedEvent.start, false) ? 1 : 0]++;
-                            observedCountsOR[PERMUTED][isPaired(minorPairedSites, majorPairedSites, (permutedEvent.start + permutedEvent.length) % pairingProbability.length, false) ? 1 : 0]++;
-                            observedCountsAND[PERMUTED][isPaired(minorPairedSites, majorPairedSites, permutedEvent.start, true) ? 1 : 0]++;
-                            observedCountsAND[PERMUTED][isPaired(minorPairedSites, majorPairedSites, (permutedEvent.start + permutedEvent.length) % pairingProbability.length, true) ? 1 : 0]++;
+                            System.out.println(realEvent.bothParentsKnown + "\t" + h + "\t" + realEvent);
+                            if (realEvent.bothParentsKnown) {
+                                observedCountsOR[PERMUTED][isPaired(minorPairedSites, majorPairedSites, permutedEvent.start, false) ? 1 : 0]++;
+                                observedCountsOR[PERMUTED][isPaired(minorPairedSites, majorPairedSites, (permutedEvent.start + permutedEvent.length) % pairingProbability.length, false) ? 1 : 0]++;
+                                observedCountsAND[PERMUTED][isPaired(minorPairedSites, majorPairedSites, permutedEvent.start, true) ? 1 : 0]++;
+                                observedCountsAND[PERMUTED][isPaired(minorPairedSites, majorPairedSites, (permutedEvent.start + permutedEvent.length) % pairingProbability.length, true) ? 1 : 0]++;
 
 
-                            permutedEnergyValues.add(permutedRecombinantFold.freeEnergy);
-                            permutedSimilarityValues.add(averageSimilarityToParents(minorAligned, majorAligned, permutedAligned));
-                            permutedDisruptionValues.add((double) getDisruptionScore(minorAligned, majorAligned, permutedAligned, true));
-
+                                permutedEnergyValues.add(permutedRecombinantFold.freeEnergy);
+                                permutedSimilarityValues.add(averageSimilarityToParents(minorAligned, majorAligned, permutedAligned));
+                                permutedMinorSimilarityValues.add(similarity(minorAligned, permutedAligned));
+                                permutedMajorSimilarityValues.add(similarity(majorAligned, permutedAligned));
+                                permutedDisruptionANDValues.add((double) getDisruptionScore(minorAligned, majorAligned, permutedAligned, true));
+                                permutedDisruptionORValues.add((double) getDisruptionScore(minorAligned, majorAligned, permutedAligned, false));
+                                permutedDisruptionSimpleValues.add((double) getDisruptionScoreSimple(minorAligned, majorAligned, permutedAligned));
+                            }
                         }
 
-                        MyMannWhitney mwpairing = new MyMannWhitney(realPairingValues, permutedPairingValues);
-                        MannWhitneyUTest mwpairing2 = new MannWhitneyUTest(NaNStrategy.REMOVED, TiesStrategy.RANDOM);
-                        MyMannWhitney mw5primepairing = new MyMannWhitney(real5PrimePairingValues, permuted5PrimePairingValues);
-                        MyMannWhitney mw3primepairing = new MyMannWhitney(real3PrimePairingValues, permuted3PrimePairingValues);
-                        MyMannWhitney mw5prime3prime = new MyMannWhitney(real5PrimePairingValues, real3PrimePairingValues);
-                        MyMannWhitney mwenergy = new MyMannWhitney(realEnergyValues, permutedEnergyValues);
-                        MyMannWhitney mwsimilarity = new MyMannWhitney(realSimilarityValues, permutedSimilarityValues);
-                        MyMannWhitney mwdisruption = new MyMannWhitney(realDisruptionValues, permutedDisruptionValues);
-                        System.out.println("pairing\t" + j + "\t" + RankingAnalyses.getMedian(realPairingValues) + "\t" + RankingAnalyses.getMedian(permutedPairingValues) + "\t" + mwpairing.getZ() + "\t" + realPairingValues.size() + "\t" + permutedPairingValues.size());
-                        double pairing2pval = mwpairing2.mannWhitneyUTest(RankingAnalyses.getArray(realPairingValues), RankingAnalyses.getArray(permutedPairingValues));
-                        //System.out.println("pairing2\t"+pairing2pval+"\t"+StatUtils.getInvCDF(pairing2pval, true)+"\t"+StatUtils.getInvCDF(pairing2pval/2, true));
-                        System.out.println("pairing 5'\t" + j + "\t" + RankingAnalyses.getMedian(real5PrimePairingValues) + "\t" + RankingAnalyses.getMedian(permuted5PrimePairingValues) + "\t" + mw5primepairing.getZ() + "\t" + real5PrimePairingValues.size() + "\t" + permuted5PrimePairingValues.size());
-                        System.out.println("pairing 3'\t" + j + "\t" + RankingAnalyses.getMedian(real3PrimePairingValues) + "\t" + RankingAnalyses.getMedian(permuted3PrimePairingValues) + "\t" + mw3primepairing.getZ() + "\t" + real3PrimePairingValues.size() + "\t" + permuted3PrimePairingValues.size());
-                        System.out.println("5' vs. 3'\t" + j + "\t" + RankingAnalyses.getMedian(real5PrimePairingValues) + "\t" + RankingAnalyses.getMedian(real3PrimePairingValues) + "\t" + mw5prime3prime.getZ());
-                        System.out.println("energy\t" + j + "\t" + RankingAnalyses.getMedian(realEnergyValues) + "\t" + RankingAnalyses.getMedian(permutedEnergyValues) + "\t" + mwenergy.getZ() + "\t" + realEnergyValues.size() + "\t" + permutedEnergyValues.size());
-                        System.out.println("similarity\t" + j + "\t" + RankingAnalyses.getMedian(realSimilarityValues) + "\t" + RankingAnalyses.getMedian(permutedSimilarityValues) + "\t" + mwsimilarity.getZ() + "\t" + realSimilarityValues.size() + "\t" + permutedSimilarityValues.size());
-                        System.out.println("disruption\t" + j + "\t" + RankingAnalyses.getMedian(realDisruptionValues) + "\t" + RankingAnalyses.getMedian(permutedDisruptionValues) + "\t" + mwdisruption.getZ() + "\t" + realDisruptionValues.size() + "\t" + permutedDisruptionValues.size());
-                        ChiSquareTest chiPairingTest = new ChiSquareTest();
-                        for (int recombinant = 0; recombinant < observedCountsOR.length; recombinant++) {
-                            for (int ispaired = 0; ispaired < observedCountsOR[0].length; ispaired++) {
-                                System.out.print(observedCountsOR[recombinant][ispaired] + "\t");
+                        if (!doshift) {
+                            MyMannWhitney mwpairing = new MyMannWhitney(realPairingValues, permutedPairingValues);
+                            MannWhitneyUTest mwpairing2 = new MannWhitneyUTest(NaNStrategy.REMOVED, TiesStrategy.RANDOM);
+                            MyMannWhitney mw5primepairing = new MyMannWhitney(real5PrimePairingValues, permuted5PrimePairingValues);
+                            MyMannWhitney mw3primepairing = new MyMannWhitney(real3PrimePairingValues, permuted3PrimePairingValues);
+                            MyMannWhitney mw5prime3prime = new MyMannWhitney(real5PrimePairingValues, real3PrimePairingValues);
+                            MyMannWhitney mw5prime3primepermuted = new MyMannWhitney(permuted5PrimePairingValues, permuted3PrimePairingValues);
+                            MyMannWhitney mwenergy = new MyMannWhitney(realEnergyValues, permutedEnergyValues);
+                            MyMannWhitney mwsimilarity = new MyMannWhitney(realSimilarityValues, permutedSimilarityValues);
+                            MyMannWhitney mwminorsimilarity = new MyMannWhitney(realMinorSimilarityValues, permutedMinorSimilarityValues);
+                            MyMannWhitney mwmajorsimilarity = new MyMannWhitney(realMajorSimilarityValues, permutedMajorSimilarityValues);
+                            MyMannWhitney mwdisruptionAND = new MyMannWhitney(realDisruptionANDValues, permutedDisruptionANDValues);
+                            MyMannWhitney mwdisruptionOR = new MyMannWhitney(realDisruptionORValues, permutedDisruptionORValues);
+                            MyMannWhitney mwdisruptionSimple = new MyMannWhitney(realDisruptionSimpleValues, permutedDisruptionSimpleValues);
+                            System.out.println("pairing\t" + j + "\t" + RankingAnalyses.getMedian(realPairingValues) + "\t" + RankingAnalyses.getMedian(permutedPairingValues) + "\t" + mwpairing.getZ() + "\t" + realPairingValues.size() + "\t" + permutedPairingValues.size());
+//                            double pairing2pval = mwpairing2.mannWhitneyUTest(RankingAnalyses.getArray(realPairingValues), RankingAnalyses.getArray(permutedPairingValues));
+                            //System.out.println("pairing2\t"+pairing2pval+"\t"+StatUtils.getInvCDF(pairing2pval, true)+"\t"+StatUtils.getInvCDF(pairing2pval/2, true));
+                            System.out.println("pairing 5'\t" + j + "\t" + RankingAnalyses.getMedian(real5PrimePairingValues) + "\t" + RankingAnalyses.getMedian(permuted5PrimePairingValues) + "\t" + mw5primepairing.getZ() + "\t" + real5PrimePairingValues.size() + "\t" + permuted5PrimePairingValues.size());
+                            System.out.println("pairing 3'\t" + j + "\t" + RankingAnalyses.getMedian(real3PrimePairingValues) + "\t" + RankingAnalyses.getMedian(permuted3PrimePairingValues) + "\t" + mw3primepairing.getZ() + "\t" + real3PrimePairingValues.size() + "\t" + permuted3PrimePairingValues.size());
+                            System.out.println("5' vs. 3' (real)\t" + j + "\t" + RankingAnalyses.getMedian(real5PrimePairingValues) + "\t" + RankingAnalyses.getMedian(real3PrimePairingValues) + "\t" + mw5prime3prime.getZ());
+                            System.out.println("5' vs. 3' (permuted)\t" + j + "\t" + RankingAnalyses.getMedian(permuted5PrimePairingValues) + "\t" + RankingAnalyses.getMedian(permuted3PrimePairingValues) + "\t" + mw5prime3primepermuted.getZ());
+                            if (!fast) {
+                                System.out.println("energy\t" + j + "\t" + RankingAnalyses.getMedian(realEnergyValues) + "\t" + RankingAnalyses.getMedian(permutedEnergyValues) + "\t" + mwenergy.getZ() + "\t" + realEnergyValues.size() + "\t" + permutedEnergyValues.size());
+                                System.out.println("similarity\t" + j + "\t" + RankingAnalyses.getMedian(realSimilarityValues) + "\t" + RankingAnalyses.getMedian(permutedSimilarityValues) + "\t" + mwsimilarity.getZ() + "\t" + realSimilarityValues.size() + "\t" + permutedSimilarityValues.size());
+                                System.out.println("similarity (minor)\t" + j + "\t" + RankingAnalyses.getMedian(realMinorSimilarityValues) + "\t" + RankingAnalyses.getMedian(permutedMinorSimilarityValues) + "\t" + mwminorsimilarity.getZ());
+                                System.out.println("similarity (major)\t" + j + "\t" + RankingAnalyses.getMedian(realMajorSimilarityValues) + "\t" + RankingAnalyses.getMedian(permutedMajorSimilarityValues) + "\t" + mwmajorsimilarity.getZ());
+                                System.out.println("disruption (AND)\t" + j + "\t" + RankingAnalyses.getMedian(realDisruptionANDValues) + "\t" + RankingAnalyses.getMedian(permutedDisruptionANDValues) + "\t" + mwdisruptionAND.getZ() + "\t" + realDisruptionANDValues.size() + "\t" + permutedDisruptionANDValues.size());
+                                System.out.println("disruption (OR)\t" + j + "\t" + RankingAnalyses.getMedian(realDisruptionORValues) + "\t" + RankingAnalyses.getMedian(permutedDisruptionORValues) + "\t" + mwdisruptionOR.getZ() + "\t" + realDisruptionORValues.size() + "\t" + permutedDisruptionORValues.size());
+                                System.out.println("disruption (simple)\t" + j + "\t" + RankingAnalyses.getMedian(realDisruptionSimpleValues) + "\t" + RankingAnalyses.getMedian(permutedDisruptionSimpleValues) + "\t" + mwdisruptionSimple.getZ());
+                                ChiSquareTest chiPairingTest = new ChiSquareTest();
+                                for (int recombinant = 0; recombinant < observedCountsOR.length; recombinant++) {
+                                    for (int ispaired = 0; ispaired < observedCountsOR[0].length; ispaired++) {
+                                        System.out.print(observedCountsOR[recombinant][ispaired] + "\t");
+                                    }
+                                    System.out.println();
+                                }
+                                System.out.println("p-value (OR) = " + chiPairingTest.chiSquareTest(observedCountsOR));
+                                for (int recombinant = 0; recombinant < observedCountsAND.length; recombinant++) {
+                                    for (int ispaired = 0; ispaired < observedCountsAND[0].length; ispaired++) {
+                                        System.out.print(observedCountsAND[recombinant][ispaired] + "\t");
+                                    }
+                                    System.out.println();
+                                }
+                                System.out.println("p-value (AND) = " + chiPairingTest.chiSquareTest(observedCountsAND));
                             }
                             System.out.println();
                         }
-                        System.out.println("p-value (OR) = " + chiPairingTest.chiSquareTest(observedCountsOR));
-                        for (int recombinant = 0; recombinant < observedCountsAND.length; recombinant++) {
-                            for (int ispaired = 0; ispaired < observedCountsAND[0].length; ispaired++) {
-                                System.out.print(observedCountsAND[recombinant][ispaired] + "\t");
-                            }
-                            System.out.println();
-                        }
-                        System.out.println("p-value (AND) = " + chiPairingTest.chiSquareTest(observedCountsAND));
-                        System.out.println();
 
                     }
                 }
 
-                MyMannWhitney mwpairing = new MyMannWhitney(realPairingValues, permutedPairingValues);
-                MyMannWhitney mwenergy = new MyMannWhitney(realEnergyValues, permutedEnergyValues);
-                System.out.println(j + "\t" + RankingAnalyses.getMedian(realPairingValues) + "\t" + RankingAnalyses.getMedian(permutedPairingValues) + "\t" + mwpairing.getZ());
-                System.out.println(j + "\t" + RankingAnalyses.getMedian(realEnergyValues) + "\t" + RankingAnalyses.getMedian(permutedEnergyValues) + "\t" + mwenergy.getZ());
-                //System.out.println();
-                // System.out.println();
+                // print offset info here
+                double medianPairingReal = RankingAnalyses.getMedian(realPairingValues);
+                double medianPairingPerm = RankingAnalyses.getMedian(permutedPairingValues);
+                double zscorePairing = new MyMannWhitney(realPairingValues, permutedPairingValues).getZ();
+                double medianPairing5PrimeReal = RankingAnalyses.getMedian(real5PrimePairingValues);
+                double medianPairing5PrimePerm = RankingAnalyses.getMedian(permuted5PrimePairingValues);
+                double zscorePairing5Prime = new MyMannWhitney(real5PrimePairingValues, permuted5PrimePairingValues).getZ();
+                double medianPairing3PrimeReal = RankingAnalyses.getMedian(real3PrimePairingValues);
+                double medianPairing3PrimePerm = RankingAnalyses.getMedian(permuted3PrimePairingValues);
+                double zscorePairing3Prime = new MyMannWhitney(real3PrimePairingValues, permuted3PrimePairingValues).getZ();
+                double zscore5Prime3PrimeReal = new MyMannWhitney(real5PrimePairingValues, real3PrimePairingValues).getZ();
+                double zscore5Prime3PrimePerm = new MyMannWhitney(permuted5PrimePairingValues, permuted3PrimePairingValues).getZ();
+                System.out.println(j + "\t" + medianPairingReal + "\t" + medianPairingPerm + "\t" + zscorePairing + "\t" + medianPairing5PrimeReal + "\t" + medianPairing5PrimePerm + "\t" + zscorePairing5Prime + "\t" + medianPairing3PrimeReal + "\t" + medianPairing3PrimePerm + "\t" + zscorePairing3Prime + "\t" + zscore5Prime3PrimeReal + "\t" + zscore5Prime3PrimePerm);
+
+
             }
 
 
@@ -922,6 +1038,35 @@ public class RecombinationFoldDisruption {
             }
         }
         return disruption;
+    }
+
+    public int getDisruptionScoreSimple(String minorParentDotBracket, String majorParentDotBracket, String recombinantDotBracket) {
+        int[] minorSites = RNAFoldingTools.getPairedSitesFromDotBracketString(minorParentDotBracket);
+        int[] majorSites = RNAFoldingTools.getPairedSitesFromDotBracketString(majorParentDotBracket);
+        int[] recombinantSites = RNAFoldingTools.getPairedSitesFromDotBracketString(recombinantDotBracket);
+
+        int disruption = 0;
+        for (int i = 0; i < minorSites.length; i++) {
+            /*
+             * if(minorSites[i] != 0 && recombinantSites[i] != minorSites[i]) {
+             * disruption++; } if(majorSites[i] != 0 && recombinantSites[i] !=
+             * majorSites[i]) { disruption++; }
+             *
+             */
+
+            if (minorSites[i] != recombinantSites[i]) {
+                disruption++;
+            }
+
+            if (majorSites[i] != recombinantSites[i]) {
+                disruption++;
+            }
+        }
+        return disruption;
+    }
+
+    public double similarity(String parentDotBracket, String recombinantDotBracket) {
+        return 1 - MountainMetrics.calculateNormalizedWeightedMountainDistance(RNAFoldingTools.getPairedSitesFromDotBracketString(parentDotBracket), RNAFoldingTools.getPairedSitesFromDotBracketString(recombinantDotBracket));
     }
 
     public double averageSimilarityToParents(String minorParentDotBracket, String majorParentDotBracket, String recombinantDotBracket) {

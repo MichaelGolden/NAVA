@@ -105,7 +105,7 @@ public class GeneFinder {
 
         // int n = 100;
         //int[] sizes = {50,100, 200, 20, 10, 300, 400};
-        int[] sizes = {100,300, 250, 200, 50, 100, 20, 10};
+        int[] sizes = {100,300, 250,400, 200, 50, 100, 20, 10};
         //int[] sizes = {25, 20, 50, 100, 200, 10};
         //int[] sizes = {25};
         for (int n : sizes) {
@@ -154,7 +154,12 @@ public class GeneFinder {
             //datasets.add(new Dataset("C:/dev/thesis/gb/", new File("C:/dev/thesis/gb/complete.gb"), "gb", true));
            //datasets.add(new Dataset("C:/dev/thesis/jev/", new File("C:/dev/thesis/jev/complete.gb"), "jev", false));
            // datasets.add(new Dataset("C:/dev/thesis/porcine/", new File("C:/dev/thesis/porcine/complete.gb"), "porcine", false));
-             datasets.add(new Dataset("C:/dev/thesis/yfv/", new File("C:/dev/thesis/yfv/complete.gb"), "yfv", false));
+            // datasets.add(new Dataset("C:/dev/thesis/yfv/", new File("C:/dev/thesis/yfv/complete.gb"), "yfv", false));
+            //datasets.add(new Dataset("C:/dev/thesis/hepe/", new File("C:/dev/thesis/hepe/complete.gb"), "hepe", false));
+            datasets.add(new Dataset("C:/dev/thesis/enteroc/", new File("C:/dev/thesis/enteroc/complete.gb"), "enteroc", false));
+            datasets.add(new Dataset("C:/dev/thesis/enterob/", new File("C:/dev/thesis/enterob/complete.gb"), "enterob", false));
+            //datasets.add(new Dataset("C:/dev/thesis/enteroa/", new File("C:/dev/thesis/enteroa/complete.gb"), "enteroa", false));
+             //datasets.add(new Dataset("C:/dev/thesis/norwalk/", new File("C:/dev/thesis/norwalk/complete.gb"), "norwalk", false));
             // datasets.add(new Dataset("C:/dev/thesis/bvdv/", new File("C:/dev/thesis/bvdv/complete.gb"), "bvdv", true));
 
             //  boolean allowXs = true;

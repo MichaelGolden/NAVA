@@ -26,6 +26,23 @@ public class MappedData {
     boolean[] used;
     Mapping mapping;
     Mapping[] mappings;
+    
+    public MappedData()
+    {
+        
+    }
+    
+    public MappedData(double [] mappedValues)
+    {
+        values = new double[mappedValues.length];
+        used = new boolean[mappedValues.length];
+        for(int i = 0 ; i < mappedValues.length ; i++)
+        {
+            values[i] = mappedValues[i];
+            used[i] = true;
+        }
+                
+    }
 
     public static MappedData getMappedData(File referenceAlignment, File inputAlignment, double[] values, boolean codon, String name, boolean useMUSCLE) {
         Mapping mapping = Mapping.createMapping(referenceAlignment, inputAlignment, 1,useMUSCLE);

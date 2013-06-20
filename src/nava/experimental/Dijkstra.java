@@ -13,12 +13,14 @@ import nava.utils.RNAFoldingTools;
 class Vertex implements Comparable<Vertex> {
 
     public final String name;
+    public final int index;
     public Edge[] adjacencies;
     public double minDistance = Double.POSITIVE_INFINITY;
     public Vertex previous;
 
-    public Vertex(String argName) {
-        name = argName;
+    public Vertex(String name, int index) {
+        this.name = name;
+        this.index = index;
     }
 
     public String toString() {
@@ -78,7 +80,7 @@ public class Dijkstra {
     public static Vertex[] getPairedSitesGraph(int[] pairedSites) {
         Vertex[] vertices = new Vertex[pairedSites.length];
         for (int i = 0; i < vertices.length; i++) {
-            vertices[i] = new Vertex(i + "");
+            vertices[i] = new Vertex(i + "", i);
         }
 
         for (int i = 0; i < vertices.length; i++) {
@@ -101,6 +103,35 @@ public class Dijkstra {
 
         return vertices;
     }
+    
+    public static short [][] getDistanceMatrix(int [] pairedSites)
+    {
+        short [][] distanceMatrix = new short[pairedSites.length][pairedSites.length];
+        Vertex[] vertices = Dijkstra.getPairedSitesGraph(pairedSites);
+        
+        
+        for (int i = 0; i < pairedSites.length; i++) {
+            for(Vertex v : vertices)
+            {
+                v.minDistance = Double.POSITIVE_INFINITY;
+                v.previous = null;
+            }
+            
+            computePaths(vertices[i]);
+            for (Vertex v : vertices) {
+                distanceMatrix[i][v.index] =  (short) v.minDistance;
+            }
+        }
+        
+        return distanceMatrix;        
+    }
+    
+    public static double getDistance(int [] pairedSites, int i, int j)
+    {
+          Vertex[] vertices = Dijkstra.getPairedSitesGraph(pairedSites);
+          computePaths(vertices[i]);
+          return vertices[j].minDistance;
+    }
 
     public static void main(String[] args) {
         //String dbs = "(((............)))";
@@ -109,18 +140,29 @@ public class Dijkstra {
         int[] pairedSites = RNAFoldingTools.getPairedSitesFromDotBracketString(dbs);
 
 
+        short [][] distanceMatrix = Dijkstra.getDistanceMatrix(pairedSites);
+        
+        /*
         Vertex[] vertices = Dijkstra.getPairedSitesGraph(pairedSites);
+        
+        
         for (int i = 0; i < pairedSites.length; i++) {
-
+            for(Vertex v : vertices)
+            {
+                v.minDistance = Double.POSITIVE_INFINITY;
+                v.previous = null;
+            }
+            
             computePaths(vertices[i]);
             System.out.println(i + "\t");
+            // System.out.println("Distance to\t" + 0 + "\t" + vertices[0].minDistance);
             for (Vertex v : vertices) {
                 //System.out.println(v);
                 // System.out.println("Distance to " + v + ": " + v.minDistance);
                 //List<Vertex> path = getShortestPathTo(v);
                 // System.out.println("Path: " + path);
             }
-        }
+        }*/
 
         /*
          *

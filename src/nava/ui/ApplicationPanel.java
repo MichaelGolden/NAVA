@@ -54,6 +54,7 @@ public class ApplicationPanel extends javax.swing.JPanel implements ListSelectio
         appController.registerApplication(new ClustalWApplication());
         appController.registerApplication(new SimpleNucleotideDiversityApplication());
         appController.registerApplication(new FastTreeApplication());
+        appController.registerApplication(new FigTreeApplication());
         applications = appController.getApplications();
 
         applicationListModel = new DefaultListModel<>();

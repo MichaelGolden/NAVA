@@ -170,6 +170,7 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Nucleic Acid Visualisation and Analysis");
+        setMinimumSize(new java.awt.Dimension(600, 400));
         setPreferredSize(new java.awt.Dimension(800, 600));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
@@ -177,14 +178,16 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
             }
         });
 
+        jTabbedPane1.setToolTipText("");
+
         jPanel1.setLayout(new java.awt.BorderLayout());
-        jTabbedPane1.addTab("Data analysis", jPanel1);
+        jTabbedPane1.addTab("Data input", jPanel1);
 
         jPanel2.setPreferredSize(new java.awt.Dimension(800, 0));
         jPanel2.setLayout(new java.awt.BorderLayout());
         jTabbedPane1.addTab("Visualisation", jPanel2);
 
-        jTabbedPane1.setSelectedComponent(jPanel2);
+        jTabbedPane1.setSelectedComponent(jPanel1);
 
         getContentPane().add(jTabbedPane1, java.awt.BorderLayout.CENTER);
 
@@ -208,12 +211,12 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
 
         jMenu2.setText("Open recently used");
         jMenu2.addMenuListener(new javax.swing.event.MenuListener() {
-            public void menuDeselected(javax.swing.event.MenuEvent evt) {
-            }
             public void menuCanceled(javax.swing.event.MenuEvent evt) {
             }
             public void menuSelected(javax.swing.event.MenuEvent evt) {
                 jMenu2MenuSelected(evt);
+            }
+            public void menuDeselected(javax.swing.event.MenuEvent evt) {
             }
         });
         jMenu2.addActionListener(new java.awt.event.ActionListener() {

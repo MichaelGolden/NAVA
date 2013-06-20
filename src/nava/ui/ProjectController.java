@@ -249,6 +249,7 @@ public class ProjectController implements SafeListListener {
             IO.loadFastaSequences(alignment.originalFile, sequences, sequenceNames);
             IO.saveToFASTAfile(sequences, sequenceNames, new File(alignment.getOriginalDataSourcePath(projectModel.getProjectPathString())));
             IO.saveToFASTAfile(sequences, sequenceNames, new File(alignment.getImportedDataSourcePath(projectModel.getProjectPathString())));
+            IO.resaveAsNormalisedFasta(Paths.get(alignment.getImportedDataSourcePath(projectModel.getProjectPathString())).toFile(), Paths.get(alignment.getNormalisedDataSourcePath(projectModel.getProjectPathString())).toFile());
             alignment.fileSize = new FileSize(Paths.get(alignment.getImportedDataSourcePath(projectModel.getProjectPathString())).toFile().length());
 
             try {
@@ -283,11 +284,13 @@ public class ProjectController implements SafeListListener {
             tree.setImportId(getNextImportId());
             tree.originalDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "orig.nwk").toString();
             tree.importedDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "nwk").toString();
+             tree.normalisedDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "norm." + "nwk").toString();
             tree.title = outputFile.dataSource.title;
             tree.parentSource = outputFile.dataSource.parentSource;
 
             IO.copyFile(outputFile.dataSource.originalFile, new File(tree.getOriginalDataSourcePath(projectModel.getProjectPathString())));
             IO.copyFile(outputFile.dataSource.originalFile, new File(tree.getImportedDataSourcePath(projectModel.getProjectPathString())));
+            IO.copyFile(outputFile.dataSource.originalFile, new File(tree.getNormalisedDataSourcePath(projectModel.getProjectPathString())));
             tree.fileSize = new FileSize(Paths.get(tree.getImportedDataSourcePath(projectModel.getProjectPathString())).toFile().length());
 
             projectModel.dataSources.addElement(tree);

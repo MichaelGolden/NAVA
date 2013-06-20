@@ -99,16 +99,16 @@ public class PairwiseStructureComparison {
             int windowSize = 75;
             boolean balance = true;
 
-          //  File outFile = new File("C:/dev/thesis/dengue/dengue_permutations2.txt");
-          //  String[] categories = {"dengue1", "dengue2", "dengue3", "dengue4"};
-          //  File structureAlignment = new File("C:/dev/thesis/dengue/dengue-alignment.dbn");
-          //  ArrayList<MappedData> dataSources = new ArrayList<>();
-          //  File sequenceFile = new File("C:/dev/thesis/dengue/dengue-alignment.fas");
-          //  File referenceFile = new File("C:/dev/thesis/dengue/dengue_refseq.fasta");
-          //  MappableData synDataDengue = new MappableData(new File("C:/dev/thesis/dengue/300/dengue_polyprotein_300_aligned.fas"), new File("C:/dev/thesis/dengue/300/dengue_polyprotein_300_aligned.csv"), 1, 1, true, "Syn rates dengue");
-          //  dataSources.add(MappedData.getMappedData(sequenceFile, synDataDengue, 1000, false));
-          //  MappableData nucDataDengue = new MappableData(new File("C:/dev/thesis/dengue/300/dengue_all_300_aligned.fas"), new File("C:/dev/thesis/dengue/300/site rates.csv"), 1, 1, true, "Nuc rates dengue");
-           // dataSources.add(MappedData.getMappedData(sequenceFile, nucDataDengue, 1000, false));
+            //  File outFile = new File("C:/dev/thesis/dengue/dengue_permutations2.txt");
+            //  String[] categories = {"dengue1", "dengue2", "dengue3", "dengue4"};
+            //  File structureAlignment = new File("C:/dev/thesis/dengue/dengue-alignment.dbn");
+            //  ArrayList<MappedData> dataSources = new ArrayList<>();
+            //  File sequenceFile = new File("C:/dev/thesis/dengue/dengue-alignment.fas");
+            //  File referenceFile = new File("C:/dev/thesis/dengue/dengue_refseq.fasta");
+            //  MappableData synDataDengue = new MappableData(new File("C:/dev/thesis/dengue/300/dengue_polyprotein_300_aligned.fas"), new File("C:/dev/thesis/dengue/300/dengue_polyprotein_300_aligned.csv"), 1, 1, true, "Syn rates dengue");
+            //  dataSources.add(MappedData.getMappedData(sequenceFile, synDataDengue, 1000, false));
+            //  MappableData nucDataDengue = new MappableData(new File("C:/dev/thesis/dengue/300/dengue_all_300_aligned.fas"), new File("C:/dev/thesis/dengue/300/site rates.csv"), 1, 1, true, "Nuc rates dengue");
+            // dataSources.add(MappedData.getMappedData(sequenceFile, nucDataDengue, 1000, false));
 
             //File outFile = new File("C:/dev/thesis/westnile/westnile_permutations.txt");
             //  String[] categories = {"westnile"};
@@ -133,44 +133,68 @@ public class PairwiseStructureComparison {
             //File referenceFile = new File("C:/dev/thesis/dengue/dengue-alignment.fas");
 
 
-           File outFile = new File("C:/dev/thesis/jev_tbv_westnile/jev_tbv_westnile_permutations_1000_2.txt");
-           String[] categories = {"jev", "tbv", "westnile"};
-          File structureAlignment = new File("C:/dev/thesis/jev_tbv_westnile/jev_westnile_tbv_aligned.dbn");
-          ArrayList<MappedData> dataSources = new ArrayList<>();
-          File sequenceFile = new File("C:/dev/thesis/jev_tbv_westnile/jev_westnile_tbv_aligned.fas");
-           File referenceFile = new File("C:/dev/thesis/jev_tbv_westnile/visualisation/westnile_reference.fasta");
-         MappableData synDataJEV= new MappableData(new File("C:/dev/thesis/jev_tbv_westnile/visualisation/jev_polyprotein_300_aligned.fas"), new File("C:/dev/thesis/jev_tbv_westnile/visualisation/jev_polyprotein_300_aligned.csv"), 1, 1, true, "Syn rates JEV");
-          dataSources.add(MappedData.getMappedData(sequenceFile, synDataJEV, 1000, false));
-          MappableData synDataTBV= new MappableData(new File("C:/dev/thesis/jev_tbv_westnile/visualisation/tbv_polyprotein_300_aligned.fas"), new File("C:/dev/thesis/jev_tbv_westnile/visualisation/tbv_polyprotein_300_aligned.csv"), 1, 1, true, "Syn rates TBV");
-          dataSources.add(MappedData.getMappedData(sequenceFile, synDataTBV, 1000, false));
-          MappableData synDataWestnile= new MappableData(new File("C:/dev/thesis/jev_tbv_westnile/visualisation/westnile_polyprotein_300_aligned.fas"), new File("C:/dev/thesis/jev_tbv_westnile/visualisation/westnile_polyprotein_300_aligned.csv"), 1, 1, true, "Syn rates westnile");
-          dataSources.add(MappedData.getMappedData(sequenceFile, synDataWestnile, 1000, false));
+            //   File outFile = new File("C:/dev/thesis/jev_tbv_westnile/jev_tbv_westnile_permutations_1000_2.txt");
+            //  String[] categories = {"jev", "tbv", "westnile"};
+            //  File structureAlignment = new File("C:/dev/thesis/jev_tbv_westnile/jev_westnile_tbv_aligned.dbn");
+            //  ArrayList<MappedData> dataSources = new ArrayList<>();
+            //  File sequenceFile = new File("C:/dev/thesis/jev_tbv_westnile/jev_westnile_tbv_aligned.fas");
+            //   File referenceFile = new File("C:/dev/thesis/jev_tbv_westnile/visualisation/westnile_reference.fasta");
+            //  MappableData synDataJEV= new MappableData(new File("C:/dev/thesis/jev_tbv_westnile/visualisation/jev_polyprotein_300_aligned.fas"), new File("C:/dev/thesis/jev_tbv_westnile/visualisation/jev_polyprotein_300_aligned.csv"), 1, 1, true, "Syn rates JEV");
+            //   dataSources.add(MappedData.getMappedData(sequenceFile, synDataJEV, 1000, false));
+            //   MappableData synDataTBV= new MappableData(new File("C:/dev/thesis/jev_tbv_westnile/visualisation/tbv_polyprotein_300_aligned.fas"), new File("C:/dev/thesis/jev_tbv_westnile/visualisation/tbv_polyprotein_300_aligned.csv"), 1, 1, true, "Syn rates TBV");
+            //  dataSources.add(MappedData.getMappedData(sequenceFile, synDataTBV, 1000, false));
+            //  MappableData synDataWestnile= new MappableData(new File("C:/dev/thesis/jev_tbv_westnile/visualisation/westnile_polyprotein_300_aligned.fas"), new File("C:/dev/thesis/jev_tbv_westnile/visualisation/westnile_polyprotein_300_aligned.csv"), 1, 1, true, "Syn rates westnile");
+            //  dataSources.add(MappedData.getMappedData(sequenceFile, synDataWestnile, 1000, false));
 
-            //File outFile = new File("C:/dev/thesis/hcv_westnile_permutations2.txt");
+
+            //String[] categories = {"hcv1", "hcv2"};
+            String[] categories = {"hcv1", "hcv2", "hcv3", "hcv4", "hcv6"};
+            File outFile = new File("C:/dev/thesis/hcv/hcv_permutations2.txt");
+            //  String[] categories = {"hcv1a", "hcv1b", "hcv2a", "hcv2b", "hcv3", "hcv4", "hcv6"};
+            File structureAlignment = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.dbn");
+            File sequenceFile = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.fas");
+            File referenceFile = new File("C:/dev/thesis/hcv/visualisation/H77_reference.fasta");
+            MappableData nucleotideData = new MappableData(sequenceFile, new File("C:/dev/thesis/hcv/conservation/rates.csv"), 0, 1, false, "Nucleotide rates");
+            MappableData synDataHCV1 = new MappableData(new File("C:/dev/thesis/hcv/1/300/hcv1_polyprotein_300_aligned.fas"), new File("C:/dev/thesis/hcv/1/300/hcv1_polyprotein_300_aligned.csv"), 1, 1, true, "Syn rates hcv 1");
+            MappableData synDataHCV1a = new MappableData(new File("C:/dev/thesis/hcv/1a/300/hcv1a_polyprotein_300_aligned.fas"), new File("C:/dev/thesis/hcv/1a/300/hcv1a_polyprotein_300_aligned.csv"), 1, 1, true, "Syn rates hcv 1a");
+            MappableData synDataHCV1b = new MappableData(new File("C:/dev/thesis/hcv/1b/300/hcv1b_polyprotein_300_aligned.fas"), new File("C:/dev/thesis/hcv/1b/300/hcv1b_polyprotein_300_aligned.csv"), 1, 1, true, "Syn rates hcv 1b");
+            MappableData synDataHCV2 = new MappableData(new File("C:/hcv/2_coding_alignment_100.fas"), new File("C:/hcv/2_coding_alignment_100.nex.csv"), 1, 1, true, "Syn rates hcv 2");
+            MappableData synDataHCV3 = new MappableData(new File("C:/hcv/3_coding_alignment_48.fas_DNA.fasta"), new File("C:/hcv/3_coding_alignment_48.fas_DNA.nex.csv"), 1, 1, true, "Syn rates hcv 3");
+            MappableData synDataHCV4 = new MappableData(new File("C:/hcv/4_coding_macse.fas_DNA.fasta"), new File("C:/hcv/4_coding_macse.fas_DNA.fasta.nex.csv"), 1, 1, true, "Syn rates hcv 4");
+            MappableData synDataHCV6 = new MappableData(new File("C:/hcv/6_coding_alignment_77.fas"), new File("C:/hcv/6_coding_alignment_77.nex.csv"), 1, 1, true, "Syn rates hcv 6");
+            ArrayList<MappedData> dataSources = new ArrayList<>();
+            dataSources.add(MappedData.getMappedData(sequenceFile, nucleotideData, 1000, false));
+            dataSources.add(MappedData.getMappedData(sequenceFile, synDataHCV1, 1000, false));
+            dataSources.add(MappedData.getMappedData(sequenceFile, synDataHCV1a, 1000, false));
+            dataSources.add(MappedData.getMappedData(sequenceFile, synDataHCV1b, 1000, false));
+            dataSources.add(MappedData.getMappedData(sequenceFile, synDataHCV2, 1000, false));
+            dataSources.add(MappedData.getMappedData(sequenceFile, synDataHCV3, 1000, false));
+            dataSources.add(MappedData.getMappedData(sequenceFile, synDataHCV4, 1000, false));
+            dataSources.add(MappedData.getMappedData(sequenceFile, synDataHCV6, 1000, false));
             //String[] categories = {"westnile", "hcv1a", "hcv1b", "hcv2a", "hcv2b","hcv3","hcv4", "hcv6"};
-           //  File outFile = new File("C:/dev/thesis/hcv/hcv_permutations2.txt"); 
-           //  String[] categories = {"hcv1a", "hcv1b", "hcv2a", "hcv2b", "hcv3", "hcv4", "hcv6"};
-          //   File structureAlignment = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.dbn"); 
-          //   File sequenceFile = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.fas"); 
-          //  File referenceFile = new File("C:/dev/thesis/hcv/visualisation/H77_reference.fasta");
-          //  MappableData nucleotideData = new MappableData(sequenceFile, new File("C:/dev/thesis/hcv/conservation/rates.csv"), 0, 1, false,"Nucleotide rates"); 
-          //   MappableData synDataHCV1 = new MappableData(new File("C:/dev/thesis/hcv/1/300/hcv1_polyprotein_300_aligned.fas"), new File("C:/dev/thesis/hcv/1/300/hcv1_polyprotein_300_aligned.csv"), 1, 1, true, "Syn rates hcv 1"); 
-          //  MappableData synDataHCV1a = new MappableData(new File("C:/dev/thesis/hcv/1a/300/hcv1a_polyprotein_300_aligned.fas"), new File("C:/dev/thesis/hcv/1a/300/hcv1a_polyprotein_300_aligned.csv"), 1, 1, true, "Syn rates hcv 1a"); 
-           // MappableData synDataHCV1b = new  MappableData(new File("C:/dev/thesis/hcv/1b/300/hcv1b_polyprotein_300_aligned.fas"), new File("C:/dev/thesis/hcv/1b/300/hcv1b_polyprotein_300_aligned.csv"), 1, 1, true, "Syn rates hcv 1b"); 
-          //   MappableData synDataHCV2 = new MappableData(new File("C:/hcv/2_coding_alignment_100.fas"), new File("C:/hcv/2_coding_alignment_100.nex.csv"), 1, 1, true, "Syn rates hcv 2"); 
-          //   MappableData synDataHCV3 = new MappableData(new File("C:/hcv/3_coding_alignment_48.fas_DNA.fasta"), new File("C:/hcv/3_coding_alignment_48.fas_DNA.nex.csv"), 1, 1, true, "Syn rates hcv 3"); 
-          //  MappableData synDataHCV4 = new MappableData(new File("C:/hcv/4_coding_macse.fas_DNA.fasta"), new File("C:/hcv/4_coding_macse.fas_DNA.fasta.nex.csv"), 1, 1, true, "Syn rates hcv 4"); 
-          //   MappableData synDataHCV6 = new MappableData(new File("C:/hcv/6_coding_alignment_77.fas"), new File("C:/hcv/6_coding_alignment_77.nex.csv"), 1, 1, true, "Syn rates hcv 6"); 
-          //   ArrayList<MappedData> dataSources = new ArrayList<>();
-          // dataSources.add(MappedData.getMappedData(sequenceFile,nucleotideData, 1000, false));
-          //   dataSources.add(MappedData.getMappedData(sequenceFile,synDataHCV1, 1000, false));
-          //  dataSources.add(MappedData.getMappedData(sequenceFile, synDataHCV1a, 1000, false));
-          //  dataSources.add(MappedData.getMappedData(sequenceFile,synDataHCV1b, 1000, false));
-          //  dataSources.add(MappedData.getMappedData(sequenceFile,synDataHCV2, 1000, false));
-           // dataSources.add(MappedData.getMappedData(sequenceFile, synDataHCV3, 1000, false));
-           // dataSources.add(MappedData.getMappedData(sequenceFile,synDataHCV4, 1000, false));
-           // dataSources.add(MappedData.getMappedData(sequenceFile, synDataHCV6, 1000, false));
-            
+            //  File outFile = new File("C:/dev/thesis/hcv/hcv_permutations2.txt"); 
+            //  String[] categories = {"hcv1a", "hcv1b", "hcv2a", "hcv2b", "hcv3", "hcv4", "hcv6"};
+            //   File structureAlignment = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.dbn"); 
+            //   File sequenceFile = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.fas"); 
+            //  File referenceFile = new File("C:/dev/thesis/hcv/visualisation/H77_reference.fasta");
+            //  MappableData nucleotideData = new MappableData(sequenceFile, new File("C:/dev/thesis/hcv/conservation/rates.csv"), 0, 1, false,"Nucleotide rates"); 
+            //   MappableData synDataHCV1 = new MappableData(new File("C:/dev/thesis/hcv/1/300/hcv1_polyprotein_300_aligned.fas"), new File("C:/dev/thesis/hcv/1/300/hcv1_polyprotein_300_aligned.csv"), 1, 1, true, "Syn rates hcv 1"); 
+            //  MappableData synDataHCV1a = new MappableData(new File("C:/dev/thesis/hcv/1a/300/hcv1a_polyprotein_300_aligned.fas"), new File("C:/dev/thesis/hcv/1a/300/hcv1a_polyprotein_300_aligned.csv"), 1, 1, true, "Syn rates hcv 1a"); 
+            // MappableData synDataHCV1b = new  MappableData(new File("C:/dev/thesis/hcv/1b/300/hcv1b_polyprotein_300_aligned.fas"), new File("C:/dev/thesis/hcv/1b/300/hcv1b_polyprotein_300_aligned.csv"), 1, 1, true, "Syn rates hcv 1b"); 
+            //   MappableData synDataHCV2 = new MappableData(new File("C:/hcv/2_coding_alignment_100.fas"), new File("C:/hcv/2_coding_alignment_100.nex.csv"), 1, 1, true, "Syn rates hcv 2"); 
+            //   MappableData synDataHCV3 = new MappableData(new File("C:/hcv/3_coding_alignment_48.fas_DNA.fasta"), new File("C:/hcv/3_coding_alignment_48.fas_DNA.nex.csv"), 1, 1, true, "Syn rates hcv 3"); 
+            //  MappableData synDataHCV4 = new MappableData(new File("C:/hcv/4_coding_macse.fas_DNA.fasta"), new File("C:/hcv/4_coding_macse.fas_DNA.fasta.nex.csv"), 1, 1, true, "Syn rates hcv 4"); 
+            //   MappableData synDataHCV6 = new MappableData(new File("C:/hcv/6_coding_alignment_77.fas"), new File("C:/hcv/6_coding_alignment_77.nex.csv"), 1, 1, true, "Syn rates hcv 6"); 
+            //   ArrayList<MappedData> dataSources = new ArrayList<>();
+            // dataSources.add(MappedData.getMappedData(sequenceFile,nucleotideData, 1000, false));
+            //   dataSources.add(MappedData.getMappedData(sequenceFile,synDataHCV1, 1000, false));
+            //  dataSources.add(MappedData.getMappedData(sequenceFile, synDataHCV1a, 1000, false));
+            //  dataSources.add(MappedData.getMappedData(sequenceFile,synDataHCV1b, 1000, false));
+            //  dataSources.add(MappedData.getMappedData(sequenceFile,synDataHCV2, 1000, false));
+            // dataSources.add(MappedData.getMappedData(sequenceFile, synDataHCV3, 1000, false));
+            // dataSources.add(MappedData.getMappedData(sequenceFile,synDataHCV4, 1000, false));
+            // dataSources.add(MappedData.getMappedData(sequenceFile, synDataHCV6, 1000, false));
+
             //ArrayList<MappedData> dataSources = new ArrayList<>();
             // File outFile = new File("C:/dev/thesis/hiv_full/hiv_not_siv_permutations2.txt");
             // String[] categories = {"hiv1b", "hiv1c", "hiv1d", "hiv1g", "hiv1o", "hiv2"};
@@ -179,12 +203,12 @@ public class PairwiseStructureComparison {
             //File referenceFile = new File("C:/dev/thesis/hiv_full/hiv1-reference.fasta");
             //dataSources.add(hivMapping(sequenceFile));
 
-          //   ArrayList<MappedData> dataSources = new ArrayList<>();
+            //   ArrayList<MappedData> dataSources = new ArrayList<>();
             // File outFile = new File("C:/dev/thesis/bvdv_csfv/bvdv_and_csfv_permutations.txt");
             // String[] categories = {"bvdv", "csfv"};
-          //  File structureAlignment = new File("C:/dev/thesis/bvdv_csfv/bvdv_and_csfv.dbn");
-           // File sequenceFile = new File("C:/dev/thesis/bvdv_csfv/bvdv_and_csfv.fas");
-           // File referenceFile = new File("C:/dev/thesis/bvdv_csfv/bvdv_and_csfv.fas");
+            //  File structureAlignment = new File("C:/dev/thesis/bvdv_csfv/bvdv_and_csfv.dbn");
+            // File sequenceFile = new File("C:/dev/thesis/bvdv_csfv/bvdv_and_csfv.fas");
+            // File referenceFile = new File("C:/dev/thesis/bvdv_csfv/bvdv_and_csfv.fas");
             //dataSources.add(hivMapping(sequenceFile));
 
 
@@ -205,7 +229,7 @@ public class PairwiseStructureComparison {
             ArrayList<Combination> combinations = combinations(categories);
             for (int i = 0; i < combinations.size(); i++) {
                 Combination combination = combinations.get(i);
-                if (combination.combination.size() <10) {
+                if (combination.combination.size() == 3) {
                     //if (combination.combination.size() == 4) {
                 } else {
                     combinations.remove(i);
@@ -412,6 +436,19 @@ public class PairwiseStructureComparison {
 
         public ArrayList<String> combination;
 
+        public boolean startsWith(String startsWith) {
+            for (String s : combination) {
+                if (startsWith.startsWith(s)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public boolean startsWith(String s1, String s2) {
+            return startsWith(s1) && startsWith(s2);
+        }
+
         public Combination(String[] combination) {
             this.combination = new ArrayList<>();
             for (int i = 0; i < combination.length; i++) {
@@ -420,11 +457,13 @@ public class PairwiseStructureComparison {
         }
 
         public boolean contains(String s1) {
-            return combination.contains(s1);
+            //return combination.contains(s1);
+            return startsWith(s1);
         }
 
         public boolean contains(String s1, String s2) {
-            return combination.contains(s1) && combination.contains(s2);
+            //return combination.contains(s1) && combination.contains(s2);
+            return startsWith(s1) && startsWith(s2);
         }
 
         @Override
@@ -531,9 +570,16 @@ public class PairwiseStructureComparison {
                 String[] split = d.title.split("_");
                 item.organism = split[split.length - 1];
                 if (!combination.contains((item.organism))) {
-                    // System.out.println("Removing " + d.title + "\t" + item.organism);
+
+                    System.out.println("Removing " + d.title + "\t" + item.organism + "\t" + combination);
                     structureData2.remove(d);
+                } else {
+                    System.out.println("Not removing " + d.title + "\t" + item.organism + "\t" + combination);
                 }
+            }
+
+            if (structureData2.size() == 0) {
+                return;
             }
 
             double[] gaps = getPercentGaps(structureData2, windowSize);
@@ -572,7 +618,10 @@ public class PairwiseStructureComparison {
                     mayContinue = true;
                     for (int i = 0; i < pairMustContain.size(); i++) {
                         // exactly one of the pair must contain value i
-                        if (!(pairMustContain.get(i).equals(o1) ^ pairMustContain.get(i).equals(o2))) {
+                        //System.out.println(pairMustContain.get(i)+"\t"+o1+"\t"+pairMustContain.get(i)+o2);
+                        if (!(o1.startsWith(pairMustContain.get(i)) ^ o2.startsWith(pairMustContain.get(i))))
+                                {
+                          //  pairMustContain.get(i).equals(o1) ^ pairMustContain.get(i).equals(o2))) {
                             mayContinue = false;
                             break;
                         }

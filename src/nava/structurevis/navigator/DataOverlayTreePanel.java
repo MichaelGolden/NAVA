@@ -17,10 +17,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JFileChooser;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
@@ -344,6 +341,18 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
                 } catch (IOException ex) {
                     Logger.getLogger(DataOverlayTreePanel.class.getName()).log(Level.SEVERE, null, ex);
                 }
+            }
+        }
+         else if (e.getSource().equals(deleteItem)) 
+        {
+            Overlay overlay = ((DataOverlayTreeNode) overlayTree.getSelectionPath().getLastPathComponent()).overlay;
+            int n = JOptionPane.showConfirmDialog(MainFrame.self,
+            "Warning, you are about to delete a data overlay!\nAre you sure you wish to continue?",
+            "Warning",
+             JOptionPane.YES_NO_OPTION);
+            if(n == 0)
+            {
+                this.structureVisController.structureVisModel.overlayNavigatorTreeModel.deleteDataOverlay(overlay);
             }
         }
     }

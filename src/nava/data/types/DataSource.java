@@ -32,6 +32,7 @@ public abstract class DataSource implements Serializable {
     public DataType dataType;
     public FileSize fileSize;
     public DataSource parentSource;
+    public boolean deleted = false;
 
     public DataSource() {
         id = count;

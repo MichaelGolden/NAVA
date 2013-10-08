@@ -54,6 +54,8 @@ public class DataInspectorPanel extends javax.swing.JPanel implements ItemListen
         else
         {
            this.holderPanel.removeAll();
+           this.holderPanel.revalidate();
+           this.holderPanel.repaint();
         }
        // exportPanel.revalidate();
         //exportPanel.repaint();

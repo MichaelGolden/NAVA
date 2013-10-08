@@ -58,16 +58,28 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
         root.add(structureData);
 
         for (int i = 0; i < structureVisModel.structureVisDataOverlays1D.size(); i++) {
-            oneDimensionalData.add(new DataOverlayTreeNode(structureVisModel.structureVisDataOverlays1D.get(i)));
+           if(!structureVisModel.structureVisDataOverlays1D.get(i).deleted)
+           {
+                oneDimensionalData.add(new DataOverlayTreeNode(structureVisModel.structureVisDataOverlays1D.get(i)));
+           }
         }
         for (int i = 0; i < structureVisModel.structureVisDataOverlays2D.size(); i++) {
-            twoDimensionalData.add(new DataOverlayTreeNode(structureVisModel.structureVisDataOverlays2D.get(i)));
+            if(!structureVisModel.structureVisDataOverlays2D.get(i).deleted)
+            {
+                twoDimensionalData.add(new DataOverlayTreeNode(structureVisModel.structureVisDataOverlays2D.get(i)));
+            }
         }
         for (int i = 0; i < structureVisModel.nucleotideSources.size(); i++) {
-            nucleotideData.add(new DataOverlayTreeNode(structureVisModel.nucleotideSources.get(i)));
+            if(!structureVisModel.nucleotideSources.get(i).deleted)
+            {
+                nucleotideData.add(new DataOverlayTreeNode(structureVisModel.nucleotideSources.get(i)));
+            }
         }
         for (int i = 0; i < structureVisModel.structureSources.size(); i++) {
-            structureData.add(new DataOverlayTreeNode(structureVisModel.structureSources.get(i)));
+            if(!structureVisModel.structureSources.get(i).deleted)
+            {
+                structureData.add(new DataOverlayTreeNode(structureVisModel.structureSources.get(i)));
+            }
         }
     }
 
@@ -93,22 +105,23 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
     }
 
     public void addDataOverlay(Overlay dataOverlay) {
-        if (dataOverlay instanceof DataOverlay1D) {
-            insertNodeInto(new DataOverlayTreeNode(dataOverlay), oneDimensionalData, oneDimensionalData.getChildCount());
-        }
+        if(!dataOverlay.deleted)
+        {
+            if (dataOverlay instanceof DataOverlay1D) {
+                insertNodeInto(new DataOverlayTreeNode(dataOverlay), oneDimensionalData, oneDimensionalData.getChildCount());
+            }
 
-        if (dataOverlay instanceof DataOverlay2D) {
-            insertNodeInto(new DataOverlayTreeNode(dataOverlay), twoDimensionalData, twoDimensionalData.getChildCount());
-        }
+            if (dataOverlay instanceof DataOverlay2D) {
+                insertNodeInto(new DataOverlayTreeNode(dataOverlay), twoDimensionalData, twoDimensionalData.getChildCount());
+            }
 
-        if (dataOverlay instanceof NucleotideComposition) {
-            insertNodeInto(new DataOverlayTreeNode(dataOverlay), nucleotideData, nucleotideData.getChildCount());
-        }
+            if (dataOverlay instanceof NucleotideComposition) {
+                insertNodeInto(new DataOverlayTreeNode(dataOverlay), nucleotideData, nucleotideData.getChildCount());
+            }
 
-        if (dataOverlay instanceof StructureOverlay) {
-            insertNodeInto(new DataOverlayTreeNode(dataOverlay), structureData, structureData.getChildCount());
-        }
-
+            if (dataOverlay instanceof StructureOverlay) {
+                insertNodeInto(new DataOverlayTreeNode(dataOverlay), structureData, structureData.getChildCount());
+            }
         /*
          * if (dataSource instanceof Alignment) { insertNodeInto(new
          * NavigatorTreeNode(dataSource), alignmentsNode,
@@ -130,6 +143,13 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
          * TabularField) { insertNodeInto(new NavigatorTreeNode(dataSource),
          * tabularNode, tabularNode.getChildCount()); }
          */
+        }
+    }
+    
+    public void deleteDataOverlay(Overlay dataOverlay)
+    {
+        dataOverlay.deleted = true;
+        this.structureVisModel.overlayNavigatorTreeModel.removeNodeFromParent(findNode(dataOverlay));        
     }
 
     @Override
@@ -184,7 +204,7 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
     public void dataOverlayChanged(Overlay oldOverlay, Overlay newOverlay) {
         System.out.println("DataOverlayTreeModel.dataOverlayChanged" + oldOverlay + "\t" + newOverlay);
         DataOverlayTreeNode node = this.findNode(oldOverlay);
-        if (node != null) {
+        if (!oldOverlay.deleted && !newOverlay.deleted &&  node != null) {
             node.overlay = newOverlay;
             DataOverlayTreeNode parent = (DataOverlayTreeNode) node.getParent();
             int[] indices = {parent.getIndex(node)};

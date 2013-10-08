@@ -54,29 +54,39 @@ public class NavigatorTreeModel extends DefaultTreeModel implements Serializable
     }
 
     public void addDataSource(DataSource dataSource) {
-        if (dataSource instanceof Alignment) {
-            insertNodeInto(new NavigatorTreeNode(dataSource), alignmentsNode, alignmentsNode.getChildCount());
-        }
-
-        if (dataSource instanceof Annotations) {
-            insertNodeInto(new NavigatorTreeNode(dataSource), annotationsNode, annotationsNode.getChildCount());
-        }
-
-        if (dataSource instanceof Matrix) {
-            insertNodeInto(new NavigatorTreeNode(dataSource), matricesNode, matricesNode.getChildCount());
-        }
-
-        if (dataSource instanceof SecondaryStructure || dataSource instanceof StructureList) {
-            insertNodeInto(new NavigatorTreeNode(dataSource), structuresNode, structuresNode.getChildCount());
-        }
-
-        if (dataSource instanceof Tabular || dataSource instanceof TabularField) {
-            insertNodeInto(new NavigatorTreeNode(dataSource), tabularNode, tabularNode.getChildCount());
-        }
         
-        if (dataSource instanceof Tree || dataSource instanceof Tree) {
-            insertNodeInto(new NavigatorTreeNode(dataSource), treesNode, treesNode.getChildCount());
+        if(!dataSource.deleted)
+        {
+            if (dataSource instanceof Alignment) {
+                insertNodeInto(new NavigatorTreeNode(dataSource), alignmentsNode, alignmentsNode.getChildCount());
+            }
+
+            if (dataSource instanceof Annotations) {
+                insertNodeInto(new NavigatorTreeNode(dataSource), annotationsNode, annotationsNode.getChildCount());
+            }
+
+            if (dataSource instanceof Matrix) {
+                insertNodeInto(new NavigatorTreeNode(dataSource), matricesNode, matricesNode.getChildCount());
+            }
+
+            if (dataSource instanceof SecondaryStructure || dataSource instanceof StructureList) {
+                insertNodeInto(new NavigatorTreeNode(dataSource), structuresNode, structuresNode.getChildCount());
+            }
+
+            if (dataSource instanceof Tabular || dataSource instanceof TabularField) {
+                insertNodeInto(new NavigatorTreeNode(dataSource), tabularNode, tabularNode.getChildCount());
+            }
+
+            if (dataSource instanceof Tree || dataSource instanceof Tree) {
+                insertNodeInto(new NavigatorTreeNode(dataSource), treesNode, treesNode.getChildCount());
+            }
         }
+    }
+    
+    public void deleteDataSource(DataSource dataSource)
+    {
+        dataSource.deleted = true;
+        this.removeNodeFromParent(findNode(dataSource));
     }
 
     public void setup() {

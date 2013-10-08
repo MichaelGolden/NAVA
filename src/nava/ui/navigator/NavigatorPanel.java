@@ -16,21 +16,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.*;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import nava.data.types.DataSource;
-import nava.structurevis.data.DataOverlay1D;
-import nava.structurevis.data.Overlay;
-import nava.structurevis.navigator.DataOverlayTreeNode;
 import nava.ui.*;
 import nava.utils.GraphicsUtils;
 import nava.utils.SafeListModel;
@@ -200,11 +193,14 @@ public class NavigatorPanel extends javax.swing.JPanel implements ActionListener
     public void valueChanged(TreeSelectionEvent e) {
         NavigationEvent navigationEvent = new NavigationEvent();
         TreePath[] paths = navigationTree.getSelectionPaths();
-        for (TreePath path : paths) {
-            NavigatorTreeNode node = (NavigatorTreeNode) path.getLastPathComponent();
-            node.isNew = false;
-            if (node.dataSource != null) {
-                navigationEvent.selectedDataSources.add(node.dataSource);
+        if(paths != null)
+        {
+            for (TreePath path : paths) {
+                NavigatorTreeNode node = (NavigatorTreeNode) path.getLastPathComponent();
+                node.isNew = false;
+                if (node.dataSource != null) {
+                    navigationEvent.selectedDataSources.add(node.dataSource);
+                }
             }
         }
 
@@ -246,8 +242,12 @@ public class NavigatorPanel extends javax.swing.JPanel implements ActionListener
     @Override
     public void dataSourcesIntervalAdded(ListDataEvent e) {
         for (int i = e.getIndex0(); i < e.getIndex1() + 1; i++) {
-            projectController.projectModel.navigatorTreeModel.addDataSource(projectController.projectModel.dataSources.get(i));
+            //if(projectController.projectModel.dataSources.get(i).deleted)
+          //  {
+                projectController.projectModel.navigatorTreeModel.addDataSource(projectController.projectModel.dataSources.get(i));
+      
             System.out.println("Adding " + i);
+                 // }
         }
     }
 
@@ -260,9 +260,11 @@ public class NavigatorPanel extends javax.swing.JPanel implements ActionListener
         SafeListModel<DataSource> dataSources = projectController.projectModel.dataSources;
         for(int i = e.getIndex0() ; i <= e.getIndex1() ; i++)
         {
-           NavigatorTreeNode node = projectController.projectModel.navigatorTreeModel.findNode(dataSources.get(i));
-           projectController.projectModel.navigatorTreeModel.nodeChanged(node);
-           
+            //if(projectController.projectModel.dataSources.get(i).deleted)
+           // {
+                NavigatorTreeNode node = projectController.projectModel.navigatorTreeModel.findNode(dataSources.get(i));
+                projectController.projectModel.navigatorTreeModel.nodeChanged(node);
+           // }
         }
     }
 
@@ -308,6 +310,20 @@ public class NavigatorPanel extends javax.swing.JPanel implements ActionListener
             ExportDataDialog exportDialog = new ExportDataDialog(MainFrame.self, true, projectController, dataSource);
             GraphicsUtils.centerWindowOnWindow(exportDialog, MainFrame.self);
             exportDialog.setVisible(true);
+        }
+        else
+        if(e.getSource().equals(deleteItem))
+        {
+             DataSource dataSource = ((NavigatorTreeNode) navigationTree.getSelectionPath().getLastPathComponent()).dataSource;
+              int n = JOptionPane.showConfirmDialog(MainFrame.self,
+            "Warning, you are about to delete a data source!\nAre you sure you wish to continue?",
+            "Warning",
+             JOptionPane.YES_NO_OPTION);
+            if(n == 0)
+            {
+                this.projectController.projectModel.navigatorTreeModel.deleteDataSource(dataSource);
+            }
+             
         }
     }
 

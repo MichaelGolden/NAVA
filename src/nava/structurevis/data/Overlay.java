@@ -29,6 +29,7 @@ public abstract class Overlay implements Serializable {
     public double thresholdMaxPerc = 1;
     public double thresholdMin = 0;
     public double thresholdMax = 0;
+    public boolean deleted = false;
 
     public OverlayState getState() {
         return state;

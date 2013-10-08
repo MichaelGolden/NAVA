@@ -56,29 +56,17 @@ public class DataPanel extends javax.swing.JPanel implements NavigationListener 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(15, 0), new java.awt.Dimension(15, 0), new java.awt.Dimension(15, 32767));
         jLabel4 = new javax.swing.JLabel();
         filler3 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 32767));
         jProgressBar = new javax.swing.JProgressBar();
-
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Project navigation"));
-        jPanel1.setMaximumSize(new java.awt.Dimension(300, 2147483647));
-        jPanel1.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel1.setLayout(new java.awt.BorderLayout());
-
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Data inspector"));
-        jPanel3.setMinimumSize(new java.awt.Dimension(200, 23));
-        jPanel3.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel3.setLayout(new java.awt.BorderLayout());
-
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Actions"));
-        jPanel2.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel2.setLayout(new java.awt.BorderLayout());
+        jSplitPane2 = new javax.swing.JSplitPane();
+        jSplitPane1 = new javax.swing.JSplitPane();
+        jPanel3 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Tasks"));
         jPanel4.setPreferredSize(new java.awt.Dimension(12, 150));
@@ -97,7 +85,7 @@ public class DataPanel extends javax.swing.JPanel implements NavigationListener 
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addGap(694, 694, 694)
                 .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 166, Short.MAX_VALUE)
                 .addComponent(filler3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(24, 24, 24)
                 .addComponent(jLabel4)
@@ -120,27 +108,47 @@ public class DataPanel extends javax.swing.JPanel implements NavigationListener 
                 .addGap(0, 0, 0))
         );
 
+        jSplitPane2.setDividerLocation(200);
+        jSplitPane2.setDividerSize(3);
+
+        jSplitPane1.setDividerLocation(350);
+        jSplitPane1.setDividerSize(3);
+
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Data inspector"));
+        jPanel3.setMinimumSize(new java.awt.Dimension(200, 23));
+        jPanel3.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel3.setLayout(new java.awt.BorderLayout());
+        jSplitPane1.setLeftComponent(jPanel3);
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Actions"));
+        jPanel2.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel2.setLayout(new java.awt.BorderLayout());
+        jSplitPane1.setRightComponent(jPanel2);
+
+        jSplitPane2.setRightComponent(jSplitPane1);
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Project navigation"));
+        jPanel1.setMaximumSize(new java.awt.Dimension(300, 2147483647));
+        jPanel1.setMinimumSize(new java.awt.Dimension(200, 23));
+        jPanel1.setName("");
+        jPanel1.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel1.setLayout(new java.awt.BorderLayout());
+        jSplitPane2.setLeftComponent(jPanel1);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 244, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 460, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
             .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanel5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addComponent(jSplitPane2)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -157,6 +165,8 @@ public class DataPanel extends javax.swing.JPanel implements NavigationListener 
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JProgressBar jProgressBar;
+    private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JSplitPane jSplitPane2;
     // End of variables declaration//GEN-END:variables
 
     @Override

@@ -75,6 +75,7 @@ public class TaskPanel extends javax.swing.JPanel implements ListSelectionListen
         setLayout(new java.awt.BorderLayout());
 
         jSplitPane1.setDividerLocation(500);
+        jSplitPane1.setDividerSize(3);
 
         jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.LINE_AXIS));
 

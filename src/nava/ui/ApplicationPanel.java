@@ -120,23 +120,29 @@ public class ApplicationPanel extends javax.swing.JPanel implements ListSelectio
             //always valid, so just use the value.)
             Application app = (Application) value;
             boolean useable = app.canProcessDataSources(selectedDataSources);
-            Color useableSelectedColor = new Color(190, 255, 190);
-            Color useableUnselectedColor = new Color(230, 255, 230);
+            Color useableSelectedColor = new Color(100, 150, 190);
+            //Color useableUnselectedColor = new Color(230, 255, 230);
+            Color useableUnselectedColor = new Color(235, 245, 255);
 
-            Color unusuableSelectedColor = new Color(235, 235, 255);
+            //Color unusuableSelectedColor = new Color(235, 235, 255);
+            Color unusuableSelectedColor= new Color(255, 255, 255);
             Color unusueableUnselectedColor = new Color(255, 255, 255);
             ApplicationPanelItem item = new ApplicationPanelItem(app.getName(), null, app.getDescription());
             if (isSelected) {
                 if (useable) {
+                    item.setActivated(true);
                     item.setBackground(useableSelectedColor);
                 } else {
+                    item.setActivated(false);
                     item.setBackground(unusuableSelectedColor);
                 }
                 item.setForeground(list.getSelectionForeground());
             } else {
                 if (useable) {
+                    item.setActivated(true);
                     item.setBackground(useableUnselectedColor);
                 } else {
+                    item.setActivated(false);
                     item.setBackground(unusueableUnselectedColor);
                 }
                 item.setForeground(list.getForeground());

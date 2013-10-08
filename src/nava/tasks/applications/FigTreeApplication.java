@@ -78,7 +78,7 @@ public class FigTreeApplication extends Application {
 
     @Override
     public String getDescription() {
-        return "Graphical viewer for phylogenetic trees";
+        return "Graphical viewer and editor for phylogenetic trees";
     }
     
 }

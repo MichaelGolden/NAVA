@@ -68,17 +68,12 @@ public class TaskConsolePanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jTabbedPane2 = new javax.swing.JTabbedPane();
         standardScrollPane = new javax.swing.JScrollPane();
 
         setLayout(new java.awt.BorderLayout());
-
-        jTabbedPane2.addTab("Output", standardScrollPane);
-
-        add(jTabbedPane2, java.awt.BorderLayout.CENTER);
+        add(standardScrollPane, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTabbedPane jTabbedPane2;
     private javax.swing.JScrollPane standardScrollPane;
     // End of variables declaration//GEN-END:variables
 }

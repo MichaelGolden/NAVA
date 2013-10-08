@@ -22,6 +22,63 @@ import org.apache.commons.math3.stat.correlation.SpearmansCorrelation;
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
 public class MappingComparison {
+    
+    public static MappedData getHIVMappedData(File referenceAlignment) throws Exception
+    {
+        ArrayList<MappableData> mappableData = new ArrayList<>();
+
+        File envCsv = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_env_300_nooverlap_aligned.csv");
+        File envAlignment = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_env_300_nooverlap_aligned.fas");
+        ArrayList<String> envValues = CsvReader.getColumn(envCsv, 1);
+        envValues.remove(0);
+        mappableData.add(new MappableData(envAlignment, envValues, true, "env"));
+
+        File gagCsv = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_gag_300_nooverlap_aligned.csv");
+        File gagAlignment = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_gag_300_nooverlap_aligned.fas");
+        ArrayList<String> gagValues = CsvReader.getColumn(gagCsv, 1);
+        gagValues.remove(0);
+        mappableData.add(new MappableData(gagAlignment, gagValues, true, "gag"));
+
+        File nefCsv = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_nef_300_nooverlap_aligned.csv");
+        File nefAlignment = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_nef_300_nooverlap_aligned.fas");
+        ArrayList<String> nefValues = CsvReader.getColumn(nefCsv, 1);
+        nefValues.remove(0);
+        mappableData.add(new MappableData(nefAlignment, nefValues, true, "nef"));
+
+        File polCsv = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_pol_300_nooverlap_aligned.csv");
+        File polAlignment = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_pol_300_nooverlap_aligned.fas");
+        ArrayList<String> polValues = CsvReader.getColumn(polCsv, 1);
+        polValues.remove(0);
+        mappableData.add(new MappableData(polAlignment, polValues, true, "pol"));
+
+        File tatCsv = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_tat_300_nooverlap_aligned.csv");
+        File tatAlignment = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_tat_300_nooverlap_aligned.fas");
+        ArrayList<String> tatValues = CsvReader.getColumn(tatCsv, 1);
+        tatValues.remove(0);
+        //mappableData.add(new MappableData(tatAlignment, tatValues, true, "tat"));
+
+        File vifCsv = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_vif_300_nooverlap_aligned.csv");
+        File vifAlignment = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_vif_300_nooverlap_aligned.fas");
+        ArrayList<String> vifValues = CsvReader.getColumn(vifCsv, 1);
+        vifValues.remove(0);
+        // mappableData.add(new MappableData(vifAlignment, vifValues, true, "vif"));
+
+        File vprCsv = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_vpr_300_nooverlap_aligned.csv");
+        File vprAlignment = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_vpr_300_nooverlap_aligned.fas");
+        ArrayList<String> vprValues = CsvReader.getColumn(vprCsv, 1);
+        vprValues.remove(0);
+        mappableData.add(new MappableData(vprAlignment, vprValues, true, "vpr"));
+
+
+        File vpuCsv = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_vpu_300_nooverlap_aligned.csv");
+        File vpuAlignment = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_vpu_300_nooverlap_aligned.fas");
+        ArrayList<String> vpuValues = CsvReader.getColumn(vpuCsv, 1);
+        vpuValues.remove(0);
+        mappableData.add(new MappableData(vpuAlignment, vpuValues, true, "vpu"));
+
+        MappedData mappedData = MappedData.getMappedData(referenceAlignment, mappableData, 1000, false);
+        return mappedData;
+    }
 
     public void hivMapping() throws IOException, ParserException, Exception {
         File referenceAlignment = new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.fas");
@@ -105,7 +162,7 @@ public class MappingComparison {
         CorrelatedSitesTest correlatedSitesTest = new CorrelatedSitesTest();
         for(SecondaryStructureData structure : structureData)
         {
-            correlatedSitesTest.pairedSitesCorrelationPermutationTest(mappedData, structure.pairedSites);
+            correlatedSitesTest.pairedSitesCorrelationPermutationTest(mappedData, structure.pairedSites,8);
         }
     }
 

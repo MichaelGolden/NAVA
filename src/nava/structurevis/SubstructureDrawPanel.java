@@ -49,6 +49,7 @@ import net.hanjava.svg.SVG2EMF;
  */
 public class SubstructureDrawPanel extends JPanel implements ActionListener, MouseListener, MouseMotionListener, MouseWheelListener {
 
+    Color linkColor = Color.lightGray;
     public static final int SHOW = 0;
     public static final int HIDE = 1;
     public int oneDimensionalData = SHOW;
@@ -428,6 +429,14 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                 }
             }
             pw.println("</g>");
+           
+            pw.println("<g>");
+            for(int i = 0 ; i < nucleotidePositions.length - 1 ; i++)
+            {
+                pw.println("    <line id=\"bond_" + i + "\" x1=\"" + nucleotidePositions[i].x + "\" y1=\"" + nucleotidePositions[i].y + "\"  x2=\"" + nucleotidePositions[i+1].x + "\" y2=\"" + nucleotidePositions[i+1].y + "\" style=\"stroke-width:" + 2.5f + ";stroke:" + GraphicsUtils.getRGBAString(linkColor) + "\"/>");
+            }
+            pw.println("</g>");
+                    
         }
 
         // draw two-dimensional data
@@ -737,7 +746,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                 for (int j = substructureModel.substructure.getStartPosition(); j < substructureModel.substructure.getEndPosition(); j++) {
                     int k = i - substructureModel.substructure.getStartPosition();
                     int l = j - substructureModel.substructure.getStartPosition();
-                    if (substructureModel.maxDistance == -1 || (substructureModel.substructureDistanceMatrix != null && substructureModel.substructureDistanceMatrix.getDistance(k, l) <= substructureModel.maxDistance) || (substructureModel.substructureDistanceMatrix == null && substructureModel.substructureDistanceMatrix.getDistance(i, j) <= substructureModel.maxDistance)) {
+                    if ((substructureModel != null && substructureModel.maxDistance == -1) || (substructureModel.substructureDistanceMatrix != null && substructureModel.substructureDistanceMatrix.getDistance(k, l) <= substructureModel.maxDistance) || (substructureModel.substructureDistanceMatrix == null && substructureModel.substructureDistanceMatrix.getDistance(i, j) <= substructureModel.maxDistance)) {
                         Color c = null;
                         //double p = model.data2D.emptyValue;
                        // double p = substructureModel.data2D.get(i, j, substructureModel.mapping2D);

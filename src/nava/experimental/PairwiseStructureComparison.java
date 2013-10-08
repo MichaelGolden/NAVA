@@ -146,13 +146,119 @@ public class PairwiseStructureComparison {
             //  MappableData synDataWestnile= new MappableData(new File("C:/dev/thesis/jev_tbv_westnile/visualisation/westnile_polyprotein_300_aligned.fas"), new File("C:/dev/thesis/jev_tbv_westnile/visualisation/westnile_polyprotein_300_aligned.csv"), 1, 1, true, "Syn rates westnile");
             //  dataSources.add(MappedData.getMappedData(sequenceFile, synDataWestnile, 1000, false));
 
+            /*boolean circular = true;
+            String [] categories = {"GeminiTYLCV","GeminiEACMV", "GeminiMYVYV"};
+            File structureAlignment = new File("C:/brej/gemini_begomo/Gemini_Begomovirus_aligned.dbn");
+            File sequenceFile = new File("C:/brej/gemini_begomo/Gemini_Begomovirus_aligned.fas");
+            File outFile = new File("C:/brej/gemini_begomo/begomo_permutations_saved.txt");
+             ArrayList<File> referenceFiles = new ArrayList<>();
+            referenceFiles.add(new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Nasp alignments/Geminiviruses/GeminiTYLCV.fas"));
+            referenceFiles.add(new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Nasp alignments/Geminiviruses/GeminiEACMV.fas"));
+            referenceFiles.add(new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Nasp alignments/Geminiviruses/GeminiMYVYV.fas"));
+           
+            ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(structureAlignment, DataType.FileFormat.VIENNA_DOT_BRACKET);
+            ArrayList<MappedData> dataSources = new ArrayList<>();*/
+          
+         /*  boolean circular = false;
+            String [] categories = {"ParvoAAV", "ParvoMPV","ParvoHBoV"};
+            File structureAlignment = new File("C:/brej/parvovirus/Parvovirus_aligned.dbn");
+            File sequenceFile = new File("C:/brej/parvovirus/Parvovirus_aligned.fas");
+            File outFile = new File("C:/brej/parvovirus/parvovirus_permutations_saved3.txt");
+                ArrayList<File> referenceFiles = new ArrayList<>();
+            referenceFiles.add(new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Nasp alignments/Parvoviruses/ParvoAAV.fas"));
+            referenceFiles.add(new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Nasp alignments/Parvoviruses/ParvoHBoV.fas"));
+            referenceFiles.add(new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Nasp alignments/Parvoviruses/ParvoMLP.fas"));
+           
+            ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(structureAlignment, DataType.FileFormat.VIENNA_DOT_BRACKET);
+            ArrayList<MappedData> dataSources = new ArrayList<>();*/
+            /*MappableData synDataParvoAAV_NS1 = new MappableData(new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Fubar/Parvovirus/ParvoAAV_NS1.fas"), new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Fubar/Parvovirus/ParvoAAV_NS1.fas_gardout_finalout.fubar.csv"), 1, 1, true, "Syn rates ParvoAAV_NS1");
+            dataSources.add(MappedData.getMappedData(sequenceFile, synDataParvoAAV_NS1, 1000, false));
+            MappableData synDataParvoAAV_VP1 = new MappableData(new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Fubar/Parvovirus/ParvoAAV_VP1.fas"), new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Fubar/Parvovirus/ParvoAAV_VP1.fas_gardout_finalout.fubar.csv"), 1, 1, true, "Syn rates ParvoAAV_VP1");
+            dataSources.add(MappedData.getMappedData(sequenceFile, synDataParvoAAV_VP1, 1000, false));
+            MappableData synDataParvoHBoV_NP1 = new MappableData(new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Fubar/Parvovirus/ParvoHBoV_NP1_trimed_edit.fas"), new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Fubar/Parvovirus/ParvoHBoV_NP1_trimed.fas_gardout_finalout.fubar.csv"), 1, 1, true, "Syn rates ParvoHBoV_NP1");
+            dataSources.add(MappedData.getMappedData(sequenceFile, synDataParvoHBoV_NP1, 1000, false));
+            MappableData synDataParvoHBoV_NS1 = new MappableData(new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Fubar/Parvovirus/ParvoHBoV_NS1.fas"), new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Fubar/Parvovirus/ParvoHBoV_NS1.fas_gardout_finalout.fubar.csv"), 1, 1, true, "Syn rates ParvoHBoV_NS1");
+            dataSources.add(MappedData.getMappedData(sequenceFile, synDataParvoHBoV_NS1, 1000, false));
+             MappableData synDataParvoMPV_NS1 = fnew MappableData(new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Fubar/Parvovirus/ParvoMPV_NS1.fas"), new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Fubar/Parvovirus/ParvoMPV_NS1.fas_gardout_finalout.fubar.csv"), 1, 1, true, "Syn rates ParvoMPV_NS1");
+            dataSources.add(MappedData.getMappedData(sequenceFile, synDataParvoMPV_NS1, 1000, false));
+            MappableData synDataParvoMPV_VP2 = new MappableData(new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Fubar/Parvovirus/ParvoMPV_VP2.fas"), new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Fubar/Parvovirus/ParvoMPV_VP2.fas_gardout_finalout.fubar.csv"), 1, 1, true, "Syn rates ParvoMPV_VP2");
+            dataSources.add(MappedData.getMappedData(sequenceFile, synDataParvoMPV_VP2, 1000, false));
+           */
+            
+          /* boolean circular = true;
+           String [] categories = {"AnelloTTSuV1","AnelloTTSuV2","AnelloTTV"};
+            File structureAlignment = new File("C:/brej/anellovirus/Anellovirus_aligned.dbn");
+            File sequenceFile = new File("C:/brej/anellovirus/Anellovirus_aligned.fas");
+            File outFile = new File("C:/brej/anellovirus/anellovirus_permutations_saved.txt");
+            File referenceFile = sequenceFile;
+          
+            ArrayList<File> referenceFiles = new ArrayList<>();
+            referenceFiles.add(new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Nasp alignments/Anelloviruses/AnelloTTSuV1.fas"));
+            referenceFiles.add(new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Nasp alignments/Anelloviruses/AnelloTTSuV2.fas"));
+            referenceFiles.add(new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Nasp alignments/Anelloviruses/AnelloTTV.fas"));
+        
+
+            ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(structureAlignment, DataType.FileFormat.VIENNA_DOT_BRACKET);
+            ArrayList<MappedData> dataSources = new ArrayList<>();
+            MappableData synDataAnelloTTSuV1ORF1 = new MappableData(new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Fubar/Anellovirus/AnelloTTSuV1_ORF1.fas"), new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Fubar/Anellovirus/AnelloTTSuV1_ORF1.fas_gardout_finalout.fubar.csv"), 1, 1, true, "Syn rates AnelloTTSuV1_ORF1");
+            dataSources.add(MappedData.getMappedData(sequenceFile, synDataAnelloTTSuV1ORF1, 1000, true));
+             MappableData AnelloTTSuV2_ORF1 = new MappableData(new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Fubar/Anellovirus/AnelloTTSuV2_ORF1.fas"), new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Fubar/Anellovirus/AnelloTTSuV2_ORF1.fas_gardout_finalout.fubar.csv"), 1, 1, true, "Syn rates AnelloTTSuV2_ORF1");
+            dataSources.add(MappedData.getMappedData(sequenceFile, AnelloTTSuV2_ORF1, 1000, true));
+             MappableData synDataAnelloTTVORF1 = new MappableData(new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Fubar/Anellovirus/AnelloTTV_ORF1.fas"), new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Fubar/Anellovirus/AnelloTTV_ORF1.fas_gardout_finalout.fubar.csv"), 1, 1, true, "Syn rates AnelloTTV_ORF1");
+            dataSources.add(MappedData.getMappedData(sequenceFile, synDataAnelloTTVORF1, 1000, true));
+       */
+            boolean circular = false;
+             String [] categories = {"seq"};
+            File structureAlignment = new File("C:/dev/thesis/hiv_full/darren/conserved/darren_hiv_full_aligned_muscle.dbn");
+            File sequenceFile = new File("C:/dev/thesis/hiv_full/darren/conserved/darren_hiv_full_aligned_muscle.fas");
+            File outFile = new File("C:/dev/thesis/hiv_full/darren/conserved/hiv_permutations.txt");
+            File referenceFile = sequenceFile;
+          
+            ArrayList<File> referenceFiles = new ArrayList<>();
+ 
+            ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(structureAlignment, DataType.FileFormat.VIENNA_DOT_BRACKET);
+            ArrayList<MappedData> dataSources = new ArrayList<>();
+  
+           /* boolean circular = true;
+           String [] categories = {"CircoPCV","CircoCoCV", "CircoBFDV", "CircoDGCV"};
+            File structureAlignment = new File("C:/brej/circovirus/Circovirus_aligned.dbn");
+            File sequenceFile = new File("C:/brej/circovirus/Circovirus_aligned.fas");
+            File outFile = new File("C:/brej/circovirus/circovirus_permutations_saved.txt");
+            File referenceFile = sequenceFile;
+            ArrayList<File> referenceFiles = new ArrayList<>();
+            referenceFiles.add(new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Nasp alignments/Circoviruses/CircoBFDV.fas"));
+            referenceFiles.add(new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Nasp alignments/Circoviruses/CircoCoCV.fas"));
+            referenceFiles.add(new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Nasp alignments/Circoviruses/CircoDGCV.fas"));
+            referenceFiles.add(new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Nasp alignments/Circoviruses/CircoPCV.fas"));
+            ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(structureAlignment, DataType.FileFormat.VIENNA_DOT_BRACKET);
+            ArrayList<MappedData> dataSources = new ArrayList<>();*/
+            
+           /*boolean circular = true;
+            String [] categories = {"GeminiMSV","GeminiPanSV", "GeminiTYDV-CpCV", "GeminiCpCDV", "GeminiWDV"};
+            File structureAlignment = new File("C:/brej/gemini_mastrevirus/Gemini_Mastrevirus_aligned.dbn");
+            File sequenceFile = new File("C:/brej/gemini_mastrevirus/Gemini_Mastrevirus_aligned.fas");
+            File outFile = new File("C:/brej/gemini_mastrevirus/mastrevirus_permutations_saved.txt");            
+            ArrayList<File> referenceFiles = new ArrayList<>();
+            referenceFiles.add(new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Nasp alignments/Geminiviruses/GeminiMSV.fas"));
+            referenceFiles.add(new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Nasp alignments/Geminiviruses/GeminiPanSV.fas"));
+            referenceFiles.add(new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Nasp alignments/Geminiviruses/GeminiTYDV-CpCV.fas"));
+            referenceFiles.add(new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Nasp alignments/Geminiviruses/GeminiCpCDV.fas"));
+            referenceFiles.add(new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Nasp alignments/Geminiviruses/GeminiWDV.fas"));
+            ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(structureAlignment, DataType.FileFormat.VIENNA_DOT_BRACKET);
+            ArrayList<MappedData> dataSources = new ArrayList<>();
+            */
+            //String [] categories = {"msv"};
+            //File structureAlignment = new File("C:/brej/msv/MSV_10seq.dbn");
+           // File sequenceFile = new File("C:/brej/msv/MSV_10seq.fas");
+            //File outFile = new File("C:/brej/msv/msv_permutations.txt");
+            //ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(structureAlignment, DataType.FileFormat.VIENNA_DOT_BRACKET);
 
             //String[] categories = {"hcv1", "hcv2"};
-            String[] categories = {"hcv1", "hcv2", "hcv3", "hcv4", "hcv6"};
-            File outFile = new File("C:/dev/thesis/hcv/hcv_permutations2.txt");
+            //String[] categories = {"hcv1", "hcv2", "hcv3", "hcv4", "hcv6"};
+            //File outFile = new File("C:/dev/thesis/hcv/hcv_permutations2.txt");
             //  String[] categories = {"hcv1a", "hcv1b", "hcv2a", "hcv2b", "hcv3", "hcv4", "hcv6"};
-            File structureAlignment = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.dbn");
-            File sequenceFile = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.fas");
+            //File structureAlignment = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.dbn");
+            /*File sequenceFile = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.fas");
             File referenceFile = new File("C:/dev/thesis/hcv/visualisation/H77_reference.fasta");
             MappableData nucleotideData = new MappableData(sequenceFile, new File("C:/dev/thesis/hcv/conservation/rates.csv"), 0, 1, false, "Nucleotide rates");
             MappableData synDataHCV1 = new MappableData(new File("C:/dev/thesis/hcv/1/300/hcv1_polyprotein_300_aligned.fas"), new File("C:/dev/thesis/hcv/1/300/hcv1_polyprotein_300_aligned.csv"), 1, 1, true, "Syn rates hcv 1");
@@ -229,7 +335,7 @@ public class PairwiseStructureComparison {
             ArrayList<Combination> combinations = combinations(categories);
             for (int i = 0; i < combinations.size(); i++) {
                 Combination combination = combinations.get(i);
-                if (combination.combination.size() == 3) {
+                if (combination.combination.size() <= 2 || combination.combination.size() == categories.length) {
                     //if (combination.combination.size() == 4) {
                 } else {
                     combinations.remove(i);
@@ -282,20 +388,14 @@ public class PairwiseStructureComparison {
 
 
 
-            ArrayList<String> pairMustContain = new ArrayList<>();
-            //pairMustContain.add("");
-            //pairMustContain.add("dengue4");
-            ////pairMustContain.add("siv");
-            //pairMustContain.add("hcv6");
-            // pairMustContain.add("westnile");
-
-            for (int i = 0; i < categories.length; i++) {
+          ArrayList<String> pairMustContain = new ArrayList<>();
+           for (int i = 0; i < categories.length; i++) {
                 pairMustContain = new ArrayList<>();
                 pairMustContain.add(categories[i]);
-                postAnalysis(outFile, outFile, categories, combinations, structureData, windowSize, pairMustContain, sequenceFile, referenceFile, dataSources);
+                postAnalysis(outFile, outFile, categories, combinations, structureData, windowSize, pairMustContain, sequenceFile, referenceFiles, dataSources, circular);
             }
             pairMustContain = new ArrayList<>();
-            postAnalysis(outFile, outFile, categories, combinations, structureData, windowSize, pairMustContain, sequenceFile, referenceFile, dataSources);
+            postAnalysis(outFile, outFile, categories, combinations, structureData, windowSize, pairMustContain, sequenceFile, referenceFiles, dataSources, circular);
             System.exit(0);
             //ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(new File("C:/dev/thesis/dengue2/50/dengue2_all_50_aligned_partial_structurealign.fas.dbn"), DataType.FileFormat.VIENNA_DOT_BRACKET);
             //ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(new File("C:/dev/thesis/full-alignment.dbn"), DataType.FileFormat.VIENNA_DOT_BRACKET);
@@ -340,30 +440,47 @@ public class PairwiseStructureComparison {
                 //System.out.println(catList+"\t"+s1.organism);
                 int cati = catList.indexOf(s1.organism);
                 int catj = catList.indexOf(s2.organism);
+                if(catList.size() == 1)
+                {
+                    catj=cati;
+                    balance = false;
+                }
                 if (balance) {
                     if (catPerc[cati] > catFrac || catPerc[catj] > catFrac) { // balance for the fact that we have an uneven number of sequences from each category
                         continue;
                     }
                 }
 
-                catCount[cati]++;
-                catCount[catj]++;
-                t += 2;
-                for (int c = 0; c < catPerc.length; c++) {
-                    catPerc[c] = catCount[c] / t;
-                }
-                if (a % 10 == 0) {
+
+                if(balance)
+                {
+                    catCount[cati]++;
+                    catCount[catj]++;
+                    t += 2;
                     for (int c = 0; c < catPerc.length; c++) {
-                        System.out.println(catList.get(c) + "\t" + catPerc[c]);
+                        catPerc[c] = catCount[c] / t;
                     }
-                    System.out.println();
+                    if (a % 10 == 0) {
+                        for (int c = 0; c < catPerc.length; c++) {
+                            System.out.println(catList.get(c) + "\t" + catPerc[c]);
+                        }
+                        System.out.println();
+                    }
                 }
                 a++;
 
                 //double[] pairwiseSimilarity = StructureAlign.slidingWeightedMountainSimilarity(s1.pairedSites, s2.pairedSites, windowSize, true);
 
                 // double[] pairwiseSimilarity = StructureAlign.permutationTestSliding(s1.pairedSites, s2.pairedSites, windowSize, true, -1);
-                double[] pairwiseSimilarity = sal.parallelizedPermutationTestSliding(s1.pairedSites, s2.pairedSites, s1.sequence, windowSize, true, permutations);
+                double[] pairwiseSimilarity = null;
+                if(circular)
+                {
+                    pairwiseSimilarity = sal.parallelizedPermutationTestSlidingCircular(s1.pairedSites, s2.pairedSites, s1.sequence, windowSize, true, permutations);
+                }
+                else
+                {
+                    pairwiseSimilarity = sal.parallelizedPermutationTestSliding(s1.pairedSites, s2.pairedSites, s1.sequence, windowSize, true, permutations);
+                }
                 String[] split1 = s1.title.split("_");
                 String[] split2 = s2.title.split("_");
                 String o1 = split1[split1.length - 1];
@@ -543,14 +660,22 @@ public class PairwiseStructureComparison {
         return possibilities;
     }
 
-    public void postAnalysis(File inFile, File outFile, String[] categories, ArrayList<Combination> combinations, ArrayList<SecondaryStructureData> structureData, int windowSize, ArrayList<String> pairMustContain, File sequenceFile, File referenceFile, ArrayList<MappedData> dataSources) {
+    public void postAnalysis(File inFile, File outFile, String[] categories, ArrayList<Combination> combinations, ArrayList<SecondaryStructureData> structureData, int windowSize, ArrayList<String> pairMustContain, File sequenceFile, ArrayList<File> referenceFiles, ArrayList<MappedData> dataSources, boolean circular) {
 
 
         double gapPerc = 0.3;
         double pvalCutoff = 0.05;
 
-        Mapping alignmentToReference = Mapping.createMapping(sequenceFile, referenceFile, 1000, false);
-
+        
+        
+        //Mapping alignmentToReference = ;
+        ArrayList<Mapping> alignmentToReferenceMappings = new ArrayList<>();
+        for(File referenceFile : referenceFiles)
+        {
+            alignmentToReferenceMappings.add(Mapping.createMapping(sequenceFile, referenceFile, 1000, false));
+        }
+        
+        
         String mustHave = "";
 
         if (pairMustContain.size() > 0) {
@@ -569,6 +694,7 @@ public class PairwiseStructureComparison {
                 item.title = d.title;
                 String[] split = d.title.split("_");
                 item.organism = split[split.length - 1];
+                
                 if (!combination.contains((item.organism))) {
 
                     System.out.println("Removing " + d.title + "\t" + item.organism + "\t" + combination);
@@ -593,6 +719,7 @@ public class PairwiseStructureComparison {
             if (!mayContinue) {
                 continue;
             }
+           
 
             ArrayList<Integer> structures = new ArrayList<>();
             try {
@@ -608,7 +735,6 @@ public class PairwiseStructureComparison {
                     //ArrayList<Double> values = new ArrayList<>();
                     dataLength = dataLength == -1 ? split.length - 2 : dataLength;
                     double[] values = new double[dataLength];
-
                     int x = Integer.parseInt(split[0].split("_")[0]);
                     int y = Integer.parseInt(split[0].split("_")[1]);
 
@@ -680,7 +806,7 @@ public class PairwiseStructureComparison {
                         double percentile90 = StatUtils.getInvCDF(RankingAnalyses.getPercentile(valuesAtPos, 0.90) / 2, true);
                         double zscore = StatUtils.getInvCDF(medianPval / 2, true);
                         medianPvals.add(medianPval);
-                        writer.write(i + "\t" + gaps[i] + "\t" + medianPval + "\t" + zscore + "\t" + (gaps[i] >= gapPerc ? "1\t0\t0\t0\t0" : medianPval + "\t" + zscore + "\t" + percentile25 + "\t" + percentile75 + "\t" + percentile90));
+                        writer.write(i + "\t" + gaps[i%gaps.length] + "\t" + medianPval + "\t" + zscore + "\t" + (gaps[i%gaps.length] >= gapPerc ? "1\t0\t0\t0\t0" : medianPval + "\t" + zscore + "\t" + percentile25 + "\t" + percentile75 + "\t" + percentile90));
                         //writer.write(i + "\t" + gaps[i] + "\t" + medianPval + "\t" + zscore + "\t" + (gaps[i] >= 0.2 ? "1\t0" : medianPval + "\t" + zscore));
 
                         writer.newLine();
@@ -690,16 +816,21 @@ public class PairwiseStructureComparison {
                     writer.close();
                 }
 
-                boolean[] inWindow = new boolean[structureData.get(0).pairedSites.length];
+                int realLength = structureData.get(0).pairedSites.length;
+                int arrayLength = realLength+windowSize;
+                //boolean[] inWindow = new boolean[structureData.get(0).pairedSites.length];
+                boolean[] inWindow = new boolean[arrayLength];
                 for (int i = 0; i < medianPvals.size(); i++) {
-                    if (gaps[i] < gapPerc && medianPvals.get(i) <= pvalCutoff) {
+                    if (gaps[i%gaps.length] < gapPerc && medianPvals.get(i) <= pvalCutoff) {
+                        System.out.println("FAV\t"+i+"\t"+inWindow.length+"\t"+medianPvals.get(i));
                         for (int j = i; j < i + windowSize; j++) {
+                            // OVERHEREA AAA
                             inWindow[j] = true;
                         }
                     }
                 }
                 for (int i = 0; i < medianPvals.size(); i++) {
-                    if (gaps[i] >= gapPerc) {
+                    if (gaps[i%gaps.length] >= gapPerc) {
                         writer2.write('-');
                     } else if (medianPvals.get(i) <= pvalCutoff) {
                         writer2.write('*');
@@ -736,25 +867,75 @@ public class PairwiseStructureComparison {
 
 
                 //DecimalFormat df = new DecimalFormat("0.000");
-                BufferedWriter substructureWriter = new BufferedWriter(new FileWriter(outFile.getAbsolutePath() + "_" + combination + mustHave + "_" + pvalCutoff + ".substructures"));
+                File substructureFile = new File(outFile.getAbsolutePath() + "_" + combination + mustHave + "_" + pvalCutoff + ".substructures");
+                BufferedWriter substructureWriter = new BufferedWriter(new FileWriter(substructureFile));
                 for (Substructure substructure : substructures) {
                     ArrayList<Double> pvalues = new ArrayList<>();
+                    System.out.println("JXJA"+substructureFile+"\t"+substructure.start+"\t"+(substructure.start + substructure.length - windowSize + 1));
                     for (int i = substructure.start; i < substructure.start + substructure.length - windowSize + 1; i++) {
                         pvalues.add(medianPvals.get(i));
+                        System.out.println(i+"\t"+medianPvals.get(i));
                     }
-                    int l = Math.max(0, (1250 - substructure.length) / 2);
+                    //1250
+                    int l = Math.max(0, (1000 - substructure.length) / 2);
                     System.out.println("l=" + l + "\t" + substructure.start + "\t" + substructure.length);
                     substructure.startMatrix = Math.max(0, substructure.start - l);
                     int endPos = Math.min(structureData.get(0).pairedSites.length, substructure.startMatrix + substructure.length + 2 * l);
+                    if(circular)
+                    {
+                        endPos = substructure.startMatrix + substructure.length + 2 * l;
+                    }
                     substructure.matrixLength = endPos - substructure.startMatrix;
 
                     substructure.medianPvalue = RankingAnalyses.getMedian(pvalues);
+                    System.out.println(pvalues);
 
                     substructure.matrix = new double[substructure.matrixLength][substructure.matrixLength];
                     for (int a = 0; a < structures.size(); a++) {
                         SecondaryStructureData structure = structureData.get(structures.get(a));
-                        for (int x = 0; x < structure.pairedSites.length; x++) {
-                            int y = structure.pairedSites[x] - 1;
+                        int length = structure.pairedSites.length;
+                        //int length = circular ? (structure.pairedSites.length*3)/2 : structure.pairedSites.length;
+                        for (int x = 0; x < length; x++) {
+                            int y = structure.pairedSites[x%structure.pairedSites.length] - 1;
+                           // System.out.println("HITA "+x+"\t"+y+"\t"+structure.pairedSites.length+"\t"+length);                            
+                            /*if(x >= structure.pairedSites.length && y >= 0)
+                            {
+                                y += structure.pairedSites.length;
+                            }*/
+                            
+                           // System.out.println("HITB "+x+"\t"+y+"\t"+structure.pairedSites.length+"\t"+length);
+                            if (x - substructure.startMatrix >= 0 && x - substructure.startMatrix < substructure.matrixLength) {
+                                if (y - substructure.startMatrix >= 0 && y - substructure.startMatrix < substructure.matrixLength) {
+
+                                    substructure.matrix[x - substructure.startMatrix][y - substructure.startMatrix]++;
+                                    //System.out.println(x - substructure.start+"\t"+(y - substructure.start)+"\t"+substructure.matrix[x - substructure.start][y - substructure.start]);
+                                }
+                            }
+                        }
+                        
+                        if(circular)
+                        {
+                            for (int x2 = 0; x2 < length; x2++) {
+                                int x = x2+length;
+                                int y = structure.pairedSites[x%structure.pairedSites.length] - 1;
+                            // System.out.println("HITB "+x+"\t"+y+"\t"+structure.pairedSites.length+"\t"+length);
+                                if (x - substructure.startMatrix >= 0 && x - substructure.startMatrix < substructure.matrixLength) {
+                                    if (y - substructure.startMatrix >= 0 && y - substructure.startMatrix < substructure.matrixLength) {
+
+                                        substructure.matrix[x - substructure.startMatrix][y - substructure.startMatrix]++;
+                                        //System.out.println(x - substructure.start+"\t"+(y - substructure.start)+"\t"+substructure.matrix[x - substructure.start][y - substructure.start]);
+                                    }
+                                }
+                            }
+
+                            for (int x2 = 0; x2 < length; x2++) {
+                            int x = x2;
+                            int y = structure.pairedSites[x%structure.pairedSites.length] - 1;
+                            if(y != -1)
+                            {
+                                y += length;
+                            }
+                            // System.out.println("HITB "+x+"\t"+y+"\t"+structure.pairedSites.length+"\t"+length);
                             if (x - substructure.startMatrix >= 0 && x - substructure.startMatrix < substructure.matrixLength) {
                                 if (y - substructure.startMatrix >= 0 && y - substructure.startMatrix < substructure.matrixLength) {
 
@@ -764,6 +945,7 @@ public class PairwiseStructureComparison {
                             }
                         }
                     }
+                    }
                     DecimalFormat df = new DecimalFormat("0.000");
                     double t = structures.size();
                     for (int x = 0; x < substructure.matrix.length; x++) {
@@ -771,15 +953,31 @@ public class PairwiseStructureComparison {
                             substructure.matrix[x][y] /= t;
                         }
                     }
+                    System.out.println("Substructure start = " + substructure.startMatrix+"\t"+substructure.start);
                     System.out.println("Start posterior decoding " + substructure.matrix.length);
                     substructure.pairedSites = PosteriorDecodingTool.getPosteriorDecodingConsensusStructure(substructure.matrix);
-                    substructure.pairedSites = StructureAlign.getSubstructure(substructure.pairedSites, substructure.start - substructure.startMatrix, substructure.length);
+                    if(circular)
+                    {
+                        // this may need to be  fixed
+                         substructure.pairedSites = StructureAlign.getSubstructureCircular(substructure.pairedSites, substructure.start - substructure.startMatrix, substructure.length);
+                    }
+                    else
+                    {
+                          substructure.pairedSites = StructureAlign.getSubstructure(substructure.pairedSites, substructure.start - substructure.startMatrix, substructure.length);
+                    }
                     System.out.println("End posterior decoding " + substructure.matrix.length);
                     System.out.println(substructure.toString());
                     substructureWriter.write(substructure.toString());
-                    int startMapped = alignmentToReference.aToBNearest(substructure.start) + 1;
-                    int endMapped = alignmentToReference.aToBNearest(substructure.start + substructure.length);
-                    substructureWriter.write(startMapped + "-" + endMapped + "\n");
+                    
+                    for(int i = 0 ; i < alignmentToReferenceMappings.size() ; i++)
+                    {
+                        Mapping alignmentToReference = alignmentToReferenceMappings.get(i);
+                        substructureWriter.write(referenceFiles.get(i).toString()+"\n");
+                        int startMapped = alignmentToReference.aToBNearest(substructure.start%realLength) + 1;
+                        int endMapped = alignmentToReference.aToBNearest((substructure.start + substructure.length-1)%realLength)+1;
+                        substructureWriter.write((substructure.start%realLength+1) + "-" + ((substructure.start + substructure.length-1)%realLength+1)+ "\n");
+                        substructureWriter.write(startMapped + "-" + endMapped + "\n\n");
+                    }
                     substructureWriter.write("p-value=" + df.format(substructure.medianPvalue) + "\n");
                     substructureWriter.write("z-score=" + df.format(StatUtils.getInvCDF(substructure.medianPvalue / 2, true)) + "\n");
                     for (MappedData mappedData : dataSources) {
@@ -820,15 +1018,15 @@ public class PairwiseStructureComparison {
                             structure += RNAFoldingTools.getDotBracketStringFromPairedSites(substructure.pairedSites);
 
                             for (int j = i; j < i + substructure.length; j++) {
-                                pairingProbability[j] = substructure.pairingProbability[j - i];
+                                pairingProbability[j%pairingProbability.length] = substructure.pairingProbability[(j - i)%substructure.pairingProbability.length];
                             }
                             i += substructure.length;
 
                             for (int x = substructure.start - substructure.startMatrix; x < substructure.start - substructure.startMatrix + substructure.length; x++) {
                                 for (int y = substructure.start - substructure.startMatrix; y < substructure.start - substructure.startMatrix + substructure.length; y++) {
                                     //pairingProbability[x - (substructure.start - substructure.startMatrix)] += substructure.matrix[x][y];
-                                    if (substructure.matrix[x][y] != 0) {
-                                        matrixWriter.write((x + substructure.startMatrix) + "," + (y + substructure.startMatrix) + "," + substructure.matrix[x][y]);
+                                    if (substructure.matrix[x%substructure.matrixLength][y%substructure.matrixLength] != 0) {
+                                        matrixWriter.write((x + substructure.startMatrix) + "," + (y + substructure.startMatrix) + "," + substructure.matrix[x%substructure.matrixLength][y%substructure.matrixLength]);
                                         matrixWriter.newLine();
                                     }
                                 }
@@ -962,7 +1160,15 @@ public class PairwiseStructureComparison {
 
             System.out.println(">>>" + substructure.medianPvalue + "\t" + gradient.getColor(transform.transform((float) substructure.medianPvalue)) + "\t" + transform.transform((float) substructure.medianPvalue));
 
-            pw.println("<rect x=\"" + (x) + "\" y=\"" + 0 + "\" width=\"" + (width) + "\" height=\"" + (panelHeight) + "\"  style=\"fill:#" + GraphicsUtils.getHexString(gradient.getColor(transform.transform((float) substructure.medianPvalue))) + ";\"/>");
+            if(x+width < panelWidth)
+            {
+                pw.println("<rect x=\"" + (x) + "\" y=\"" + 0 + "\" width=\"" + (width) + "\" height=\"" + (panelHeight) + "\"  style=\"fill:#" + GraphicsUtils.getHexString(gradient.getColor(transform.transform((float) substructure.medianPvalue))) + ";\"/>");
+            }
+            else
+            {
+                pw.println("<rect x=\"" + (x) + "\" y=\"" + 0 + "\" width=\"" + (panelWidth-x) + "\" height=\"" + (panelHeight) + "\"  style=\"fill:#" + GraphicsUtils.getHexString(gradient.getColor(transform.transform((float) substructure.medianPvalue))) + ";\"/>");
+                pw.println("<rect x=\"" + (0) + "\" y=\"" + 0 + "\" width=\"" + (x+width-panelWidth) + "\" height=\"" + (panelHeight) + "\"  style=\"fill:#" + GraphicsUtils.getHexString(gradient.getColor(transform.transform((float) substructure.medianPvalue))) + ";\"/>");
+            }
         }
         pw.println("</g>");
         /*

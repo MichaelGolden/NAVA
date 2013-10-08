@@ -376,6 +376,6 @@ public class RNAalifoldApplication extends Application {
 
     @Override
     public String getDescription() {
-        return "Predicts a consensus secondary structure from a set of aligned sequences.";
+        return "Predicts a consensus RNA secondary structure from a set of aligned sequences using a thermodynamic approach.";
     }
 }

@@ -90,8 +90,6 @@ public class DataInspectorPanel extends javax.swing.JPanel implements ItemListen
 
         jLabel3.setText("Title");
 
-        titleField.setText("jTextField1");
-
         editTitleButton.setText("Edit");
         editTitleButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -114,10 +112,9 @@ public class DataInspectorPanel extends javax.swing.JPanel implements ItemListen
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(dataTypeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(titleField, javax.swing.GroupLayout.DEFAULT_SIZE, 268, Short.MAX_VALUE)
+                        .addComponent(titleField, javax.swing.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(editTitleButton)
-                        .addGap(58, 58, 58)))
+                        .addComponent(editTitleButton)))
                 .addContainerGap())
             .addComponent(holderPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );

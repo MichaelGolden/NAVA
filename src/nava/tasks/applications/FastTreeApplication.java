@@ -116,6 +116,6 @@ public class FastTreeApplication extends Application {
 
     @Override
     public String getDescription() {
-        return "";
+        return "Exceptionally fast and accurate approach for inferring a phylogenetic tree from a set of aligned sequences.";
     }
 }

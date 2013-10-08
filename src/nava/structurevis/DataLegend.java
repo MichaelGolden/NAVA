@@ -289,7 +289,7 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
         pw.println("<defs>");
         pw.println("<linearGradient id=\"grad1\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\">");
         for (int i = 0; i < colorGradient.colours.length; i++) {
-            double perc = colorGradient.positions[i] * 100;
+            double perc = (1-colorGradient.positions[colorGradient.colours.length-i-1]) * 100;
             Color c = colorGradient.colours[colorGradient.colours.length-i-1];
             pw.println("<stop offset=\"" + (perc) + "%\" style=\"stop-color:rgb(" + c.getRed() + "," + c.getGreen() + "," + c.getBlue() + ");stop-opacity:" + (((double) c.getAlpha()) / 255.0) + "\" />");
         }

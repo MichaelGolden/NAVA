@@ -651,6 +651,72 @@ public class StructureAlign {
         //System.out.println(">"+permCount+"\t"+permTotal);
         return 1 - (permCount / permTotal);
     }
+    
+    public static double permutationTestCircular(int startPos, int length, double sim, int[] pairedSites1, int [] gapCountSum, int[] pairedSites2, int windowSize, boolean relaxed, boolean slidingSim, int permutations) {
+        double permCount = 0;
+        double permTotal = 0;
+
+
+        Random random = new Random(-1380401484108201L);
+        boolean[] indices = new boolean[pairedSites1.length];
+        indices[startPos] = true;
+        Utils.randomBooleanArray(random, permutations < 0 ? indices.length : permutations, indices);
+
+        //Arrays.fill(indices, true);
+        int[] subPairedSites2 = null;
+        if (relaxed) {
+            subPairedSites2 = StructureAlign.getSubstructureRelaxedCircular(pairedSites2, startPos, length);
+        } else {
+            subPairedSites2 = StructureAlign.getSubstructureCircular(pairedSites2, startPos, length);
+        }
+        //System.out.println(RNAFoldingTools.getDotBracketStringFromPairedSites(subPairedSites2));
+        //for (int k = 0; k < pairedSites1.length - length; k++) {
+        for (int k = 0; k < pairedSites1.length ; k++) {
+            if (indices[k]) {
+                if(k != startPos)
+                {
+                    int startGap = 0;
+                    if(k > 0)
+                    {
+                        startGap = gapCountSum[k-1];
+                    }
+                    double gaps = gapCountSum[(k+length)%gapCountSum.length] - startGap;
+                    double gapPerc = gaps / (double)length;
+                    if(gapPerc > 0.2)
+                    {
+                        continue; // if two many gaps in permuted substructure: skip
+                    }
+                }
+                //int[] permutedPairedSites1 = StructureAlign.getSubstructureRelaxed(pairedSites1, k, region.length);
+                int[] permutedPairedSites1 = null;
+                if (relaxed) {
+                    permutedPairedSites1 = StructureAlign.getSubstructureRelaxedCircular(pairedSites1, k, length);
+                } else {
+                    permutedPairedSites1 = StructureAlign.getSubstructureCircular(pairedSites1, k, length);
+                }
+                double permSim = 0;
+                if (slidingSim) {
+                    permSim = StructureAlign.slidingWeightedMountainSimilarityAverage(permutedPairedSites1, subPairedSites2, windowSize - 1, relaxed);
+                } else {
+                    permSim = 1 - MountainMetrics.calculateNormalizedWeightedMountainDistance(permutedPairedSites1, subPairedSites2);
+                    //System.out.println(RNAFoldingTools.getDotBracketStringFromPairedSites(permutedPairedSites1));
+
+                    //System.out.println();
+                }
+                if (sim > permSim) {
+                    permCount++;
+                }
+                permTotal++;
+                //System.out.println(permTotal);
+            }
+        }
+        if(permTotal == 0)
+        {
+            return 1;
+        }
+        //System.out.println(">"+permCount+"\t"+permTotal);
+        return 1 - (permCount / permTotal);
+    }
 
     public static double[] permutationTestSliding(int[] pairedSites1, int[] pairedSites2, int windowSize, boolean relaxed, int permutations) {
         double[] pvals = new double[pairedSites1.length - windowSize];
@@ -714,6 +780,45 @@ public class StructureAlign {
 
         return pvals;
     }
+    
+    public double[] parallelizedPermutationTestSlidingCircular(int[] pairedSites1, int[] pairedSites2, String seq1, int windowSize, boolean relaxed, int permutations) {
+
+        int [] gapCountSum = new int[seq1.length()];
+        gapCountSum[0] = seq1.charAt(0) == '-' ? 1 : 0;
+        for (int i = 1; i < gapCountSum.length; i++) {
+            gapCountSum[i] = (seq1.charAt(i) == '-' ? 1 : 0) + gapCountSum[i-1];
+        }
+
+        double[] pvals = new double[pairedSites1.length];
+        ArrayList<Input> inputs = new ArrayList<>();
+        for (int i = 0; i < pvals.length; i++) {
+            int[] subPairedSites1;
+            int[] subPairedSites2;
+            if (relaxed) {
+                subPairedSites1 = StructureAlign.getSubstructureRelaxedCircular(pairedSites1, i, windowSize);
+                subPairedSites2 = StructureAlign.getSubstructureRelaxedCircular(pairedSites2, i, windowSize);
+            } else {
+                subPairedSites1 = StructureAlign.getSubstructureCircular(pairedSites1, i, windowSize);
+                subPairedSites2 = StructureAlign.getSubstructureCircular(pairedSites2, i, windowSize);
+            }
+
+            double sim = 1 - MountainMetrics.calculateNormalizedWeightedMountainDistance(subPairedSites1, subPairedSites2);
+            //pvals[i] = permutationTest(i, windowSize, sim, pairedSites1, pairedSites2, windowSize, relaxed, false, permutations);
+            inputs.add(new Input(i, windowSize, sim, pairedSites1, gapCountSum, pairedSites2, windowSize, relaxed, false, permutations));
+        }
+        try {
+            List<Output> outputs = processInputs(inputs);
+            for (Output out : outputs) {
+                pvals[out.i] = out.pval;
+            }
+        } catch (InterruptedException ex) {
+            Logger.getLogger(StructureAlign.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ExecutionException ex) {
+            Logger.getLogger(StructureAlign.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return pvals;
+    }
 
     public class Input {
 
@@ -761,7 +866,7 @@ public class StructureAlign {
                 public Output call() throws Exception {
                     Output output = new Output();
                     output.i = input.startPos;
-                    output.pval = permutationTest(input.startPos, input.length, input.sim, input.pairedSites1, input.gapCountSum, input.pairedSites2, input.windowSize, input.relaxed, input.slidingSim, input.permutations);
+                    output.pval = permutationTestCircular(input.startPos, input.length, input.sim, input.pairedSites1, input.gapCountSum, input.pairedSites2, input.windowSize, input.relaxed, input.slidingSim, input.permutations);
                     return output;
                 }
             };
@@ -994,6 +1099,30 @@ public class StructureAlign {
         }
         return substructure;
     }
+    
+    public static int[] getSubstructureCircular(int[] pairedSites, int i, int length) {
+        int[] substructure = new int[length];
+        int a = 0;
+        for (int j = i; j < i + length; j++) {
+            substructure[a] = Math.max(0, pairedSites[j%pairedSites.length] - i);
+            /*if(Math.abs(pairedSites[j%pairedSites.length]-1-i) >= pairedSites.length/2)
+            {
+                substructure[a] += pairedSites.length;
+            }*/        
+            if (substructure[a] > length) {
+                substructure[a] = 0;
+            }
+            a++;
+        }
+        /*for(int j = 0 ; j < substructure.length ; j++)
+        {
+            if(substructure[j] != 0)
+            {
+                substructure[substructure[j]-1] = j+1;
+            }
+        }*/
+        return substructure;
+    }
 
     public static int[] getSubstructureRelaxed(int[] pairedSites, int i, int length) {
         int[] substructure = new int[length];
@@ -1007,6 +1136,65 @@ public class StructureAlign {
         return substructure;
     }
 
+    public static int[] getSubstructureRelaxedCircular(int[] pairedSites, int i, int length) {
+        int[] substructure = new int[length];
+        int a = 0;
+        for (int j = i; j < i + length; j++) {
+            if (pairedSites[j%pairedSites.length] != 0) {
+                substructure[a] = pairedSites[j%pairedSites.length] - i;
+           
+                
+                //if(j >= pairedSites.length)
+                //{
+                
+                if(Math.abs(pairedSites[j%pairedSites.length]-1-i) >= pairedSites.length/2)
+                {
+                    substructure[a] += pairedSites.length;
+                }
+                
+                     
+                if(substructure[a] <= 0)
+                {
+                    substructure[a] = -pairedSites[j%pairedSites.length];
+                }
+            }
+            a++;
+        }
+        
+       /* for(int j = 0 ; j < substructure.length ; j++)
+        {
+            if(substructure[j] != 0)
+            {
+                substructure[substructure[j]-1] = j+1;
+            }
+        }*/
+        return substructure;
+    }
+    
+    public static void main(String [] args)
+    {
+        //                                                             0123456789012
+        int [] p = RNAFoldingTools.getPairedSitesFromDotBracketString("(.....(....))");
+         int [] p2 = RNAFoldingTools.getPairedSitesFromDotBracketString("(.....(....))");
+        int [] s = getSubstructureRelaxedCircular(p, 11, 2);
+         int [] s2 = getSubstructureRelaxedCircular(p, 11, 2);
+        //int [] s = getSubstructureRelaxedCircular(p, 0, 4);        
+        for(int i = 0;  i < s.length ; i++)
+        {
+            System.out.println((i+1)+"\t"+s[i]);
+        }
+        
+        System.out.println(RNAFoldingTools.getDotBracketStringFromPairedSites(s));
+        StructureAlign sal = new StructureAlign();
+       double [] d = sal.parallelizedPermutationTestSlidingCircular(s, s2, "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", 75, true, 1000);
+       for(int i = 0 ; i < d.length ; i++)
+       {
+           System.out.println(i+"\t"+d[i]);
+       }
+       
+    }
+    
+    
     public static class Region {
 
         public int id;

@@ -89,33 +89,7 @@ public class DistanceMatrix {
         this.binSize = 1;
         //this.radius = radius;
         this.nd = n;
-        this.matrix = new int[nd][nd];
-
-        for (int i = 0; i < matrix.length; i++) {
-            Arrays.fill(matrix[i], Integer.MAX_VALUE);
-        }
-
-        for (int i = 0; i < matrix.length; i++) {
-            for (int j = 0; j < matrix.length; j++) {
-                matrix[i][j] = Math.abs(i - j);
-            }
-        }
-
-        for (int i = 0; i < pairedSites.length; i++) {
-            int x = i;
-            System.out.println(pairedSites[i]+"\t"+pairedSites.length);
-            int y = (pairedSites[i] - 1) % pairedSites.length;
-            if (pairedSites[i] != 0) {
-                matrix[x][y] = 1;
-                matrix[y][x] = 1;
-            }
-        }
-
-        for (int i = 0; i < matrix.length; i++) {
-            matrix[i][i] = 0;
-        }
-
-        this.computeFloydWarshall2();
+        this.matrix = distCalc(pairedSites);
     }
 
     public static int getBestBinSize(int genomeLength, int radius) {
@@ -290,7 +264,7 @@ public class DistanceMatrix {
         }
     }
 
-    public void computeFloydWarshall2() {
+    /*public void computeFloydWarshall2() {
         for (int k = 0; k < nd; k++) {
             for (int i = 0; i < nd; i++) {
                 for (int j = 0; j < nd; j++) {
@@ -298,7 +272,31 @@ public class DistanceMatrix {
                 }
             }
         }
+    }*/
+    
+    /**
+        * calculates distances between bases in alignment
+        * @author lepuslapis
+        * @return distances between bases in alignment
+        */
+    public static int[][] distCalc(int[] structure) {
+
+        int length = structure.length;
+        int[][] distances = new int[length][length];
+        for (int b=1; b<length; b++) {
+            for (int j=0; j<length-b; j++) {
+                if ((structure[j]-1>j)&&(structure[j]-1<=j+b)) {
+                        distances[j][j+b]=1+distances[structure[j]-1][j+b];
+                } else {
+                        //int tmp = distances[j+1][j+b];
+                        distances[j][j+b]=1+distances[j+1][j+b];
+                }
+            }
+        }
+        return distances;
     }
+
+    
 
     public void printMatrix() {
         for (int i = 0; i < nd; i++) {

@@ -51,8 +51,25 @@ public class PosteriorDecodingTool {
         
         return getPosteriorDecodingConsensusStructure(getFloatMatrix(basePairProb));
     }
+    
+    public static int[] getPosteriorDecodingConsensusStructure(double[][] basePairProb, int start,int end){
+        
+        return getPosteriorDecodingConsensusStructure(getFloatMatrix(basePairProb), start, end);
+    }
 
     public static int[] getPosteriorDecodingConsensusStructure(float[][] basePairProb){
+        float[] singleBaseProb = new float[basePairProb.length];
+        for (int i = 0; i < basePairProb.length; i++) {
+            singleBaseProb[i] = 1;
+            for (int j = 0; j < basePairProb[0].length; j++) {
+                singleBaseProb[i] -= basePairProb[i][j];
+            }
+        }
+        
+        return getPosteriorDecodingConsensusStructure(basePairProb, singleBaseProb);
+    }
+    
+    public static int[] getPosteriorDecodingConsensusStructure(float[][] basePairProb, int start, int end){
         float[] singleBaseProb = new float[basePairProb.length];
         for (int i = 0; i < basePairProb.length; i++) {
             singleBaseProb[i] = 1;
@@ -92,6 +109,28 @@ public class PosteriorDecodingTool {
         //writeMatrix(S, new File("e.matrix"));
         //writeMatrix(S, new File("s.matrix"));
         traceBack(S, 0, eMatrix.length - 1, pairedWith);
+
+        return pairedWith;
+    }
+    
+    public static int[] getPosteriorDecodingConsensusStructure(float[][] basePairProb, float[] singleBaseProb, int start, int end) {        
+        float[][] eMatrix = new float[basePairProb.length][basePairProb[0].length];
+        for (int i = 0; i < eMatrix.length; i++) {
+            for (int j = 0; j < eMatrix.length; j++) {
+                eMatrix[i][j] = PosteriorDecodingTool.emptyValue;
+            }
+        }
+
+        int[] pairedWith = new int[eMatrix.length];
+        short[][] S = new short[basePairProb.length][basePairProb[0].length];
+        recursePosteriorDecoding(basePairProb, singleBaseProb, eMatrix, S, start, end);
+
+        //printMatrix(eMatrix);
+        //System.out.println();
+        //printMatrix(S);
+        //writeMatrix(S, new File("e.matrix"));
+        //writeMatrix(S, new File("s.matrix"));
+        traceBack(S, start, end, pairedWith);
 
         return pairedWith;
     }

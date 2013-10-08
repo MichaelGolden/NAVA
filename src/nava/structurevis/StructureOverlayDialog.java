@@ -62,7 +62,7 @@ public class StructureOverlayDialog extends javax.swing.JDialog {
         addButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Add a structure");
+        setTitle("Add a structure overlay");
 
         jPanel1.setPreferredSize(new java.awt.Dimension(461, 433));
         jPanel1.setLayout(new java.awt.BorderLayout());

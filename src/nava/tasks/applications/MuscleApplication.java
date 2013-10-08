@@ -109,6 +109,6 @@ public class MuscleApplication extends Application {
 
     @Override
     public String getDescription() {
-        return "";
+        return "Perform a multiple sequence alignment - MUSCLE is accurate, but somewhat slow";
     }
 }

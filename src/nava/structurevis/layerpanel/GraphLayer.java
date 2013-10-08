@@ -95,7 +95,7 @@ public class GraphLayer extends JPanel implements ActionListener, MouseListener 
                     }
                 }
                 int x = data1Dmapping.aToB(i);
-                if (x >= 0 && dataOverlay1D.used[x] && count > 0) {
+                if (x >= 0 && x < dataOverlay1D.used.length && dataOverlay1D.used[x] && count > 0) {
                     slidingWindowData[i] = sum / count;
                 } else {
                     slidingWindowData[i] = -1;

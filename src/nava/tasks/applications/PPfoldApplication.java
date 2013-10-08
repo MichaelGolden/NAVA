@@ -46,7 +46,7 @@ public class PPfoldApplication extends Application {
         IO.copyFile(new File(inputDataSource.getNormalisedDataSourcePath(ProjectModel.path)), inFastaFile);
 
         try {
-            String cmd = "java -jar " + new File(PPFOLD_EXECUTABLE).getAbsolutePath() + " \"" + inFastaFile.getAbsolutePath() + "\" "+arguments+"  --exports";
+            String cmd = "java -Xms4096M -jar " + new File(PPFOLD_EXECUTABLE).getAbsolutePath() + " \"" + inFastaFile.getAbsolutePath() + "\" "+arguments+"  --exports";
             System.out.println(cmd);
             process = Runtime.getRuntime().exec(cmd, null, tempDir);
 
@@ -131,6 +131,6 @@ public class PPfoldApplication extends Application {
 
     @Override
     public String getDescription() {
-        return "Predicts a consensus secondary structure from a set of aligned sequences.";
+        return "Predicts a consensus RNA secondary structure from a set of aligned sequences using a Stochastic-Context Free Grammer (SCFG) approach.";
     }
 }

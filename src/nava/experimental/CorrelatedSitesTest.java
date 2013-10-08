@@ -75,6 +75,7 @@ public class CorrelatedSitesTest {
         return outputs;
     }
 
+    static Random random = new Random(367080280244348720L);
     public static double[] calculatePairedSitesCorrelation(MappedData data, int[] mappedPairedSites, int offset) {
         ArrayList<Double> sites1 = new ArrayList<>();
         ArrayList<Double> sites2 = new ArrayList<>();
@@ -85,8 +86,17 @@ public class CorrelatedSitesTest {
                 int xo = (x + offset) % data.values.length;
                 int yo = (y + offset) % data.values.length;
                 if (data.used[xo] && data.used[yo]) {
-                    sites1.add(data.values[xo]);
-                    sites2.add(data.values[yo]);
+                    boolean switchSites = random.nextBoolean();
+                    if(switchSites)
+                    {
+                        sites2.add(data.values[xo]);
+                        sites1.add(data.values[yo]);
+                    }
+                    else
+                    {
+                        sites1.add(data.values[xo]);
+                        sites2.add(data.values[yo]);
+                    }
                 }
             }
         }
@@ -506,7 +516,134 @@ public class CorrelatedSitesTest {
     }
 
     public static void main(String[] args) throws IOException, ParserException, Exception {
-
+ 
+      int threads = 4;
+        /*
+       File referenceAlignment = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.fas");
+       File structureAlignment = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.dbn");
+       File dataAlignment = new File("C:/dev/thesis/hcv/1a/100/hcv1a_all_100_aligned.fas");
+       File csvFile = new File("C:/dev/thesis/hcv/1a/100/hcv1a_all_100_aligned.csv");
+       String name = "hcv1a";
+       boolean codon = false;
+       int column = 1;
+       * */
+       
+      /* File referenceAlignment = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.fas");
+       File structureAlignment = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.dbn");
+       File dataAlignment = new File("C:/dev/thesis/hcv/1/100/hcv1_all_100_aligned.fas");
+       File csvFile = new File("C:/dev/thesis/hcv/1/100/hcv1_all_100_aligned.csv");
+       String name = "hcv1";
+       boolean codon = false;
+       int column = 1;*/
+        
+    /* File referenceAlignment = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.fas");
+       File structureAlignment = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.dbn");
+       File dataAlignment = new File("C:/dev/thesis/hcv/1b/100/hcv1b_all_100_aligned.fas");
+       File csvFile = new File("C:/dev/thesis/hcv/1b/100/hcv1b_all_100_aligned.csv");
+       String name = "hcv1b";
+       boolean codon = false;
+       int column = 1;*/
+      
+     /*File referenceAlignment = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.fas");
+       File structureAlignment = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.dbn");
+       File dataAlignment = new File("C:/dev/thesis/hcv/2/100/hcv2_all_100_aligned_edit.fas");
+       File csvFile = new File("C:/dev/thesis/hcv/2/100/hcv2_all_100_aligned_edit.csv");
+       String name = "hcv2";
+       boolean codon = false;
+       int column = 1;*/
+        
+      /*File referenceAlignment = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.fas");
+       File structureAlignment = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.dbn");
+       File dataAlignment = new File("C:/dev/thesis/hcv/6/100/hcv6_all_100_aligned.fas");
+       File csvFile = new File("C:/dev/thesis/hcv/6/100/hcv6_all_100_aligned.csv");
+       String name = "hcv6";
+       boolean codon = false;
+       int column = 1;
+      */
+      
+        /*File referenceAlignment = new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.fas");
+        File structureAlignment =  new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.dbn");
+        File csvFile = new File("C:/dev/thesis/hiv_full/hiv1/100/hiv1_all_100_aligned.csv");
+        File dataAlignment = new File("C:/dev/thesis/hiv_full/hiv1/100/hiv1_all_100_aligned.fas");
+         String name = "hiv1";
+        boolean codon = false;
+        int column = 1;*/
+        
+        /*File referenceAlignment = new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.fas");
+        File structureAlignment =  new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.dbn");
+        File csvFile = new File("C:/dev/thesis/hiv_full/1b/100/hiv1b_all_100_aligned.csv");
+        File dataAlignment = new File("C:/dev/thesis/hiv_full/1b/100/hiv1b_all_100_aligned.fas");
+         String name = "hiv1b";
+        boolean codon = false;
+        int column = 1;*/
+        
+      /* File referenceAlignment = new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.fas");
+        File structureAlignment =  new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.dbn");
+        File csvFile = new File("C:/dev/thesis/hiv_full/1c/100/hiv1c_all_100_aligned.csv");
+        File dataAlignment = new File("C:/dev/thesis/hiv_full/1c/100/hiv1c_all_100_aligned.fas");
+         String name = "hiv1c";
+        boolean codon = false;
+        int column = 1;
+        */
+      
+      /* File referenceAlignment = new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.fas");
+        File structureAlignment =  new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.dbn");
+        File csvFile = new File("C:/dev/thesis/hiv_full/1d/100/hiv1d_all_100_aligned.csv");
+        File dataAlignment = new File("C:/dev/thesis/hiv_full/1d/100/hiv1d_all_100_aligned.fas");
+         String name = "hiv1d";
+        boolean codon = false;
+        int column = 1;*/
+        
+        /* File referenceAlignment = new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.fas");
+        File structureAlignment =  new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.dbn");
+        File csvFile = new File("C:/dev/thesis/hiv_full/2/100/hiv2_all_100_aligned.csv");
+        File dataAlignment = new File("C:/dev/thesis/hiv_full/2/100/hiv2_all_100_aligned.fas");
+         String name = "hiv2";
+        boolean codon = false;
+        int column = 1;*/
+                
+                
+       /*File referenceAlignment = new File("C:/dev/thesis/dengue/dengue-alignment.fas");
+        File structureAlignment = new File("C:/dev/thesis/dengue/dengue-alignment.dbn");
+      File csvFile = new File("C:/dev/thesis/dengue/100/dengue_all_100_aligned_full.csv");
+       File dataAlignment = new File("C:/dev/thesis/dengue/100/dengue_all_100_aligned.fas");
+       String name = "dengue";
+     boolean codon = false;
+      int column = 1;*/
+        
+      /*
+      File referenceAlignment = new File("C:/dev/thesis/dengue/dengue-alignment.fas");
+        File structureAlignment = new File("C:/dev/thesis/dengue/dengue-alignment.dbn");
+      File csvFile = new File("C:/dev/thesis/dengue1/100/dengue1_all_100_aligned.csv");
+       File dataAlignment = new File("C:/dev/thesis/dengue1/100/dengue1_all_100_aligned.fas");
+       String name = "dengue2";
+     boolean codon = false;
+      int column = 1;*/
+      
+       /*File referenceAlignment = new File("C:/dev/thesis/dengue/dengue-alignment.fas");
+        File structureAlignment = new File("C:/dev/thesis/dengue/dengue-alignment.dbn");
+      File csvFile = new File("C:/dev/thesis/dengue4/100/dengue4_all_100_aligned.csv");
+       File dataAlignment = new File("C:/dev/thesis/dengue4/100/dengue4_all_100_aligned.fas");
+       String name = "dengue4";
+     boolean codon = false;
+      int column = 1;*/
+      /*File referenceAlignment = new File("C:/dev/thesis/bvdv/bvdv_all_aligned.fas");
+      File structureAlignment = new File("C:/dev/thesis/bvdv/bvdv_all_aligned.dbn");
+      File dataAlignment = new File("C:/dev/thesis/bvdv/100/all_100_aligned.fas");
+       File csvFile = new File("C:/dev/thesis/bvdv/100/all_100_aligned.csv");
+      String name = "bvdv";
+      boolean codon = false;
+      int column = 1;*/
+      
+       /*File referenceAlignment = new File("C:/dev/thesis/westnile/westnile_all_200_aligned.fas");
+       File structureAlignment =  new File("C:/dev/thesis/westnile/westnile_all_200_aligned.dbn");
+        File csvFile = new File("C:/dev/thesis/westnile/100/westnile_all_100_aligned.csv");
+        File dataAlignment = new File("C:/dev/thesis/westnile/100/westnile_all_100_aligned.fas");
+        String name = "westnile";
+        boolean codon = false;
+        int column = 1;
+        */
+      
         //File referenceAlignment = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.fas");
        // File structureAlignment = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.dbn");
        // File dataAlignment = new File("C:/dev/thesis/hcv/1a/300/hcv1a_polyprotein_300_aligned.fas");
@@ -515,6 +652,7 @@ public class CorrelatedSitesTest {
        // boolean codon = true;
         //int column = 1;
         
+       
         // File referenceAlignment = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.fas");
         // File structureAlignment = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.dbn");
         // File dataAlignment = new File("C:/dev/thesis/hcv/1b/300/hcv1b_polyprotein_300_aligned.fas");
@@ -545,6 +683,7 @@ public class CorrelatedSitesTest {
         // String name = "hcv2";
         // boolean codon = false;
         //int column = 0;
+      
 
         //  File referenceAlignment = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.fas");
         //  File structureAlignment = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.dbn");
@@ -582,6 +721,22 @@ public class CorrelatedSitesTest {
          //boolean codon = true;
          //int column = 1;
 
+      
+          /*File referenceAlignment = new File("C:/dev/thesis/tbv/all_tbv_aligned.fas");
+        File structureAlignment = new File("C:/dev/thesis/tbv/all_tbv_aligned.dbn");
+         File dataAlignment = new File("C:/dev/thesis/tbv/100/tbv_all_100_aligned.fas");
+        File csvFile = new File("C:/dev/thesis/tbv/100/tbv_all_100_aligned.csv");
+        String name = "tbv";
+         boolean codon = false;
+         int column = 1;
+         * */
+       File referenceAlignment = new File("C:/dev/thesis/csfv/csfv_all_aligned.fas");
+         File structureAlignment = new File("C:/dev/thesis/csfv/csfv_all_aligned.dbn");
+         File dataAlignment = new File("C:/dev/thesis/csfv/100/all_100_aligned.fas");
+       File csvFile = new File("C:/dev/thesis/csfv/100/all_100_aligned.csv");
+         String name = "csfv";
+         boolean codon = false;
+         int column = 1;
 
         //File dataAlignment = new File("C:/Users/Michael/Dropbox/Weeks/Fubar/100_coding.fas");
         //File csvFile = new File("C:/Users/Michael/Dropbox/Weeks/Fubar/2 partition/fubar_2.csv");
@@ -612,13 +767,32 @@ public class CorrelatedSitesTest {
         //String name = "dengue";
         //boolean codon = false;
        // int column = 0;
-
-        // File referenceAlignment = new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.fas");
-        // File structureAlignment =  new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.dbn");
-        //File csvFile = new File("C:/dev/thesis/dengue/300/dengue_polyprotein_300_aligned.csv");
-        //File dataAlignment = new File("C:/dev/thesis/dengue/300/dengue_polyprotein_300_aligned.fas");
-        // String name = "hiv1";
-        // boolean codon = true;
+        
+       /* File referenceAlignment = new File("C:/dev/thesis/dengue/dengue-alignment.fas");
+        File structureAlignment = new File("C:/dev/thesis/dengue/dengue-alignment.dbn");
+        File csvFile = new File("C:/dev/thesis/dengue4/250/dengue4_polyprotein_250_aligned.csv");
+        File dataAlignment = new File("C:/dev/thesis/dengue4/250/dengue4_polyprotein_250_aligned.fas");
+        String name = "dengue4";
+        boolean codon = true;
+        int column = 1;*/
+        
+        /* File referenceAlignment = new File("C:/dev/thesis/dengue/dengue-alignment.fas");
+        File structureAlignment = new File("C:/dev/thesis/dengue/dengue-alignment.dbn");
+        File csvFile = new File("C:/dev/thesis/dengue3/300/dengue3_polyprotein_300_aligned.csv");
+        File dataAlignment = new File("C:/dev/thesis/dengue3/300/dengue3_polyprotein_300_aligned.fas");
+        String name = "dengue3";
+        boolean codon = true;
+        int column = 1;*/
+        
+         /*File referenceAlignment = new File("C:/dev/thesis/jev/jev-alignment.fas");
+        File structureAlignment =  new File("C:/dev/thesis/jev/jev-alignment.dbn");
+         File csvFile = new File("C:/dev/thesis/jev/100/jev_all_100_aligned.csv");
+       File dataAlignment = new File("C:/dev/thesis/jev/100/jev_all_100_aligned.fas");
+        String name = "jev";
+        boolean codon = false;
+         int column = 1;*/
+      
+      
 
        //  File referenceAlignment = new File("C:/dev/thesis/westnile/westnile_all_200_aligned.fas");
         // File structureAlignment =  new File("C:/dev/thesis/westnile/westnile_all_200_aligned.dbn");
@@ -627,6 +801,8 @@ public class CorrelatedSitesTest {
         // String name = "westnile";
         // boolean codon = true;
         // int column = 1;
+      
+      
 
         //File referenceAlignment = new File("C:/dev/thesis/jev/jev-alignment.fas");
         //File structureAlignment =  new File("C:/dev/thesis/jev/jev-alignment.dbn");
@@ -635,7 +811,7 @@ public class CorrelatedSitesTest {
         //String name = "jev";
         // boolean codon = true;
          
-         File referenceAlignment = new File("C:/dev/thesis/jev/jev-alignment.fas");
+       /*  File referenceAlignment = new File("C:/dev/thesis/jev/jev-alignment.fas");
         File structureAlignment =  new File("C:/dev/thesis/jev/jev-alignment.dbn");
          //File csvFile = new File("C:/dev/thesis/jev/300/jev_polyprotein_300_aligned.csv");
         //File dataAlignment = new File("C:/dev/thesis/jev/300/jev_polyprotein_300_aligned.fas");
@@ -643,7 +819,7 @@ public class CorrelatedSitesTest {
         File dataAlignment = new File("C:/dev/thesis/jev/300/jev_all_300_aligned.fas_norm");
         String name = "jev";
          boolean codon = false;
-         int column = 0;
+         int column = 0;*/
 
 
         // File referenceAlignment = new File("C:/dev/thesis/tbv/all_tbv_aligned.fas");
@@ -702,16 +878,16 @@ public class CorrelatedSitesTest {
             SecondaryStructureData structure = structureData.get(j);
             // test.realDistanceTest3(mappedData, structure.pairedSites);
             // System.out.println(structure.title);
-          /* System.out.print(j + "\t");
-            PairedSitesPermutationTestResult result = test.pairedSitesCorrelationPermutationTest(mappedData, structure.pairedSites, 4);
+           System.out.print(j + "\t");
+            PairedSitesPermutationTestResult result = test.pairedSitesCorrelationPermutationTest(mappedData, structure.pairedSites, threads);
             rvalues.add(result.r);
             pvalues.add(result.pval);
             permvalues.add(result.permutation);
             System.out.println(rvalues.size() + "\t" + RankingAnalyses.getMedian(rvalues) + "\t" + RankingAnalyses.getMedian(pvalues) + "\t" + RankingAnalyses.getMedian(permvalues));
-        */
+     
             
-            CorrelatedSitesTest.distanceCorrelationTest(mappedData,structure.pairedSites);
-            used[j] = true;
+            //CorrelatedSitesTest.distanceCorrelationTest(mappedData,structure.pairedSites);
+           // used[j] = true;
         }
 
         /*

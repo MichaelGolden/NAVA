@@ -128,7 +128,7 @@ public class PosteriorDecodingApplication extends Application {
 
     @Override
     public String getName() {
-        return "Posterior-decoding";
+        return "Maximum Expected Accuracy prediction";
     }
 
     @Override

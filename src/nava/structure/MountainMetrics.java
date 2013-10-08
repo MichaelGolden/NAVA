@@ -70,13 +70,27 @@ public class MountainMetrics {
         double[] f1 = new double[pairedSites.length];
         if (weighted) {
             if (pairedSites[0] != 0) {
-                f1[0] += 1 / ((double) (pairedSites[0] - 1 - 0));
+                if(pairedSites[0] > 0)
+                {
+                    f1[0] += 1 / ((double) (pairedSites[0] - 1 - 0));
+                }
+                else
+                {
+                    f1[0] -= 1 / ((double) (-pairedSites[0] - 1 - 0)); // handle negative indices
+                }
             }
 
             for (int i = 1; i < pairedSites.length; i++) {
                 f1[i] = f1[i - 1];
                 if (pairedSites[i] != 0) {
-                    f1[i] += 1 / ((double) (pairedSites[i] - 1 - i));
+                    if(pairedSites[0] > 0)
+                    {
+                        f1[i] += 1 / ((double) (pairedSites[i] - 1 - i));
+                    }
+                    else
+                    {
+                        f1[i] -= 1 / ((double) (-pairedSites[i] - 1 - i));  // handle negative indices
+                    }
                 }
             }
             return f1;

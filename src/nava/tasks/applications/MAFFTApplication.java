@@ -160,6 +160,6 @@ public class MAFFTApplication extends Application {
 
     @Override
     public String getDescription() {
-        return "";
+        return "Perform a multiple sequence alignment - MAFFT is fast and reasonably accurate";
     }
 }

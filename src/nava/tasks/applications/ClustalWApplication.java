@@ -99,6 +99,6 @@ public class ClustalWApplication extends Application {
     
     @Override
     public String getDescription() {
-        return "";
+        return "Perform a multiple sequence alignment - ClustalW is an older multiple sequence alignment tool which is no longer state-of-the-art";
     }
 }

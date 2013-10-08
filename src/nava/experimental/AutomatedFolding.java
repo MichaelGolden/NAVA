@@ -4,10 +4,7 @@
  */
 package nava.experimental;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,7 +23,9 @@ import nava.utils.RNAFoldingTools;
 public class AutomatedFolding {
 
     public static final File workingDir = new File("bin/hybrid-ss-min-tiled-cpu-win");
+    public static final File workingDirOld = new File("bin/hybrid-ss-min-tiled-cpu-win/old/");
     public static final String HYBRIDSSMIN_EXECUTABLE = "bin/hybrid-ss-min-tiled-cpu-win/hybrid-ss-min-SSE4.exe";
+    public static final String HYBRIDSSMIN_EXECUTABLE_OLD = "bin/hybrid-ss-min-tiled-cpu-win/old/hybrid-ss-min-old.exe";
 
     public static void main(String[] args) {
        // new AutomatedFolding().performingFolding(new File("C:/dev/thesis/dengue_50x4.fas"), new File("C:/dev/thesis/dengue_50x4.dbn"));
@@ -37,7 +36,15 @@ public class AutomatedFolding {
         // new AutomatedFolding().performingFolding(new File("C:/dev/thesis/csfv/300/all_300_aligned.fas"), new File("C:/dev/thesis/csfv/csfv_all.dbn"), 4);
          //new AutomatedFolding().performingFolding(new File("C:/dev/thesis/bvdv/300/all_300_aligned.fas"), new File("C:/dev/thesis/bvdv/bvdv_all.dbn"), 4);
         //new AutomatedFolding().performingFolding(new File("C:/dev/thesis/tbv/all_tbv.fas"), new File("C:/dev/thesis/tbv/all_tbv.dbn"), 8);
-        new AutomatedFolding().performingFolding(new File("C:/dev/thesis/jev_tbv_westnile/jev_westnile.fas"), new File("C:/dev/thesis/jev_tbv_westnile/jev_westnile.dbn"), 8);
+        //new AutomatedFolding().performingFolding(new File("C:/dev/thesis/jev_tbv_westnile/jev_westnile.fas"), new File("C:/dev/thesis/jev_tbv_westnile/jev_westnile.dbn"), 8);
+        //new AutomatedFolding().performingFolding(new File("C:/brej/msv/MSV_10seq.fas"), new File("C:/brej/msv/MSV_10seq.dbn"), 1, true, 25, true);
+       // new AutomatedFolding().performingFolding(new File("C:/brej/gemini_begomo/Gemini_Begomovirus.fas"), new File("C:/brej/gemini_begomo/Gemini_Begomovirus.dbn"), 1, true, 25, true);
+         //new AutomatedFolding().performingFolding(new File("C:/brej/gemini_mastrevirus/Gemini_Mastrevirus.fas"), new File("C:/brej/gemini_mastrevirus/Gemini_Mastrevirus.dbn"), 1, true, 25, true);
+       // new AutomatedFolding().performingFolding(new File("C:/brej/circovirus/Circovirus.fas"), new File("C:/brej/circovirus/Circovirus.dbn"), 1, true, 37, true);
+        // new AutomatedFolding().performingFolding(new File("C:/brej/anellovirus/Anellovirus.fas"), new File("C:/brej/anellovirus/Anellovirus.dbn"), 1, true, 37, true);
+         //new AutomatedFolding().performingFolding(new File("C:/brej/parvovirus/Parvovirus.fas"), new File("C:/brej/parvovirus/Parvovirus.dbn"), 8, false, 37, true);
+        new AutomatedFolding().performingFolding(new File("C:/dev/thesis/hiv_full/darren/darren_hiv_full_aligned_muscle.fas"), new File("C:/dev/thesis/hiv_full/darren/darren_hiv_full_aligned_muscle.dbn"), 8);
+        
         
     }
     
@@ -68,6 +75,11 @@ public class AutomatedFolding {
     
     public static Fold fold(String sequence, int threads)
     {
+        return fold(sequence, threads,false,37, false);
+    }
+    
+    public static Fold fold(String sequence, int threads, boolean circular, double temp, boolean dna)
+    {
             ArrayList<String> seq = new ArrayList<>();
             ArrayList<String> seqName = new ArrayList<>();
             seq.add(sequence);
@@ -77,10 +89,22 @@ public class AutomatedFolding {
             IO.saveToFASTAfile(seq, seqName, foldFastaFile);
             try {
 
-                File tempCtFile = new File(workingDir.getAbsolutePath() + File.separator + "fold.fas.ct");
+                File tempCtFile = new File((circular ? workingDirOld.getAbsolutePath() : workingDir.getAbsolutePath()) + File.separator + "fold.fas.ct");
                 String cmd = new File(HYBRIDSSMIN_EXECUTABLE).getAbsolutePath() + " " + foldFastaFile.getAbsolutePath() + " --threads="+threads;
-
-                Process p = Runtime.getRuntime().exec(cmd, null, workingDir);
+                if(circular)
+                {
+                    cmd += " --circular ";
+                }
+                if(temp != 37)
+                {
+                    cmd += "--tmin="+temp+" --tmax="+temp+" ";
+                }
+                if(dna)
+                {
+                    cmd += " --NA=DNA ";
+                }
+                
+                Process p = Runtime.getRuntime().exec(cmd, null, (circular ? workingDirOld : workingDir));
                 Application.nullOutput(p.getInputStream());
                 Application.nullOutput(p.getErrorStream());;
                 int code = p.waitFor();
@@ -113,26 +137,52 @@ public class AutomatedFolding {
     }
 
     public void performingFolding(File inFastaFile, File outCtFile, int threads) {
+
+        performingFolding(inFastaFile, outCtFile, threads, false, 37, false);
+    }
+   
+          
+    
+    public void performingFolding(File inFastaFile, File outCtFile, int threads, boolean circular, double temp, boolean dna) {
         ArrayList<String> sequences = new ArrayList<>();
         ArrayList<String> sequenceNames = new ArrayList<>();
         IO.loadFastaSequences(inFastaFile, sequences, sequenceNames);
-        outCtFile.delete();
+        //outCtFile.delete();
         for (int i = 0; i < sequences.size(); i++) {
             ArrayList<String> seq = new ArrayList<>();
             ArrayList<String> seqName = new ArrayList<>();
             seq.add(sequences.get(i));
             seqName.add(sequenceNames.get(i));
-            File foldFastaFile = new File("fold.fas");
+            File foldFastaFile = new File(inFastaFile.getName()+".fold.fas");
             //File workingDirectory = new File("");
             IO.saveToFASTAfile(seq, seqName, foldFastaFile);
             try {
 
-                File tempCtFile = new File(workingDir.getAbsolutePath() + File.separator + "fold.fas.ct");
-                String cmd = new File(HYBRIDSSMIN_EXECUTABLE).getAbsolutePath() + " " + foldFastaFile.getAbsolutePath() + " --threads="+threads;
-
-                Process p = Runtime.getRuntime().exec(cmd, null, workingDir);
-                Application.nullOutput(p.getInputStream());
-                Application.nullOutput(p.getErrorStream());
+                File tempCtFile = new File((circular ? workingDirOld.getAbsolutePath() : workingDir.getAbsolutePath()) + File.separator + inFastaFile.getName()+".fold.fas.ct");                
+                System.out.println(">"+tempCtFile.getAbsolutePath());
+                String cmd = new File(circular ? HYBRIDSSMIN_EXECUTABLE_OLD : HYBRIDSSMIN_EXECUTABLE).getAbsolutePath() + " " + foldFastaFile.getAbsolutePath() + (circular ? "" : " --threads="+threads);
+                if(circular)
+                {
+                    cmd += " --circular ";
+                }
+                if(temp != 37)
+                {
+                    cmd += "--tmin="+temp+" --tmax="+temp+" ";
+                }
+                if(dna)
+                {
+                    cmd += " --NA=DNA ";
+                }
+                Process p = Runtime.getRuntime().exec(cmd, null, (circular ? workingDirOld : workingDir));
+                String textline = null;
+                BufferedReader reader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+                while((textline = reader.readLine()) != null)
+                {
+                    System.err.println(textline);
+                }
+                
+                /*Application.nullOutput(p.getInputStream());
+                Application.nullOutput(p.getErrorStream());*/
                 int code = p.waitFor();
                 System.out.println(code);
                 if (code == 0) {

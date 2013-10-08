@@ -115,6 +115,19 @@ public class MyMannWhitney {
         this.nx = x.size();
         this.ny = y.size();
         this.N = this.nx + this.ny;
+        
+        int removed = 0;
+        while(x.contains(Double.NaN))
+        {
+            x.remove(Double.NaN);
+            removed++;
+        }
+        
+        while(y.contains(Double.NaN))
+        {
+            y.remove(Double.NaN);
+            removed++;
+        }       
 
         for (int i = 0; i < x.size(); i++) {
             groups.put(x.get(i), getGroup(x.get(i)) + 1);

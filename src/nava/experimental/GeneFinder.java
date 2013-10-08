@@ -99,19 +99,20 @@ public class GeneFinder {
         int k = 6;
 
         ArrayList<String> forbiddenKeywords = new ArrayList<>();
-        forbiddenKeywords.add("modified");
-        forbiddenKeywords.add("attenuated");
-        forbiddenKeywords.add("patent");
+        //forbiddenKeywords.add("modified");
+       // forbiddenKeywords.add("attenuated");
+       // forbiddenKeywords.add("patent");
 
         // int n = 100;
         //int[] sizes = {50,100, 200, 20, 10, 300, 400};
-        int[] sizes = {100,300, 250,400, 200, 50, 100, 20, 10};
+        int[] sizes = {300, 100, 250,400, 200, 50, 100, 20, 10};
         //int[] sizes = {25, 20, 50, 100, 200, 10};
         //int[] sizes = {25};
         for (int n : sizes) {
             double cutoff = 0.5;
 
             ArrayList<Dataset> datasets = new ArrayList<>();
+            datasets.add(new Dataset("C:/dev/thesis/hiv_full/darren/", new File("C:/dev/thesis/hiv_full/darren/complete.gb"), "darren_hiv", true));
             //resaveGenbankFile(new File("C:/dev/thesis/hiv_full/1a/complete.gb"),new File("C:/dev/thesis/hiv_full/1a/complete2.gb"));
             //resaveGenbankFile(new File("C:/dev/thesis/hiv_full/1b/complete.gb"),new File("C:/dev/thesis/hiv_full/1b/complete2.gb"));
             // resaveGenbankFile(new File("C:/dev/thesis/hiv_full/1c/complete.gb"),new File("C:/dev/thesis/hiv_full/1c/complete2.gb"));
@@ -156,8 +157,8 @@ public class GeneFinder {
            // datasets.add(new Dataset("C:/dev/thesis/porcine/", new File("C:/dev/thesis/porcine/complete.gb"), "porcine", false));
             // datasets.add(new Dataset("C:/dev/thesis/yfv/", new File("C:/dev/thesis/yfv/complete.gb"), "yfv", false));
             //datasets.add(new Dataset("C:/dev/thesis/hepe/", new File("C:/dev/thesis/hepe/complete.gb"), "hepe", false));
-            datasets.add(new Dataset("C:/dev/thesis/enteroc/", new File("C:/dev/thesis/enteroc/complete.gb"), "enteroc", false));
-            datasets.add(new Dataset("C:/dev/thesis/enterob/", new File("C:/dev/thesis/enterob/complete.gb"), "enterob", false));
+           // datasets.add(new Dataset("C:/dev/thesis/enteroc/", new File("C:/dev/thesis/enteroc/complete.gb"), "enteroc", false));
+            //datasets.add(new Dataset("C:/dev/thesis/enterob/", new File("C:/dev/thesis/enterob/complete.gb"), "enterob", false));
             //datasets.add(new Dataset("C:/dev/thesis/enteroa/", new File("C:/dev/thesis/enteroa/complete.gb"), "enteroa", false));
              //datasets.add(new Dataset("C:/dev/thesis/norwalk/", new File("C:/dev/thesis/norwalk/complete.gb"), "norwalk", false));
             // datasets.add(new Dataset("C:/dev/thesis/bvdv/", new File("C:/dev/thesis/bvdv/complete.gb"), "bvdv", true));

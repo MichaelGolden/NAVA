@@ -85,18 +85,38 @@ public class DataOverlay2D extends Overlay implements Serializable {
             x = mapping.aToB(i - dataOffset);
             y = mapping.aToB(j - dataOffset);
         }
+
+        
         try {
+         
+            
             switch (matrixRegion) {
                 case FULL:
+                    /*System.out.println("full\t"+x+"\t"+y+"\t"+i+"\t"+j+"\t"+dataMatrix.getValue(x, y));
+                    if(x == 8154 && y == 8205)
+                    {
+                        System.out.println("coevolution\t"+x+"\t"+y+"\t"+i+"\t"+j+"\t"+dataMatrix.getValue(x, y));
+                    }*/
                     return dataMatrix.getValue(x, y);
                 case UPPER_TRIANGLE:
-                    if (x <= y) {
+                    
+                    /*System.out.println("upper\t"+x+"\t"+y+"\t"+i+"\t"+j+"\t"+dataMatrix.getValue(x, y));
+                    if(x == 8154 && y == 8205)
+                    {
+                        System.out.println("coevolution\t"+x+"\t"+y+"\t"+i+"\t"+j+"\t"+dataMatrix.getValue(x, y));
+                    }*/
+                    if (i <= j) {
                         return dataMatrix.getValue(x, y);
                     } else {
                         return emptyValue;
                     }
-                case LOWER_TRIANGLE:
-                    if (x >= y) {
+                case LOWER_TRIANGLE:                    
+                    /*System.out.println("lower\t"+x+"\t"+y+"\t"+i+"\t"+j+"\t"+dataMatrix.getValue(x, y));
+                    if(x == 8154 && y == 8205)
+                    {
+                        System.out.println("coevolution\t"+x+"\t"+y+"\t"+i+"\t"+j+"\t"+dataMatrix.getValue(x, y));
+                    }*/
+                    if (i >= j) {
                         return dataMatrix.getValue(x, y);
                     } else {
                         return emptyValue;
@@ -108,6 +128,8 @@ public class DataOverlay2D extends Overlay implements Serializable {
             ex.printStackTrace();
             return emptyValue;
         }
+        
+
     }
 
     @Override

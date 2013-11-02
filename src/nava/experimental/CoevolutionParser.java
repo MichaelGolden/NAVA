@@ -51,7 +51,7 @@ public class CoevolutionParser {
        File inFile = new File("C:/dev/thesis/dengue/coevolution/all.txt");
        File outFile = new File("C:/dev/thesis/dengue/coevolution/dengue-formation.clm");
        
-       // File inFile = new File("C:/dev/thesis/jev/coevolution/all.txt");
+       //File inFile = new File("C:/dev/thesis/jev/coevolution/all.txt");
        //File outFile = new File("C:/dev/thesis/jev/coevolution/jev-formation.clm");
         
        // File inFile = new File("C:/dev/thesis/hcv/coevolution/all.txt");

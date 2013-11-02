@@ -287,9 +287,11 @@ public class DistanceMatrix {
             for (int j=0; j<length-b; j++) {
                 if ((structure[j]-1>j)&&(structure[j]-1<=j+b)) {
                         distances[j][j+b]=1+distances[structure[j]-1][j+b];
+                        distances[j+b][j] = distances[j][j+b];
                 } else {
                         //int tmp = distances[j+1][j+b];
                         distances[j][j+b]=1+distances[j+1][j+b];
+                        distances[j+b][j] = distances[j][j+b];
                 }
             }
         }
@@ -309,7 +311,14 @@ public class DistanceMatrix {
 
     // zero offset
     public int getDistance(int i, int j) {
-        return matrix[i / binSize][j / binSize] * binSize;
+        if(matrix != null)
+        {
+            return matrix[i / binSize][j / binSize] * binSize;
+        }
+        else
+        {
+            return -1;
+        }
     }
 
     public static File getCacheFile(File collectionFolder/*

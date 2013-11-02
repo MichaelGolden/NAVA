@@ -1041,6 +1041,47 @@ public class StructureAlign {
         s.sequence = seq;
         return s;
     }
+    
+    public static int [] getMappedSites(String alignedSequence, String mappingString, int [] pairedSites)
+    {
+        String s = RNAFoldingTools.getDotBracketStringFromPairedSites(pairedSites);
+         String ret = "";
+         char gapInsert = '-';
+        int spos = 0;
+        for (int i = 0; i < alignedSequence.length(); i++) {
+            if (alignedSequence.charAt(i) != '-' && spos < s.length()) {
+                ret += s.charAt(spos);
+                spos++;
+            } else {
+                ret += gapInsert;
+            }
+        }
+        int [] newsites = RNAFoldingTools.getPairedSitesFromDotBracketString(ret);
+        
+        for(int i = 0 ; i < newsites.length ; i++)
+        {
+            if(mappingString.charAt(i) == '-')
+            {
+                int temp = newsites[i];
+                if(temp != 0)
+                {
+                    newsites[i] = 0;
+                    newsites[temp-1] = 0;
+                }
+            }
+        }
+        String str = RNAFoldingTools.getDotBracketStringFromPairedSites(newsites);
+        String ret2 = "";
+        for(int i = 0  ; i < mappingString.length() ; i++)
+        {
+            if(mappingString.charAt(i) != '-')
+            {
+                ret2 += str.charAt(i);
+            }
+        }
+        
+        return RNAFoldingTools.getPairedSitesFromDotBracketString(ret2);
+    }
 
     public static String mapStringToAlignedSequence(String s, String alignedSequence, String gapInsert) {
         String ret = "";

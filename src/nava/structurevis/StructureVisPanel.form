@@ -34,7 +34,8 @@
   <SubComponents>
     <Container class="javax.swing.JSplitPane" name="verticalSplitPane">
       <Properties>
-        <Property name="dividerLocation" type="int" value="300"/>
+        <Property name="dividerLocation" type="int" value="250"/>
+        <Property name="dividerSize" type="int" value="3"/>
         <Property name="orientation" type="int" value="0"/>
       </Properties>
 

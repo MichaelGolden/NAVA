@@ -7,6 +7,7 @@ package nava.structurevis.data;
 import java.awt.Color;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import nava.ranking.RankingAnalyses;
 import nava.utils.Utils;
 
 /**
@@ -69,6 +70,10 @@ public class NHistogramClass {
                 percs[i] = (double) bins[i] / (double) values.size();
             }
         }
+        
+        median = RankingAnalyses.getMedian(values);
+        System.out.println("Median="+median);
+        System.out.println("N="+values.size());
     }
     
     public void print() {

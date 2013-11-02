@@ -78,12 +78,18 @@ public class NHistogramPanel extends JPanel implements ActionListener, MouseMoti
 
     public String getSVGString() {
         Graphics g = getGraphics();
+  
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
 
         int width = 1000;
         int height = 600;
+        if(g == null)
+        {
+            BufferedImage bimage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            g = bimage.getGraphics();
+        }
 
         // initialise svg
         pw.println("<?xml version=\"1.0\" standalone=\"no\"?>");
@@ -172,8 +178,10 @@ public class NHistogramPanel extends JPanel implements ActionListener, MouseMoti
             // g.setFont(smallFont);
             if (histogram.transform != null) {
                 double swidth = g.getFontMetrics().stringWidth("0.0000");
-
-                int points = Math.max(2, (int) (graphWidth / swidth / 1.7));
+                
+                
+                //int points = Math.max(2, (int) (graphWidth / swidth / 1.7));
+                int points = histogram.nbins+1;
                 for (int i = 0; i < points; i++) {
                     double val = 0;
                     double y = 0;

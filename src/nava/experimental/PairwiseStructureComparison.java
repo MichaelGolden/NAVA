@@ -99,6 +99,18 @@ public class PairwiseStructureComparison {
             int windowSize = 75;
             boolean balance = true;
 
+            boolean circular = false;
+           ArrayList<MappedData> dataSources = new ArrayList<>();
+            File outFile = new File("C:/dev/thesis/hiv_full/hiv_not_siv_permutations2.txt");
+             String[] categories = {"hiv1b", "hiv1c", "hiv1d", "hiv1g", "hiv1o", "hiv2"};
+           File structureAlignment = new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.dbn");
+             File sequenceFile = new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.fas");
+              ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(structureAlignment, DataType.FileFormat.VIENNA_DOT_BRACKET);
+            
+            ArrayList<File> referenceFiles = new ArrayList<>();
+            referenceFiles.add(new File("C:/dev/thesis/hiv_full/hiv1-reference.fasta"));
+            dataSources.add(hivMapping(sequenceFile));
+            
             //  File outFile = new File("C:/dev/thesis/dengue/dengue_permutations2.txt");
             //  String[] categories = {"dengue1", "dengue2", "dengue3", "dengue4"};
             //  File structureAlignment = new File("C:/dev/thesis/dengue/dengue-alignment.dbn");
@@ -207,7 +219,7 @@ public class PairwiseStructureComparison {
              MappableData synDataAnelloTTVORF1 = new MappableData(new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Fubar/Anellovirus/AnelloTTV_ORF1.fas"), new File("C:/Users/Michael/Dropbox/BrejAndMichael/ssDNA_viruses_groups/Fubar/Anellovirus/AnelloTTV_ORF1.fas_gardout_finalout.fubar.csv"), 1, 1, true, "Syn rates AnelloTTV_ORF1");
             dataSources.add(MappedData.getMappedData(sequenceFile, synDataAnelloTTVORF1, 1000, true));
        */
-            boolean circular = false;
+           /* boolean circular = false;
              String [] categories = {"seq"};
             File structureAlignment = new File("C:/dev/thesis/hiv_full/darren/conserved/darren_hiv_full_aligned_muscle.dbn");
             File sequenceFile = new File("C:/dev/thesis/hiv_full/darren/conserved/darren_hiv_full_aligned_muscle.fas");
@@ -217,7 +229,19 @@ public class PairwiseStructureComparison {
             ArrayList<File> referenceFiles = new ArrayList<>();
  
             ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(structureAlignment, DataType.FileFormat.VIENNA_DOT_BRACKET);
-            ArrayList<MappedData> dataSources = new ArrayList<>();
+            ArrayList<MappedData> dataSources = new ArrayList<>();*/
+            
+            /*boolean circular = false;
+             String [] categories = {"seq"};
+            File structureAlignment = new File("C:/dev/thesis/hiv_full/test/darren_hiv.dbn");
+            File sequenceFile = new File("C:/dev/thesis/hiv_full/test/darren_hiv.fas");
+            File outFile = new File("C:/dev/thesis/hiv_full/test/darren_hiv_permutations.txt");
+            File referenceFile = sequenceFile;
+          
+            ArrayList<File> referenceFiles = new ArrayList<>();
+ 
+            ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(structureAlignment, DataType.FileFormat.VIENNA_DOT_BRACKET);
+            ArrayList<MappedData> dataSources = new ArrayList<>();*/
   
            /* boolean circular = true;
            String [] categories = {"CircoPCV","CircoCoCV", "CircoBFDV", "CircoDGCV"};
@@ -254,12 +278,14 @@ public class PairwiseStructureComparison {
             //ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(structureAlignment, DataType.FileFormat.VIENNA_DOT_BRACKET);
 
             //String[] categories = {"hcv1", "hcv2"};
-            //String[] categories = {"hcv1", "hcv2", "hcv3", "hcv4", "hcv6"};
-            //File outFile = new File("C:/dev/thesis/hcv/hcv_permutations2.txt");
+            /*boolean circular = false;
+            String[] categories = {"hcv1", "hcv2", "hcv3", "hcv4", "hcv6"};
+            File outFile = new File("C:/dev/thesis/hcv/hcv_permutations2.txt");
             //  String[] categories = {"hcv1a", "hcv1b", "hcv2a", "hcv2b", "hcv3", "hcv4", "hcv6"};
-            //File structureAlignment = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.dbn");
-            /*File sequenceFile = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.fas");
-            File referenceFile = new File("C:/dev/thesis/hcv/visualisation/H77_reference.fasta");
+            File structureAlignment = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.dbn");
+            File sequenceFile = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.fas");
+            ArrayList<File> referenceFiles = new ArrayList<>();
+            referenceFiles.add(new File("C:/dev/thesis/hcv/visualisation/H77_reference.fasta"));
             MappableData nucleotideData = new MappableData(sequenceFile, new File("C:/dev/thesis/hcv/conservation/rates.csv"), 0, 1, false, "Nucleotide rates");
             MappableData synDataHCV1 = new MappableData(new File("C:/dev/thesis/hcv/1/300/hcv1_polyprotein_300_aligned.fas"), new File("C:/dev/thesis/hcv/1/300/hcv1_polyprotein_300_aligned.csv"), 1, 1, true, "Syn rates hcv 1");
             MappableData synDataHCV1a = new MappableData(new File("C:/dev/thesis/hcv/1a/300/hcv1a_polyprotein_300_aligned.fas"), new File("C:/dev/thesis/hcv/1a/300/hcv1a_polyprotein_300_aligned.csv"), 1, 1, true, "Syn rates hcv 1a");
@@ -277,6 +303,22 @@ public class PairwiseStructureComparison {
             dataSources.add(MappedData.getMappedData(sequenceFile, synDataHCV3, 1000, false));
             dataSources.add(MappedData.getMappedData(sequenceFile, synDataHCV4, 1000, false));
             dataSources.add(MappedData.getMappedData(sequenceFile, synDataHCV6, 1000, false));
+            ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(structureAlignment, DataType.FileFormat.VIENNA_DOT_BRACKET);
+            */
+            
+            /*boolean circular = false;
+            String[] categories = {"dengue", "jev", "tbv", "westnile"};
+            File outFile = new File("C:/dev/thesis/dengue_jev_tbv_westnile/dengue_jev_tbv_westnile_permutations.txt");
+            //  String[] categories = {"hcv1a", "hcv1b", "hcv2a", "hcv2b", "hcv3", "hcv4", "hcv6"};
+            File structureAlignment = new File("C:/dev/thesis/dengue_jev_tbv_westnile/dengue_jev_westnile_tbv_aligned.dbn");
+            File sequenceFile = new File("C:/dev/thesis/dengue_jev_tbv_westnile/dengue_jev_westnile_tbv_aligned.fas");
+            ArrayList<File> referenceFiles = new ArrayList<>();
+            referenceFiles.add(new File("C:/dev/thesis/dengue_jev_tbv_westnile/dengue_refseq.fasta"));
+            referenceFiles.add(new File("C:/dev/thesis/jev_tbv_westnile/visualisation/westnile_reference.fasta"));
+            ArrayList<MappedData> dataSources = new ArrayList<>();
+            ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(structureAlignment, DataType.FileFormat.VIENNA_DOT_BRACKET);
+            */
+            /*
             //String[] categories = {"westnile", "hcv1a", "hcv1b", "hcv2a", "hcv2b","hcv3","hcv4", "hcv6"};
             //  File outFile = new File("C:/dev/thesis/hcv/hcv_permutations2.txt"); 
             //  String[] categories = {"hcv1a", "hcv1b", "hcv2a", "hcv2b", "hcv3", "hcv4", "hcv6"};
@@ -335,7 +377,8 @@ public class PairwiseStructureComparison {
             ArrayList<Combination> combinations = combinations(categories);
             for (int i = 0; i < combinations.size(); i++) {
                 Combination combination = combinations.get(i);
-                if (combination.combination.size() <= 2 || combination.combination.size() == categories.length) {
+                 if (combination.combination.size() >=4) {
+               // if (combination.combination.size() <= 2 || combination.combination.size() == categories.length) {
                     //if (combination.combination.size() == 4) {
                 } else {
                     combinations.remove(i);
@@ -388,14 +431,15 @@ public class PairwiseStructureComparison {
 
 
 
-          ArrayList<String> pairMustContain = new ArrayList<>();
+        ArrayList<String> pairMustContain = new ArrayList<>();
+         pairMustContain = new ArrayList<>();
+            postAnalysis(outFile, outFile, categories, combinations, structureData, windowSize, pairMustContain, sequenceFile, referenceFiles, dataSources, circular);
            for (int i = 0; i < categories.length; i++) {
                 pairMustContain = new ArrayList<>();
                 pairMustContain.add(categories[i]);
                 postAnalysis(outFile, outFile, categories, combinations, structureData, windowSize, pairMustContain, sequenceFile, referenceFiles, dataSources, circular);
             }
-            pairMustContain = new ArrayList<>();
-            postAnalysis(outFile, outFile, categories, combinations, structureData, windowSize, pairMustContain, sequenceFile, referenceFiles, dataSources, circular);
+           
             System.exit(0);
             //ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(new File("C:/dev/thesis/dengue2/50/dengue2_all_50_aligned_partial_structurealign.fas.dbn"), DataType.FileFormat.VIENNA_DOT_BRACKET);
             //ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(new File("C:/dev/thesis/full-alignment.dbn"), DataType.FileFormat.VIENNA_DOT_BRACKET);
@@ -686,6 +730,11 @@ public class PairwiseStructureComparison {
         }
 
         for (Combination combination : combinations) {
+            if(!(combination.toString().equals("hiv1b_hiv1c_hiv1d_hiv1g") || combination.toString().equals("hiv1b_hiv1c_hiv1d_hiv1g_hiv1o") || combination.toString().equals("hiv1b_hiv1c_hiv1d_hiv1g_hiv1o_hiv2")))
+            {
+                continue;
+            }
+            
             ArrayList<SecondaryStructureData> structureData2 = (ArrayList<SecondaryStructureData>) structureData.clone();
             for (SecondaryStructureData d : structureData) {
                 StructureItem item = new StructureItem();
@@ -727,7 +776,8 @@ public class PairwiseStructureComparison {
                 BufferedWriter writer2 = new BufferedWriter(new FileWriter(outFile.getAbsolutePath() + "_" + combination + mustHave + "_" + pvalCutoff + "_structures.txt"));
                 double totalPairs = 0;
                 String textline = null;
-                ArrayList<double[]> data = new ArrayList<>();
+                ArrayList<double[]> zscores = new ArrayList<>();
+                ArrayList<double[]> simscores = new ArrayList<>();
                 int dataLength = -1;
                 long startTime = System.currentTimeMillis();
                 while ((textline = buffer.readLine()) != null) {
@@ -764,7 +814,7 @@ public class PairwiseStructureComparison {
                         }
                         if (dataLength == split.length - 2) // if last line too short because of file I/O do not add
                         {
-                            data.add(values);
+                            zscores.add(values);
                         }
 
                         writer2.write(RNAFoldingTools.getDotBracketStringFromPairedSites(structureData.get(x).pairedSites));
@@ -777,27 +827,41 @@ public class PairwiseStructureComparison {
                         // System.out.println(o2 + "\t" + y);
                         structures.add(x);
                         structures.add(y);
+                        
+                        double [] pairwiseSim = StructureAlign.slidingWeightedMountainSimilarity(structureData.get(x).pairedSites, structureData.get(y).pairedSites, windowSize, circular);
+                         double [] pairwiseSimOffset = new double[pairwiseSim.length+windowSize];
+                         for(int i = 0 ; i < pairwiseSim.length ; i++)
+                         {
+                             pairwiseSimOffset[i+(windowSize/2)] = pairwiseSim[i];
+                         }
+                         simscores.add(pairwiseSimOffset);
+                        
 
-                        if (data.size() >= 10000) {
+                        if (zscores.size() >= 10000) {
                             break;
                         }
                     }
                 }
                 long endTime = System.currentTimeMillis();
                 double elapsedTime = (double) (endTime - startTime) / 1000.0;
-                System.out.println("Elapsed time = " + data.size() + "\t" + elapsedTime);
+                System.out.println("Elapsed time = " + zscores.size() + "\t" + elapsedTime);
                 buffer.close();
-                System.out.println(combination + "\t" + data.size());
+                System.out.println(combination + "\t" + zscores.size());
 
                 ArrayList<Double> medianPvals = new ArrayList<>();
 
 
-                if (data.size() > 0) {
+                if (zscores.size() > 0) {
                     BufferedWriter writer = new BufferedWriter(new FileWriter(outFile.getAbsolutePath() + "_" + combination + mustHave + "_" + pvalCutoff));
-                    for (int i = 0; i < data.get(0).length; i++) {
+                    for (int i = 0; i < zscores.get(0).length; i++) {
                         ArrayList<Double> valuesAtPos = new ArrayList<>();
-                        for (int j = 0; j < data.size(); j++) {
-                            valuesAtPos.add(data.get(j)[i]);
+                        for (int j = 0; j < zscores.size(); j++) {
+                            valuesAtPos.add(zscores.get(j)[i]);
+                        }
+                        
+                        ArrayList<Double> simValuesAtPos = new ArrayList<>();
+                        for (int j = 0; j < simscores.size(); j++) {
+                            simValuesAtPos.add(simscores.get(j)[i]);
                         }
 
                         double medianPval = RankingAnalyses.getMedian(valuesAtPos);
@@ -805,8 +869,9 @@ public class PairwiseStructureComparison {
                         double percentile75 = StatUtils.getInvCDF(RankingAnalyses.getPercentile(valuesAtPos, 0.75) / 2, true);
                         double percentile90 = StatUtils.getInvCDF(RankingAnalyses.getPercentile(valuesAtPos, 0.90) / 2, true);
                         double zscore = StatUtils.getInvCDF(medianPval / 2, true);
+                        double medianSimscore = RankingAnalyses.getMedian(simValuesAtPos);
                         medianPvals.add(medianPval);
-                        writer.write(i + "\t" + gaps[i%gaps.length] + "\t" + medianPval + "\t" + zscore + "\t" + (gaps[i%gaps.length] >= gapPerc ? "1\t0\t0\t0\t0" : medianPval + "\t" + zscore + "\t" + percentile25 + "\t" + percentile75 + "\t" + percentile90));
+                        writer.write(i + "\t" + gaps[i%gaps.length] + "\t" + medianPval + "\t" + zscore + "\t" + (gaps[i%gaps.length] >= gapPerc ? "1\t0\t0\t0\t0" : medianPval + "\t" + zscore + "\t" + percentile25 + "\t" + percentile75 + "\t" + percentile90) +"\t"+medianSimscore);
                         //writer.write(i + "\t" + gaps[i] + "\t" + medianPval + "\t" + zscore + "\t" + (gaps[i] >= 0.2 ? "1\t0" : medianPval + "\t" + zscore));
 
                         writer.newLine();

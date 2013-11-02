@@ -104,7 +104,7 @@ public class DataPanel extends javax.swing.JPanel implements NavigationListener 
                 .addComponent(jProgressBar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE))
         );
 
-        jSplitPane3.setDividerLocation(350);
+        jSplitPane3.setDividerLocation(375);
         jSplitPane3.setDividerSize(3);
         jSplitPane3.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         jSplitPane3.setResizeWeight(0.85);
@@ -115,7 +115,7 @@ public class DataPanel extends javax.swing.JPanel implements NavigationListener 
         jPanel4.setLayout(new java.awt.BorderLayout());
         jSplitPane3.setBottomComponent(jPanel4);
 
-        jSplitPane2.setDividerLocation(200);
+        jSplitPane2.setDividerLocation(250);
         jSplitPane2.setDividerSize(3);
 
         jSplitPane1.setDividerLocation(350);

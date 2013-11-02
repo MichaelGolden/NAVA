@@ -75,6 +75,10 @@ public class DataOverlay2D extends Overlay implements Serializable {
     }
 
     public double get(int i, int j, Mapping mapping) {
+        if(dataMatrix == null)
+        {
+            return emptyValue;
+        }
         int x = i - dataOffset;
         int y = j - dataOffset;
         if (codonPositions) {

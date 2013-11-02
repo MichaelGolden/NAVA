@@ -27,7 +27,7 @@ import org.apache.commons.math3.stat.inference.ChiSquareTest;
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class SubstructureCoevolution {
+public class SubstructureCoevolution2 {
     public static class Substructure
     {
         int start;
@@ -202,12 +202,12 @@ public class SubstructureCoevolution {
     {
         try {
             
-            /*File coevolutionFile = new File("C:/dev/thesis/hcv/coevolution/hcv-formation.clm");
+             /*File coevolutionFile = new File("C:/dev/thesis/hcv/coevolution/hcv-formation.clm");
             File coevolutionAlignment = new File("C:/dev/thesis/hcv/coevolution/HCV_mafft_aligned_250_resave.fas");
             File structureAlignment = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.dbn");
             File sequenceFile = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.fas");
            
-            ArrayList<Substructure> substructures = new ArrayList<>();
+           ArrayList<Substructure> substructures = new ArrayList<>();
             substructures.add( new Substructure("114 - 190"));
             substructures.add( new Substructure("356 - 950"));
             substructures.add( new Substructure("8132 - 8377"));
@@ -216,7 +216,7 @@ public class SubstructureCoevolution {
             substructures.add( new Substructure("8948 - 9086"));
             substructures.add( new Substructure("9382 - 9796")); // 9796
              substructures.add( new Substructure("0 - 100000"));*/
-           /* File coevolutionFile = new File("C:/dev/thesis/hiv_full/coevolution/hiv-formation.clm");
+           File coevolutionFile = new File("C:/dev/thesis/hiv_full/coevolution/hiv-formation.clm");
             File coevolutionAlignment = new File("C:/dev/thesis/hiv_full/coevolution/hiv2010-500-seperated.fas.fas");
             File structureAlignment = new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.dbn");
             File sequenceFile = new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.fas");
@@ -228,7 +228,7 @@ public class SubstructureCoevolution {
             substructures.add( new Substructure("2496 - 2647")); // 1576-1695
             substructures.add( new Substructure("7593 - 7734")); // 5884-6023
             substructures.add( new Substructure("9493 - 9840")); // 7289-7609
-             substructures.add( new Substructure("0 - 100000"));*/
+             substructures.add( new Substructure("0 - 100000"));
             
          /* File coevolutionFile = new File("C:/dev/thesis/jev/coevolution/jev-formation.clm");
             File coevolutionAlignment = new File("C:/dev/thesis/jev/coevolution/jev_200_seperated.fas");
@@ -244,7 +244,7 @@ public class SubstructureCoevolution {
              substructures.add( new Substructure("0 - 100000"));*/
             
             
-           File coevolutionFile = new File("C:/dev/thesis/dengue/coevolution/dengue-formation.clm");
+            /*File coevolutionFile = new File("C:/dev/thesis/dengue/coevolution/dengue-formation.clm");
             File coevolutionAlignment = new File("C:/dev/thesis/dengue/coevolution/dengue_all_300_aligned_curated.fas");
             File structureAlignment =  new File("C:/dev/thesis/dengue/dengue-alignment.dbn");
             File sequenceFile = new File("C:/dev/thesis/dengue/dengue-alignment.fas");
@@ -254,7 +254,7 @@ public class SubstructureCoevolution {
             substructures.add( new Substructure("3176 - 3268"));
             substructures.add( new Substructure("5208 - 5284"));
             substructures.add( new Substructure("10937 - 11012"));
-             substructures.add( new Substructure("0 - 100000"));
+             substructures.add( new Substructure("0 - 100000"));*/
     
             ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(structureAlignment, DataType.FileFormat.VIENNA_DOT_BRACKET);
             double [] [] pairedMatrix = getPairedMatrix(structureData);
@@ -410,7 +410,7 @@ public class SubstructureCoevolution {
                                     in_substructure = true;
                                 }
                             }
-                            in_substructure = false;
+                           //in_substructure = false;
                             if(!in_substructure)
                             {
                                 unpairedValues.add(elem.pval);
@@ -428,7 +428,7 @@ public class SubstructureCoevolution {
             }
             
         } catch (IOException ex) {
-            Logger.getLogger(SubstructureCoevolution.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SubstructureCoevolution2.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

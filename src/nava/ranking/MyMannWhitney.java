@@ -7,6 +7,10 @@ package nava.ranking;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Random;
+import org.apache.commons.math3.stat.inference.MannWhitneyUTest;
+import org.apache.commons.math3.stat.ranking.NaNStrategy;
+import org.apache.commons.math3.stat.ranking.TiesStrategy;
 
 /**
  *
@@ -14,6 +18,12 @@ import java.util.Hashtable;
  */
 public class MyMannWhitney {
 
+    
+    public static void main(String [] args)
+    {
+        System.out.println(StatUtils.getInvCDF(0.05, true));
+    }
+            
     double ux = 0;
     double uy = 0;
     double nx;
@@ -111,8 +121,62 @@ public class MyMannWhitney {
         }
     }*/
     
+    public double approximatePvalue(double [] x, double [] y)
+    {
+        Random random = new Random(6912481482045395204L);
+        double d = 0;
+        double t = 0;
+        for(int i = 0 ; i < 1000000 ; i++)
+        {
+            double x1 = x[random.nextInt(x.length)];
+            double y1 = y[random.nextInt(y.length)];
+           
+            if(x1 > y1)
+            {
+                d++;
+            }
+            t++;
+        }
+        
+        return d/t;
+    }
+    
+    public static int direction(double [] x, double [] y)
+    {
+        Random random = new Random(6912481482045395204L);
+        int d = 0;
+        for(int i = 0 ; i < 100000 ; i++)
+        {
+            double x1 = x[random.nextInt(x.length)];
+            double y1 = y[random.nextInt(y.length)];
+            if(x1 < y1)
+            {
+                d--;
+            }
+            else
+            if(x1 > y1)
+            {
+                d++;
+            }
+        }
+        
+        if(d < 0)
+        {
+            return -1;
+        }
+        else
+        {
+            return 1;
+        }
+    }
+    
+    double pvalue = Double.NaN;
+    double uscore = Double.NaN;
+    double zscore = Double.NaN;
+    int direction = 0;
+    double approxp = Double.NaN;
     public MyMannWhitney(ArrayList<Double> x, ArrayList<Double> y) {
-        this.nx = x.size();
+       /* this.nx = x.size();
         this.ny = y.size();
         this.N = this.nx + this.ny;
         
@@ -167,11 +231,49 @@ public class MyMannWhitney {
             double c = groups.get(keys.nextElement());
             double q = (Math.pow(c, 3) - c) / 12;
             tieCorrectionFactor += q;
+        }*/
+        int removed = 0;
+        while(x.contains(Double.NaN))
+        {
+            x.remove(Double.NaN);
+            removed++;
+        }
+        
+        while(y.contains(Double.NaN))
+        {
+            y.remove(Double.NaN);
+            removed++;
+        }  
+        
+        MannWhitneyUTest test = new MannWhitneyUTest(NaNStrategy.REMOVED, TiesStrategy.RANDOM);
+        double [] x1 = new double[x.size()];
+        double [] y1 = new double[y.size()];
+        for(int i = 0 ; i < x.size() ; i++)
+        {
+            x1[i] = x.get(i);
+        }
+        for(int i = 0 ; i < y.size() ; i++)
+        {
+            y1[i] = y.get(i);
+        }
+        
+        
+        if(x1.length == 0 || y1.length == 0)
+        {
+            
+        }
+        else
+        {        
+            pvalue = test.mannWhitneyUTest(x1, y1);
+            uscore = test.mannWhitneyU(x1, y1);
+            zscore = -StatUtils.getInvCDF(pvalue/2, true);
+            approxp = approximatePvalue(x1,y1);
+            direction = direction(x1,y1);
         }
     }
     
     public MyMannWhitney(double[] x, double[] y) {
-        this.nx = x.length;
+        /*this.nx = x.length;
         this.ny = y.length;
         this.N = this.nx + this.ny;
 
@@ -214,18 +316,43 @@ public class MyMannWhitney {
             double q = (Math.pow(c, 3) - c) / 12;
             tieCorrectionFactor += q;
         }
+        
+        * */
+           MannWhitneyUTest test = new MannWhitneyUTest(NaNStrategy.REMOVED, TiesStrategy.RANDOM);
+
+        pvalue = test.mannWhitneyUTest(x, y);
+        uscore = test.mannWhitneyU(x, y);
+        zscore = -StatUtils.getInvCDF(pvalue/2, true);
+        approxp = approximatePvalue(x,y);
+        direction = direction(x,y);
     }
 
     public double getTestStatistic() {
         return Math.max(ux, uy);
     }
 
+    static double min = 1;
     public double getZ() {
-        double n = ((nx * ny) / (N * (N - 1)));
+      /*double n = ((nx * ny) / (N * (N - 1)));
         double d = ((Math.pow(N, 3) - N) / 12 - tieCorrectionFactor);
 
         double variance = Math.sqrt(n * d);
         //System.out.println(ux + "\t" + nx + "\t" + ny + "\t" + tieCorrectionFactor + "\t" + n + "\t" + d + "\t" + variance);
-        return (ux - (nx * ny / 2)) / variance;
+  
+  
+        System.out.println(pvalue+"\t"+zscore+"\t"+uscore+"\t"+(direction*zscore));
+        return (ux - (nx * ny / 2)) / variance;*/
+        /*System.out.println(pvalue+"\t"+zscore+"\t"+direction);
+        if(pvalue > 0)
+        {
+            min = Math.min(pvalue, min);
+        }*/
+        if(pvalue < 1.1102230246251565E-16)
+        {
+            zscore = -StatUtils.getInvCDF(1.1102230246251565E-16/2, true);
+            System.out.println("*");
+        }
+        System.out.println(zscore+"\t"+pvalue+"\t"+approxp);
+        return (direction*zscore);
     }
 }

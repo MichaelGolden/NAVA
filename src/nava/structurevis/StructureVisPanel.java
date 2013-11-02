@@ -87,8 +87,8 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         topScrollPane.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.darkGray));
         topScrollPane.setViewportView(layerPanel);
 
-        verticalSplitPane.setDividerLocation(100 + 3 + 50);
-
+        //verticalSplitPane.setDividerLocation(100 + 3 + 0);
+        verticalSplitPane.setDividerLocation(80 + 0);
 
         substructurePanel = new SubstructurePanel(structureVisController, projectController);
         bottomSplit.add(substructurePanel, BorderLayout.CENTER);
@@ -210,7 +210,8 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         topScrollPane = new javax.swing.JScrollPane();
         bottomSplit = new javax.swing.JPanel();
 
-        verticalSplitPane.setDividerLocation(300);
+        verticalSplitPane.setDividerLocation(250);
+        verticalSplitPane.setDividerSize(3);
         verticalSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
         topSplit.setLayout(new javax.swing.BoxLayout(topSplit, javax.swing.BoxLayout.PAGE_AXIS));

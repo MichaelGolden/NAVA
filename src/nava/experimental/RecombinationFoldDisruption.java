@@ -5,10 +5,8 @@
 package nava.experimental;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Random;
+import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,6 +19,7 @@ import nava.ranking.RankingAnalyses;
 import nava.ranking.StatUtils;
 import nava.structure.MountainMetrics;
 import nava.structure.StructureAlign;
+import nava.utils.Mapping;
 import nava.utils.RNAFoldingTools;
 import org.apache.commons.math3.stat.inference.ChiSquareTest;
 import org.apache.commons.math3.stat.inference.MannWhitneyUTest;
@@ -112,6 +111,7 @@ public class RecombinationFoldDisruption {
             int seq1Length = seq1.length();
             informativeSitesRunningSum = new int[seq1Length * 2];
 
+            System.out.println(informativeSitesRunningSum);
             informativeSitesRunningSum[0] = seq1.charAt(0) != seq2.charAt(0) ? 1 : 0;
             for (int i = 1; i < informativeSitesRunningSum.length; i++) {
                 informativeSitesRunningSum[i] = informativeSitesRunningSum[i - 1];
@@ -243,7 +243,7 @@ public class RecombinationFoldDisruption {
         int newStart = newRandomStart;
         RecombinationEvent newEvent = event.clone();
         newEvent.start = newStart;
-        if (simplePermutation) {
+        if (simplePermutation || event.minorParentSequence == null || event.majorParentSequence == null) {
         } else {
             InformativeSiteCalculation infCalc = new InformativeSiteCalculation(event.minorParentSequence, event.majorParentSequence);
             int informativeSitesReal = infCalc.getNumberOfInformativeSites(event.start, event.length);
@@ -415,12 +415,18 @@ public class RecombinationFoldDisruption {
 
     public void performTest3() {
 
-
-
+        double highConfidencePercent = 0.5;
+            boolean useHighConfidencePairings = false;
+        boolean useSHAPEHCSS = false;
+        if(useSHAPEHCSS)
+        {
+            highConfidencePercent = 1.0;
+        }
+        
         Random random = new Random(7920171293137101310L);
         Random random2 = new Random(301201013337101310L);
-       // File alignmentFile = new File("C:/dev/thesis/hiv_full/test/darren_hiv.fas");
-        //File rdpCSVFile = new File("C:/dev/thesis/hiv_full/test/darren_hiv.csv");
+   // File alignmentFile = new File("C:/dev/thesis/hiv_full/test/darren_hiv.fas");
+    // File rdpCSVFile = new File("C:/dev/thesis/hiv_full/test/darren_hiv.csv");
       // File alignmentFile = new File("C:/dev/thesis/hiv_full/test/darren_hiv.fas");
      // File rdpCSVFile = new File("C:/dev/thesis/hiv_full/test/darren_hiv_auto.csv");
               // File alignmentFile = new File("C:/dev/thesis/hiv_full/test/darren_hiv.fas");
@@ -428,10 +434,19 @@ public class RecombinationFoldDisruption {
         //File alignmentFile = new File("C:/dev/thesis/hiv_full/test/darren_hiv_full_aligned.fas");
        // File rdpCSVFile = new File("C:/dev/thesis/hiv_full/test/darren_hiv_full_aligned2_methods2.csv");
          
-        File alignmentFile = new File("C:/dev/thesis/hiv_full/test/darren_hiv_full_aligned_muscle.fas");
-         //File rdpCSVFile = new File("C:/dev/thesis/hiv_full/test/darren_hiv_muscle_aligned.csv");
-         File rdpCSVFile = new File("C:/dev/thesis/hiv_full/test/darren_hiv_muscle_aligned_6methods.csv");
+     File alignmentFile = new File("C:/dev/thesis/hiv_full/test/darren_hiv_full_aligned_muscle.fas");
+     //File rdpCSVFile = new File("C:/dev/thesis/hiv_full/test/darren_hiv_muscle_aligned.csv");
+     File rdpCSVFile = new File("C:/dev/thesis/hiv_full/test/darren_hiv_muscle_aligned_6methods.csv");
           
+       Mapping mapping = Mapping.createMapping(alignmentFile, new File("C:/dev/NL4-3-shape-alignment.fas"), 1000, false);
+       String shapeDBN = "(((.(((((((((((.(((((...((((......)))))))))))))))))))))))((((((((.(((((((.............)))).)))..)))))))).(((((((((..........(((((((..((((((((.((.(((((.......)))..)).))...))))))))......................................)))))))....((((((..(((....((((.(((((((.........)))))))...))))..)))((((((....))).)))............(((((....)))))...)))))))))))))))...................(((((..............((((.............(((((((((....................................................................)))))))))................((((((...((.....))..)))))).......)))).........((((...........))))................((..((((((((.(((((((((........))))).....))))..(((...)))........))))))))...))....................((((.((.....)).((((((...((.........))..))))))...............))))....))))).(((((...((((.((..(((((.....................(((((((((.................((((...)))).........))))))))).....((..............((.((((((..........................)))))))).(((...((((((((....)))..........((........))..)))))...)))........(((((...))))).))..)))))..)).))))...............(((((((...........................)))))..)).......(((.(((((........)))))))).(((((...(((...((((((.....))))))..)))))))).........................)))))....(((((.(((((.....((((((.((...)).......(((((....((((((.....))))))...))))).((((.......))))..............................))))))..))))).)))))............................((...((((((.(((((..((((...........(((((...)))))...)))).((((.(((.((......))...((((((((((.........)))))))...........))).(((((((((.(((.....(((.((((............)))).)))....))).))).))))))........(((.....)))..........))))))).........((((((((((.....(((....((((((..((....((((((((...(((.....)))...))))))))..))....((((((((((((....)))))))))))).....))))))........)))...))))))))))............))))).)).((((((..(((.......)))..))))))..((((...((.........))..)))).))))...))(((((((......(((.((((((....(((((((((........))).))))))............(((((..........))))).............................))))))).)).(((...))).........))))))).(((((((....................................(((((((((...............((((((((.((((((((((........(((((((..(((......))).))))))).(((.....)))....................)))))))))).)))))))).............(((....)))((((((...............)))))).............................(((((((........................)))))))......((((........)))).......((((((((((.(................))))))....))))).......))))))))).(((..(((.....)))..)))...((((((((...((((......)))).((((((((.....(((.........................)))))))))))..((((((..........((((.................))))......)))))).((........))...............))))))))..................))))))).(((((((((..(((.............)))...................(((((..((((............((((..((((((((((((((......))))))))))...)))).))))(((.(((.......))))))...............))))..))))).((((....)))).((((((......)).))))........................)))))))))..(((((((........)))))))........((.((((((........))))))))..........(((((((((((...................(((((...........(((((...........((((.............(((...........(((((..((....))..................(((((..................((((....))))........(((...)))..........))))).(((.((........))))).........................)))))((..(((...)))..)).....................)))..........(((....))).......))))...........))))).(((.......)))..............(((.............)))...................((((......))))............)))))...........(.((((((....(((((................)))))....)))))).).(((((...((....))..)))))...........))))).))))))...........((......)).((((..(((((((((((..((((((((.((....))..................(((.....)))........................))))(((((.....................((((((...((.(((..........)))..............................((((.....))))............((.((((((................)))))).))...))...))))))......................................((((((.((((.(((((((..........................................))))))).....................................)))).................(((((((((.............((((((...........((((........))))............)))))))))))))))..)))))).....)))))...))))))))))).))))...)))).((((.........((((.....)))).........................(((..(((.....)))..))).((((....................))))...........((........))...((((((((.......)).))))))...((((.......................))))......((((((................((((((......))))))..................((...((((.((((((((....................................................................((((............)))).((((........)))).........................)))))))).))))....)).(((((((..............................................................................((((.....(((((..........)))....)).....)))).((...)))))))))....)))))).))))....................(((.........((((((((((............((((......)))).(((((((((....((((((((.....((..........................(((.((((.................)))).)))...................(((.((((.......................)))).))).....................((((((.....))))))..........................(((((((...(((..........)))......(((((((((..((((((.....))))))..........................))))))))).))))))).))....))))))))...........)))))))))...((((((.......(((((....((((((.........)))))))))))........))))))..........((((.....))))....)))))))))).................................((((((.......((((....)))))))))).............((((...........)))))))...((..(((((((....((((........(((((...................)))))......)))).((.(((((..((((((((..........(((..(((((.............))))).))).((((((((((...))))........)))))).....((((((((((((((.........))))))..))))..)))).....((.(..(((....)))..).))......)))))))).....))))))).......(((((......))))).....(((........))).(((.....)))......................(((((.....................(((.((((.....)))).)))..........(((((.(((...((.(((.((.............))))).))..))))))))..................((...((((((.(.((((..........))))).))))))...)).)))))................))))))))).................................................(((.................((((((((((........((((...((((((.................(((((((...(((((........((((((...))))))...............((((((....)))))).....((((((((((((........((....)).((((((..((......)).(((.........((((((((.((((....)))).))))......))))........))).))))))....))))).)))))))..)))))..)))))))..........(((.....................(((((.........))))).....(((.((((...(((......(((.....)))........)))...)).)).))).......))).)))))).)))).((.......)).........................((............)).................................))))))))))..........................((((((.........)))))).....................))).............(((.((((((................................)))))).....(((((((.....((...(((((.............((((.((((((((...((((((..................((((....)))).......(((((.............)))))..........))))))))))))))..............((((((.(((((((((((((....................)))).)))))).))).)))).))...................((((.((....)).))))........................................................))))....))))).((...(((((((((.............................)))))))))...))...)).....))).))))...............)))........................................((((...((..(((((.........(((((.((((((.....))))))......(((((((((..((((((((((.........((((...........(((((.........))))).......(((....))).........(((..((.((((.........))))))....)))....................))))......))))))))))..........))))))).).).(((((((.......))))))).........)))))(((((((.........))))))).............(((((...........))))).))))).)).....))))........................................................(.(((((....((((((((........((((((((((((((.....(((((((.......((((((((((.(((((((((((((....(((((((((.((((((.(..(((((((((...)))).)).)))..)....((((((.....))))))...))))))..(((((........))))).........(((..(((((((...)))))))..)))...(((((((((........))))))))).....))))).))))...)))).)))).))))).))).))))))).((...))....)))))))......))).)))))))))))....))))))))..))))).).((((........))))..........((......)).((((..(((((((((..................................))))))............((((((.((..((..............(((......)))...............))..)))))))).))))))).............((((((((((((...........................((((.....))))..............(((..(((...............)))..))).((((..(((((((.............(((((((((...((((..(((..((((.((((((((..(((............((((..................(((((.(((.......))).))))).....))))............))).))).))))))).(((((.(((.......))).))))).....(((...........)))......))..)))..))))....)))))))))..............)))))))...)))).........(((((((................))).......)))).)))))))))))).......(((((.................................)))))......(((((..(((((...(((.............)))((..............))..........)))))..))))).........(((((........(.(((((((..((................))..).)))))))....(((((((........((((....(((............(((...(((((((((((................)))))))))))....)))...........))).....)))).((.((((((((((...((((.(((.........)))............(((..............)))................)))).)))))))))).))...)))))))......(((((((.....)))).))).(((.....)))))))).(((((((.((((..((((((.................(((((((((((.......))))))))))).((((((((.....)))))))).....(((......))).......))))))...((((((....(((((........((((....((((...((((..((.....)).......((((((((((.((((..(.....)..)))))))))))))).....(((((......))))).)))).)).............(((.......)))..))....)))).......)))))...)))))).))))...))))))).(((((....((((.((.....))))))....(((((......))))).((.....))......(((((.(((((((((((.(((((...((((......)))))))))))))))))))))))))))))).(((((((((...........))))).))))";
+       String shapeAligned = RNAFoldingTools.getDotBracketStringFromPairedSites(StructureAlign.getMappedSites(mapping.alignedB0, mapping.alignedA0, RNAFoldingTools.getPairedSitesFromDotBracketString(shapeDBN)));
+        // String shapeAligned = StructureAlign.mapStringToAlignedSequence(shapeDBN, mapping.alignedB0, "-");
+      // System.out.println(mapping.alignedB0);
+       //System.out.println(mapping.alignedA0);
+       //System.out.println(shapeAligned);
+       
+         
         
         
         //File alignmentFile = new File("C:/dev/thesis/porcine/300/porcine_all_300_aligned.fas");
@@ -464,8 +479,8 @@ public class RecombinationFoldDisruption {
         ArrayList<String> sequences = new ArrayList<>();
         ArrayList<String> sequenceNames = new ArrayList<>();
 
-        int save_interval = 100;
-        // File cacheFile = new File("fold.cache");
+        int save_interval = 50;
+        //File cacheFile = new File("fold.cache");
         File cacheFile = new File(alignmentFile.getName()+"_fold.cache");
     
         IO.loadFastaSequences(alignmentFile, sequences, sequenceNames);
@@ -474,6 +489,12 @@ public class RecombinationFoldDisruption {
         double[] nongaps = new double[sequences.get(0).length()];
         double t = 0;
         double[] pairingProbability = new double[count.length];
+        SparseBasePairMatrix pairMatrix = new SparseBasePairMatrix();
+        if(useSHAPEHCSS)
+        {
+            pairMatrix.increment(RNAFoldingTools.getPairedSitesFromDotBracketString(shapeAligned));
+        }
+        
         try
         {
         BufferedWriter writer = new BufferedWriter(new FileWriter("myhahahaoutput.dbn"));
@@ -496,15 +517,46 @@ public class RecombinationFoldDisruption {
             writer.write(">"+sequenceNames.get(i)+"_seq"+"\n");
             writer.write(seq+"\n");
             writer.write(dbs_aligned+"\n");
-            int[] pairedSites = RNAFoldingTools.getPairedSitesFromDotBracketString(dbs_aligned);
-            for (int j = 0; j < pairedSites.length; j++) {
-                count[j] += pairedSites[j] != 0 ? 1 : 0;
+            int[] alignedPairedSites = RNAFoldingTools.getPairedSitesFromDotBracketString(dbs_aligned);
+            for (int j = 0; j < alignedPairedSites.length; j++) {
+                count[j] += alignedPairedSites[j] != 0 ? 1 : 0;
                 nongaps[j] += sequences.get(i).charAt(j) == '-' ? 0 : 1;
+            }
+            
+            if(!useSHAPEHCSS)
+            {
+                pairMatrix.increment(alignedPairedSites);
             }
             t++;
         }
         writer.close();
+        
+            for (int i = 0; i < sequences.size(); i++) {
+                int seqno = i;
+                String seq = sequences.get(seqno);
+                Fold f = fold(seq, 8);
+                if (!f.cached) {
+                    try {
+                        saveFoldCache(save_interval, cacheFile);
+                    } catch (IOException ex) {
+                        Logger.getLogger(RecombinationFoldDisruption.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                String dbs = RNAFoldingTools.getDotBracketStringFromPairedSites(f.pairedSites);
+                String dbs_aligned = StructureAlign.mapStringToAlignedSequence(dbs, seq, "-");
+                int[] alignedPairedSites = RNAFoldingTools.getPairedSitesFromDotBracketString(dbs_aligned);
+               // System.out.println("?"+i+"\t"+RNAFoldingTools.getDotBracketStringFromPairedSites(pairMatrix.getHighConfidencePairedPositions(0.25, alignedPairedSites)));
+                //System.out.println("?"+i+"\t"+pairMatrix.getHighConfidencePairedPositionCount(0.1, alignedPairedSites));
+                //System.out.println("?"+i+"\t"+pairMatrix.getHighConfidencePairedPositionCount(0.15, alignedPairedSites));
+                //System.out.println("?"+i+"\t"+pairMatrix.getHighConfidencePairedPositionCount(0.25, alignedPairedSites));
+                System.out.println("?"+i+"\t"+pairMatrix.getHighConfidencePairedPositionCount(0.0, alignedPairedSites)+"\t"+pairMatrix.getHighConfidencePairedPositionCount(highConfidencePercent, alignedPairedSites));
+                t++;
+            }
         }
+        
+        
+        
+        
         catch(IOException ex)
         {
             ex.printStackTrace();
@@ -532,8 +584,7 @@ public class RecombinationFoldDisruption {
             
             mappedData = MappedData.getMappedData(alignmentFile, new File("C:/dev/NL4-3-shape-alignment.fas"), values, false, "", 1000, false);
             pairingProbability = mappedData.values;
-        }
-        
+        }        
         double[] pairingProbabilityWindow = new double[pairingProbability.length];
         //boolean used =
         ///double [] pairingProbabilityWindow = pairingProbability;
@@ -595,7 +646,12 @@ public class RecombinationFoldDisruption {
             for (RecombinationEvent event : recombinationEvents) {
                 // if (!event.breakpointUndetermined && event.circulationCount >= 0 && event.recombinantName.matches("SN[0-9]+_.+"))
 
+              /*if(event.recombinantName.matches("SN[0-9]+_.+"))
+                {
+                    selectedRecombinationEvents.add(event);
+                }*/
                 selectedRecombinationEvents.add(event);
+                
                 /*
                  * if (!event.breakpointUndetermined && event.circulationCount
                  * >= 0) // if (!event.breakpointUndetermined &&
@@ -677,14 +733,18 @@ public class RecombinationFoldDisruption {
                 ArrayList<Double> permutedDisruptionANDValues = new ArrayList<>();
                 ArrayList<Double> realDisruptionORValues = new ArrayList<>();
                 ArrayList<Double> permutedDisruptionORValues = new ArrayList<>();
+                 ArrayList<Double> realDisruptionMinorValues = new ArrayList<>();
+                ArrayList<Double> permutedDisruptionMinorValues = new ArrayList<>();
+                ArrayList<Double> realDisruptionMajorValues = new ArrayList<>();
+                ArrayList<Double> permutedDisruptionMajorValues = new ArrayList<>();
                 ArrayList<Double> realDisruptionSimpleValues = new ArrayList<>();
                 ArrayList<Double> permutedDisruptionSimpleValues = new ArrayList<>();
-                ArrayList<Double> realDistanceScoresMajor = new ArrayList<>();
+                /*ArrayList<Double> realDistanceScoresMajor = new ArrayList<>();
                 ArrayList<Double> permutedDistanceScoresMajor = new ArrayList<>();
                 ArrayList<Double> realDistanceScoresMinor = new ArrayList<>();
                 ArrayList<Double> permutedDistanceScoresMinor = new ArrayList<>();
                 ArrayList<Double> realDistanceScoresRecombinant = new ArrayList<>();
-                ArrayList<Double> permutedDistanceScoresRecombinant = new ArrayList<>();
+                ArrayList<Double> permutedDistanceScoresRecombinant = new ArrayList<>();*/
                 ArrayList<Double> realPercentPairedMinor = new ArrayList<>();
                 ArrayList<Double> permutedPercentPairedMinor = new ArrayList<>();
                 ArrayList<Double> realPercentPairedMajor = new ArrayList<>();
@@ -696,20 +756,50 @@ public class RecombinationFoldDisruption {
                 int UNPAIRED = 0, PAIRED = 1;
                 int PERMUTED = 0, REAL = 1;
 
+                int totaliter = 0;
                 double realSum = 0;
+                int breakpointCount = 0;
                 for (int i = 0; i < iterations; i++) {
                     double permSum = 0;
                     int[][] nullpositions = new int[sequences.size()][sequences.get(0).length()];
                     for (int h = 0; h < selectedRecombinationEvents.size(); h++) {
+                        totaliter++;
                         int randomOffset = random.nextInt(pairingProbability.length);
                         RecombinationEvent realEvent = selectedRecombinationEvents.get(h).clone();
                         realEvent.start = (realEvent.start + j + pairingProbabilityWindow.length) % pairingProbabilityWindow.length;
                         // RecombinationEvent permutedEvent2 = generatePermutedRecombinationEvent(random, realEvent2, false);
 
-                        RecombinationEvent permutedEvent = generatePermutedRecombinationEvent3(random, (realEvent.start + randomOffset) % pairingProbability.length, realEvent, true, sequenceNames, nullpositions);
+                        RecombinationEvent permutedEvent = generatePermutedRecombinationEvent3(random, (realEvent.start + randomOffset) % pairingProbability.length, realEvent, false, sequenceNames, nullpositions);
+                       if(!realEvent.recombinantName.matches("SN[0-9]+_.+"))
+                        {
+                           // continue;
+                        }
+                       
                         if (realEvent.breakpointUndetermined) {
                             continue;
                         }
+                        breakpointCount+= 2;
+                        //breakpointCount+= 2;
+                       /* if((realEvent.breakpointStart >= 2248 && realEvent.breakpointStart < 2371)) // full
+                        {
+                            breakpointCount+= 1;
+                        }
+                        if((realEvent.breakpointEnd >= 2248 && realEvent.breakpointEnd < 2371)) // full
+                        {
+                            breakpointCount+= 1;
+                        }*/
+                        if((realEvent.breakpointStart >= 8872 && realEvent.breakpointStart < 9184))
+                        {
+                            //breakpointCount+= 1;
+                        }
+                        if((realEvent.breakpointEnd >= 8872 && realEvent.breakpointEnd < 9184))
+                        {
+                            //breakpointCount+= 1;
+                        }
+                        /*if((i >= 2248 && i < 2371) || (i >= 8872 && i < 9184)) // full
+                        {
+                            breakpointCount+= 2;
+                        }*/
                         Fold minorParentFold = null;
                         Fold majorParentFold = null;
                         Fold realRecombinantFold = null;
@@ -733,6 +823,27 @@ public class RecombinationFoldDisruption {
                                 realAligned = StructureAlign.mapStringToAlignedSequence(RNAFoldingTools.getDotBracketStringFromPairedSites(realRecombinantFold.pairedSites), realEvent.getRecombinant(), "-");
                                 permutedAligned = StructureAlign.mapStringToAlignedSequence(RNAFoldingTools.getDotBracketStringFromPairedSites(permutedRecombinantFold.pairedSites), permutedEvent.getRecombinant(), "-");
 
+                                int gdist1 = geneticDistance(realEvent.getRecombinant(), realEvent.minorParentSequence);
+                                int gdist2 = geneticDistance(permutedEvent.getRecombinant(), realEvent.minorParentSequence);
+                                if(realEvent.majorParentSequence != null)
+                                {
+                                    int gdist3 = geneticDistance(realEvent.getRecombinant(), realEvent.majorParentSequence);
+                                    int gdist4 = geneticDistance(permutedEvent.getRecombinant(), realEvent.majorParentSequence);
+                                    System.out.println("GDIST="+gdist1+"\t"+gdist2+"\t"+gdist3+"\t"+gdist4);
+                                }
+                                else
+                                {
+                                    System.out.println("GDIST="+gdist1+"\t"+gdist2);
+                                }
+                                
+                                if(useHighConfidencePairings || useSHAPEHCSS)
+                                {
+                                    minorAligned = RNAFoldingTools.getDotBracketStringFromPairedSites(pairMatrix.getHighConfidencePairedPositions(highConfidencePercent, RNAFoldingTools.getPairedSitesFromDotBracketString(minorAligned)));
+                                    majorAligned = RNAFoldingTools.getDotBracketStringFromPairedSites(pairMatrix.getHighConfidencePairedPositions(highConfidencePercent, RNAFoldingTools.getPairedSitesFromDotBracketString(majorAligned)));
+                                    realAligned = RNAFoldingTools.getDotBracketStringFromPairedSites(pairMatrix.getHighConfidencePairedPositions(highConfidencePercent, RNAFoldingTools.getPairedSitesFromDotBracketString(realAligned)));
+                                    permutedAligned = RNAFoldingTools.getDotBracketStringFromPairedSites(pairMatrix.getHighConfidencePairedPositions(highConfidencePercent, RNAFoldingTools.getPairedSitesFromDotBracketString(permutedAligned)));
+                                }
+                                
                                 minorPairedSites = RNAFoldingTools.getPairedSitesFromDotBracketString(minorAligned);
                                 majorPairedSites = RNAFoldingTools.getPairedSitesFromDotBracketString(majorAligned);
                             }
@@ -783,16 +894,19 @@ public class RecombinationFoldDisruption {
                                     realDisruptionANDValues.add((double) getDisruptionScore(minorAligned, majorAligned, realAligned, true));
                                     realDisruptionORValues.add((double) getDisruptionScore(minorAligned, majorAligned, realAligned, false));
                                     realDisruptionSimpleValues.add((double) getDisruptionScoreSimple(minorAligned, majorAligned, realAligned));
-
+                                    realDisruptionMinorValues.add((double) getDisruptionScoreForParents(minorAligned, realAligned));
+                                    realDisruptionMajorValues.add((double) getDisruptionScoreForParents(majorAligned, realAligned));
+                                   
+                                    
                                     /// realDistanceScoresRecombinant.add(Dijkstra.getDistance(RNAFoldingTools.getPairedSitesFromDotBracketString(minorAligned), realEvent.start, (realEvent.start + realEvent.length) % pairingProbability.length));
                                     // permutedDistanceScoresRecombinant.add(Dijkstra.getDistance(RNAFoldingTools.getPairedSitesFromDotBracketString(minorAligned), permutedEvent.start, (permutedEvent.start + permutedEvent.length) % pairingProbability.length));
                                     //  realDistanceScoresRecombinant.add(Dijkstra.getDistance(RNAFoldingTools.getPairedSitesFromDotBracketString(majorAligned), realEvent.start, (realEvent.start + realEvent.length) % pairingProbability.length));
                                     // permutedDistanceScoresRecombinant.add(Dijkstra.getDistance(RNAFoldingTools.getPairedSitesFromDotBracketString(majorAligned), permutedEvent.start, (permutedEvent.start + permutedEvent.length) % pairingProbability.length));
 
-                                    realDistanceScoresMinor.add(Dijkstra.getDistance(RNAFoldingTools.getPairedSitesFromDotBracketString(minorAligned), minorAligned, realEvent.start, (realEvent.start + realEvent.length) % pairingProbability.length));
+                                    /*realDistanceScoresMinor.add(Dijkstra.getDistance(RNAFoldingTools.getPairedSitesFromDotBracketString(minorAligned), minorAligned, realEvent.start, (realEvent.start + realEvent.length) % pairingProbability.length));
                                     realDistanceScoresMajor.add(Dijkstra.getDistance(RNAFoldingTools.getPairedSitesFromDotBracketString(majorAligned), majorAligned, realEvent.start, (realEvent.start + realEvent.length) % pairingProbability.length));
                                     realDistanceScoresRecombinant.add(Dijkstra.getDistance(RNAFoldingTools.getPairedSitesFromDotBracketString(realAligned), realAligned, realEvent.start, (realEvent.start + realEvent.length) % pairingProbability.length));
-                                                                        
+                                      */                                  
                                     realPercentPairedMinor.add(getPercentPaired(minorPairedSites, minorAligned, realEvent.start, window));
                                     realPercentPairedMinor.add(getPercentPaired(minorPairedSites, minorAligned, realEvent.start + realEvent.length, window));
                                     realPercentPairedMajor.add(getPercentPaired(majorPairedSites, majorAligned, realEvent.start, window));
@@ -802,7 +916,7 @@ public class RecombinationFoldDisruption {
 
 
                         }
-                        System.out.println("ZZZZ"+permSum+"\t"+ pairingProbabilityWindow[permutedEvent.start]+"\t"+pairingProbabilityWindow[(permutedEvent.start + permutedEvent.length) % pairingProbability.length]);
+                    
                         permSum += pairingProbabilityWindow[permutedEvent.start];
                         permSum += pairingProbabilityWindow[(permutedEvent.start + permutedEvent.length) % pairingProbability.length];
                         permutedPairingValues.add(pairingProbabilityWindow[permutedEvent.start]);
@@ -816,7 +930,7 @@ public class RecombinationFoldDisruption {
                         }
 
                         if (!fast) {
-                            System.out.println(realEvent.bothParentsKnown + "\t" + h + "\t" + realEvent);
+                           // System.out.println(realEvent.bothParentsKnown + "\t" + h + "\t" + realEvent);
                             if (realEvent.bothParentsKnown) {
                                 if(minorAligned.charAt(permutedEvent.start) != '-' && majorAligned.charAt(permutedEvent.start) != '-')
                                 {
@@ -843,11 +957,13 @@ public class RecombinationFoldDisruption {
                                 permutedDisruptionANDValues.add((double) getDisruptionScore(minorAligned, majorAligned, permutedAligned, true));
                                 permutedDisruptionORValues.add((double) getDisruptionScore(minorAligned, majorAligned, permutedAligned, false));
                                 permutedDisruptionSimpleValues.add((double) getDisruptionScoreSimple(minorAligned, majorAligned, permutedAligned));
-
+                                permutedDisruptionMinorValues.add((double) getDisruptionScoreForParents(minorAligned, permutedAligned));
+                                permutedDisruptionMajorValues.add((double) getDisruptionScoreForParents(majorAligned, permutedAligned));
+                                   
                                 // realDistanceScoresRecombinant.add(Dijkstra.getDistance(RNAFoldingTools.getPairedSitesFromDotBracketString(majorAligned), realEvent.start, (realEvent.start + realEvent.length) % pairingProbability.length));
-                                permutedDistanceScoresMinor.add(Dijkstra.getDistance(RNAFoldingTools.getPairedSitesFromDotBracketString(minorAligned), minorAligned, permutedEvent.start, (permutedEvent.start + permutedEvent.length) % pairingProbability.length));
+                                /*permutedDistanceScoresMinor.add(Dijkstra.getDistance(RNAFoldingTools.getPairedSitesFromDotBracketString(minorAligned), minorAligned, permutedEvent.start, (permutedEvent.start + permutedEvent.length) % pairingProbability.length));
                                 permutedDistanceScoresMajor.add(Dijkstra.getDistance(RNAFoldingTools.getPairedSitesFromDotBracketString(majorAligned), majorAligned, permutedEvent.start, (permutedEvent.start + permutedEvent.length) % pairingProbability.length));
-                                permutedDistanceScoresRecombinant.add(Dijkstra.getDistance(RNAFoldingTools.getPairedSitesFromDotBracketString(permutedAligned), permutedAligned, permutedEvent.start, (permutedEvent.start + permutedEvent.length) % pairingProbability.length));
+                                permutedDistanceScoresRecombinant.add(Dijkstra.getDistance(RNAFoldingTools.getPairedSitesFromDotBracketString(permutedAligned), permutedAligned, permutedEvent.start, (permutedEvent.start + permutedEvent.length) % pairingProbability.length));*/
 
                                 permutedPercentPairedMinor.add(getPercentPaired(minorPairedSites, minorAligned, permutedEvent.start, window));
                                 permutedPercentPairedMinor.add(getPercentPaired(minorPairedSites, minorAligned, permutedEvent.start + permutedEvent.length, window));
@@ -858,6 +974,9 @@ public class RecombinationFoldDisruption {
 
                         }
 
+                        System.out.println("Iterations = "+i+"\t"+totaliter+"\tbreakpoints="+breakpointCount);
+                        if(totaliter % 25 == 0)
+                        {
                         if (!doshift) {
                                 MyMannWhitney mwpairing = new MyMannWhitney(realPairingValues, permutedPairingValues);
                                 MannWhitneyUTest mwpairing2 = new MannWhitneyUTest(NaNStrategy.REMOVED, TiesStrategy.RANDOM);
@@ -872,9 +991,11 @@ public class RecombinationFoldDisruption {
                                 MyMannWhitney mwdisruptionAND = new MyMannWhitney(realDisruptionANDValues, permutedDisruptionANDValues);
                                 MyMannWhitney mwdisruptionOR = new MyMannWhitney(realDisruptionORValues, permutedDisruptionORValues);
                                 MyMannWhitney mwdisruptionSimple = new MyMannWhitney(realDisruptionSimpleValues, permutedDisruptionSimpleValues);
-                                MyMannWhitney mwdistanceminor = new MyMannWhitney(realDistanceScoresMinor, permutedDistanceScoresMinor);
+                                MyMannWhitney mwdisruptionMinorParent = new MyMannWhitney(realDisruptionMinorValues, permutedDisruptionMinorValues);
+                                MyMannWhitney mwdisruptionMajorParent = new MyMannWhitney(realDisruptionMajorValues, permutedDisruptionMajorValues);
+                                /*MyMannWhitney mwdistanceminor = new MyMannWhitney(realDistanceScoresMinor, permutedDistanceScoresMinor);
                                 MyMannWhitney mwdistancemajor = new MyMannWhitney(realDistanceScoresMajor, permutedDistanceScoresMajor);
-                                MyMannWhitney mwdistancerecombinant = new MyMannWhitney(realDistanceScoresRecombinant, permutedDistanceScoresRecombinant);
+                                MyMannWhitney mwdistancerecombinant = new MyMannWhitney(realDistanceScoresRecombinant, permutedDistanceScoresRecombinant);*/
                                 MyMannWhitney mwpercentPairedMinor = new MyMannWhitney(realPercentPairedMinor, permutedPercentPairedMinor);
                                 MyMannWhitney mwpercentPairedMajor = new MyMannWhitney(realPercentPairedMajor, permutedPercentPairedMajor);
                                 System.out.println("pairing\t" + j + "\t" + RankingAnalyses.getMedian(realPairingValues) + "\t" + RankingAnalyses.getMedian(permutedPairingValues) + "\t" + mwpairing.getZ() + "\t" + realPairingValues.size() + "\t" + permutedPairingValues.size());
@@ -892,9 +1013,11 @@ public class RecombinationFoldDisruption {
                                     System.out.println("disruption (AND)\t" + j + "\t" + RankingAnalyses.getMedian(realDisruptionANDValues) + "\t" + RankingAnalyses.getMedian(permutedDisruptionANDValues) + "\t" + mwdisruptionAND.getZ() + "\t" + realDisruptionANDValues.size() + "\t" + permutedDisruptionANDValues.size());
                                     System.out.println("disruption (OR)\t" + j + "\t" + RankingAnalyses.getMedian(realDisruptionORValues) + "\t" + RankingAnalyses.getMedian(permutedDisruptionORValues) + "\t" + mwdisruptionOR.getZ() + "\t" + realDisruptionORValues.size() + "\t" + permutedDisruptionORValues.size());
                                     System.out.println("disruption (simple)\t" + j + "\t" + RankingAnalyses.getMedian(realDisruptionSimpleValues) + "\t" + RankingAnalyses.getMedian(permutedDisruptionSimpleValues) + "\t" + mwdisruptionSimple.getZ());
-                                    System.out.println("distance (minor)\t" + j + "\t" + RankingAnalyses.getMedian(realDistanceScoresMinor) + "\t" + RankingAnalyses.getMedian(permutedDistanceScoresMinor) + "\t" + mwdistanceminor.getZ());
+                                    System.out.println("disruption (minor)\t" + j + "\t" + RankingAnalyses.getMedian(realDisruptionMinorValues) + "\t" + RankingAnalyses.getMedian(permutedDisruptionMinorValues) + "\t" + mwdisruptionMinorParent.getZ() + "\t" + realDisruptionMinorValues.size() + "\t" + permutedDisruptionMinorValues.size());
+                                    System.out.println("disruption (major)\t" + j + "\t" + RankingAnalyses.getMedian(realDisruptionMajorValues) + "\t" + RankingAnalyses.getMedian(permutedDisruptionMajorValues) + "\t" + mwdisruptionMajorParent.getZ());
+                                    /*System.out.println("distance (minor)\t" + j + "\t" + RankingAnalyses.getMedian(realDistanceScoresMinor) + "\t" + RankingAnalyses.getMedian(permutedDistanceScoresMinor) + "\t" + mwdistanceminor.getZ());
                                     System.out.println("distance (major)\t" + j + "\t" + RankingAnalyses.getMedian(realDistanceScoresMajor) + "\t" + RankingAnalyses.getMedian(permutedDistanceScoresMajor) + "\t" + mwdistancemajor.getZ());
-                                    System.out.println("distance (recombinant)\t" + j + "\t" + RankingAnalyses.getMedian(realDistanceScoresRecombinant) + "\t" + RankingAnalyses.getMedian(permutedDistanceScoresRecombinant) + "\t" + mwdistancerecombinant.getZ());
+                                    System.out.println("distance (recombinant)\t" + j + "\t" + RankingAnalyses.getMedian(realDistanceScoresRecombinant) + "\t" + RankingAnalyses.getMedian(permutedDistanceScoresRecombinant) + "\t" + mwdistancerecombinant.getZ());*/
                                      System.out.println("paired (minor)\t" + j + "\t" + RankingAnalyses.getMedian(realPercentPairedMinor) + "\t" + RankingAnalyses.getMedian(permutedPercentPairedMinor) + "\t" + mwpercentPairedMinor.getZ());
                                     System.out.println("paired (major)\t" + j + "\t" + RankingAnalyses.getMedian(realPercentPairedMajor) + "\t" + RankingAnalyses.getMedian(permutedPercentPairedMajor) + "\t" + mwpercentPairedMajor.getZ());
                                     ChiSquareTest chiPairingTest = new ChiSquareTest();
@@ -926,13 +1049,14 @@ public class RecombinationFoldDisruption {
                         }
 
                     }
+                    }
 
                     if (realSum > permSum) {
                         overallCount++;
                     }
                     overallTotal++;
                     
-                    System.out.println(realSum+"\t"+permSum+" --> "+(overallCount) + "\t" + overallTotal + "\t" + (overallCount / overallTotal));
+                    //System.out.println(realSum+"\t"+permSum+" --> "+(overallCount) + "\t" + overallTotal + "\t" + (overallCount / overallTotal));
                           
                 }
 
@@ -1264,6 +1388,7 @@ public class RecombinationFoldDisruption {
                 // int UNPAIRED = 0, PAIRED = 1;
                 // int PERMUTED = 0, REAL = 1;
 
+                int breakpointCount = 0;
                 for (int i = 0; i < iterations; i++) {
                     for (int h = 0; h < selectedRecombinationEvents.size(); h++) {
                         int randomOffset = random.nextInt(pairingProbability.length);
@@ -1841,11 +1966,16 @@ public class RecombinationFoldDisruption {
 
         int disruption = 0;
         for (int i = 0; i < minorSites.length; i++) {
-            if((i >= 2248 && i < 2371) || (i >= 8872 && i < 9184))
+            //if((i >= 2248 && i < 2371) || (i >= 8872 && i < 9184)) // full
+            //if((i >= 1311 && i < 1485) || (i >= 7540 && i < 7851)) // coding
+              //if((i >= 1311 && i < 1485)) // coding
+            //if((i >= 7540 && i < 7851)) // coding
+              // if((i >= 8872 && i < 9184))
+            //if((i >= 2248 && i < 2371) )
+            {
+            if(1==1)
             {
 
-            //if(minorParentDotBracket.charAt(i) != '-' && majorParentDotBracket.charAt(i) != '-' && recombinantDotBracket.charAt(i) != '-')
-            //{
                 if (useAND) {
                     if ((minorSites[i] != 0 || majorSites[i] != 0) && !(recombinantSites[i] == minorSites[i] && recombinantSites[i] == majorSites[i])) {
                         disruption++;
@@ -1855,9 +1985,21 @@ public class RecombinationFoldDisruption {
                         disruption++;
                     }
                 }
-           // }
+                /*if (useAND) {
+                    if ((minorSites[i] != 0) && !(recombinantSites[i] == minorSites[i])) {
+                        disruption++;
+                    }
+                } else {
+                    if ((majorSites[i] != 0) && !(recombinantSites[i] == majorSites[i])) {
+                        disruption++;
+                    }
+                }*/
+          
+           }
             }
-        }
+        
+            
+            
         /*
         int[] minorSites = RNAFoldingTools.getPairedSitesFromDotBracketString(minorParentDotBracket);
         //int[] majorSites = RNAFoldingTools.getPairedSitesFromDotBracketString(majorParentDotBracket);
@@ -1870,6 +2012,31 @@ public class RecombinationFoldDisruption {
                 disruption++;
             }
         }*/
+        }
+        return disruption;
+  
+    }
+        
+        public int getDisruptionScoreForParents(String parentDotBracket, String recombinantDotBracket) {
+        
+        int[] parentSites = RNAFoldingTools.getPairedSitesFromDotBracketString(parentDotBracket);
+        int[] recombinantSites = RNAFoldingTools.getPairedSitesFromDotBracketString(recombinantDotBracket);
+
+        int disruption = 0;
+        for (int i = 0; i < parentSites.length; i++) {
+            // if(/*(i >= 2248 && i < 2371) ||*/ (i >= 8872 && i < 9184))
+             //if((i >= 1311 && i < 1485)) // coding
+            //if((i >= 7540 && i < 7851)) // coding
+               //if((i >= 8872 && i < 9184))
+            //if((i >= 2248 && i < 2371) )
+            //if((i >= 2248 && i < 2371) || (i >= 8872 && i < 9184)) // full
+                 //if((i >= 1311 && i < 1485) || (i >= 7540 && i < 7851)) // coding
+            {
+            if ((parentSites[i] != 0) && !(recombinantSites[i] == parentSites[i])) {
+                disruption++;
+            }
+            }
+        }
         return disruption;
     }
 
@@ -1886,7 +2053,13 @@ public class RecombinationFoldDisruption {
              * majorSites[i]) { disruption++; }
              *
              */
-            if((i >= 2248 && i < 2371) || (i >= 8872 && i < 9184))
+           //if((i >= 8872 && i < 9184))
+            //if((i >= 2248 && i < 2371) )
+            //if((i >= 2248 && i < 2371) || (i >= 8872 && i < 9184)) // full
+              //if((i >= 1311 && i < 1485)) // coding
+           // if((i >= 7540 && i < 7851)) // coding
+            //if((i >= 1311 && i < 1485) || (i >= 7540 && i < 7851)) // coding
+            //if(1==1)
             {
                 if (minorSites[i] != recombinantSites[i]) {
                     disruption++;
@@ -1939,4 +2112,18 @@ public class RecombinationFoldDisruption {
         //new RecombinationFoldDisruption().example();
 
     }
+    
+    public static int geneticDistance(String a, String b)
+    {
+        int n = 0;
+        for(int i = 0 ; i < a.length() ; i++)
+        {
+            if(a.charAt(i) != b.charAt(i))
+            {
+                n++;
+            }
+        }
+        return n;
+    }
+   
 }

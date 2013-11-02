@@ -211,12 +211,12 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
 
         jMenu2.setText("Open recently used");
         jMenu2.addMenuListener(new javax.swing.event.MenuListener() {
+            public void menuDeselected(javax.swing.event.MenuEvent evt) {
+            }
             public void menuCanceled(javax.swing.event.MenuEvent evt) {
             }
             public void menuSelected(javax.swing.event.MenuEvent evt) {
                 jMenu2MenuSelected(evt);
-            }
-            public void menuDeselected(javax.swing.event.MenuEvent evt) {
             }
         });
         jMenu2.addActionListener(new java.awt.event.ActionListener() {
@@ -324,7 +324,7 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
     }//GEN-LAST:event_jMenuItem4ActionPerformed
 
     private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
-        JFrame frame = new JFrame("Structure ranking");
+        JFrame frame = new JFrame("Paired sites comparison ranking");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setIconImage(getIconImage());
 

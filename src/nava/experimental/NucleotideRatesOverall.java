@@ -4,10 +4,12 @@
  */
 package nava.experimental;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import nava.data.io.CsvReader;
@@ -16,6 +18,9 @@ import nava.data.types.DataType;
 import nava.data.types.SecondaryStructureData;
 import nava.ranking.MyMannWhitney;
 import nava.ranking.RankingAnalyses;
+import nava.structurevis.data.DataTransform;
+import nava.structurevis.data.NHistogram;
+import nava.structurevis.data.NHistogramPanel;
 import nava.utils.Mapping;
 
 /**
@@ -95,11 +100,25 @@ public class NucleotideRatesOverall {
         System.out.println(">>>"+keyword);
         System.out.println("All\t"+pairedValuesSiteAll.size()+"\t"+unpairedValuesSiteAll.size()+"\t"+df.format(RankingAnalyses.getMedian(pairedValuesSiteAll))+"\t"+df.format(RankingAnalyses.getMedian(unpairedValuesSiteAll)) +"\t"+df.format(siteAll.getZ())+"\t"+df2.format(RankingAnalyses.NormalZ(siteAll.getZ())));
        
+        double min = Math.min(Collections.min(pairedValuesSiteAll), Collections.min(unpairedValuesSiteAll));
+        double max = Math.min(Collections.max(pairedValuesSiteAll), Collections.max(unpairedValuesSiteAll));
+        NHistogramPanel panel = new NHistogramPanel();
+        min = 0;
+        max = 3;
+        NHistogram nhist = new NHistogram(min, max, 10, new DataTransform(min, max, DataTransform.TransformType.LINEAR));
+        nhist.addClass("Paired sites", Color.red, pairedValuesSiteAll);
+        nhist.addClass("Unpaired sites", Color.blue, unpairedValuesSiteAll);
+        nhist.calculate();
+        panel.setNHistogram(nhist);
+        panel.saveAsSVG(new File(keyword+"_histogram.svg"));
+        
     }
     
     public static void main(String [] args)
     {
         try {
+                        SynonymousTestData hcv2Data = new SynonymousTestData(new File("C:/dev/thesis/hcv/2/100/hcv2_all_100_aligned_edit.csv"),new File("C:/dev/thesis/hcv/2/100/hcv2_all_100_aligned_edit.fas"),new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.dbn"), new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.fas"));
+            runTest(hcv2Data, "hcv2");
             
             SynonymousTestData hiv1bData = new SynonymousTestData(new File("C:/dev/thesis/hiv_full/1b/100/hiv1b_all_100_aligned.csv"),new File("C:/dev/thesis/hiv_full/1b/100/hiv1b_all_100_aligned.fas"),new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.dbn"), new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.fas"));
             runTest(hiv1bData, "hiv1b");
@@ -145,8 +164,7 @@ public class NucleotideRatesOverall {
             SynonymousTestData hcv1bData = new SynonymousTestData(new File("C:/dev/thesis/hcv/1b/100/hcv1b_all_100_aligned.csv"),new File("C:/dev/thesis/hcv/1b/100/hcv1b_all_100_aligned.fas"),new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.dbn"), new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.fas"));
             runTest(hcv1bData, "hcv1b");
              
-            SynonymousTestData hcv2Data = new SynonymousTestData(new File("C:/dev/thesis/hcv/2/100/hcv2_all_100_aligned_edit.csv"),new File("C:/dev/thesis/hcv/2/100/hcv2_all_100_aligned_edit.fas"),new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.dbn"), new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.fas"));
-            runTest(hcv2Data, "hcv2");
+
             
             SynonymousTestData hcv2aData = new SynonymousTestData(new File("C:/dev/thesis/hcv/2a/100/hcv2a_all_100_aligned.csv"),new File("C:/dev/thesis/hcv/2a/100/hcv2a_all_100_aligned.fas"),new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.dbn"), new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.fas"));
             runTest(hcv2aData, "hcv2a");

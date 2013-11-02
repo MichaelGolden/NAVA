@@ -112,7 +112,7 @@ public class NavigatorPanel extends javax.swing.JPanel implements ActionListener
         });
 
 
-        JTextArea textArea = new JTextArea("Drop and drag a file into the area above to import or click 'Import file'.");
+        JTextArea textArea = new JTextArea("Drag and drop files into the area above to import or click 'Import file'.");
         textArea.setFont(textArea.getFont().deriveFont(Font.ITALIC));
         textArea.setLineWrap(true);
         textArea.setEditable(false);

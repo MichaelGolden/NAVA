@@ -36,11 +36,13 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import nava.structure.StructureAlign;
+import nava.structurevis.data.Feature;
 import nava.structurevis.layout.RadiateView;
 import nava.ui.MainFrame;
 import nava.utils.ColorUtils;
 import nava.utils.GraphicsUtils;
 import nava.utils.RNAFoldingTools;
+import nava.utils.Utils;
 import net.hanjava.svg.SVG2EMF;
 
 /**
@@ -133,6 +135,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
     JRadioButtonMenuItem naViewMode = new JRadioButtonMenuItem("NAView");
     JRadioButtonMenuItem radiateViewMode = new JRadioButtonMenuItem("Radiate");
     JRadioButtonMenuItem radiateViewFlatMode = new JRadioButtonMenuItem("Radiate (Flat base)");
+    
 
     public enum DrawingMode {
 
@@ -231,6 +234,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
         drawingGroup.add(radiateViewFlatMode);
 
         naViewMode.setSelected(true);
+        ToolTipManager.sharedInstance().registerComponent(this);
     }
 
     public void initialise() {
@@ -290,6 +294,8 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
 
             computeAndDraw();
         }
+        
+        redraw();
     }
 
     /*
@@ -307,8 +313,10 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
         repaint();
     }
 
+    boolean redraw = false;
     public void redraw() {
         repaint = true;
+        redraw = true;
         repaint();
     }
     double horizontalScale = 2.6;
@@ -463,9 +471,14 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                                 c = substructureModel.data2D.colorGradient.getColor((float) substructureModel.data2D.dataTransform.transform(value));
                             }
                         }
+                     
 
                         if (c != null && nucleotidePositions.length == substructureModel.substructure.length) { // TODO strange error where the array length is different from the structure length, probably a race condition
-
+                               
+                            if(c.getAlpha() == 0)
+                            {
+                                continue;
+                            }
                             double x1 = nucleotidePositions[k].getX();
                             double y1 = nucleotidePositions[k].getY();
                             double x2 = nucleotidePositions[l].getX();
@@ -697,7 +710,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
     public void drawStructureNative(Graphics graphics) {
         int panelWidth = (int) ((maxx - minx) * horizontalScale + xoffset * 2);
         int panelHeight = (int) ((maxy - miny) * verticalScale + 100);
-        Dimension d = new Dimension((int) (panelWidth * zoomScale), (int) (panelHeight * zoomScale));
+        //Dimension d = new Dimension((int) (panelWidth * zoomScale), (int) (panelHeight * zoomScale));
         g = (Graphics2D) graphics;
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.scale(zoomScale, zoomScale);
@@ -740,13 +753,16 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
 
         g.setColor(Color.black);
         int length = substructureModel.substructure.length;
+     
         covariationInteractions.clear();
         if (show2DData && substructureModel.data2D != null) {
             for (int i = substructureModel.substructure.getStartPosition(); i < substructureModel.substructure.getEndPosition(); i++) {
                 for (int j = substructureModel.substructure.getStartPosition(); j < substructureModel.substructure.getEndPosition(); j++) {
                     int k = i - substructureModel.substructure.getStartPosition();
                     int l = j - substructureModel.substructure.getStartPosition();
-                    if ((substructureModel != null && substructureModel.maxDistance == -1) || (substructureModel.substructureDistanceMatrix != null && substructureModel.substructureDistanceMatrix.getDistance(k, l) <= substructureModel.maxDistance) || (substructureModel.substructureDistanceMatrix == null && substructureModel.substructureDistanceMatrix.getDistance(i, j) <= substructureModel.maxDistance)) {
+                   // System.out.println("Pmax distance = " + substructureModel.maxDistance+"\t"+substructureModel.substructureDistanceMatrix +"\t"+i+"\t"+j+"\t"+substructureModel.substructureDistanceMatrix.getDistance(k, l));
+                    if ((substructureModel != null && substructureModel.maxDistance == -1) ||  (substructureModel.substructureDistanceMatrix == null || substructureModel.substructureDistanceMatrix.getDistance(k, l) <= substructureModel.maxDistance)) {
+                    //if ((substructureModel != null && substructureModel.maxDistance == -1) || (substructureModel.substructureDistanceMatrix != null && substructureModel.substructureDistanceMatrix.getDistance(k, l) <= substructureModel.maxDistance) || (substructureModel.substructureDistanceMatrix == null && substructureModel.substructureDistanceMatrix.getDistance(i, j) <= substructureModel.maxDistance)) {
                         Color c = null;
                         //double p = model.data2D.emptyValue;
                        // double p = substructureModel.data2D.get(i, j, substructureModel.mapping2D);
@@ -762,6 +778,11 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                         }
 
                         if (c != null) {
+                            
+                            if(c.getAlpha() == 0)
+                            {
+                                continue;
+                            }
 
                             //System.out.println(k + "\t" + l + "\t" + i + "\t" + j + "\t" + nucleotidePositions.length);
                             double x1 = nucleotidePositions[k].getX();
@@ -798,7 +819,9 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                             } else {
                                 shape = new Line2D.Double(nucleotidePositions[k], nucleotidePositions[l]);
                             }
+                       
                             covariationInteractions.add(new Interaction(shape, i, j));
+                       
 
                             g.setColor(c);
                             g.setStroke(normalStroke);
@@ -1224,21 +1247,24 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
      */
     boolean noStructure = false;
 
+    BufferedImage buffer = null;
     @Override
     public void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
         Graphics2D g = (Graphics2D) graphics;
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+        
         if (noStructure) {
             g.setColor(Color.white);
             g.fillRect(0, 0, getWidth(), getHeight());
             return;
         }
-
         int panelWidth = (int) ((maxx - minx) * horizontalScale + xoffset * 2);
         int panelHeight = (int) ((maxy - miny) * verticalScale + 100);
 
+        
+        
         if (repaint) {
             repaint = false;
             currentDrawType = drawComplexStructure();
@@ -1305,12 +1331,26 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
         } else if (currentDrawType == DRAW_NATIVE_GRAPHIC) {
             //g.setColor(Color.lightGray);
             //g.fillRect(0, 0, getWidth(), getHeight());
-            g.setColor(Color.white);
-            g.fillRect(0, 0, (int) (panelWidth * zoomScale), (int) (panelHeight * zoomScale));
-            //g.scale(zoomScale, zoomScale);
-            drawStructureNative(g);
+            //g.scale(zoomScale, zoomScale);         
+             
+             if(redraw)
+             {
+                buffer =  new BufferedImage((int)(panelWidth * zoomScale), (int)(panelHeight * zoomScale), bufferedImage.TYPE_INT_ARGB);                       
+                Graphics g2 = buffer.getGraphics();
+                g2.setColor(Color.white);
+                g2.fillRect(0, 0, (int) (panelWidth * zoomScale), (int) (panelHeight * zoomScale));            
+                drawStructureNative(g2);
+               // System.out.println("OBER AAA");
+             }
+            // System.out.println("OBER AAA2");
+             g.scale(1, 1);
+             g.drawImage(buffer, 0, 0, null);
+             redraw = false;
+             g.scale(zoomScale, zoomScale);
             //g.drawImage(bufferedImage, 0, 0, this);
+            //System.out.println("REPAINT COMPLETELY");
         }
+       // System.out.println("MINCE MEAT");
 
 
         int preferredWidth = (int) Math.ceil(panelWidth * zoomScale);
@@ -1811,6 +1851,141 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             //System.out.println("Center"+newLeftX+"\t"+newLeftY);
             //mainapp.substructureScrollPane.getViewport().setViewPosition(new Point((int) newLeftX, (int) newLeftY));
         }
+    }
+    
+      public String getToolTipText(MouseEvent e) {
+          
+         String interactionText = "";
+
+        double x = e.getPoint().x / zoomScale;
+        double y = e.getPoint().y / zoomScale;
+
+        if (substructureModel.substructure != null && nucleotidePositions != null) {
+            // 1D interactions
+            int minIndex = -1;
+            double minDistance = Double.MAX_VALUE;
+            for (int i = 0; i < nucleotidePositions.length; i++) {
+                Point2D.Double scaledPoint = new Point2D.Double(x, y);
+                double distance = nucleotidePositions[i].distance(scaledPoint);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    minIndex = i;
+                }
+            }
+            int nucleotide = 0;
+            boolean nucSelected = false;
+            if (minDistance <= nucleotideDiameter / 2) {
+                nucleotide = minIndex;
+                nucSelected = true;
+            }
+
+            int pos = (substructureModel.substructure.getStartPosition() + nucleotide) % substructureModel.sequenceLength;
+            //System.out.println("POSITION = po"+pos);
+            if (substructureModel.nucleotideSource != null && nucSelected) {
+                double[] nucfa = substructureModel.nucleotideSource.getMappedFrequencyAtNucleotide(substructureModel.nucleotideMapping, pos);
+                interactionText += "Composition: ";
+                for (int i = 0; i < 4; i++) {
+                    String a = "";
+                    switch (i) {
+                        case 0:
+                            a = "A";
+                            break;
+                        case 1:
+                            a = "C";
+                            break;
+                        case 2:
+                            a = "G";
+                            break;
+                        case 3:
+                            if (showDNA) {
+                                a = "T";
+                            } else {
+                                a = "U";
+                            }
+                            break;
+                    }
+
+                    double perc = 0;
+                    if (nucfa != null) {
+                        perc = nucfa[i];
+                    }
+                    interactionText += a + "=" + decimalFormat.format(perc * 100) + "%,  ";
+                }
+                int nonGapCount = substructureModel.nucleotideSource.getMappedNonGapCountAtNucleotide(substructureModel.nucleotideMapping, pos);
+
+              interactionText += " [nucleotides=" + nonGapCount + "]";              
+              interactionText += "\n";
+            } else {
+                //interactionText += "Composition: none";
+            }
+            
+
+            if (substructureModel.data1D != null  && nucSelected) {
+                double p = substructureModel.data1D.data[pos];
+                interactionText += "1D data: pos=" + (pos + 1) + ", value=" + substructureModel.data1D.dataTransform.getFormattedString(p, 6) + "";                
+                interactionText += "\n";
+            } else {
+                //interactionText += "1D data: none";
+            }
+        }
+
+
+        // 2D interactions
+        if (substructureModel != null) {
+            //mainapp.data2DLabel.setText("");
+            int interaction2D = -1;
+            for (int i = 0; i < covariationInteractions.size(); i++) {
+                //  if (covariationInteractions.get(i).shape instanceof QuadCurve2) {
+                int c = 0;
+                boolean[] count = new boolean[4];
+                count[0] = covariationInteractions.get(i).shape.intersects(x - 2, y - 2, 4, 4);
+                count[1] = covariationInteractions.get(i).shape.intersects(x + 2, y - 2, 4, 4);
+                count[2] = covariationInteractions.get(i).shape.intersects(x - 2, y + 2, 4, 4);
+                count[3] = covariationInteractions.get(i).shape.intersects(x + 2, y + 2, 4, 4);
+                for (int k = 0; k < count.length; k++) {
+                    if (count[k]) {
+                        c++;
+                    }
+                }
+                if (c > 0) {
+                    //System.out.println(c);
+                }
+                if (c >= 1 && c <= 3) {// mouse over information
+                    interaction2D = i;
+                }
+            }
+
+            int oldSelectedNucleotideX = selectedNucleotideX;
+            int oldSelectedNucleotideY = selectedNucleotideY;
+            selectedNucleotideX = -1;
+            selectedNucleotideY = -1;
+            if (interaction2D != -1) {
+                Interaction interaction = covariationInteractions.get(interaction2D);
+                double p = substructureModel.data2D.get(interaction.nucleotidei, interaction.nucleotidej, substructureModel.mapping2D);
+                //mainapp.data2DLabel.setText(interaction.nucleotidei + " <-> " + interaction.nucleotidej + "  =  " + mainapp.data2D.matrix.get(interaction.nucleotidei - 1, interaction.nucleotidej - 1));
+                //System.out.println("INTERACTION " + covariationInteractions.get(i));
+                int i = Math.min(interaction.nucleotidei, interaction.nucleotidej)+1;
+                int j = Math.max(interaction.nucleotidei, interaction.nucleotidej)+1;
+                interactionText += "2D data: " + i + " ~ " + j + ", value=" + substructureModel.data2D.dataTransform.getFormattedString(p, 6) + "";
+                this.selectedNucleotideX = interaction.nucleotidei - 1;
+                this.selectedNucleotideY = interaction.nucleotidej - 1;
+            } else {
+                //interactionText += "2D data: none";
+            }
+
+            //mainapp.data2DLabel.setText(interactionText);
+
+            if (oldSelectedNucleotideX != selectedNucleotideX || oldSelectedNucleotideY != selectedNucleotideY) {
+                repaint();
+            }
+        }
+        //System.out.println("\""+interactionText+"\"");
+        // System.out.println("\""+interactionText+"\"");
+        if(interactionText.equals(""))
+        {
+            return super.getToolTipText(e);
+        }
+        return Utils.plainTextToHtml(interactionText);
     }
 
     public Point2D.Double getViewCenter() {

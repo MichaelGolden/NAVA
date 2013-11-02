@@ -130,7 +130,7 @@ public class Dijkstra {
         }
         String dbs = sb.toString().replace("-", "");
         int[] newsites = RNAFoldingTools.getPairedSitesFromDotBracketString(dbs);
-        System.out.println("DDD"+newsites.length+"\t"+pairedSites.length);
+        //System.out.println("DDD"+newsites.length+"\t"+pairedSites.length);
 
         //return newsites.length;
         

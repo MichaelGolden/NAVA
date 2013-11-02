@@ -422,18 +422,22 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         } else {
             structureVisController.structureVisModel.substructureModel.maxDistance = value;
             distanceLabel.setText(value + "");
-            structureDrawPanel.redraw();
-            fullGenomeDrawPanel.redraw();
+            //structureDrawPanel.redraw();
+            //fullGenomeDrawPanel.redraw();
         }
     }
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        if (e.getSource().equals(distanceSlider)) {
-            setDistanceLimit(distanceSlider.getValue());
-        }
-        structureDrawPanel.redraw();
-        fullGenomeDrawPanel.redraw();
+       // if(!distanceSlider.getValueIsAdjusting())
+       // {
+            if (e.getSource().equals(distanceSlider)) {
+                setDistanceLimit(distanceSlider.getValue());
+            }
+           
+                structureDrawPanel.redraw();
+                fullGenomeDrawPanel.redraw();
+       // }
     }
 
     @Override

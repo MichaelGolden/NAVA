@@ -43,7 +43,9 @@ public class AutomatedFolding {
        // new AutomatedFolding().performingFolding(new File("C:/brej/circovirus/Circovirus.fas"), new File("C:/brej/circovirus/Circovirus.dbn"), 1, true, 37, true);
         // new AutomatedFolding().performingFolding(new File("C:/brej/anellovirus/Anellovirus.fas"), new File("C:/brej/anellovirus/Anellovirus.dbn"), 1, true, 37, true);
          //new AutomatedFolding().performingFolding(new File("C:/brej/parvovirus/Parvovirus.fas"), new File("C:/brej/parvovirus/Parvovirus.dbn"), 8, false, 37, true);
-        new AutomatedFolding().performingFolding(new File("C:/dev/thesis/hiv_full/darren/darren_hiv_full_aligned_muscle.fas"), new File("C:/dev/thesis/hiv_full/darren/darren_hiv_full_aligned_muscle.dbn"), 8);
+        //new AutomatedFolding().performingFolding(new File("C:/dev/thesis/hiv_full/darren/darren_hiv_full_aligned_muscle.fas"), new File("C:/dev/thesis/hiv_full/darren/darren_hiv_full_aligned_muscle.dbn"), 8);
+        //new AutomatedFolding().performingFolding(new File("C:/dev/thesis/dengue/100/dengue_all_100_aligned.fas"), new File("C:/dev/thesis/dengue/100/dengue_all_100_aligned.dbn"), 8);
+        //new AutomatedFolding().performingFolding(new File("C:/dev/thesis/hiv_full/test/darren_hiv.fas"), new File("C:/dev/thesis/hiv_full/test/darren_hiv.dbn"), 4);
         
         
     }

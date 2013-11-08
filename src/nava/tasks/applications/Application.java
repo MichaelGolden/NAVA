@@ -34,6 +34,7 @@ public abstract class Application extends Task {
     private JPanel applicationPanel;
     private ApplicationPanelInterface applicationPanelInterface;
     public ProjectController projectController;
+    public boolean showWarningForUnalignedAlignmentInputs = false;
 
     //BufferedWriter standardBuffer;
     //BufferedWriter errorBuffer;

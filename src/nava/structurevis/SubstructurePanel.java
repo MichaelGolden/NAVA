@@ -198,6 +198,11 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         jLabel1.setText("Structure");
 
         structureComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        structureComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                structureComboBoxActionPerformed(evt);
+            }
+        });
 
         jLabel5.setText("2D");
 
@@ -263,6 +268,10 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
     private void substructureComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_substructureComboBoxActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_substructureComboBoxActionPerformed
+
+    private void structureComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_structureComboBoxActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_structureComboBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel distanceLabel;

@@ -377,7 +377,8 @@ public class PairwiseStructureComparison {
             ArrayList<Combination> combinations = combinations(categories);
             for (int i = 0; i < combinations.size(); i++) {
                 Combination combination = combinations.get(i);
-                 if (combination.combination.size() >=4) {
+                if (combination.combination.size() >=3) {
+                 //if (combination.combination.size() >=4) {
                // if (combination.combination.size() <= 2 || combination.combination.size() == categories.length) {
                     //if (combination.combination.size() == 4) {
                 } else {
@@ -730,7 +731,8 @@ public class PairwiseStructureComparison {
         }
 
         for (Combination combination : combinations) {
-            if(!(combination.toString().equals("hiv1b_hiv1c_hiv1d_hiv1g") || combination.toString().equals("hiv1b_hiv1c_hiv1d_hiv1g_hiv1o") || combination.toString().equals("hiv1b_hiv1c_hiv1d_hiv1g_hiv1o_hiv2")))
+            if(!combination.toString().equals("hiv1c_hiv1d_hiv1g"))
+            //if(!(combination.toString().equals("hiv1b_hiv1c_hiv1d_hiv1g") || combination.toString().equals("hiv1b_hiv1c_hiv1d_hiv1g_hiv1o") || combination.toString().equals("hiv1b_hiv1c_hiv1d_hiv1g_hiv1o_hiv2")))
             {
                 continue;
             }

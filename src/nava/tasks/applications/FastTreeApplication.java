@@ -29,7 +29,7 @@ public class FastTreeApplication extends Application {
     
     public FastTreeApplication()
     {
-        
+        this.showWarningForUnalignedAlignmentInputs = true;
     }
     
     public String arguments = "";

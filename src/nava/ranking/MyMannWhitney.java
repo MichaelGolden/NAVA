@@ -320,9 +320,16 @@ public class MyMannWhitney {
         * */
            MannWhitneyUTest test = new MannWhitneyUTest(NaNStrategy.REMOVED, TiesStrategy.RANDOM);
 
-        pvalue = test.mannWhitneyUTest(x, y);
-        uscore = test.mannWhitneyU(x, y);
-        zscore = -StatUtils.getInvCDF(pvalue/2, true);
+           
+           try
+           {
+                pvalue = test.mannWhitneyUTest(x, y);
+                uscore = test.mannWhitneyU(x, y);        
+                zscore = -StatUtils.getInvCDF(pvalue/2, true);
+           }catch(Exception ex)
+           {
+               ex.printStackTrace();
+           }
         approxp = approximatePvalue(x,y);
         direction = direction(x,y);
     }
@@ -350,9 +357,9 @@ public class MyMannWhitney {
         if(pvalue < 1.1102230246251565E-16)
         {
             zscore = -StatUtils.getInvCDF(1.1102230246251565E-16/2, true);
-            System.out.println("*");
+            //System.out.println("*");
         }
-        System.out.println(zscore+"\t"+pvalue+"\t"+approxp);
+        //System.out.println(zscore+"\t"+pvalue+"\t"+approxp);
         return (direction*zscore);
     }
 }

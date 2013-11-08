@@ -15,12 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.DefaultListModel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.ListCellRenderer;
+import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import nava.data.types.Alignment;
 import nava.data.types.DataSource;
 import nava.tasks.applications.*;
 
@@ -203,10 +201,37 @@ public class ApplicationPanel extends javax.swing.JPanel implements ListSelectio
     private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runButtonActionPerformed
         if (jList1.getSelectedValue() != null) {
             try {
-                Application app = (Application) jList1.getSelectedValue().getClass().newInstance();
+                Application app = (Application) jList1.getSelectedValue().getClass().newInstance();                
                 app.setProjectController(projectController);
                 app.setDataSource(selectedDataSources.get(0));
-                MainFrame.taskManager.queueTask(app, false);
+                boolean allowRun = true;
+                if(app.showWarningForUnalignedAlignmentInputs)
+                {
+                    boolean dataSourceUnaligned = false;
+                    for(int i = 0 ; i < selectedDataSources.size() ; i++)
+                    {                        
+                        if((selectedDataSources.get(i) instanceof Alignment) && !((Alignment)selectedDataSources.get(i)).aligned)
+                        {
+                            dataSourceUnaligned = true;
+                        }
+                    }
+                
+                    if(dataSourceUnaligned)
+                    {
+                        int n = JOptionPane.showConfirmDialog(MainFrame.self,
+                                "Warning you are about to use an alignment source that may be unaligned.\nDo you still wish run this application?",
+                                "Appication requires aligned source",
+                                JOptionPane.YES_NO_OPTION);
+                        if(n != 0)
+                        {
+                            allowRun = false;
+                        }
+                    }                
+                }
+                if(allowRun)
+                {
+                    MainFrame.taskManager.queueTask(app, false);
+                }
             } catch (InstantiationException ex) {
                 Logger.getLogger(ApplicationPanel.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IllegalAccessException ex) {

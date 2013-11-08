@@ -42,7 +42,7 @@ public class DataOverlay2D extends Overlay implements Serializable {
 
         FULL, UPPER_TRIANGLE, LOWER_TRIANGLE
     };
-    MatrixRegion matrixRegion = MatrixRegion.FULL;
+    public MatrixRegion matrixRegion = MatrixRegion.FULL;
 
     public void loadData() {
         dataMatrix = matrix.getObject(ProjectModel.path, MainFrame.dataSourceCache);

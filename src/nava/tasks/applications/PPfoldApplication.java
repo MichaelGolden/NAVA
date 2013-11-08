@@ -31,6 +31,7 @@ public class PPfoldApplication extends Application {
     PPfoldPanel ppfoldPanel;
 
     public PPfoldApplication() {
+        this.showWarningForUnalignedAlignmentInputs = true;
         this.slotUsage = Runtime.getRuntime().availableProcessors();
        /// System.out.println("VALUE " + this);
         ppfoldPanel =  new PPfoldPanel(this, inputDataSource);
@@ -46,7 +47,7 @@ public class PPfoldApplication extends Application {
         IO.copyFile(new File(inputDataSource.getNormalisedDataSourcePath(ProjectModel.path)), inFastaFile);
 
         try {
-            String cmd = "java -Xms4096M -jar " + new File(PPFOLD_EXECUTABLE).getAbsolutePath() + " \"" + inFastaFile.getAbsolutePath() + "\" "+arguments+"  --exports";
+            String cmd = "java -Xms2048M -jar " + new File(PPFOLD_EXECUTABLE).getAbsolutePath() + " \"" + inFastaFile.getAbsolutePath() + "\" "+arguments+"  --exports";
             System.out.println(cmd);
             process = Runtime.getRuntime().exec(cmd, null, tempDir);
 
@@ -77,6 +78,7 @@ public class PPfoldApplication extends Application {
                     matrix.parentSource = inputDataSource;
                     outputFile2.dataSource = matrix;
                     outputFiles.add(outputFile2);
+                    System.out.println("matrixOutputFile exists");
                 }
             } else {
             }

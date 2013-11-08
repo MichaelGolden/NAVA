@@ -1132,7 +1132,9 @@ public class StructureAlign {
         int[] substructure = new int[length];
         int a = 0;
         for (int j = i; j < i + length; j++) {
-            substructure[a] = Math.max(0, pairedSites[j] - i);
+            //System.out.println("a"+a+"\tj"+j+"\ti"+i+"\tslen"+substructure.length+"\tpaired"+pairedSites.length);
+            
+            substructure[a] = Math.max(0, (j >= 0 &&  j < pairedSites.length) ? pairedSites[j] - i : 0);
             if (substructure[a] > length) {
                 substructure[a] = 0;
             }

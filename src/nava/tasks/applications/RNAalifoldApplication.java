@@ -24,6 +24,7 @@ public class RNAalifoldApplication extends Application {
 
     public RNAalifoldApplication() {
         this.setApplicationPanel(new RNAalifoldPanel());
+        this.showWarningForUnalignedAlignmentInputs = true;
     }
 
     public boolean checkRNAalifold() {

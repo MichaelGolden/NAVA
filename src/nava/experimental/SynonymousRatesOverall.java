@@ -16,6 +16,7 @@ import nava.data.types.DataType;
 import nava.data.types.SecondaryStructureData;
 import nava.ranking.MyMannWhitney;
 import nava.ranking.RankingAnalyses;
+import nava.structurevis.data.NucleotideComposition;
 import nava.utils.Mapping;
 
 /**
@@ -58,7 +59,8 @@ public class SynonymousRatesOverall {
             return;
         }
         
-        double [] pairedPercent = getPairedPercentage(structureData);
+        //double [] pairedPercent = getPairedPercentage(structureData);
+        double [] pairedPercent = getPairedPercentagePhylogeneticallyWeighted(structureData);
         
       /*  Mapping mapping = Mapping.createMapping(testData.synonymousAlignment, testData.sequenceAlignment, 1000,false);
         ArrayList<String> values = CsvReader.getColumn(testData.synonymousCSV, 1);
@@ -78,7 +80,8 @@ public class SynonymousRatesOverall {
         ArrayList<Double> all = new ArrayList<Double>();
         
         //MappedData data = MappingComparison.getHIVMappedData(testData.sequenceAlignment);
-       MappedData data = MappedData.getMappedData(testData.sequenceAlignment, new MappableData(testData.synonymousAlignment, testData.synonymousCSV,1,1, true, "Syn"), 1000, false);
+        int column = 1;
+      MappedData data = MappedData.getMappedData(testData.sequenceAlignment, new MappableData(testData.synonymousAlignment, testData.synonymousCSV,column,1, true, "Syn"), 1000, false);
       /* for(int i = 0 ; i < data.used.length ; i++)
        {
            if(i >= 225 && i <= 525)
@@ -200,9 +203,9 @@ public class SynonymousRatesOverall {
     public static void main(String [] args)
     {
         try {
-            // SynonymousTestData hivData = new SynonymousTestData(new File("C:/dev/thesis/jev/300/jev_polyprotein_300_aligned.csv"),new File("C:/dev/thesis/jev/300/jev_polyprotein_300_aligned.fas"),new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.dbn"), new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.fas"));
-           //runTest(hivData, null);
-          // System.exit(0);
+            //SynonymousTestData hivData = new SynonymousTestData(new File("C:/dev/thesis/jev/300/jev_polyprotein_300_aligned.csv"),new File("C:/dev/thesis/jev/300/jev_polyprotein_300_aligned.fas"),new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.dbn"), new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.fas"));
+         //  runTest(hivData, null);
+         //  System.exit(0);
               SynonymousTestData dengueData = new SynonymousTestData(new File("C:/dev/thesis/dengue/300/dengue_polyprotein_300_aligned.csv"),new File("C:/dev/thesis/dengue/300/dengue_polyprotein_300_aligned.fas"),new File("C:/dev/thesis/dengue/dengue-alignment.dbn"), new File("C:/dev/thesis/dengue/dengue-alignment.fas"));
             runTest(dengueData, null);
              SynonymousTestData dengueData1 = new SynonymousTestData(new File("C:/dev/thesis/dengue1/300/dengue1_polyprotein_300_aligned.csv"),new File("C:/dev/thesis/dengue1/300/dengue1_polyprotein_300_aligned.fas"),new File("C:/dev/thesis/dengue/dengue-alignment.dbn"), new File("C:/dev/thesis/dengue/dengue-alignment.fas"));
@@ -289,5 +292,54 @@ public class SynonymousRatesOverall {
         return pairedMatrix;
     }
     
-    
+    public static double [] getPairedPercentagePhylogeneticallyWeighted(ArrayList<SecondaryStructureData> structureData)
+    {
+        ArrayList<String> sequences = new ArrayList<>();
+        for(SecondaryStructureData s : structureData)
+        {
+            sequences.add(s.sequence);
+        }        
+        ///double [][] distances = NucleotideComposition.getDistanceMatrix(sequences);
+        //double average = 
+        double [] weights = NucleotideComposition.getWeights(sequences);
+       /* for(int i = 0 ; i < weights.length ; i++)
+        {
+            System.out.println(i+"\t"+weights[i]);
+        }*/
+        
+        int length = structureData.get(0).pairedSites.length;
+        double [] pairedMatrix = new double[length];
+        double [] t = new double[length];
+        for(int k = 0; k < structureData.size() ; k++)
+        {
+            SecondaryStructureData s = structureData.get(k);
+            for(int i = 0 ; i < s.pairedSites.length ; i++)
+            {
+                if(s.pairedSites[i] != 0)
+                {
+                    //pairedMatrix[i]++;
+                    pairedMatrix[i] += weights[k];
+                }
+                
+                if(s.sequence.charAt(i) != '-')
+                {
+                    //t[i]++;
+                    t[i] += weights[k];
+                }                
+            }
+        }
+        
+        for(int i = 0 ; i < t.length ; i++)
+        {
+            pairedMatrix[i] /= t[i];
+        }
+        
+        /*
+        for(int i = 0 ; i < pairedMatrix.length ; i++)
+        {
+            System.out.println("Paired\t"+pairedMatrix[i]);
+        }*/
+        
+        return pairedMatrix;
+    }
 }

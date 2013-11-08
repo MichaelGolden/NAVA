@@ -1464,9 +1464,9 @@ public class RecombinationFoldDisruption {
                                     //  realDistanceScoresRecombinant.add(Dijkstra.getDistance(RNAFoldingTools.getPairedSitesFromDotBracketString(majorAligned), realEvent.start, (realEvent.start + realEvent.length) % pairingProbability.length));
                                     // permutedDistanceScoresRecombinant.add(Dijkstra.getDistance(RNAFoldingTools.getPairedSitesFromDotBracketString(majorAligned), permutedEvent.start, (permutedEvent.start + permutedEvent.length) % pairingProbability.length));
 
-                                    realDistanceScoresMinor.add(Dijkstra.getDistance(RNAFoldingTools.getPairedSitesFromDotBracketString(minorAligned), realEvent.start, (realEvent.start + realEvent.length) % pairingProbability.length));
-                                    realDistanceScoresMajor.add(Dijkstra.getDistance(RNAFoldingTools.getPairedSitesFromDotBracketString(majorAligned), realEvent.start, (realEvent.start + realEvent.length) % pairingProbability.length));
-                                    realDistanceScoresRecombinant.add(Dijkstra.getDistance(RNAFoldingTools.getPairedSitesFromDotBracketString(realAligned), realEvent.start, (realEvent.start + realEvent.length) % pairingProbability.length));
+                                  //  realDistanceScoresMinor.add(Dijkstra.getDistance(RNAFoldingTools.getPairedSitesFromDotBracketString(minorAligned), realEvent.start, (realEvent.start + realEvent.length) % pairingProbability.length));
+                                    //realDistanceScoresMajor.add(Dijkstra.getDistance(RNAFoldingTools.getPairedSitesFromDotBracketString(majorAligned), realEvent.start, (realEvent.start + realEvent.length) % pairingProbability.length));
+                                    //realDistanceScoresRecombinant.add(Dijkstra.getDistance(RNAFoldingTools.getPairedSitesFromDotBracketString(realAligned), realEvent.start, (realEvent.start + realEvent.length) % pairingProbability.length));
 
                                 }
                             }
@@ -1502,9 +1502,9 @@ public class RecombinationFoldDisruption {
                                 permutedDisruptionSimpleValues.add((double) getDisruptionScoreSimple(minorAligned, majorAligned, permutedAligned));
 
                                 // realDistanceScoresRecombinant.add(Dijkstra.getDistance(RNAFoldingTools.getPairedSitesFromDotBracketString(majorAligned), realEvent.start, (realEvent.start + realEvent.length) % pairingProbability.length));
-                                permutedDistanceScoresMinor.add(Dijkstra.getDistance(RNAFoldingTools.getPairedSitesFromDotBracketString(minorAligned), permutedEvent.start, (permutedEvent.start + permutedEvent.length) % pairingProbability.length));
-                                permutedDistanceScoresMajor.add(Dijkstra.getDistance(RNAFoldingTools.getPairedSitesFromDotBracketString(majorAligned), permutedEvent.start, (permutedEvent.start + permutedEvent.length) % pairingProbability.length));
-                                permutedDistanceScoresRecombinant.add(Dijkstra.getDistance(RNAFoldingTools.getPairedSitesFromDotBracketString(realAligned), permutedEvent.start, (permutedEvent.start + permutedEvent.length) % pairingProbability.length));
+                                //permutedDistanceScoresMinor.add(Dijkstra.getDistance(RNAFoldingTools.getPairedSitesFromDotBracketString(minorAligned), permutedEvent.start, (permutedEvent.start + permutedEvent.length) % pairingProbability.length));
+                                //permutedDistanceScoresMajor.add(Dijkstra.getDistance(RNAFoldingTools.getPairedSitesFromDotBracketString(majorAligned), permutedEvent.start, (permutedEvent.start + permutedEvent.length) % pairingProbability.length));
+                                //permutedDistanceScoresRecombinant.add(Dijkstra.getDistance(RNAFoldingTools.getPairedSitesFromDotBracketString(realAligned), permutedEvent.start, (permutedEvent.start + permutedEvent.length) % pairingProbability.length));
 
                             }
 
@@ -1785,7 +1785,7 @@ public class RecombinationFoldDisruption {
         Random random = new Random(7920171293137101310L);
         Random random2 = new Random(3811018041148014014L);
         try {
-            loadFoldCache(cacheFile);
+            //loadFoldCache(cacheFile);
             ArrayList<RecombinationEvent> recombinationEvents = loadRecombinationEvents(alignmentFile, rdpCSVFile, true);
             ArrayList<RecombinationEvent> selectedRecombinationEvents = new ArrayList<>();
             for (RecombinationEvent event : recombinationEvents) {
@@ -1893,7 +1893,7 @@ public class RecombinationFoldDisruption {
                 //double basePairCount = 
                 System.out.println(realEvent.id + ", " + realEvent.start + ", " + permutedEvent.start + ": " + realRecombinantFold.freeEnergy + "\t" + permutedRecombinantFold.freeEnergy + "\t" + energyPval + "\t" + realDisruption + "\t" + permutedDisruption + "\t" + disruptionPval + "\t" + realSimilarityToParents + "\t" + permutedSimilarityToParents + "\t" + parentalSimilarityPval + "\t" + (sumDisruptionReal / (sumDisruptionReal + sumDisruptionPermuted)) + "\t" + countBasePairsReal + "/" + (countBasePairsReal + countBasePairsPermuted) + "\t" + (countBasePairsReal / (countBasePairsReal + countBasePairsPermuted)));
                 if (i % 20 == 0) {
-                    saveFoldCache(cacheFile);
+                    //saveFoldCache(cacheFile);
                 }
             }
             writer.close();

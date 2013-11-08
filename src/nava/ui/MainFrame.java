@@ -211,12 +211,12 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
 
         jMenu2.setText("Open recently used");
         jMenu2.addMenuListener(new javax.swing.event.MenuListener() {
-            public void menuDeselected(javax.swing.event.MenuEvent evt) {
-            }
             public void menuCanceled(javax.swing.event.MenuEvent evt) {
             }
             public void menuSelected(javax.swing.event.MenuEvent evt) {
                 jMenu2MenuSelected(evt);
+            }
+            public void menuDeselected(javax.swing.event.MenuEvent evt) {
             }
         });
         jMenu2.addActionListener(new java.awt.event.ActionListener() {
@@ -259,6 +259,11 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
         jMenu3.setText("Help");
 
         jMenuItem3.setText("About");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem3ActionPerformed(evt);
+            }
+        });
         jMenu3.add(jMenuItem3);
 
         jMenuBar1.add(jMenu3);
@@ -371,6 +376,15 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
             jMenu2.add(menuItem);
         }
     }//GEN-LAST:event_jMenu2MenuSelected
+
+    
+    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+        AboutDialog d = new AboutDialog(MainFrame.self, true);
+        GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
+        d.setVisible(true);
+        
+        
+    }//GEN-LAST:event_jMenuItem3ActionPerformed
 
     /**
      * @param args the command line arguments

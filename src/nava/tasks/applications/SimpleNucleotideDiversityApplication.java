@@ -29,6 +29,11 @@ public class SimpleNucleotideDiversityApplication extends Application {
     Alignment inputDataSource = null;
     ArrayList<ApplicationOutput> outputFiles = new ArrayList<>();
     
+    public SimpleNucleotideDiversityApplication()
+    {
+        this.showWarningForUnalignedAlignmentInputs = true;
+    }
+    
     @Override
     protected void start() {
         AlignmentData data = inputDataSource.getObject(ProjectModel.path, MainFrame.dataSourceCache);
@@ -104,6 +109,6 @@ public class SimpleNucleotideDiversityApplication extends Application {
     
     @Override
     public String getDescription() {
-        return "Calculate simple nucleotide diversity per site";
+        return "Calculates nucleotide diversity at each alignment site";
     }
 }

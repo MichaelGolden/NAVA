@@ -362,8 +362,9 @@ public class NucleotideComposition extends Overlay implements Serializable {
         int len = sequences.size();
         double[][] distanceMatrix = new double[len][len];
         for (int i = 0; i < len; i++) {
-            for (int j = 0; j < len; j++) {
+            for (int j = i+1; j < len; j++) {
                 distanceMatrix[i][j] = distanceIgnoringGaps(sequences.get(i), sequences.get(j));
+                distanceMatrix[j][i] =  distanceMatrix[i][j];
             }
         }
 

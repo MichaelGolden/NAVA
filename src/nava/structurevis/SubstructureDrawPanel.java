@@ -1359,10 +1359,10 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             setPreferredSize(new Dimension(preferredWidth, preferredHeight));
             revalidate();
             // g.scale(zoomScale, zoomScale);
-            if (selectedNucleotide != -1) {
+            if (mouseoverNucleotide != -1) {
                 g.setColor(Color.black);
-                g.drawOval((int) posx - (nucleotideDiameter / 2), (int) posy - (nucleotideDiameter / 2), (int) (nucleotideDiameter), (int) (nucleotideDiameter));
-                nucleotidePositions[selectedNucleotide] = new Point2D.Double(posx, posy);
+                g.setStroke(new BasicStroke((float) 2.25));
+                g.drawOval((int) nucleotidePositions[mouseoverNucleotide].x - (nucleotideDiameter / 2), (int) nucleotidePositions[mouseoverNucleotide].y - (nucleotideDiameter / 2), (int) (nucleotideDiameter), (int) (nucleotideDiameter));
             }
 
             if (selectedNucleotideX != -1 || selectedNucleotideY != -1) {
@@ -1386,7 +1386,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             // highlight nucleotides
             for (int i = startHighlightPosition; i < endHighlightPosition; i++) {
                 g.setColor(Color.orange);
-                g.setStroke(new BasicStroke((float) 3));
+                g.setStroke(new BasicStroke((float) 2));
 
                 int nucX = i - substructureModel.substructure.startPosition;
                 if (nucX >= 0 && nucX < nucleotidePositions.length) {
@@ -1447,7 +1447,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
     }
     int selectedNucleotideX = -1;
     int selectedNucleotideY = -1;
-
+    int mouseoverNucleotide = 0;
     public void mouseMoved(MouseEvent e) {
         String interactionText = "";
 
@@ -1471,10 +1471,24 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                 nucleotide = minIndex;
             }
 
-            int pos = (substructureModel.substructure.getStartPosition() + nucleotide - 1) % substructureModel.sequenceLength;
-
+            /*int pos = (substructureModel.substructure.getStartPosition() + nucleotide - 1) % substructureModel.sequenceLength;
+             
             if (substructureModel.nucleotideSource != null && nucleotide != -1) {
-                double[] nucfa = substructureModel.nucleotideSource.getMappedFrequencyAtNucleotide(substructureModel.nucleotideMapping, pos);
+                mouseoverNucleotide = nucleotide;
+                repaint();
+            }
+            else
+            {
+                mouseoverNucleotide = -1;
+                repaint();
+            }*/
+            
+            if(nucleotide !=  mouseoverNucleotide)
+            {
+                mouseoverNucleotide = nucleotide;
+                repaint();
+            }
+            /*    double[] nucfa = substructureModel.nucleotideSource.getMappedFrequencyAtNucleotide(substructureModel.nucleotideMapping, pos);
                 interactionText += "Composition (";
                 for (int i = 0; i < 4; i++) {
                     String a = "";
@@ -1565,7 +1579,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
 
             if (oldSelectedNucleotideX != selectedNucleotideX || oldSelectedNucleotideY != selectedNucleotideY) {
                 repaint();
-            }
+            }*/
         }
 
     }
@@ -1853,6 +1867,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
         }
     }
     
+    @Override
       public String getToolTipText(MouseEvent e) {
           
          String interactionText = "";
@@ -1876,12 +1891,12 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             boolean nucSelected = false;
             if (minDistance <= nucleotideDiameter / 2) {
                 nucleotide = minIndex;
-                nucSelected = true;
-            }
+                nucSelected = true;                
+            } 
 
             int pos = (substructureModel.substructure.getStartPosition() + nucleotide) % substructureModel.sequenceLength;
-            //System.out.println("POSITION = po"+pos);
-            if (substructureModel.nucleotideSource != null && nucSelected) {
+           //System.out.println("POSITION = po"+pos);
+            if (substructureModel.nucleotideSource != null && nucSelected) {   
                 double[] nucfa = substructureModel.nucleotideSource.getMappedFrequencyAtNucleotide(substructureModel.nucleotideMapping, pos);
                 interactionText += "Composition: ";
                 for (int i = 0; i < 4; i++) {

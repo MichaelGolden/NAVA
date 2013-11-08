@@ -21,6 +21,7 @@ import nava.ranking.RankingAnalyses;
 import nava.structurevis.data.DataTransform;
 import nava.structurevis.data.NHistogram;
 import nava.structurevis.data.NHistogramPanel;
+import nava.structurevis.data.NucleotideComposition;
 import nava.utils.Mapping;
 
 /**
@@ -62,10 +63,11 @@ public class NucleotideRatesOverall {
         {
             return;
         }
+        //double [] pairedPercent = getPairedPercentage(structureData);
         
-        double [] pairedPercent = getPairedPercentage(structureData);
+    double [] pairedPercent = getPairedPercentagePhylogeneticallyWeighted(structureData);
         
-      /*  Mapping mapping = Mapping.createMapping(testData.synonymousAlignment, testData.sequenceAlignment, 1000,false);
+      /* Mapping mapping = Mapping.createMapping(testData.synonymousAlignment, testData.sequenceAlignment, 1000,false);
         ArrayList<String> values = CsvReader.getColumn(testData.synonymousCSV, 1);
         values.remove(0);
          System.out.println(values);*/
@@ -74,11 +76,11 @@ public class NucleotideRatesOverall {
         ArrayList<Double> all = new ArrayList<Double>();
         
         //MappedData data = MappingComparison.getHIVMappedData(testData.sequenceAlignment);
-       MappedData data = MappedData.getMappedData(testData.sequenceAlignment, new MappableData(testData.synonymousAlignment, testData.synonymousCSV,1,1, false, "Nuc"), 1000, false);
+     MappedData data = MappedData.getMappedData(testData.sequenceAlignment, new MappableData(testData.synonymousAlignment, testData.synonymousCSV,1,1, false, "Nuc"), 1000, false);
     
         for(int i = 0 ; i < data.values.length ; i++)
         {
-            System.out.println(data.values[i]+"\t"+data.used[i]+"\t"+data.codon[i]);
+           // System.out.println(data.values[i]+"\t"+data.used[i]+"\t"+data.codon[i]);
             if(data.used[i])
             {
                 if( pairedPercent[i] > 0.5)
@@ -117,8 +119,6 @@ public class NucleotideRatesOverall {
     public static void main(String [] args)
     {
         try {
-                        SynonymousTestData hcv2Data = new SynonymousTestData(new File("C:/dev/thesis/hcv/2/100/hcv2_all_100_aligned_edit.csv"),new File("C:/dev/thesis/hcv/2/100/hcv2_all_100_aligned_edit.fas"),new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.dbn"), new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.fas"));
-            runTest(hcv2Data, "hcv2");
             
             SynonymousTestData hiv1bData = new SynonymousTestData(new File("C:/dev/thesis/hiv_full/1b/100/hiv1b_all_100_aligned.csv"),new File("C:/dev/thesis/hiv_full/1b/100/hiv1b_all_100_aligned.fas"),new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.dbn"), new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.fas"));
             runTest(hiv1bData, "hiv1b");
@@ -155,6 +155,8 @@ public class NucleotideRatesOverall {
            
              SynonymousTestData dengueData4 = new SynonymousTestData(new File("C:/dev/thesis/dengue4/100/dengue4_all_100_aligned.csv"),new File("C:/dev/thesis/dengue4/100/dengue4_all_100_aligned.fas"),new File("C:/dev/thesis/dengue/dengue-alignment.dbn"), new File("C:/dev/thesis/dengue/dengue-alignment.fas"));
            runTest(dengueData4, "dengue4");
+           
+           
             SynonymousTestData hcv1Data = new SynonymousTestData(new File("C:/dev/thesis/hcv/1/100/hcv1_all_100_aligned.csv"),new File("C:/dev/thesis/hcv/1/100/hcv1_all_100_aligned.fas"),new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.dbn"), new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.fas"));
             runTest(hcv1Data, "hcv1");
             
@@ -165,6 +167,8 @@ public class NucleotideRatesOverall {
             runTest(hcv1bData, "hcv1b");
              
 
+            SynonymousTestData hcv2Data = new SynonymousTestData(new File("C:/dev/thesis/hcv/2/100/hcv2_all_100_aligned_edit.csv"),new File("C:/dev/thesis/hcv/2/100/hcv2_all_100_aligned_edit.fas"),new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.dbn"), new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.fas"));
+            runTest(hcv2Data, "hcv2");
             
             SynonymousTestData hcv2aData = new SynonymousTestData(new File("C:/dev/thesis/hcv/2a/100/hcv2a_all_100_aligned.csv"),new File("C:/dev/thesis/hcv/2a/100/hcv2a_all_100_aligned.fas"),new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.dbn"), new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.fas"));
             runTest(hcv2aData, "hcv2a");
@@ -292,6 +296,57 @@ public class NucleotideRatesOverall {
         {
             pairedMatrix[i] /= t[i];
         }
+        
+        return pairedMatrix;
+    }
+    
+     public static double [] getPairedPercentagePhylogeneticallyWeighted(ArrayList<SecondaryStructureData> structureData)
+    {
+        ArrayList<String> sequences = new ArrayList<>();
+        for(SecondaryStructureData s : structureData)
+        {
+            sequences.add(s.sequence);
+        }        
+        ///double [][] distances = NucleotideComposition.getDistanceMatrix(sequences);
+        //double average = 
+        double [] weights = NucleotideComposition.getWeights(sequences);
+       /* for(int i = 0 ; i < weights.length ; i++)
+        {
+            System.out.println(i+"\t"+weights[i]);
+        }*/
+        
+        int length = structureData.get(0).pairedSites.length;
+        double [] pairedMatrix = new double[length];
+        double [] t = new double[length];
+        for(int k = 0; k < structureData.size() ; k++)
+        {
+            SecondaryStructureData s = structureData.get(k);
+            for(int i = 0 ; i < s.pairedSites.length ; i++)
+            {
+                if(s.pairedSites[i] != 0)
+                {
+                    //pairedMatrix[i]++;
+                    pairedMatrix[i] += weights[k];
+                }
+                
+                if(s.sequence.charAt(i) != '-')
+                {
+                    //t[i]++;
+                    t[i] += weights[k];
+                }                
+            }
+        }
+        
+        for(int i = 0 ; i < t.length ; i++)
+        {
+            pairedMatrix[i] /= t[i];
+        }
+        
+        /*
+        for(int i = 0 ; i < pairedMatrix.length ; i++)
+        {
+            System.out.println("Paired\t"+pairedMatrix[i]);
+        }*/
         
         return pairedMatrix;
     }

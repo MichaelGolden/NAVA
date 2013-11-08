@@ -106,6 +106,7 @@ public class MAFFTApplication extends Application {
 
                 outputFile1.file = null;
                 Alignment alignment = new Alignment();
+                alignment.aligned = true;
                 alignment.title = inputDataSource.title + "_mafft_aligned";
                 alignment.originalFile = outFastaFile;
                 outputFile1.dataSource = alignment;

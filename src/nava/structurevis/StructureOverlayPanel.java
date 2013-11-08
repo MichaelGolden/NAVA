@@ -4,8 +4,16 @@
  */
 package nava.structurevis;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
@@ -29,7 +37,7 @@ import nava.utils.GraphicsUtils;
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeListener, ItemListener {
+public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeListener, ItemListener, KeyListener {
 
     //ProjectController projectController;
     ProjectModel projectModel;
@@ -58,7 +66,7 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
         //this.maxSpinner.setModel(this.maxSpinnerModel);
         //this.maxSpinner.addChangeListener(this);
         circularRadioButton.addItemListener(this);
-
+        sequenceTextField.addKeyListener(this);
         populateStructureComboBox(projectModel.dataSources.getArrayListShallowCopy());
         populateAlignmentComboBox(projectModel.dataSources.getArrayListShallowCopy());
     }
@@ -107,6 +115,7 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
         fromSequenceRadioButton = new javax.swing.JRadioButton();
         sequenceTextField = new javax.swing.JTextField();
         addMappingAlignmentAsOverlayCheckBox = new javax.swing.JCheckBox();
+        jButton4 = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jButton3 = new javax.swing.JButton();
         jLabel8 = new javax.swing.JLabel();
@@ -147,10 +156,23 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
         jButton2.setEnabled(false);
 
         mappingGroup.add(fromSequenceRadioButton);
-        fromSequenceRadioButton.setText("From sequence string (ctrl-v to paste here)");
+        fromSequenceRadioButton.setText("Paste from sequence string");
+
+        sequenceTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sequenceTextFieldActionPerformed(evt);
+            }
+        });
 
         addMappingAlignmentAsOverlayCheckBox.setSelected(true);
         addMappingAlignmentAsOverlayCheckBox.setText("Add this mapping alignment as a nucleotide overlay (recommended)");
+
+        jButton4.setText("Paste");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -165,8 +187,7 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
                     .addComponent(addMappingAlignmentAsOverlayCheckBox)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(21, 21, 21)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(sequenceTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 386, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jLabel4)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -174,8 +195,12 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jLabel5)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jButton2)))))
-                .addContainerGap(16, Short.MAX_VALUE))
+                                .addComponent(jButton2))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(sequenceTextField)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton4)))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -193,8 +218,12 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(fromSequenceRadioButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(sequenceTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(10, 10, 10)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jButton4)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(sequenceTextField)
+                        .addGap(2, 2, 2)))
+                .addGap(8, 8, 8)
                 .addComponent(addMappingAlignmentAsOverlayCheckBox)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -228,7 +257,7 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel8)
                     .addComponent(jButton3))
-                .addGap(0, 113, Short.MAX_VALUE))
+                .addGap(0, 112, Short.MAX_VALUE))
         );
 
         conformationGroup.add(linearRadioButton);
@@ -316,6 +345,28 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
         }
         System.out.println(structureOverlay.substructureList);
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void sequenceTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sequenceTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_sequenceTextFieldActionPerformed
+
+    
+    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        Transferable contents = clipboard.getContents(null);
+        
+        boolean hasTransferableText = (contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor);
+    
+        if(hasTransferableText) {
+            try {
+                sequenceTextField.setText((String)contents.getTransferData(DataFlavor.stringFlavor));
+                fromSequenceRadioButton.setSelected(true);
+            }
+            catch (UnsupportedFlavorException | IOException ex){
+            }
+        }
+    }//GEN-LAST:event_jButton4ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox addMappingAlignmentAsOverlayCheckBox;
     private javax.swing.JComboBox alignmentComboBox;
@@ -327,6 +378,7 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -420,7 +472,11 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
                 this.embeddSequenceRadioButton.setSelected(true);
                 break;
             case ALIGNMENT:
-                this.fromAlignmentRadioButton.setSelected(true);
+                this.fromAlignmentRadioButton.setSelected(true);         
+                if(structureOverlay.mappingSource != null)
+                {
+                    alignmentComboBoxModel.setSelectedItem(structureOverlay.mappingSource.alignmentSource);
+                }
                 break;
             case STRING:
                 this.fromSequenceRadioButton.setSelected(true);
@@ -440,6 +496,16 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
 
     @Override
     public void stateChanged(ChangeEvent e) {
+        if(e.getSource().equals(this.structureComboBoxModel))
+        {
+            SecondaryStructure structure = (SecondaryStructure) structureComboBox.getSelectedItem();
+            if(structureOverlay != null)
+            {
+                structureOverlay.structure = structure;
+                structureOverlay.substructureList = new SubstructureList(structureOverlay);
+            }
+            
+        }
         update();
         /*
          * int min = (Integer) minSpinner.getValue(); int max = (Integer)
@@ -449,5 +515,20 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
          * minSpinnerModel.setValue(max); } }
          *
          */
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        fromSequenceRadioButton.setSelected(true);
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+       fromSequenceRadioButton.setSelected(true);
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        fromSequenceRadioButton.setSelected(true);
     }
 }

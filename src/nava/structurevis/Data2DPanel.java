@@ -267,6 +267,20 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
         this.dataMaxField.setValue(dataSource2D.maxValue);
         this.missingDataRadioButton.setSelected(dataSource2D.excludeValuesOutOfRange);
         this.clampedRadioButton.setSelected(!dataSource2D.excludeValuesOutOfRange);
+       
+        switch(dataSource2D.matrixRegion)
+        {
+            case  FULL:
+                useEntireMatrixRadioButton.setSelected(true);
+                break;
+            case UPPER_TRIANGLE:
+                useUpperMatrixRadioButton.setSelected(true);
+                break;
+            case LOWER_TRIANGLE:
+                useLowerMatrixRadioButton.setSelected(true);
+                break;
+        }
+                
         this.transformComboBoxModel.setSelectedItem(dataSource2D.dataTransform.type);
         this.dataLegend.setLegend(null, dataSource2D.dataTransform, dataSource2D.colorGradient, dataSource2D.defaultColorGradient, dataSource2D.useLowerThreshold, dataSource2D.useUpperThreshold, dataSource2D.thresholdMinPerc, dataSource2D.thresholdMaxPerc, dataSource2D);
         this.mappingSourceComboBoxModel.setSelectedItem(dataSource2D.mappingSource.alignmentSource);
@@ -802,6 +816,7 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         selectBestAlignment();
     }//GEN-LAST:event_jButton1ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton clampedRadioButton;
     private javax.swing.JCheckBox codonCheckButton;

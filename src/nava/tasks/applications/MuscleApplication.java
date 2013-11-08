@@ -12,8 +12,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import nava.data.types.Alignment;
 import nava.data.types.DataSource;
-import nava.data.types.SecondaryStructure;
-import nava.data.types.SecondaryStructureData;
 import nava.ui.ProjectModel;
 
 /**
@@ -55,6 +53,7 @@ public class MuscleApplication extends Application {
 
                 outputFile1.file = null;
                 Alignment alignment = new Alignment();
+                alignment.aligned = true;
                 alignment.title = inputDataSource.title + "_muscle_aligned";
                 alignment.originalFile = outFastaFile;
                 outputFile1.dataSource = alignment;

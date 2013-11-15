@@ -4,16 +4,17 @@
  */
 package nava.structurevis;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.awt.Dimension;
 import java.util.List;
+import javax.accessibility.Accessible;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JPopupMenu;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import nava.data.types.Alignment;
 import nava.data.types.DataSource;
-import nava.data.types.Tabular;
-import nava.data.types.TabularField;
 import nava.structurevis.data.NucleotideComposition;
 import nava.ui.ProjectModel;
 import nava.utils.AlignmentType;
@@ -35,9 +36,14 @@ public class NucleotideCompositionPanel extends javax.swing.JPanel {
         initComponents();
         this.projectModel = projectModel;
 
-        this.nucleotideAlignmentComboBox.setModel(nucleotideAlignmentComboBoxModel);
+        
+        
+        //widerDropDownComboBox1.setPreferredSize(new Dimension(80,20));
+        widerDropDownComboBox1.setModel(nucleotideAlignmentComboBoxModel);
+      
 
         populateNucleotideAlignmentComboBox(projectModel.dataSources.getArrayListShallowCopy());
+        widerDropDownComboBox1.setWide(true);
     }
 
     public void populateNucleotideAlignmentComboBox(List<DataSource> dataSources) {
@@ -81,17 +87,17 @@ public class NucleotideCompositionPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        nucleotideAlignmentComboBox = new javax.swing.JComboBox();
         jButton1 = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
+        widerDropDownComboBox1 = new nava.ui.WiderDropDownComboBox();
 
         jLabel1.setText("Select nucleotide source");
-
-        nucleotideAlignmentComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         jButton1.setText("Add from file");
 
         jLabel2.setText("or");
+
+        widerDropDownComboBox1.setMaximumSize(new java.awt.Dimension(100, 32767));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -100,11 +106,11 @@ public class NucleotideCompositionPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(nucleotideAlignmentComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(widerDropDownComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton1)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -113,19 +119,22 @@ public class NucleotideCompositionPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jButton1)
-                        .addComponent(jLabel2))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel1)
-                        .addComponent(nucleotideAlignmentComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jButton1)
+                            .addComponent(jLabel2))
+                        .addContainerGap(23, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(widerDropDownComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JComboBox nucleotideAlignmentComboBox;
+    private nava.ui.WiderDropDownComboBox widerDropDownComboBox1;
     // End of variables declaration//GEN-END:variables
 }

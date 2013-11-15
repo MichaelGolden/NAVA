@@ -137,7 +137,7 @@ public class AddDataOverlayDialog extends javax.swing.JDialog {
     private void addNucleotideButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addNucleotideButtonActionPerformed
         this.dispose();
         NucleotideCompositionDialog d = new NucleotideCompositionDialog(null, true, projectController.projectModel, structureVisController);
-        d.setSize(600, 150);
+        d.setSize(500, 150);
         GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
         d.setEditMode(null);
         d.setVisible(true);
@@ -155,7 +155,7 @@ public class AddDataOverlayDialog extends javax.swing.JDialog {
     private void add2DButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_add2DButtonActionPerformed
         this.dispose();
         Data2DDialog d = new Data2DDialog(null, true, projectController.projectModel, structureVisController);
-        d.setSize(750, 690);
+        d.setSize(750, 720);
         GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
         d.setEditMode(null);
         d.setVisible(true);

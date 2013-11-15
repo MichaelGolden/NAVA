@@ -147,7 +147,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         } else if (selectedDataSource instanceof Matrix) {
             Data2DDialog d = new Data2DDialog(null, true, projectModel, structureVisController);
             d.data2DPanel.dataMatrixComboBoxModel.setSelectedItem(selectedDataSource);
-            d.setSize(750, 690);
+            d.setSize(750, 720);
             GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
             d.setEditMode(null);
             d.setVisible(true);
@@ -161,7 +161,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
         } else if (selectedDataSource instanceof Alignment) {
             NucleotideCompositionDialog d = new NucleotideCompositionDialog(null, true, projectModel, structureVisController);
             d.nucleotidePanel.nucleotideAlignmentComboBoxModel.setSelectedItem(selectedDataSource);
-            d.setSize(600, 150);
+            d.setSize(500, 150);
             GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
             d.setEditMode(null);
             d.setVisible(true);
@@ -181,14 +181,14 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
                 Data2DDialog d = new Data2DDialog(parent, true, projectModel, structureVisController);
                 d.data2DPanel.setDataSource2D((DataOverlay2D) overlay);
                 d.setEditMode(overlay);
-                d.setSize(750, 690);
+                d.setSize(750, 720);
                 GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
                 d.setVisible(true);
             } else if (overlay instanceof NucleotideComposition) {
                 NucleotideCompositionDialog d = new NucleotideCompositionDialog(parent, true, projectModel, structureVisController);
                 d.setEditMode(overlay);
                 d.nucleotidePanel.setNucleotideSource((NucleotideComposition) overlay);
-                d.setSize(600, 150);
+                d.setSize(500, 150);
                 GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
                 d.setVisible(true);
             } else if (overlay instanceof StructureOverlay) {

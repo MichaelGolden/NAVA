@@ -13,6 +13,10 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+/**
+ *
+ * @author Santhosh Kumar <SANTHOSH.TEKURI@GMAIL.COM>
+ */
 public class WiderDropDownComboBox extends JComboBox {
     private static final long serialVersionUID = -4994305358602391496L;
 

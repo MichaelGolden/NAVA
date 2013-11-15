@@ -69,6 +69,8 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
         sequenceTextField.addKeyListener(this);
         populateStructureComboBox(projectModel.dataSources.getArrayListShallowCopy());
         populateAlignmentComboBox(projectModel.dataSources.getArrayListShallowCopy());
+        structureComboBox.setWide(true);
+        alignmentComboBox.setWide(true);
     }
 
     public void populateStructureComboBox(List<DataSource> dataSources) {
@@ -101,7 +103,6 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
         mappingGroup = new javax.swing.ButtonGroup();
         substructureGroup = new javax.swing.ButtonGroup();
         conformationGroup = new javax.swing.ButtonGroup();
-        structureComboBox = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
@@ -109,21 +110,20 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
         embeddSequenceRadioButton = new javax.swing.JRadioButton();
         fromAlignmentRadioButton = new javax.swing.JRadioButton();
         jLabel4 = new javax.swing.JLabel();
-        alignmentComboBox = new javax.swing.JComboBox();
         jLabel5 = new javax.swing.JLabel();
         jButton2 = new javax.swing.JButton();
         fromSequenceRadioButton = new javax.swing.JRadioButton();
         sequenceTextField = new javax.swing.JTextField();
         addMappingAlignmentAsOverlayCheckBox = new javax.swing.JCheckBox();
         pasteButton = new javax.swing.JButton();
+        alignmentComboBox = new nava.ui.WiderDropDownComboBox();
         jPanel2 = new javax.swing.JPanel();
         jButton3 = new javax.swing.JButton();
         jLabel8 = new javax.swing.JLabel();
         linearRadioButton = new javax.swing.JRadioButton();
         jLabel2 = new javax.swing.JLabel();
         circularRadioButton = new javax.swing.JRadioButton();
-
-        structureComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        structureComboBox = new nava.ui.WiderDropDownComboBox();
 
         jLabel1.setText("Select structure");
 
@@ -147,8 +147,6 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
         });
 
         jLabel4.setText("Select alignment");
-
-        alignmentComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         jLabel5.setText("or");
 
@@ -174,6 +172,12 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
             }
         });
 
+        alignmentComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                alignmentComboBoxActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -190,8 +194,8 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jLabel4)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(alignmentComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(alignmentComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jLabel5)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -212,9 +216,9 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(alignmentComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5)
-                    .addComponent(jButton2))
+                    .addComponent(jButton2)
+                    .addComponent(alignmentComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(fromSequenceRadioButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -288,8 +292,8 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
                                 .addGap(0, 0, Short.MAX_VALUE))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(structureComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(structureComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jLabel3)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -307,9 +311,9 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(structureComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3)
-                    .addComponent(jButton1))
+                    .addComponent(jButton1)
+                    .addComponent(structureComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(11, 11, 11)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
@@ -365,9 +369,13 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
         }
     }//GEN-LAST:event_pasteButtonActionPerformed
 
+    private void alignmentComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alignmentComboBoxActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_alignmentComboBoxActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox addMappingAlignmentAsOverlayCheckBox;
-    private javax.swing.JComboBox alignmentComboBox;
+    private nava.ui.WiderDropDownComboBox alignmentComboBox;
     private javax.swing.JRadioButton circularRadioButton;
     private javax.swing.ButtonGroup conformationGroup;
     private javax.swing.JRadioButton embeddSequenceRadioButton;
@@ -388,7 +396,7 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
     private javax.swing.ButtonGroup mappingGroup;
     private javax.swing.JButton pasteButton;
     private javax.swing.JTextField sequenceTextField;
-    private javax.swing.JComboBox structureComboBox;
+    private nava.ui.WiderDropDownComboBox structureComboBox;
     private javax.swing.ButtonGroup substructureGroup;
     // End of variables declaration//GEN-END:variables
 

@@ -79,10 +79,11 @@ public class SynonymousRatesOverall {
         ArrayList<Double> unpairedValuesSiteAtLeast2 = new ArrayList<>();
         ArrayList<Double> all = new ArrayList<Double>();
         
-        //MappedData data = MappingComparison.getHIVMappedData(testData.sequenceAlignment);
-        int column = 1;
+        
+      int column = 2;
+      //MappedData data = MappingComparison.getHIVMappedData(testData.sequenceAlignment, column);
       MappedData data = MappedData.getMappedData(testData.sequenceAlignment, new MappableData(testData.synonymousAlignment, testData.synonymousCSV,column,1, true, "Syn"), 1000, false);
-      /* for(int i = 0 ; i < data.used.length ; i++)
+      /*for(int i = 0 ; i < data.used.length ; i++)
        {
            if(i >= 225 && i <= 525)
            {
@@ -203,9 +204,9 @@ public class SynonymousRatesOverall {
     public static void main(String [] args)
     {
         try {
-            //SynonymousTestData hivData = new SynonymousTestData(new File("C:/dev/thesis/jev/300/jev_polyprotein_300_aligned.csv"),new File("C:/dev/thesis/jev/300/jev_polyprotein_300_aligned.fas"),new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.dbn"), new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.fas"));
-         //  runTest(hivData, null);
-         //  System.exit(0);
+           /* SynonymousTestData hivData = new SynonymousTestData(new File("C:/dev/thesis/jev/300/jev_polyprotein_300_aligned.csv"),new File("C:/dev/thesis/jev/300/jev_polyprotein_300_aligned.fas"),new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.dbn"), new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.fas"));
+          runTest(hivData, null);
+           System.exit(0);*/
               SynonymousTestData dengueData = new SynonymousTestData(new File("C:/dev/thesis/dengue/300/dengue_polyprotein_300_aligned.csv"),new File("C:/dev/thesis/dengue/300/dengue_polyprotein_300_aligned.fas"),new File("C:/dev/thesis/dengue/dengue-alignment.dbn"), new File("C:/dev/thesis/dengue/dengue-alignment.fas"));
             runTest(dengueData, null);
              SynonymousTestData dengueData1 = new SynonymousTestData(new File("C:/dev/thesis/dengue1/300/dengue1_polyprotein_300_aligned.csv"),new File("C:/dev/thesis/dengue1/300/dengue1_polyprotein_300_aligned.fas"),new File("C:/dev/thesis/dengue/dengue-alignment.dbn"), new File("C:/dev/thesis/dengue/dengue-alignment.fas"));
@@ -216,6 +217,7 @@ public class SynonymousRatesOverall {
             runTest(dengueData3, "dengue3");
              SynonymousTestData dengueData4 = new SynonymousTestData(new File("C:/dev/thesis/dengue4/250/dengue4_polyprotein_250_aligned.csv"),new File("C:/dev/thesis/dengue4/250/dengue4_polyprotein_250_aligned.fas"),new File("C:/dev/thesis/dengue/dengue-alignment.dbn"), new File("C:/dev/thesis/dengue/dengue-alignment.fas"));
             runTest(dengueData4, "dengue4");
+            //System.exit(0);
                SynonymousTestData bvdvData = new SynonymousTestData(new File("C:/dev/thesis/bvdv/300/bvdv_polyprotein_300_aligned_trim.csv"),new File("C:/dev/thesis/bvdv/300/polyprotein_300_aligned_trim.fas"),new File("C:/dev/thesis/bvdv/bvdv_all_aligned.dbn"), new File("C:/dev/thesis/bvdv/bvdv_all_aligned.fas"));
             runTest(bvdvData, null);
              SynonymousTestData csfvData = new SynonymousTestData(new File("C:/dev/thesis/csfv/300/csfv_polyprotein_300_aligned.csv"),new File("C:/dev/thesis/csfv/300/polyprotein_300_aligned.fas"),new File("C:/dev/thesis/csfv/csfv_all_aligned.dbn"), new File("C:/dev/thesis/csfv/csfv_all_aligned.fas"));

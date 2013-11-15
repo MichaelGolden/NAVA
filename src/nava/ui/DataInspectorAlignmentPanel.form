@@ -21,21 +21,28 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <EmptySpace pref="0" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="nucleotideRadioButton" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="codonRadioButton" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="proteinRadioButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="isAlignedCheckBox" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="nucleotideRadioButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="codonRadioButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="proteinRadioButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+                  <Component id="numSequencesLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="numColumnsLabel" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
-                  <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace pref="71" max="32767" attributes="0"/>
+              <EmptySpace pref="27" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -58,7 +65,13 @@
                   <Component id="proteinRadioButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="25" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="numSequencesLabel" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="numColumnsLabel" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="7" max="-2" attributes="0"/>
+              <Component id="isAlignedCheckBox" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -116,6 +129,21 @@
           <Image iconType="3" name="/resources/icons/protein-alignment-16x16.png"/>
         </Property>
         <Property name="text" type="java.lang.String" value=" "/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="isAlignedCheckBox">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Sequences aligned?"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="numSequencesLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="No. sequences: 100"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="numColumnsLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="No. columns: 1000"/>
       </Properties>
     </Component>
   </SubComponents>

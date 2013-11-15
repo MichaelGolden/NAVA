@@ -8,6 +8,7 @@ import nava.structurevis.layerpanel.Layer;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.io.*;
 import java.util.ArrayList;
@@ -18,15 +19,9 @@ import java.util.logging.Logger;
 import javax.swing.*;
 import nava.structurevis.AnnotationsDialog;
 import nava.structurevis.StructureVisController;
-import nava.structurevis.SubstructureDrawPanel;
-import nava.structurevis.data.AnnotationSource;
-import nava.structurevis.data.Block;
-import nava.structurevis.data.Feature;
-import nava.tasks.AnnotationMappingTask;
+import nava.structurevis.data.*;
 import nava.ui.MainFrame;
 import nava.ui.ProjectController;
-import nava.ui.ProjectModel;
-import nava.utils.CustomItem;
 import nava.utils.CustomJMenuItem;
 import nava.utils.GraphicsUtils;
 import nava.utils.Pair;
@@ -35,7 +30,8 @@ import nava.utils.Pair;
  *
  * @author Michael Golden
  */
-public class AnnotationsLayer extends JPanel implements ActionListener, MouseListener, MouseMotionListener {
+public class AnnotationsLayer extends JPanel implements ActionListener, MouseListener, MouseMotionListener
+{
 
     //Graphics2D g = null;
     int xoffset = 5;
@@ -158,9 +154,29 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
 
         }
     };
+    
+    public void updateSubstructures()
+    {
+        try
+        {
+            structureList = this.structureVisController.structureVisModel.substructureModel.structureOverlay.substructureList.substructures;
+            structures =  this.structureVisController.structureVisModel.substructureModel.structureOverlay.substructureList.substructures;   
+            //structurePositions = getSubstructurePositions(structureVisController.structureVisModel.substructureModel.getSubstructures(), structureVisController.structureVisModel.substructureModel.structureOverlay.pairedSites.length);
+            genomeLength = this.structureVisController.structureVisModel.substructureModel.structureOverlay.pairedSites.length;
+//            this.selected2 = this.structureVisController.structureVisModel.substructureModel.structureOverlay.s
+            this.selectedSubstructure = this.structureVisController.structureVisModel.substructureModel.substructure;
+        }
+        catch(Exception ex)
+        {
+            structures =  this.structureVisController.structureVisModel.substructureModel.structureOverlay.substructureList.substructures;
+           // structurePositions = new ArrayList<>();
+            genomeLength = 0;
+            ex.printStackTrace();
+        }
+    }
 
     public void setAnnotationData(AnnotationSource annotationData, boolean map) {
-        System.out.println("setAnnotationData GACACAF " + annotationData);
+        
         if (annotationData != null) {
             if (map) {
                 AnnotationSource mappedAnnotations = AnnotationSource.getMappedAnnotations(annotationData, structureVisController.structureVisModel.substructureModel.structureOverlay, structureVisController);
@@ -171,6 +187,8 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
                 setAnnotationData(annotationData);
             }
         }
+        updateSubstructures();
+      
     }
     boolean showLoading = true;
 
@@ -208,9 +226,14 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
             this.parent.parent.updatePanel();
         }
         showAnnotations();
-        System.out.println("ABITAHFAHAFA " + annotationData);
+        updateSubstructures();
+        
         revalidate();
         repaint();
+        
+          
+       
+        
     }
 
     public void updatePreferredHeight() {
@@ -337,6 +360,7 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
 
     @Override
     public void paintComponent(Graphics graphics) {
+        
         super.paintComponent(graphics);
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -344,17 +368,45 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
 
         int panelWidth = this.getWidth();
         int panelHeight = this.getHeight();
+      
 
         g2.setColor(Color.white);
         g2.fillRect(0, 0, panelWidth, panelHeight);
+        
+        int rulerLength = genomeLength;
+        if(rulerLength > 0)
+        {
+            if(annotationData != null)
+            {
+                rulerLength = annotationData.mappedSequenceLength;
+            }
+            
+             // draw ruler
+            g2.setFont(annotationsFont.deriveFont(12.0f));
+            for (int i = 0; i < rulerLength; i++) {
+                if (i % majorTickMark == 0) {
+                    double x = ((double) i / (double) rulerLength) * (getWidth() - xoffset);
+                    g2.setColor(Color.black);
+                    Line2D.Double tick = new Line2D.Double(x + xoffset, rulerHeight - 1, x + xoffset, rulerHeight + 1);
+                    g2.draw(tick);
+                    GraphicsUtils.drawStringCentred(g2, x + xoffset, rulerHeight / 2, i + "");
+                } else if (i % minorTickMark == 0) {
+                    double x = ((double) i / (double) rulerLength) * (getWidth() - xoffset);
+                    g2.setColor(Color.black);
+                    Line2D.Double tick = new Line2D.Double(x + xoffset, rulerHeight - 1, x + xoffset, rulerHeight + 1);
+                    g2.draw(tick);
+                }
+            }
+        }
 
+        g2.setFont(annotationsFont.deriveFont(13.0f));
         if (annotationData == null || annotationData.features.isEmpty()) {
             g2.setColor(Color.black);
-            GraphicsUtils.drawStringCentred(g2, panelWidth / 2, panelHeight / 2, "Right click to add annotations.");
+            GraphicsUtils.drawStringCentred(g2, panelWidth / 2, rulerHeight + ((panelHeight-rulerHeight) / 2), "Right click to add annotations.");
         } else {
             if (showLoading) {
                 g2.setColor(Color.black);
-                GraphicsUtils.drawStringCentred(g2, panelWidth / 2, panelHeight / 2, "Mapping annotations...");
+                GraphicsUtils.drawStringCentred(g2, panelWidth / 2, rulerHeight+ ((panelHeight-rulerHeight) / 2), "Mapping annotations...");
                 return;
             }
 
@@ -362,24 +414,7 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
             minorTickMark = chooseBestTickMarkSize(annotationData.mappedSequenceLength);
             majorTickMark = minorTickMark * 2;
 
-            // draw ruler
-            g2.setFont(annotationsFont.deriveFont(12.0f));
-            System.out.println("annotationData.mappedSequenceLength=" + annotationData.mappedSequenceLength);
-            for (int i = 0; i < annotationData.mappedSequenceLength; i++) {
-                if (i % majorTickMark == 0) {
-                    double x = ((double) i / (double) annotationData.mappedSequenceLength) * (getWidth() - xoffset);
-                    g2.setColor(Color.black);
-                    Line2D.Double tick = new Line2D.Double(x + xoffset, rulerHeight - 1, x + xoffset, rulerHeight + 1);
-                    g2.draw(tick);
-                    GraphicsUtils.drawStringCentred(g2, x + xoffset, rulerHeight / 2, i + "");
-                } else if (i % minorTickMark == 0) {
-                    double x = ((double) i / (double) annotationData.mappedSequenceLength) * (getWidth() - xoffset);
-                    g2.setColor(Color.black);
-                    Line2D.Double tick = new Line2D.Double(x + xoffset, rulerHeight - 1, x + xoffset, rulerHeight + 1);
-                    g2.draw(tick);
-                }
-            }
-
+           
 
             // draw blocks
             this.featurePositions = new ArrayList<>();
@@ -412,61 +447,74 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
                 }
             }
         }
+        
+        if(selectedSubstructures != null)
+        {
+            for (int i = 0; i < selectedSubstructures.size(); i++) {
+                Color blockColor = new Color(150, 150, 150, 100);
+                if (selectedSubstructures.get(i).structure.equals(selectedSubstructure)) {
+                    blockColor = new Color(10, 255, 10, 100);
+                }
+                g2.setColor(blockColor);
+                g2.fill(selectedSubstructures.get(i).rectangle);
+                
+                g2.setColor(Color.GRAY);
+                
+            }
+        }
 
-        /*
-         * g2.drawImage(bufferedImage, 0, 0, this);
-         *
-         * if (structures != null && structurePositions != null) { for (int i =
-         * 0; i < structurePositions.size(); i++) {
-         *
-         * Color blockColor = new Color(150, 150, 150, 100); if
-         * (structurePositions.get(i).structure.equals(selected)) { blockColor =
-         * new Color(255, 10, 10, 100); //selectedRect =
-         * structurePositions.get(i); } g2.setColor(blockColor);
-         * g2.fill(structurePositions.get(i).rectangle);
-         *
-         * g2.setColor(Color.GRAY);
-         *
-         * }
-         * }
-         */
+        if (structures != null && highlightedSubstructures != null) {
+            for (int i = 0; i < highlightedSubstructures.size(); i++) {
+                Color blockColor = new Color(150, 150, 150, 100);
+                if (highlightedSubstructures.get(i).structure.equals(highlightedSubstructure)) {
+                    blockColor = new Color(10, 10, 255, 100);
+                }
+                g2.setColor(blockColor);
+                g2.fill(highlightedSubstructures.get(i).rectangle);
+                
+                g2.setColor(Color.GRAY);                
+            }
+        }
 
 
-        /*
-         * double rulerHeight = 0; if (mouseoverStart != -1 || mouseoverEnd !=
-         * -1) { double mouseoverLength = mouseoverEnd - mouseoverStart; double
-         * regionWidth = (mouseoverLength / (double) layerPanel.genomeLength) *
-         * getWidth(); double x = (mouseoverStart / (double)
-         * layerPanel.genomeLength) * getWidth(); g2.setColor(new Color(0, 0, 0,
-         * 125)); Rectangle2D rect = new Rectangle2D.Double(x + xoffset,
-         * rulerHeight + 0, regionWidth, getHeight() - rulerHeight - 1);
-         * g2.draw(rect);
-         *
-         * // wrap around if (layerPanel.genomeLength < mouseoverEnd) {
-         * mouseoverLength = mouseoverEnd - layerPanel.genomeLength; regionWidth
-         * = (mouseoverLength / (double) layerPanel.genomeLength) * getWidth();
-         * x = 0; g2.setColor(new Color(125, 125, 125, 125)); rect = new
-         * Rectangle2D.Double(x + xoffset, rulerHeight + 0, regionWidth,
-         * getHeight() - rulerHeight - 1); g2.draw(rect); } } //rulerHeight =
-         * this.rulerHeight;
-         *
-         * if (selectedStart != -1 || selectedEnd != -1) { double
-         * mouseoverLength = selectedEnd - selectedStart; double regionWidth =
-         * (mouseoverLength / (double) layerPanel.genomeLength) * getWidth();
-         * double x = (selectedStart / (double) layerPanel.genomeLength) *
-         * getWidth(); g2.setColor(Color.RED); Rectangle2D rect = new
-         * Rectangle2D.Double(x + xoffset, rulerHeight + 0, regionWidth,
-         * getHeight() - rulerHeight - 1); g2.draw(rect);
-         *
-         * // wrap around if (layerPanel.genomeLength < selectedEnd) {
-         * mouseoverLength = selectedEnd - layerPanel.genomeLength; regionWidth
-         * = (mouseoverLength / (double) layerPanel.genomeLength) * getWidth();
-         * x = 0; g2.setColor(Color.RED); rect = new Rectangle2D.Double(x +
-         * xoffset, rulerHeight + 0, regionWidth, getHeight() - rulerHeight -
-         * 1); g2.draw(rect); } }
-         *
-         * // }
-         */
+        double rulerHeight = 0;
+        if (mouseoverStart != -1 || mouseoverEnd != -1) {
+            double mouseoverLength = mouseoverEnd - mouseoverStart;
+            double regionWidth = (mouseoverLength / (double) genomeLength) * getWidth();
+            double x = (mouseoverStart / (double) genomeLength) * getWidth();
+            g2.setColor(new Color(0, 0, 0, 125));
+            Rectangle2D rect = new Rectangle2D.Double(x + xoffset, rulerHeight + 0  - 3, regionWidth, 3 + getHeight() - rulerHeight - 1);
+            g2.draw(rect);
+
+            // wrap around
+            if (genomeLength < mouseoverEnd) {
+                mouseoverLength = mouseoverEnd - genomeLength;
+                regionWidth = (mouseoverLength / (double) genomeLength) * getWidth();
+                x = 0;
+                g2.setColor(new Color(125, 125, 125, 125));
+                rect = new Rectangle2D.Double(x + xoffset, rulerHeight + 0 - 3, regionWidth, 3 + getHeight() - rulerHeight - 1);
+                g2.draw(rect);
+            }
+        }        
+
+        if (selectedStart != -1 || selectedEnd != -1) {
+            double mouseoverLength = selectedEnd - selectedStart;
+            double regionWidth = (mouseoverLength / (double) genomeLength) * getWidth();
+            double x = (selectedStart / (double) genomeLength) * getWidth();
+            g2.setColor(Color.RED);
+            Rectangle2D rect = new Rectangle2D.Double(x + xoffset, rulerHeight + 0  - 3, regionWidth, 3 + getHeight() - rulerHeight - 1);
+            g2.draw(rect);
+
+            // wrap around
+            if (genomeLength < selectedEnd) {
+                mouseoverLength = selectedEnd - genomeLength;
+                regionWidth = (mouseoverLength / (double) genomeLength) * getWidth();
+                x = 0;
+                g2.setColor(Color.RED);
+                rect = new Rectangle2D.Double(x + xoffset, rulerHeight + 0  - 3, regionWidth, 3 + getHeight() - rulerHeight - 1);
+                g2.draw(rect);
+            }
+        }
     }
 
     @Override
@@ -483,125 +531,11 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
         return super.getToolTipText(event);
     }
 
-    /*
-     * public void drawMouseOverSelection(int start, int end) { mouseoverStart =
-     * start; mouseoverEnd = end; repaint(); }
-     *
-     * public void drawSelected(int start, int end) { selectedStart = start;
-     * selectedStart = end; repaint(); }
-     *
-     * public void mouseClicked(MouseEvent e) { if (this.isEnabled()) { if
-     * (selected != null) { layerPanel.mainapp.openStructure(selected); } else {
-     * int x = e.getX(); if (x >= 0 && x < getWidth()) { int position = (int)
-     * (((double) x / (double) getWidth()) * layerPanel.genomeLength); int
-     * structureIndex =
-     * layerPanel.mainapp.getStructureIndexAtPosition(position); if
-     * (structureIndex != -1) { //System.o
-     * layerPanel.mainapp.openStructure(structureIndex); } } else { } } } }
-     *
-     * public void selectStructureAtPosition(int position) { if
-     * (layerPanel.mainapp != null) { Structure s =
-     * layerPanel.mainapp.getStructureAtPosition(position); selectStructure(s);
-     * } }
-     *
-     * public void selectStructure(Structure s) { if (s == null) { selectedStart
-     * = -1; selectedEnd = -1; } else { selectedStart = s.getStartPosition();
-     * selectedEnd = s.getEndPosition(); } repaint(); }
-     *
-     * public void mousePressed(MouseEvent e) { // throw new
-     * UnsupportedOperationException("Not supported yet."); }
-     *
-     * public void mouseReleased(MouseEvent e) { if
-     * (SwingUtilities.isRightMouseButton(e)) { this.popupMenu.show(this,
-     * e.getX(), e.getY()); } }
-     *
-     * public void mouseEntered(MouseEvent e) { //throw new
-     * UnsupportedOperationException("Not supported yet."); }
-     *
-     * public void mouseExited(MouseEvent e) { structures = null; mouseoverStart
-     * = -1; mouseoverEnd = -1; repaint(); }
-     *
-     * public void mouseDragged(MouseEvent e) { //throw new
-     * UnsupportedOperationException("Not supported yet."); }
-     *
-     * public void mouseMoved(MouseEvent e) { if (this.isEnabled()) { int x =
-     * e.getX(); int y = e.getY(); if (x >= 0 && x < getWidth()) { int position
-     * = (int) (((double) x / (double) getWidth()) * layerPanel.genomeLength);
-     * if (layerPanel.mainapp != null) { Structure s =
-     * layerPanel.mainapp.getStructureAtPosition(position); Structure largest =
-     * layerPanel.mainapp.getLargestStructureAtPosition(position, 500); if
-     * (largest != null) { selected = null; structures =
-     * layerPanel.mainapp.getStructuresInRegion(largest.startPosition,
-     * largest.getEndPosition()); structurePositions =
-     * getStructurePositions(structures); for (int i = 0; i <
-     * structurePositions.size(); i++) { if
-     * (structurePositions.get(i).rectangle.contains(x, y)) { selected =
-     * structurePositions.get(i).structure; } } if (selected == null) { selected
-     * = s; } } else { structures = null; } if (selected == null) {
-     * mouseoverStart = -1; mouseoverEnd = -1; } else { mouseoverStart =
-     * selected.getStartPosition(); mouseoverEnd = selected.getEndPosition(); }
-     * repaint(); } } else { } } }
-     *
-     * public void actionPerformed(ActionEvent e) { if
-     * (e.getSource().equals(this.autofitItem)) { layerPanel.autofitWidth(); }
-     * else if (e.getSource().equals(this.zoomInItem)) { layerPanel.zoomIn(); }
-     * else if (e.getSource().equals(this.zoomOutItem)) { layerPanel.zoomOut();
-     * } }
-     *
-     * public ArrayList<StructureAndMouseoverRegion>
-     * getStructurePositions(ArrayList<Structure> structures) { double
-     * rulerHeight = 0; ArrayList<StructureAndMouseoverRegion> rectangles = new
-     * ArrayList<StructureAndMouseoverRegion>(); double minDistance = 3; int
-     * level = 0; System.out.println("start"); for (int i = 0; i <
-     * structures.size(); i++) { double h = (getHeight() - rulerHeight - 1) /
-     * (double) (structures.size()); double y = rulerHeight + i * h; double
-     * mouseoverLength = (double) structures.get(i).getEndPosition() - (double)
-     * structures.get(i).startPosition; double regionWidth = (mouseoverLength /
-     * (double) layerPanel.genomeLength) * getWidth(); double x = ((double)
-     * structures.get(i).startPosition / (double) layerPanel.genomeLength) *
-     * getWidth(); Rectangle2D rect = new Rectangle2D.Double(x + xoffset, y,
-     * regionWidth, h);
-     *
-     * int rectLevel = 0; for (rectLevel = 0; rectLevel <= level + 1;
-     * rectLevel++) { double dist = minHorizontalDistance(rectangles, rect,
-     * rectLevel); System.out.println(i+"\t"+dist+"\t"+level+"\t"+rect); if
-     * (dist < minDistance) { } else { System.out.println("break"); break; } }
-     * System.out.println(rectLevel); level = Math.max(level, rectLevel);
-     * rect.setRect(x + xoffset, rulerHeight + rectLevel * h, regionWidth, h);
-     * System.out.println("**"+rectLevel+"\t"+rect); rectangles.add(new
-     * StructureAndMouseoverRegion(structures.get(i), rect, rectLevel));
-     *
-     * }
-     *
-     * for (int i = 0; i < rectangles.size(); i++) { Rectangle2D r =
-     * rectangles.get(i).rectangle; double h = (getHeight() - rulerHeight - 1) /
-     * (double) (level + 1); double y = rulerHeight + rectangles.get(i).level *
-     * h; rectangles.get(i).rectangle.setRect(r.getX(), y, r.getWidth(), h); }
-     *
-     * return rectangles; }
-     *
-     * public double
-     * minHorizontalDistance(ArrayList<StructureAndMouseoverRegion> rectangles,
-     * Rectangle2D rect, int level) { double x = rect.getX(); double width =
-     * rect.getWidth(); double distance = Double.MAX_VALUE; for (int i = 0; i <
-     * rectangles.size(); i++) { StructureAndMouseoverRegion other =
-     * rectangles.get(i); if (other.level == level) { double dist1 =
-     * other.rectangle.getX() - (x + width); if (dist1 >= 0) { distance =
-     * Math.min(distance, dist1); } double dist2 = x - (other.rectangle.getX() +
-     * other.rectangle.getWidth()); if (dist2 >= 0) { distance =
-     * Math.min(distance, dist2); } if (x >= other.rectangle.getX() && x + width
-     * <= other.rectangle.getX() + other.rectangle.getWidth()) { distance = 0; }
-     * if (x <= other.rectangle.getX() && x + width >= other.rectangle.getX() +
-     * other.rectangle.getWidth()) { distance = 0; } } } return distance; }
-     *
-     * public class StructureAndMouseoverRegion {
-     *
-     * Structure structure; Rectangle2D rectangle; int level;
-     *
-     * public StructureAndMouseoverRegion(Structure structure, Rectangle2D
-     * rectangle, int level) { this.structure = structure; this.rectangle =
-     * rectangle; this.level = level; } }
-     */
+    
+    
+     ArrayList<SubstructureMouseoverRegion> highlightedSubstructures = new ArrayList<>();     
+     ArrayList<SubstructureMouseoverRegion> selectedSubstructures = new ArrayList<>();
+    
     int popupMenuX = 0;
     int popupMenuY = 0;
 
@@ -632,7 +566,27 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
 
             popupMenu.show(this, popupMenuX, popupMenuY);
         }
+        
+        if (this.isEnabled()) {
+            selectedSubstructures = (ArrayList<SubstructureMouseoverRegion>) highlightedSubstructures.clone();
+            selectedSubstructure = highlightedSubstructure;
+            if (highlightedSubstructure != null) {
+                this.structureVisController.structureVisModel.substructureModel.openSubstructure(highlightedSubstructure);
+            } else {
+                int x = e.getX();
+                if (x >= 0 && x < getWidth()) {
+                    int position = (int) (((double) x / (double) getWidth()) * genomeLength);
+                    int structureIndex = getStructureIndexAtPosition(position);
+                    if (structureIndex != -1) {                        
+                        this.structureVisController.structureVisModel.substructureModel.openSubstructure(getStructureAtIndex(structureIndex));
+                    }
+                }
+            }
+        }
+        
+        repaint();
     }
+    
 
     @Override
     public void mousePressed(MouseEvent e) {
@@ -648,14 +602,229 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
 
     @Override
     public void mouseExited(MouseEvent e) {
+        structures = null;
+        mouseoverStart = -1;
+        mouseoverEnd = -1;
+        repaint();
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
+        structures = null;
+        mouseoverStart = -1;
+        mouseoverEnd = -1;
+        repaint();
     }
+    
+    Substructure highlightedSubstructure = null;    
+    Substructure selectedSubstructure = null;
+    ArrayList<Substructure> structures = null;
+    ArrayList<Substructure> structureList = null;
+    int genomeLength = 0;
 
     @Override
     public void mouseMoved(MouseEvent e) {
+        if (this.isEnabled()) {
+            int x = e.getX();
+            int y = e.getY();
+            if (x >= 0 && x < getWidth()) {
+                int position = (int) (((double) x / (double) getWidth()) * genomeLength);
+                    Substructure s = getStructureAtIndex(position);
+                    Substructure largest = getLargestStructureAtPosition(position, 500);
+                    if (largest != null) {
+                        highlightedSubstructure = null;
+                        structures = getStructuresInRegion(largest.startPosition, largest.getEndPosition());
+                        highlightedSubstructures = getStructurePositions(structures);
+                        for (int i = 0; i < highlightedSubstructures.size(); i++) {
+                            if (highlightedSubstructures.get(i).rectangle.contains(x, y)) {
+                                highlightedSubstructure = highlightedSubstructures.get(i).structure;
+                            }
+                        }
+                        if (highlightedSubstructure == null) {
+                            highlightedSubstructure = s;
+                        }
+                    } else {
+                        structures = null;
+                    }
+                    if (highlightedSubstructure == null) {
+                        mouseoverStart = -1;
+                        mouseoverEnd = -1;
+                    } else {
+                        mouseoverStart = highlightedSubstructure.getStartPosition();
+                        mouseoverEnd = highlightedSubstructure.getEndPosition();
+                    }
+                    repaint();
+                }
+            } else {
+            }
+        }
+   
+    public Substructure getLargestStructureAtPosition(int position, int lessThanLength) {
+        Substructure s = null;
+        if(structureList != null)
+        {
+            for (int i = 0; i < structureList.size(); i++) {
+                if (structureList.get(i).length < lessThanLength && structureList.get(i).getStartPosition() <= position && structureList.get(i).getEndPosition() >= position) {
+                    if (s != null) {
+                        int ilen = structureList.get(i).length;
+                        int slen = s.length;
+                        if (ilen > slen) {
+                            s = structureList.get(i);
+                        }
+                    } else {
+                       s = structureList.get(i);
+                    }
+                }
+            }
+        }
+        return s;
+    }
+    
+    public void selectedSubstructures(Substructure s)
+    {
+        if(s != null)
+        {
+            int position = s.startPosition;
+            Substructure largest = getLargestStructureAtPosition(position, 500);
+            if (largest != null) {
+                selectedSubstructure = s;
+                structures = getStructuresInRegion(largest.startPosition, largest.getEndPosition());
+                selectedSubstructures = getStructurePositions(structures);
+            } else {
+                structures = null;
+            }
+            highlightedSubstructure = null;
+            mouseoverStart = -1;
+            mouseoverEnd = -1;
+        }
+        repaint();
+    }
+    
+    public void highlightSubstructure(Substructure s)
+    {
+        //int position = (int) (((double) x / (double) getWidth()) * genomeLength);
+        //  getStructureIndexAtPosition(substructure)
+        int position = s.startPosition;
+        Substructure largest = getLargestStructureAtPosition(position, 500);
+        if (largest != null) {
+            highlightedSubstructure = s;
+            structures = getStructuresInRegion(largest.startPosition, largest.getEndPosition());
+            highlightedSubstructures = getStructurePositions(structures);
+            /*for (int i = 0; i < highlightedSubstructures.size(); i++) {
+                if (highlightedSubstructures.get(i).rectangle.contains(x, y)) {
+                    highlightedSubstructure = highlightedSubstructures.get(i).structure;
+                }
+            }
+            if (highlightedSubstructure == null) {
+                highlightedSubstructure = s;
+            }*/
+        } else {
+            structures = null;
+        }
+        if (highlightedSubstructure == null) {
+            mouseoverStart = -1;
+            mouseoverEnd = -1;
+        } else {
+            mouseoverStart = highlightedSubstructure.getStartPosition();
+            mouseoverEnd = highlightedSubstructure.getEndPosition();
+        }
+        repaint();
+    }
+    
+    public ArrayList<Substructure> getStructuresInRegion(int start, int end) {
+        ArrayList<Substructure> substructures = new ArrayList<>();
+        if (structureList != null) 
+        {
+            for (int i = 0; i < structureList.size(); i++) {
+                if (structureList.get(i).getStartPosition() >= start && structureList.get(i).getEndPosition() <= end) {
+                    substructures.add(structureList.get(i));
+                }
+            }
+            
+        }
+        return substructures;
+    }
+    
+    public Substructure getStructureAtIndex(int index)
+    {
+        for(Substructure s : structureList)
+        {
+            if(s.index == index)
+            {
+                return s;
+            }
+        }
+        return null;
+    }
+    
+    public ArrayList<SubstructureMouseoverRegion> getStructurePositions(ArrayList<Substructure> structures) {
+        double rulerHeight = 0;
+        ArrayList<SubstructureMouseoverRegion> rectangles = new ArrayList<SubstructureMouseoverRegion>();
+        double minDistance = 3;
+        int level = 0;
+        for (int i = 0; i < structures.size(); i++) {
+            double h = (getHeight() - rulerHeight - 1) / (double) (structures.size());
+            double y = rulerHeight + i * h;
+            double mouseoverLength = (double) structures.get(i).getEndPosition() - (double) structures.get(i).startPosition;
+            double regionWidth = (mouseoverLength / (double) genomeLength) * getWidth();
+            double x = ((double) structures.get(i).startPosition / (double) genomeLength) * getWidth();
+            Rectangle2D rect = new Rectangle2D.Double(x + xoffset, y, regionWidth, h);
+
+            int rectLevel = 0;
+            for (rectLevel = 0; rectLevel <= level + 1; rectLevel++) {
+                double dist = minHorizontalDistance(rectangles, rect, rectLevel);
+                if (dist < minDistance) {
+                } else {
+                    break;
+                }
+            }
+            System.out.println(rectLevel);
+            level = Math.max(level, rectLevel);
+            rect.setRect(x + xoffset, rulerHeight + rectLevel * h, regionWidth, h);
+            rectangles.add(new SubstructureMouseoverRegion(structures.get(i), rect, rectLevel));
+
+            /*
+            // wrap around
+            if (layerPanel.genomeLength < (double) structures.get(i).getEndPosition()) {
+                Rectangle2D rect2 = new Rectangle2D.Double(x + xoffset, y, regionWidth, h);
+                rectLevel = 0;
+                for (rectLevel = 0; rectLevel <= level + 1; rectLevel++) {
+                    if (minHorizontalDistance(rectangles, rect2, rectLevel) < minDistance) {
+                    } else {
+                        break;
+                    }
+                }
+                level = Math.max(level, rectLevel);
+                rect2.setRect(x + xoffset, rulerHeight + rectLevel * h, regionWidth, h);
+                rectangles.add(new StructureAndMouseoverRegion(structures.get(i), rect2, rectLevel));
+            }*/
+        }
+
+        for (int i = 0; i < rectangles.size(); i++) {
+            Rectangle2D r = rectangles.get(i).rectangle;
+            double h = (getHeight() - rulerHeight - 1) / (double) (level + 1);
+            double y = rulerHeight + rectangles.get(i).level * h;
+            rectangles.get(i).rectangle.setRect(r.getX(), y, r.getWidth(), h);
+        }
+
+        return rectangles;
+    }
+    
+    
+    public void selectStructureAtIndex(int position) {
+            Substructure s = getStructureAtIndex(position);
+            selectStructure(s);
+    }
+
+    public void selectStructure(Substructure s) {
+        if (s == null) {
+            selectedStart = -1;
+            selectedEnd = -1;
+        } else {
+            selectedStart = s.getStartPosition();
+            selectedEnd = s.getEndPosition();
+        }
+        repaint();
     }
 
     @Override
@@ -771,5 +940,134 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
                 setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
             }
         }
+    }
+    
+    public ArrayList<SubstructureMouseoverRegion> getSubstructurePositions(ArrayList<Substructure> structures, int genomeLength) {
+        double rulerHeight = 0;
+        ArrayList<SubstructureMouseoverRegion> rectangles = new ArrayList<>();
+        double minDistance = 3;
+        int level = 0;
+        for (int i = 0; i < structures.size(); i++) {
+            double h = (getHeight() - rulerHeight - 1) / (double) (structures.size());
+            double y = rulerHeight + i * h;
+            double mouseoverLength = (double) structures.get(i).getEndPosition() - (double) structures.get(i).startPosition;
+            double regionWidth = (mouseoverLength / (double) genomeLength) * getWidth();
+            double x = ((double) structures.get(i).startPosition / (double) genomeLength) * getWidth();
+            Rectangle2D rect = new Rectangle2D.Double(x + xoffset, y, regionWidth, h);
+
+            int rectLevel = 0;
+            for (rectLevel = 0; rectLevel <= level + 1; rectLevel++) {
+                double dist = minHorizontalDistance(rectangles, rect, rectLevel);
+                if (dist < minDistance) {
+                } else {
+                    break;
+                }
+            }
+            System.out.println(rectLevel);
+            level = Math.max(level, rectLevel);
+            rect.setRect(x + xoffset, rulerHeight + rectLevel * h, regionWidth, h);
+            rectangles.add(new SubstructureMouseoverRegion(structures.get(i), rect, rectLevel));
+
+            /*
+            // wrap around
+            if (layerPanel.genomeLength < (double) structures.get(i).getEndPosition()) {
+                Rectangle2D rect2 = new Rectangle2D.Double(x + xoffset, y, regionWidth, h);
+                rectLevel = 0;
+                for (rectLevel = 0; rectLevel <= level + 1; rectLevel++) {
+                    if (minHorizontalDistance(rectangles, rect2, rectLevel) < minDistance) {
+                    } else {
+                        break;
+                    }
+                }
+                level = Math.max(level, rectLevel);
+                rect2.setRect(x + xoffset, rulerHeight + rectLevel * h, regionWidth, h);
+                rectangles.add(new StructureAndMouseoverRegion(structures.get(i), rect2, rectLevel));
+            }*/
+        }
+
+        for (int i = 0; i < rectangles.size(); i++) {
+            Rectangle2D r = rectangles.get(i).rectangle;
+            double h = (getHeight() - rulerHeight - 1) / (double) (level + 1);
+            double y = rulerHeight + rectangles.get(i).level * h;
+            rectangles.get(i).rectangle.setRect(r.getX(), y, r.getWidth(), h);
+        }
+
+        return rectangles;
+    }
+    
+    public int getStructureIndexAtPosition(int position) {
+        int s = -1;
+        if (structureList != null) {
+            for (int i = 0;i < structureList.size(); i++) {
+                if (structureList.get(i).getStartPosition() <= position && structureList.get(i).getEndPosition() >= position) {
+                    if (s != -1) {
+                        int ilen = structureList.get(i).length;
+                        int slen = structureList.get(s).length;
+                        if (ilen < slen) {
+                            s = i;
+                        }
+                    } else {
+                        s = i;
+                    }
+                }
+            }
+        }
+        return s;
+    }
+    
+    public double minHorizontalDistance(ArrayList<SubstructureMouseoverRegion> rectangles, Rectangle2D rect, int level) {
+        double x = rect.getX();
+        double width = rect.getWidth();
+        double distance = Double.MAX_VALUE;
+        for (int i = 0; i < rectangles.size(); i++) {
+            SubstructureMouseoverRegion other = rectangles.get(i);
+            if (other.level == level) {
+                double dist1 = other.rectangle.getX() - (x + width);
+                if (dist1 >= 0) {
+                    distance = Math.min(distance, dist1);
+                }
+                double dist2 = x - (other.rectangle.getX() + other.rectangle.getWidth());
+                if (dist2 >= 0) {
+                    distance = Math.min(distance, dist2);
+                }
+                if (x >= other.rectangle.getX() && x + width <= other.rectangle.getX() + other.rectangle.getWidth()) {
+                    distance = 0;
+                }
+                if (x <= other.rectangle.getX() && x + width >= other.rectangle.getX() + other.rectangle.getWidth()) {
+                    distance = 0;
+                }
+            }
+        }
+        return distance;
+    }
+    
+    public class SubstructureMouseoverRegion {
+
+        Substructure structure;
+        Rectangle2D rectangle;
+        int level;
+
+        public SubstructureMouseoverRegion(Substructure structure, Rectangle2D rectangle, int level) {
+            this.structure = structure;
+            this.rectangle = rectangle;
+            this.level = level;
+        }
+
+        @Override
+        public String toString() {
+            return "SubstructureMouseoverRegion{" + "structure=" + structure + ", rectangle=" + rectangle + ", level=" + level + '}';
+        }
+    }
+    
+     public void drawMouseOverSelection(int start, int end) {
+        mouseoverStart = start;
+        mouseoverEnd = end;
+        repaint();
+    }
+
+    public void drawSelected(int start, int end) {
+        selectedStart = start;
+        selectedStart = end;
+        repaint();
     }
 }

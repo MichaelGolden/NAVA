@@ -5,7 +5,6 @@
 package nava.ranking;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Random;
@@ -17,7 +16,7 @@ import org.apache.commons.math3.stat.ranking.TiesStrategy;
  *
  * @author Michael
  */
-public class MyMannWhitney {
+public class MyMannWhitney1 {
 
     
     public static void main(String [] args)
@@ -34,15 +33,6 @@ public class MyMannWhitney {
     Hashtable<Double, Double> groups = new Hashtable<Double, Double>();
 
     public double getGroup(double value) {
-        Double val = groups.get(value);
-        if (val != null) {
-            return val.doubleValue();
-        }
-
-        return 0;
-    }
-    
-    public double getGroup(int value) {
         Double val = groups.get(value);
         if (val != null) {
             return val.doubleValue();
@@ -180,118 +170,48 @@ public class MyMannWhitney {
         }
     }
     
-   
-    class MannWhitneyValue implements Comparable<MannWhitneyValue>
-    {
-        double value;
-        double randomize;
-        
-        public MannWhitneyValue(double value, double randomize)
-        {
-            this.value = value;
-            this.randomize = randomize;
-        }
-
-        @Override
-        public int compareTo(MannWhitneyValue o) {
-            if(this.value < o.value)
-            {
-                return -1;
-            }
-            else
-            if(this.value > o.value)
-            {
-                return 1;
-            }
-            else
-            if(this.randomize < o.randomize)
-            {
-                return -1;
-            }
-            else
-            {
-                return 1;
-            }
-            
-        }
-    }
-    
-    
-    private void compute(ArrayList<Double> xin, ArrayList<Double> yin)
-    {
-        int removed = 0;
-        while(xin.contains(Double.NaN))
-        {
-            xin.remove(Double.NaN);
-            removed++;
-        }
-        
-        while(yin.contains(Double.NaN))
-        {
-            yin.remove(Double.NaN);
-            removed++;
-        }       
-        
-        long seed = 2272749019639563492L;
-        for(int i = 0 ; i < xin.size() ; i++)
-        {
-            seed += xin.get(i);
-        }
-        for(int i = 0 ; i < yin.size() ; i++)
-        {
-            seed += yin.get(i);
-        }
-        
-        if(xin.size()+yin.size() % 2 == 0)
-        {
-            seed = -seed;
-        }
-        
-        ArrayList<MannWhitneyValue> x = new ArrayList<>();
-        ArrayList<MannWhitneyValue> y = new ArrayList<>();
-    
-        Random random = new Random(seed);
-        for(int i = 0 ; i < xin.size() ; i++)
-        {
-            x.add(new MannWhitneyValue(xin.get(i), random.nextDouble()));
-        }
-        for(int i = 0 ; i < yin.size() ; i++)
-        {
-             y.add(new MannWhitneyValue(yin.get(i), random.nextDouble()));
-        }
-                
-        this.nx = x.size();
+    double pvalue = Double.NaN;
+    double uscore = Double.NaN;
+    double zscore = Double.NaN;
+    int direction = 0;
+    double approxp = Double.NaN;
+    public MyMannWhitney1(ArrayList<Double> x, ArrayList<Double> y) {
+       /* this.nx = x.size();
         this.ny = y.size();
         this.N = this.nx + this.ny;
+        
+        int removed = 0;
+        while(x.contains(Double.NaN))
+        {
+            x.remove(Double.NaN);
+            removed++;
+        }
+        
+        while(y.contains(Double.NaN))
+        {
+            y.remove(Double.NaN);
+            removed++;
+        }       
+
+        for (int i = 0; i < x.size(); i++) {
+            groups.put(x.get(i), getGroup(x.get(i)) + 1);
+        }
+
+        for (int i = 0; i < y.size(); i++) {
+            groups.put(y.get(i), getGroup(y.get(i)) + 1);
+        }
 
         double[] counts_x = new double[x.size()];
         double[] counts_y = new double[y.size()];
         for (int i = 0; i < x.size(); i++) {
             for (int j = 0; j < y.size(); j++) {
-                /*if(x.get(i).compareTo(y.get(j)) > 0)
-                {
+                if (x.get(i) == y.get(j)) {
+                    // deal with ties
+                    counts_x[i] += 0.5;
+                    counts_y[j] += 0.5;
+                } else if (x.get(i) > y.get(j)) {
                     counts_x[i]++;
-                }
-                else
-                {
-                    counts_y[j]++;
-                }*/
-                if(x.get(i).value > y.get(j).value)
-                {
-                    counts_x[i]++;
-                }
-                else
-                if(x.get(i).value < y.get(j).value)
-                {
-                    counts_y[j]++;
-                }
-                else
-                if(random.nextBoolean())
-                {
-                    counts_x[i]++;
-                }
-                else
-                {
+                } else {
                     counts_y[j]++;
                 }
             }
@@ -306,41 +226,140 @@ public class MyMannWhitney {
         }
 
         tieCorrectionFactor = 0;
-    }
-    
-    public MyMannWhitney(ArrayList<Double> xin, ArrayList<Double> yin) {        
-       compute(xin, yin);
-    }
-    
-    public MyMannWhitney(double[] x, double[] y) {
+        Enumeration<Double> keys = groups.keys();
+        while (keys.hasMoreElements()) {
+            double c = groups.get(keys.nextElement());
+            double q = (Math.pow(c, 3) - c) / 12;
+            tieCorrectionFactor += q;
+        }*/
+        int removed = 0;
+        while(x.contains(Double.NaN))
+        {
+            x.remove(Double.NaN);
+            removed++;
+        }
         
-        ArrayList<Double> xin = new ArrayList<>(x.length);
-        ArrayList<Double> yin = new ArrayList<>(y.length);
-        for(int i = 0 ; i < x.length ; i++)
+        while(y.contains(Double.NaN))
         {
-            xin.add(x[i]);
-        }
-        for(int i = 0 ; i < y.length ; i++)
+            y.remove(Double.NaN);
+            removed++;
+        }  
+        
+        MannWhitneyUTest test = new MannWhitneyUTest(NaNStrategy.REMOVED, TiesStrategy.RANDOM);
+        double [] x1 = new double[x.size()];
+        double [] y1 = new double[y.size()];
+        for(int i = 0 ; i < x.size() ; i++)
         {
-            yin.add(y[i]);
+            x1[i] = x.get(i);
         }
-        compute(xin, yin);
+        for(int i = 0 ; i < y.size() ; i++)
+        {
+            y1[i] = y.get(i);
+        }
+        
+        
+        if(x1.length == 0 || y1.length == 0)
+        {
+            
+        }
+        else
+        {        
+            pvalue = test.mannWhitneyUTest(x1, y1);
+            uscore = test.mannWhitneyU(x1, y1);
+            zscore = -StatUtils.getInvCDF(pvalue/2, true);
+            approxp = approximatePvalue(x1,y1);
+            direction = direction(x1,y1);
+        }
+    }
+    
+    public MyMannWhitney1(double[] x, double[] y) {
+        /*this.nx = x.length;
+        this.ny = y.length;
+        this.N = this.nx + this.ny;
+
+        for (int i = 0; i < x.length; i++) {
+            groups.put(x[i], getGroup(x[i]) + 1);
+        }
+
+        for (int i = 0; i < y.length; i++) {
+            groups.put(y[i], getGroup(y[i]) + 1);
+        }
+
+        double[] counts_x = new double[x.length];
+        double[] counts_y = new double[y.length];
+        for (int i = 0; i < x.length; i++) {
+            for (int j = 0; j < y.length; j++) {
+                if (x[i] == y[j]) {
+                    // deal with ties
+                    counts_x[i] += 0.5;
+                    counts_y[j] += 0.5;
+                } else if (x[i] > y[j]) {
+                    counts_x[i]++;
+                } else {
+                    counts_y[j]++;
+                }
+            }
+        }
+
+        for (int i = 0; i < counts_x.length; i++) {
+            ux += counts_x[i];
+        }
+
+        for (int i = 0; i < counts_y.length; i++) {
+            uy += counts_y[i];
+        }
+
+        tieCorrectionFactor = 0;
+        Enumeration<Double> keys = groups.keys();
+        while (keys.hasMoreElements()) {
+            double c = groups.get(keys.nextElement());
+            double q = (Math.pow(c, 3) - c) / 12;
+            tieCorrectionFactor += q;
+        }
+        
+        * */
+           MannWhitneyUTest test = new MannWhitneyUTest(NaNStrategy.REMOVED, TiesStrategy.RANDOM);
+
+           
+           try
+           {
+                pvalue = test.mannWhitneyUTest(x, y);
+                uscore = test.mannWhitneyU(x, y);        
+                zscore = -StatUtils.getInvCDF(pvalue/2, true);
+           }catch(Exception ex)
+           {
+               ex.printStackTrace();
+           }
+        approxp = approximatePvalue(x,y);
+        direction = direction(x,y);
     }
 
     public double getTestStatistic() {
         return Math.max(ux, uy);
     }
 
+    static double min = 1;
     public double getZ() {
-        double n = ((nx * ny) / (N * (N - 1)));
+      /*double n = ((nx * ny) / (N * (N - 1)));
         double d = ((Math.pow(N, 3) - N) / 12 - tieCorrectionFactor);
 
         double variance = Math.sqrt(n * d);
-        
-        return (ux - (nx * ny / 2)) / variance;
-        
-        /*double mu = (nx*ny)/2;
-        double variance = Math.sqrt((nx*ny*(nx+ny+1))/12);
-        return (ux-mu)/variance;*/
+        //System.out.println(ux + "\t" + nx + "\t" + ny + "\t" + tieCorrectionFactor + "\t" + n + "\t" + d + "\t" + variance);
+  
+  
+        System.out.println(pvalue+"\t"+zscore+"\t"+uscore+"\t"+(direction*zscore));
+        return (ux - (nx * ny / 2)) / variance;*/
+        /*System.out.println(pvalue+"\t"+zscore+"\t"+direction);
+        if(pvalue > 0)
+        {
+            min = Math.min(pvalue, min);
+        }*/
+        if(pvalue < 1.1102230246251565E-16)
+        {
+            zscore = -StatUtils.getInvCDF(1.1102230246251565E-16/2, true);
+            //System.out.println("*");
+        }
+        //System.out.println(zscore+"\t"+pvalue+"\t"+approxp);
+        return (direction*zscore);
     }
 }

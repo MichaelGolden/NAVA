@@ -4,8 +4,7 @@
  */
 package nava.tasks.applications;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -70,15 +69,46 @@ public class PPfoldApplication extends Application {
 
                 File matrixOutputFile = new File(tempDir.getAbsoluteFile().getAbsolutePath() + File.separator + "temp.bp");
                 if (matrixOutputFile.exists()) {
-                    ApplicationOutput outputFile2 = new ApplicationOutput();
-                    outputFile2.fileFormat = DataType.FileFormat.DENSE_MATRIX;
-                    outputFile2.file = matrixOutputFile;
-                    Matrix matrix = new Matrix();
-                    matrix.title = inputDataSource.title+"_ppfold";
-                    matrix.parentSource = inputDataSource;
-                    outputFile2.dataSource = matrix;
-                    outputFiles.add(outputFile2);
-                    System.out.println("matrixOutputFile exists");
+                    try
+                    {
+                        ArrayList<Double> probs = getSiteBySitePairingProbabilities(matrixOutputFile);
+                        File csvFile = new File(tempDir.getAbsoluteFile().getAbsolutePath() + File.separator + "temp.csv");
+                        BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile));
+                        writer.write("Position,Probability\n");
+                        for(int i = 0 ; i < probs.size() ; i++)
+                        {
+                            writer.write((i+1)+","+probs.get(i)+"\n");
+                        }
+                        writer.close();
+                        ApplicationOutput outputFile3 = new ApplicationOutput();
+                        Tabular tabular = new Tabular();
+                        tabular.title = inputDataSource.title + " pairing probability";
+                        tabular.originalFile = csvFile;
+                        outputFile3.dataSource = tabular;
+                        outputFiles.add(outputFile3);
+                    }
+                    catch(IOException ex)
+                    {
+                        
+                    }
+                   
+                    File sparseMatrixFile = new File(tempDir.getAbsoluteFile().getAbsolutePath() + File.separator + "temp.clm");
+                    try
+                    {
+                        saveSparseMatrix(matrixOutputFile, sparseMatrixFile);
+                        ApplicationOutput outputFile2 = new ApplicationOutput();
+                        outputFile2.fileFormat = DataType.FileFormat.COORDINATE_LIST_MATRIX;
+                        outputFile2.file = sparseMatrixFile;
+                        Matrix matrix = new Matrix();
+                        matrix.title = inputDataSource.title+"_ppfold";
+                        matrix.parentSource = inputDataSource;
+                        outputFile2.dataSource = matrix;
+                        outputFiles.add(outputFile2);
+                        }
+                     catch(IOException ex)
+                     {
+                         
+                     }
                 }
             } else {
             }
@@ -90,6 +120,55 @@ public class PPfoldApplication extends Application {
         } catch (Exception ex) {
             Logger.getLogger(PPfoldApplication.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public static  void saveSparseMatrix(File bpFile, File sparseMatrix) throws IOException
+    {
+        BufferedReader buffer = new BufferedReader(new FileReader(bpFile));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(sparseMatrix));
+        String textline = null;
+        
+        int j = 0;
+        while((textline = buffer.readLine()) != null)
+        {
+            String [] split = textline.split("\\s+");
+            if(split.length>0)
+            {
+                for(int i = 0 ; i < split.length ; i++)
+                {
+                    double val = Double.parseDouble(split[i]);
+                    if(val > 1e-10)
+                    {
+                        writer.write(i+","+j+","+val+"\n");
+                    }
+                }
+                j++;
+            }
+        }
+        buffer.close();
+        writer.close();
+    }
+    
+    public static  ArrayList<Double>  getSiteBySitePairingProbabilities(File bpFile) throws IOException
+    {
+        ArrayList<Double> probs = new ArrayList<>();
+        BufferedReader buffer = new BufferedReader(new FileReader(bpFile));
+        String textline = null;
+        while((textline = buffer.readLine()) != null)
+        {
+            double p = 0;
+            String [] split = textline.split("\\s+");
+            if(split.length>0)
+            {
+                for(int i = 0 ; i < split.length ; i++)
+                {
+                    p += Double.parseDouble(split[i]);
+                }
+                probs.add(p);
+            }
+        }
+        buffer.close();
+        return probs;
     }
 
     @Override

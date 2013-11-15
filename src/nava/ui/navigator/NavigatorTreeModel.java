@@ -93,9 +93,9 @@ public class NavigatorTreeModel extends DefaultTreeModel implements Serializable
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) this.getRoot();
         root.removeAllChildren();
 
-        origDataNode = NavigatorTreeNode.createFolderNode("Original data sources");
-        dataNode = NavigatorTreeNode.createFolderNode("Imported data sources");
-        root.add(origDataNode);
+        //origDataNode = NavigatorTreeNode.createFolderNode("Original data sources");
+        dataNode = NavigatorTreeNode.createFolderNode("Data sources");
+        //root.add(origDataNode);
         root.add(dataNode);
 
         alignmentsNode = NavigatorTreeNode.createFolderNode("Alignments");

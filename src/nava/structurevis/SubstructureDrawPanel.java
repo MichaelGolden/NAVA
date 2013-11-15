@@ -36,7 +36,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import nava.structure.StructureAlign;
-import nava.structurevis.data.Feature;
+import nava.structurevis.data.*;
 import nava.structurevis.layout.RadiateView;
 import nava.ui.MainFrame;
 import nava.utils.ColorUtils;
@@ -49,7 +49,7 @@ import net.hanjava.svg.SVG2EMF;
  *
  * @author Michael Golden
  */
-public class SubstructureDrawPanel extends JPanel implements ActionListener, MouseListener, MouseMotionListener, MouseWheelListener {
+public class SubstructureDrawPanel extends JPanel implements ActionListener, MouseListener, MouseMotionListener, MouseWheelListener, SubstructureModelListener {
 
     Color linkColor = Color.lightGray;
     public static final int SHOW = 0;
@@ -135,6 +135,67 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
     JRadioButtonMenuItem naViewMode = new JRadioButtonMenuItem("NAView");
     JRadioButtonMenuItem radiateViewMode = new JRadioButtonMenuItem("Radiate");
     JRadioButtonMenuItem radiateViewFlatMode = new JRadioButtonMenuItem("Radiate (Flat base)");
+
+    public void openSubstructure(Substructure substructure)
+    {
+        if (substructure == null) {
+            this.noStructure = true;
+            repaint();
+        } else {
+            this.noStructure = false;
+            //substructureModel.substructure = substructure;
+            if (substructureModel.substructure.length < 500) {
+                substructureModel.substructureDistanceMatrix = new DistanceMatrix(substructureModel.substructure.pairedSites);
+                System.out.println("Computing floyd warshall");
+                if (substructureModel.fullDistanceMatrix != null) {
+                    // substructureModel.fullDistanceMatrix.computeFloydWarshall();
+                }
+            } else {
+                substructureModel.substructureDistanceMatrix = null;
+            }
+
+            if (showDNA) {
+                dnaMenuItem.setSelected(true);
+            } else {
+                rnaMenuItem.setSelected(true);
+            }
+
+            computeAndDraw();
+        }
+        
+        redraw();
+    }
+    
+    @Override
+    public void substructureChanged(Substructure substructure) {
+        System.out.println("Substructure changed!!!! "+substructure);
+        
+    }
+
+    @Override
+    public void dataSource1DChanged(DataOverlay1D dataSource1D) {
+        //throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void dataSource2DChanged(DataOverlay2D dataSource2D) {
+        //throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void structureSourceChanged(StructureOverlay structureSource) {
+        //throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void annotationSourceChanged(AnnotationSource annotationSource) {
+        //throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void nucleotideSourceChanged(NucleotideComposition nucleotideSource) {
+        //throw new UnsupportedOperationException("Not supported yet.");
+    }
     
 
     public enum DrawingMode {
@@ -145,7 +206,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
 
     public void setModel(SubstructureModel substructureModel) {
         this.substructureModel = substructureModel;
-        this.openSubstructure(substructureModel.substructure);
+        this.substructureModel.openSubstructure(substructureModel.substructure);
     }
 
     //public boolean drawUsingSVG = false; // if true draw graphic using SVG, otherwise use native java graphics
@@ -267,37 +328,6 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
      * mainapp.structureCollection.structures.get(currentStructure); }
      * openStructure(structure); }
      */
-    public void openSubstructure(Substructure s) {
-
-        System.out.println("openSubstructure " + s);
-        if (s == null) {
-            this.noStructure = true;
-            repaint();
-        } else {
-            this.noStructure = false;
-            substructureModel.substructure = s;
-            if (substructureModel.substructure.length < 500) {
-                substructureModel.substructureDistanceMatrix = new DistanceMatrix(substructureModel.substructure.pairedSites);
-                System.out.println("Computing floyd warshall");
-                if (substructureModel.fullDistanceMatrix != null) {
-                    // substructureModel.fullDistanceMatrix.computeFloydWarshall();
-                }
-            } else {
-                substructureModel.substructureDistanceMatrix = null;
-            }
-
-            if (showDNA) {
-                dnaMenuItem.setSelected(true);
-            } else {
-                rnaMenuItem.setSelected(true);
-            }
-
-            computeAndDraw();
-        }
-        
-        redraw();
-    }
-
     /*
      * public void gotoStructure(int i) { currentStructure = (i + 1) %
      * numStructures; structure =
@@ -777,12 +807,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                             }
                         }
 
-                        if (c != null) {
-                            
-                            if(c.getAlpha() == 0)
-                            {
-                                continue;
-                            }
+                        if (c != null && c.getAlpha() != 0) {
 
                             //System.out.println(k + "\t" + l + "\t" + i + "\t" + j + "\t" + nucleotidePositions.length);
                             double x1 = nucleotidePositions[k].getX();
@@ -1531,7 +1556,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             } else {
                 interactionText += "1D data (none)     ";
             }
-        }
+        }*/
 
 
         // 2D interactions
@@ -1568,18 +1593,19 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                 double p = substructureModel.data2D.get(interaction.nucleotidei - 1, interaction.nucleotidej - 1, substructureModel.mapping2D);
                 //mainapp.data2DLabel.setText(interaction.nucleotidei + " <-> " + interaction.nucleotidej + "  =  " + mainapp.data2D.matrix.get(interaction.nucleotidei - 1, interaction.nucleotidej - 1));
                 //System.out.println("INTERACTION " + covariationInteractions.get(i));
-                interactionText += "2D data (" + interaction.nucleotidei + " <-> " + interaction.nucleotidej + ", " + substructureModel.data2D.dataTransform.getFormattedString(p, 6) + ")";
+                //interactionText += "2D data (" + interaction.nucleotidei + " <-> " + interaction.nucleotidej + ", " + substructureModel.data2D.dataTransform.getFormattedString(p, 6) + ")";
                 this.selectedNucleotideX = interaction.nucleotidei - 1;
                 this.selectedNucleotideY = interaction.nucleotidej - 1;
             } else {
-                interactionText += "2D data (none)";
+                //interactionText += "2D data (none)";
             }
 
             //mainapp.data2DLabel.setText(interactionText);
 
             if (oldSelectedNucleotideX != selectedNucleotideX || oldSelectedNucleotideY != selectedNucleotideY) {
                 repaint();
-            }*/
+            }
+        }
         }
 
     }
@@ -1811,7 +1837,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             int[] substructurePairedSites = StructureAlign.getSubstructure(substructureModel.structureOverlay.pairedSites, openSubstructureDialog.start - 1, length);
             //System.out.println("A "+RNAFoldingTools.getDotBracketStringFromPairedSites(substructurePairedSites));
             Substructure substructure = new Substructure(openSubstructureDialog.start - 1, substructurePairedSites);
-            this.openSubstructure(substructure);
+            this.substructureModel.openSubstructure(substructure);
         } else if (e.getSource().equals(this.naViewMode)) {
             setDrawMode(DrawingMode.NAVIEW);
             computeStructureToBeDrawn(substructureModel.substructure);
@@ -2041,4 +2067,6 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                 break;
         }
     }
+    
+    
 }

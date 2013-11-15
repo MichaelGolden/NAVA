@@ -13,6 +13,8 @@ import nava.structurevis.data.*;
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
 public interface SubstructureModelListener extends EventListener {
+    
+    public void substructureChanged(Substructure substructure);
 
     public void dataSource1DChanged(DataOverlay1D dataSource1D);
 

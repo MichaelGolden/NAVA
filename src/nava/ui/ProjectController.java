@@ -144,6 +144,7 @@ public class ProjectController implements SafeListListener {
                 }
                 break;
             case MATRIX:
+                System.out.println("Importing matrix from source");
                 dataSource = new Matrix();
                 createPaths(dataSource, dataFile.getName().substring(dataFile.getName().lastIndexOf('.') + 1), "matrix");
                 dataSource.title = dataFile.getName().replaceAll("\\.[^\\.]+$", "");
@@ -217,12 +218,15 @@ public class ProjectController implements SafeListListener {
             }
         } else if (outputFile.dataSource instanceof Matrix) {
             if (outputFile.file != null) {
+                System.out.println("Importing matrix from file " + outputFile.file);
                 Matrix matrix = (Matrix) outputFile.dataSource;
                 matrix.setImportId(getNextImportId());
                 matrix.originalDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "orig.matrix").toString();
                 matrix.importedDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "matrix").toString();
                 matrix.title = outputFile.dataSource.title;
                 System.out.println("outputFile.fileFormat" + outputFile.fileFormat);
+                System.out.println("SAVING MATRIX" +  new File(matrix.getImportedDataSourcePath(projectModel.getProjectPathString())));
+               
                 try {
                     if (outputFile.fileFormat == FileFormat.COORDINATE_LIST_MATRIX) {
                         PersistentSparseMatrix.createMatrixFromCoordinateListMatrixFile(outputFile.file, "[\\s,;]+", new File(matrix.getImportedDataSourcePath(projectModel.getProjectPathString())));

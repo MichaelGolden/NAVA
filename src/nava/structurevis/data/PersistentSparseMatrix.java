@@ -29,8 +29,8 @@ public class PersistentSparseMatrix implements Serializable {
     //private transient ArrayList<CachedLineKey> keyQueue = new ArrayList<>();
     private transient LinkedHashSet<CachedLineKey> keyQueue = new LinkedHashSet<>();
     private static int cacheLineSize = 1024; // number of consecutive elements in cache line
-    private int maxCachedLines = 1000; // max number of lines to cache
-    private int maxCachedElements = 100000;
+    private int maxCachedLines = 8000; // max number of lines to cache
+    private int maxCachedElements = 1000000;
     private int elementsCached = 0;
     private double minValue = Double.MAX_VALUE;
     private double maxValue = Double.MIN_VALUE;

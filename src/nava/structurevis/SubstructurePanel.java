@@ -44,6 +44,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         this.projectController = projectController;
 
         structureDrawPanel = new SubstructureDrawPanel(structureVisController.structureVisModel.substructureModel);
+        structureVisController.structureVisModel.substructureModel.addSubstructureModelListener(structureDrawPanel);
         fullGenomeDrawPanel = new FullGenomeDrawPanel(structureVisController);
 
         structureVisController.structureVisModel.substructureModel.addSubstructureModelListener(this);
@@ -318,7 +319,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         } else if (e.getSource().equals(substructureComboBox)) {
             CustomItem<Substructure> comboBoxItem = (CustomItem<Substructure>) substructureComboBoxModel.getSelectedItem();
             if (comboBoxItem != null) {
-                structureDrawPanel.openSubstructure(comboBoxItem.getObject());
+                this.structureVisController.structureVisModel.substructureModel.openSubstructure(comboBoxItem.getObject());
             }
         }
     }
@@ -382,13 +383,13 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
             structureSource.loadData();
             //System.out.println("structureSource.substructures.size() = "+structureSource.substructures.size());
             if (structureSource.substructureList.substructures.size() > 0) {
-                structureDrawPanel.openSubstructure(structureSource.substructureList.substructures.get(0));
+                this.structureVisController.structureVisModel.substructureModel.openSubstructure(structureSource.substructureList.substructures.get(0));
             } else {
-                structureDrawPanel.openSubstructure(null);
+                this.structureVisController.structureVisModel.substructureModel.openSubstructure(null);
             }
             populateSubtructureComboBox();
         } else {
-            structureDrawPanel.openSubstructure(null);
+            this.structureVisController.structureVisModel.substructureModel.openSubstructure(null);
         }
         DataOverlay1D dataOverlay1D = structureVisController.structureVisModel.substructureModel.data1D;
         if (dataOverlay1D != null) {
@@ -413,9 +414,6 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
 
     @Override
     public void nucleotideSourceChanged(NucleotideComposition nucleotideSource) {
-        
-        System.out.println("NUCLEOTIDE SOURCE HAS CHANGED REDRAW");
-         System.out.println(nucleotideSource.toString());
         structureDrawPanel.redraw();
         fullGenomeDrawPanel.redraw();
     }
@@ -478,5 +476,17 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
             dataLegend2D.setVisible(false);
         }
         refresh();
+    }
+
+    @Override
+    public void substructureChanged(Substructure substructure) {
+         for(int i = 0 ; i < substructureComboBoxModel.getSize() ; i++)
+         {
+             if(substructureComboBoxModel.getElementAt(i).getObject().equals(substructure))
+             {
+                 substructureComboBoxModel.setSelectedItem(substructureComboBoxModel.getElementAt(i));
+             }
+         }
+         
     }
 }

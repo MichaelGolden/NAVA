@@ -41,7 +41,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
     ProjectController projectController;
     public StructureVisController structureVisController;
     SubstructurePanel substructurePanel;
- LayerPanel layerPanel;
+    LayerPanel layerPanel;
    // LayerModel layerModel;
     //AnnotationsLayer annotationsLayerRight;
     DefaultComboBoxModel<NucleotideComposition> nucleotideComboBoxModel = new DefaultComboBoxModel<>();    
@@ -194,7 +194,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
             } else if (overlay instanceof StructureOverlay) {
                 StructureOverlayDialog d = new StructureOverlayDialog(parent, true, projectModel, structureVisController);
                 d.setEditMode(overlay);
-                d.structureDataPanel.setStructureSource((StructureOverlay) overlay);
+                d.structureDataPanel.setStructureOverlay((StructureOverlay) overlay);
                 d.setSize(640, 580);
                 GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
                 d.setVisible(true);
@@ -356,9 +356,12 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
     @Override
     public void projectModelChanged(ProjectModel newProjectModel) {
     }
-
+    
     @Override
     public void structureVisModelChanged(StructureVisModel newStructureVisModel) {
+        this.structureVisController.structureVisModel.substructureModel.removeSubstructureModelListener(this);
+        structureVisController.structureVisModel = newStructureVisModel;
+        newStructureVisModel.substructureModel.addSubstructureModelListener(this);
        // throw new UnsupportedOperationException("Not supported yet.");
         this.layerPanel.setLayerModel(newStructureVisModel.layerModel);
     }
@@ -376,5 +379,11 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
     @Override
     public void dataOverlayChanged(Overlay oldOverlay, Overlay newOverlay) {
        // throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void substructureChanged(Substructure substructure) {
+        this.substructurePanel.structureDrawPanel.openSubstructure(substructure);
+        //this.substructurePanel.structureDrawPanel.redraw();
     }
 }

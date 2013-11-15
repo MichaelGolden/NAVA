@@ -36,10 +36,24 @@ public class DataInspectorAlignmentPanel extends javax.swing.JPanel implements I
             case PROTEIN_ALIGNMENT:
                 this.proteinRadioButton.setSelected(true);
                 break;
-        }
+        }        
+        this.isAlignedCheckBox.setSelected(alignment.aligned);
+        this.isAlignedCheckBox.addItemListener(this);
         this.nucleotideRadioButton.addItemListener(this);
         this.codonRadioButton.addItemListener(this);
         this.proteinRadioButton.addItemListener(this);
+        this.setNumberOfSequences(alignment.numSequences);
+        this.setNumberOfColumns(alignment.length);
+    }
+    
+    public void setNumberOfSequences(int numSequences)
+    {
+        this.numSequencesLabel.setText("No. sequences: "+numSequences);
+    }
+    
+    public void setNumberOfColumns (int numColumns)
+    {
+        this.numColumnsLabel.setText("No. columns: "+numColumns);
     }
 
     /**
@@ -59,6 +73,9 @@ public class DataInspectorAlignmentPanel extends javax.swing.JPanel implements I
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
+        isAlignedCheckBox = new javax.swing.JCheckBox();
+        numSequencesLabel = new javax.swing.JLabel();
+        numColumnsLabel = new javax.swing.JLabel();
 
         alignmentTypeGroup.add(nucleotideRadioButton);
         nucleotideRadioButton.setSelected(true);
@@ -81,24 +98,35 @@ public class DataInspectorAlignmentPanel extends javax.swing.JPanel implements I
         jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/protein-alignment-16x16.png"))); // NOI18N
         jLabel4.setText(" ");
 
+        isAlignedCheckBox.setText("Sequences aligned?");
+
+        numSequencesLabel.setText("No. sequences: 100");
+
+        numColumnsLabel.setText("No. columns: 1000");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1)
-                .addGap(18, 18, 18)
+                .addContainerGap(0, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(nucleotideRadioButton)
-                    .addComponent(codonRadioButton)
-                    .addComponent(proteinRadioButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel4))
-                .addContainerGap(71, Short.MAX_VALUE))
+                    .addComponent(isAlignedCheckBox)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(nucleotideRadioButton)
+                            .addComponent(codonRadioButton)
+                            .addComponent(proteinRadioButton))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel4)))
+                    .addComponent(numSequencesLabel)
+                    .addComponent(numColumnsLabel))
+                .addContainerGap(27, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -116,17 +144,26 @@ public class DataInspectorAlignmentPanel extends javax.swing.JPanel implements I
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(proteinRadioButton)
                     .addComponent(jLabel4))
-                .addContainerGap(25, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(numSequencesLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(numColumnsLabel)
+                .addGap(7, 7, 7)
+                .addComponent(isAlignedCheckBox)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup alignmentTypeGroup;
     private javax.swing.JRadioButton codonRadioButton;
+    private javax.swing.JCheckBox isAlignedCheckBox;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JRadioButton nucleotideRadioButton;
+    private javax.swing.JLabel numColumnsLabel;
+    private javax.swing.JLabel numSequencesLabel;
     private javax.swing.JRadioButton proteinRadioButton;
     // End of variables declaration//GEN-END:variables
 
@@ -139,6 +176,10 @@ public class DataInspectorAlignmentPanel extends javax.swing.JPanel implements I
         }
         if (e.getSource().equals(proteinRadioButton)) {
             this.alignment.alignmentType = AlignmentType.PROTEIN_ALIGNMENT;
+        }
+        if(e.getSource().equals(isAlignedCheckBox))
+        {
+            this.alignment.aligned = isAlignedCheckBox.isSelected();
         }
         int index = projectController.projectModel.dataSources.indexOf(alignment);
         projectController.projectModel.dataSources.set(index, alignment);

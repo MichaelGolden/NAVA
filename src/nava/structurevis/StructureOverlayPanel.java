@@ -115,7 +115,7 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
         fromSequenceRadioButton = new javax.swing.JRadioButton();
         sequenceTextField = new javax.swing.JTextField();
         addMappingAlignmentAsOverlayCheckBox = new javax.swing.JCheckBox();
-        jButton4 = new javax.swing.JButton();
+        pasteButton = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jButton3 = new javax.swing.JButton();
         jLabel8 = new javax.swing.JLabel();
@@ -167,10 +167,10 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
         addMappingAlignmentAsOverlayCheckBox.setSelected(true);
         addMappingAlignmentAsOverlayCheckBox.setText("Add this mapping alignment as a nucleotide overlay (recommended)");
 
-        jButton4.setText("Paste");
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
+        pasteButton.setText("Paste");
+        pasteButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
+                pasteButtonActionPerformed(evt);
             }
         });
 
@@ -199,7 +199,7 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(sequenceTextField)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton4)))))
+                                .addComponent(pasteButton)))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -219,7 +219,7 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
                 .addComponent(fromSequenceRadioButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jButton4)
+                    .addComponent(pasteButton)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(sequenceTextField)
                         .addGap(2, 2, 2)))
@@ -336,9 +336,7 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
             GraphicsUtils.centerWindowOnScreen(dialog);
             dialog.setVisible(true);
             if (dialog.save) {
-                System.out.println("saving list");
                 structureOverlay.substructureList = dialog.substructureList;
-                System.out.println("isRecusrive?"+structureOverlay.substructureList.recursive);
                 jLabel8.setText("You have defined a list. Click to edit.");
             }
 
@@ -352,7 +350,7 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
 
     
     Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+    private void pasteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pasteButtonActionPerformed
         Transferable contents = clipboard.getContents(null);
         
         boolean hasTransferableText = (contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor);
@@ -365,7 +363,7 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
             catch (UnsupportedFlavorException | IOException ex){
             }
         }
-    }//GEN-LAST:event_jButton4ActionPerformed
+    }//GEN-LAST:event_pasteButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox addMappingAlignmentAsOverlayCheckBox;
@@ -378,7 +376,6 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -389,6 +386,7 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
     private javax.swing.JPanel jPanel2;
     private javax.swing.JRadioButton linearRadioButton;
     private javax.swing.ButtonGroup mappingGroup;
+    private javax.swing.JButton pasteButton;
     private javax.swing.JTextField sequenceTextField;
     private javax.swing.JComboBox structureComboBox;
     private javax.swing.ButtonGroup substructureGroup;
@@ -396,6 +394,17 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
 
     @Override
     public void itemStateChanged(ItemEvent e) {
+        if(e.getSource().equals(structureComboBox))
+        {
+            SecondaryStructure structure = (SecondaryStructure) structureComboBox.getSelectedItem();
+            if(structureOverlay != null)
+            {
+                structureOverlay.structure = structure;
+                structureOverlay.substructureList = null;
+                structureOverlay.substructureList = new SubstructureList(structureOverlay);
+            }
+            
+        }
         update();
     }
 
@@ -427,12 +436,6 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
             // = new StructureOverlay(structure, mappingSource);
             if (structureOverlay != null && structureOverlay.structure != null &&  structureOverlay.substructureList == null) {
                 structureOverlay.substructureList = new SubstructureList(structureOverlay);
-                //  if(this.circularRadioButton.isSelected() != structureOverlay.circular  || !structureOverlay.structure.equals(structure))
-                //  {
-                // if either parameter has changed need to regenerate list
-              //  structureOverlay.substructureList = new SubstructureList(structureOverlay);
-                //   jLabel8.setText("A new list has been generated.");
-                // }
             }
             structureOverlay.setStructureAndMapping(structure, mappingSource);
             // structureOverlay.minStructureSize = (Integer) this.minSpinnerModel.getValue();
@@ -463,7 +466,7 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
         }
     }
 
-    public void setStructureSource(StructureOverlay structureOverlay) {
+    public void setStructureOverlay(StructureOverlay structureOverlay) {
         // TODO
         this.structureComboBoxModel.setSelectedItem(structureOverlay.structure);
         this.circularRadioButton.setSelected(structureOverlay.circular);
@@ -484,6 +487,7 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
                 break;
         }
         this.structureOverlay.substructureList = structureOverlay.substructureList;
+        this.addMappingAlignmentAsOverlayCheckBox.setSelected(false);
         //this.minSpinnerModel.setValue(structureSource.minStructureSize);
         //this.maxSpinnerModel.setValue(structureSource.maxStructureSize);
         //this.jCheckBox1.setSelected(structureSource.nonOverlappingSubstructures);
@@ -496,16 +500,7 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        if(e.getSource().equals(this.structureComboBoxModel))
-        {
-            SecondaryStructure structure = (SecondaryStructure) structureComboBox.getSelectedItem();
-            if(structureOverlay != null)
-            {
-                structureOverlay.structure = structure;
-                structureOverlay.substructureList = new SubstructureList(structureOverlay);
-            }
-            
-        }
+        
         update();
         /*
          * int min = (Integer) minSpinner.getValue(); int max = (Integer)

@@ -179,6 +179,7 @@ public class LayerPanel extends javax.swing.JPanel implements Scrollable, LayerM
         resizeWidth(width);
     }
 
+    AnnotationsLayer annotationsLayer = null;
     public void addItems(int index0, int index1) {
         for (int i = index0; i <= index1; i++) {
             LayerItem item = structureVisController.structureVisModel.layerModel.items.get(i);
@@ -188,6 +189,16 @@ public class LayerPanel extends javax.swing.JPanel implements Scrollable, LayerM
                 Layer layer = new Layer(new LabelLayer("Sequence annotations"), annotationsLayer);
                 annotationsLayer.setAnnotationData(annotationSource, true);
                 annotationsLayer.parent = layer;
+                /*if(this.annotationsLayer != null)
+                {
+                    //structureVisController.structureVisModel.substructureModel.removeSubstructureModelListener(this.annotationsLayer);
+                }*/
+                this.annotationsLayer = annotationsLayer;
+                /*if(this.annotationsLayer != null)
+                {
+                    //structureVisController.structureVisModel.substructureModel.addSubstructureModelListener(this.annotationsLayer);
+                }*/
+                
                 addLayer(layer, true);
             } else if (item.type == LayerType.DATAOVERLAY_1D) {
                 DataOverlay1D dataOverlay1D = (DataOverlay1D) item.object;
@@ -226,7 +237,6 @@ public class LayerPanel extends javax.swing.JPanel implements Scrollable, LayerM
 
     @Override
     public void dataSource1DChanged(DataOverlay1D dataSource1D) {
-        System.out.println("LayerPanel.dataSource1DChanged " + dataSource1D);
         if (structureVisController.structureVisModel.layerModel != null) {
             if (dataSource1D == null) {
                 structureVisController.structureVisModel.layerModel.setDataOverlay1D(1, "1D overlay (none)", null);
@@ -246,7 +256,6 @@ public class LayerPanel extends javax.swing.JPanel implements Scrollable, LayerM
 
     @Override
     public void annotationSourceChanged(AnnotationSource annotationSource) {
-        System.out.println("LayerPanel.annotationSource " + annotationSource);
         if (structureVisController.structureVisModel.layerModel != null) {
             if (annotationSource == null) {
                 structureVisController.structureVisModel.layerModel.setAnnotationSource(null);
@@ -278,5 +287,15 @@ public class LayerPanel extends javax.swing.JPanel implements Scrollable, LayerM
 
     @Override
     public void dataOverlayChanged(Overlay oldOverlay, Overlay newOverlay) {
+    }
+
+    @Override
+    public void substructureChanged(Substructure substructure) {
+        
+      //  this.annotationsLayer.updateSubstructures();
+       this.annotationsLayer.selectedSubstructure = substructure;
+        this.annotationsLayer.repaint();
+        //this.annotationsLayer.highlightSubstructure(substructure);
+         this.annotationsLayer.selectedSubstructures(substructure);
     }
 }

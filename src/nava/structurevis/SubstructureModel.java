@@ -6,17 +6,11 @@ package nava.structurevis;
 
 import java.awt.Color;
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import javax.swing.event.EventListenerList;
 import nava.data.types.SecondaryStructureData;
-import nava.data.types.TabularField;
-import nava.data.types.TabularFieldData;
 import nava.structurevis.data.*;
-import nava.structurevis.navigator.DataOverlayTreeModel;
 import nava.ui.MainFrame;
 import nava.ui.ProgressBarMonitor;
 import nava.ui.ProjectModel;
@@ -42,7 +36,7 @@ public class SubstructureModel implements Serializable {
     NucleotideComposition.Type nucleotideCompositionType = NucleotideComposition.Type.FREQUENCY;
     public StructureOverlay structureOverlay = null;
     int numbering = 0;
-    Substructure substructure = null;
+    public Substructure substructure = null;
     transient DistanceMatrix fullDistanceMatrix = null;
     transient DistanceMatrix substructureDistanceMatrix = null;
     int maxDistance = -1;
@@ -77,6 +71,12 @@ public class SubstructureModel implements Serializable {
         if (structureOverlay != null) {
             structureOverlay.loadData();
         }
+    }
+    
+    public void openSubstructure(Substructure substructure)
+    {
+        this.substructure = substructure;
+        fireSubstructureChanged(substructure);
     }
 
     public void setAsPrimaryOverlay(Overlay overlay) {
@@ -304,6 +304,17 @@ public class SubstructureModel implements Serializable {
 
     public void removeSubstructureModelListener(SubstructureModelListener listener) {
         listeners.remove(SubstructureModelListener.class, listener);
+    }
+    
+     public void fireSubstructureChanged(Substructure substructure) {
+        Object[] listeners = this.listeners.getListenerList();
+        // Each listener occupies two elements - the first is the listener class
+        // and the second is the listener instance
+        for (int i = 0; i < listeners.length; i += 2) {
+            if (listeners[i] == SubstructureModelListener.class) {
+                ((SubstructureModelListener) listeners[i + 1]).substructureChanged(substructure);
+            }
+        }
     }
 
     public void fireDataOverlay1DChanged(DataOverlay1D dataSource1D) {

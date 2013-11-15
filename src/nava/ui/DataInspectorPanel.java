@@ -85,7 +85,7 @@ public class DataInspectorPanel extends javax.swing.JPanel implements ItemListen
 
         jLabel1.setText("Data type");
 
-        dataTypeLabel.setText("Icon and data type");
+        dataTypeLabel.setText("N/A");
         dataTypeLabel.setMaximumSize(new java.awt.Dimension(34, 16));
         dataTypeLabel.setMinimumSize(new java.awt.Dimension(34, 16));
         dataTypeLabel.setPreferredSize(new java.awt.Dimension(34, 16));

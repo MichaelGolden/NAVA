@@ -157,21 +157,23 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
     
     public void updateSubstructures()
     {
-        try
+        structures = null;
+        genomeLength = 10000;
+        
+        if(structureVisController.structureVisModel != null && structureVisController.structureVisModel.substructureModel != null &&  this.structureVisController.structureVisModel.substructureModel.structureOverlay != null )
         {
-            structureList = this.structureVisController.structureVisModel.substructureModel.structureOverlay.substructureList.substructures;
-            structures =  this.structureVisController.structureVisModel.substructureModel.structureOverlay.substructureList.substructures;   
-            //structurePositions = getSubstructurePositions(structureVisController.structureVisModel.substructureModel.getSubstructures(), structureVisController.structureVisModel.substructureModel.structureOverlay.pairedSites.length);
-            genomeLength = this.structureVisController.structureVisModel.substructureModel.structureOverlay.pairedSites.length;
-//            this.selected2 = this.structureVisController.structureVisModel.substructureModel.structureOverlay.s
             this.selectedSubstructure = this.structureVisController.structureVisModel.substructureModel.substructure;
-        }
-        catch(Exception ex)
-        {
-            structures =  this.structureVisController.structureVisModel.substructureModel.structureOverlay.substructureList.substructures;
-           // structurePositions = new ArrayList<>();
-            genomeLength = 0;
-            ex.printStackTrace();
+            
+            if(this.structureVisController.structureVisModel.substructureModel.structureOverlay.pairedSites != null)
+            {
+                genomeLength = this.structureVisController.structureVisModel.substructureModel.structureOverlay.pairedSites.length;
+            }
+            
+            if(this.structureVisController.structureVisModel.substructureModel.structureOverlay.substructureList != null)
+            {
+                structures =  this.structureVisController.structureVisModel.substructureModel.structureOverlay.substructureList.substructures;   
+                structureList = this.structureVisController.structureVisModel.substructureModel.structureOverlay.substructureList.substructures;
+            }
         }
     }
 
@@ -566,19 +568,22 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
 
             popupMenu.show(this, popupMenuX, popupMenuY);
         }
-        
-        if (this.isEnabled()) {
-            selectedSubstructures = (ArrayList<SubstructureMouseoverRegion>) highlightedSubstructures.clone();
-            selectedSubstructure = highlightedSubstructure;
-            if (highlightedSubstructure != null) {
-                this.structureVisController.structureVisModel.substructureModel.openSubstructure(highlightedSubstructure);
-            } else {
-                int x = e.getX();
-                if (x >= 0 && x < getWidth()) {
-                    int position = (int) (((double) x / (double) getWidth()) * genomeLength);
-                    int structureIndex = getStructureIndexAtPosition(position);
-                    if (structureIndex != -1) {                        
-                        this.structureVisController.structureVisModel.substructureModel.openSubstructure(getStructureAtIndex(structureIndex));
+        else
+        if(SwingUtilities.isLeftMouseButton(e))
+        {        
+            if (this.isEnabled()) {
+                selectedSubstructures = (ArrayList<SubstructureMouseoverRegion>) highlightedSubstructures.clone();
+                selectedSubstructure = highlightedSubstructure;
+                if (highlightedSubstructure != null) {
+                    this.structureVisController.structureVisModel.substructureModel.openSubstructure(highlightedSubstructure);
+                } else {
+                    int x = e.getX();
+                    if (x >= 0 && x < getWidth()) {
+                        int position = (int) (((double) x / (double) getWidth()) * genomeLength);
+                        int structureIndex = getStructureIndexAtPosition(position);
+                        if (structureIndex != -1) {                        
+                            this.structureVisController.structureVisModel.substructureModel.openSubstructure(getStructureAtIndex(structureIndex));
+                        }
                     }
                 }
             }
@@ -702,31 +707,32 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
     
     public void highlightSubstructure(Substructure s)
     {
-        //int position = (int) (((double) x / (double) getWidth()) * genomeLength);
-        //  getStructureIndexAtPosition(substructure)
-        int position = s.startPosition;
-        Substructure largest = getLargestStructureAtPosition(position, 500);
-        if (largest != null) {
-            highlightedSubstructure = s;
-            structures = getStructuresInRegion(largest.startPosition, largest.getEndPosition());
-            highlightedSubstructures = getStructurePositions(structures);
-            /*for (int i = 0; i < highlightedSubstructures.size(); i++) {
-                if (highlightedSubstructures.get(i).rectangle.contains(x, y)) {
-                    highlightedSubstructure = highlightedSubstructures.get(i).structure;
+        if(s != null)
+        {
+            int position = s.startPosition;
+            Substructure largest = getLargestStructureAtPosition(position, 500);
+            if (largest != null) {
+                highlightedSubstructure = s;
+                structures = getStructuresInRegion(largest.startPosition, largest.getEndPosition());
+                highlightedSubstructures = getStructurePositions(structures);
+                /*for (int i = 0; i < highlightedSubstructures.size(); i++) {
+                    if (highlightedSubstructures.get(i).rectangle.contains(x, y)) {
+                        highlightedSubstructure = highlightedSubstructures.get(i).structure;
+                    }
                 }
+                if (highlightedSubstructure == null) {
+                    highlightedSubstructure = s;
+                }*/
+            } else {
+                structures = null;
             }
             if (highlightedSubstructure == null) {
-                highlightedSubstructure = s;
-            }*/
-        } else {
-            structures = null;
-        }
-        if (highlightedSubstructure == null) {
-            mouseoverStart = -1;
-            mouseoverEnd = -1;
-        } else {
-            mouseoverStart = highlightedSubstructure.getStartPosition();
-            mouseoverEnd = highlightedSubstructure.getEndPosition();
+                mouseoverStart = -1;
+                mouseoverEnd = -1;
+            } else {
+                mouseoverStart = highlightedSubstructure.getStartPosition();
+                mouseoverEnd = highlightedSubstructure.getEndPosition();
+            }
         }
         repaint();
     }
@@ -898,6 +904,8 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
              */
         } else if (e.getSource().equals(this.addAnnotationFromSourceItem)) {
             AnnotationsDialog d = new AnnotationsDialog(null, true, projectController.projectModel, structureVisController);
+            d.setSize(500, 150);
+            GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
             d.setVisible(true);
 
             if (structureVisController.structureVisModel.substructureModel.getAnnotationSource() == null) {

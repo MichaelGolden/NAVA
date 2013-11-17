@@ -4,7 +4,6 @@
  */
 package nava.structurevis;
 
-import javax.swing.event.ListDataEvent;
 import nava.structurevis.data.Overlay;
 
 /**

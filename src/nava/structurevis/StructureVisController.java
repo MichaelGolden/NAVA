@@ -60,7 +60,6 @@ public class StructureVisController implements SafeListListener, ProjectView {
     ArrayList<StructureVisView> structureVisViews = new ArrayList<>();
 
     public void addView(StructureVisView view) {
-        System.out.println("addView:" + view);
         structureVisViews.add(view);
     }
 
@@ -173,8 +172,6 @@ public class StructureVisController implements SafeListListener, ProjectView {
             if (structureSource.addMappingSourceAsNucleotideOverlay) {
                 addAssociatedStructureMappingSource(structureSource);
             }
-        } else {
-            System.err.println("ERR");
         }
         refreshMappings();
     }
@@ -190,8 +187,6 @@ public class StructureVisController implements SafeListListener, ProjectView {
         int index = structureVisModel.structureVisDataOverlays1D.indexOf(currentOverlay);
         if (index >= 0) {
             structureVisModel.structureVisDataOverlays1D.set(index, dataSource);
-        } else {
-            System.err.println("ERR");
         }
         refreshMappings();
     }
@@ -224,8 +219,6 @@ public class StructureVisController implements SafeListListener, ProjectView {
         int index = structureVisModel.annotationSources.indexOf(currentOverlay);
         if (index >= 0) {
             structureVisModel.annotationSources.set(index, annotationSource);
-        } else {
-            System.err.println("ERR");
         }
         refreshMappings();
     }
@@ -241,8 +234,6 @@ public class StructureVisController implements SafeListListener, ProjectView {
         int index = structureVisModel.nucleotideSources.indexOf(currentOverlay);
         if (index >= 0) {
             structureVisModel.nucleotideSources.set(index, nucleotideComposition);
-        } else {
-            System.err.println("ERR");
         }
         refreshMappings();
     }
@@ -424,7 +415,7 @@ public class StructureVisController implements SafeListListener, ProjectView {
         //ret.structureVisModel.substructureModel.initialise(this);
         in.close();
 
-        System.out.println("StructureVis project loaded");
+        
         return ret;
     }
 
@@ -436,7 +427,6 @@ public class StructureVisController implements SafeListListener, ProjectView {
                 for (int j = e.getIndex0(); j <= e.getIndex1(); j++) {
                     Object o = list.get(j);
                     if (o instanceof Overlay) {
-                        System.out.println("Overlay added " + o);
                         structureVisViews.get(i).dataOverlayAdded((Overlay) o);
                     }
                 }
@@ -451,8 +441,7 @@ public class StructureVisController implements SafeListListener, ProjectView {
             for (int i = 0; i < structureVisViews.size(); i++) {
                 for (int j = e.getIndex0(); j <= e.getIndex1(); j++) {
                     Object o = list.get(j);
-                    if (o instanceof Overlay) {
-                        System.out.println("Overlay removed " + o);
+                    if (o instanceof Overlay) {                        
                         structureVisViews.get(i).dataOverlayRemoved((Overlay) o);
                     }
                 }
@@ -468,7 +457,7 @@ public class StructureVisController implements SafeListListener, ProjectView {
                 for (int j = e.getIndex0(); j <= e.getIndex1(); j++) {
                     Object o = list.get(j);
                     if (o instanceof Overlay) {
-                        System.out.println("CONENTS CHANGEDxxx" + e.getOldElement().toString() + "\t" + e.getNewElement().toString());
+                       
                         structureVisViews.get(i).dataOverlayChanged((Overlay) e.getOldElement(), (Overlay) e.getNewElement());
                     }
                 }
@@ -490,9 +479,7 @@ public class StructureVisController implements SafeListListener, ProjectView {
         autoCreateMappings();
     }
 
-    public void autoCreateMappings() {
-        System.out.println("autoCreateMappings");
-        System.out.println("V" + structureVisModel.structureSources.size());
+    public void autoCreateMappings() {        
         for (int j = 0; j < projectModel.dataSources.size(); j++) {
             DataSource d = projectModel.dataSources.get(j);
             MappingSource m = null;
@@ -500,14 +487,14 @@ public class StructureVisController implements SafeListListener, ProjectView {
                 Alignment alignment = (Alignment) d;
                 m = new MappingSource(alignment);
             }
-            System.out.println("A" + structureVisModel.structureSources.size());
+            
             for (int i = 0; i < structureVisModel.structureSources.size(); i++) {
                 StructureOverlay s = structureVisModel.structureSources.get(i);
-                System.out.println("N" + i);
+                
                 if (s.mappingSource != null && m != null) {
-                    System.out.println("M" + i);
+                    
                     if (!this.structureVisModel.mappings.containsKey(new Pair<>(s.mappingSource, m))) {
-                        System.out.println("Q" + i);
+                        
                         MainFrame.taskManager.queueTask(new MappingTask(this, s.mappingSource, m), true);
                     }
                 }

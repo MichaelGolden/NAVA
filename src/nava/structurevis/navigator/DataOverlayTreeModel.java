@@ -7,25 +7,22 @@ package nava.structurevis.navigator;
 import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.Objects;
-import javax.swing.DefaultListModel;
 import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import nava.data.types.DataSource;
 import nava.structurevis.StructureVisController;
 import nava.structurevis.StructureVisModel;
 import nava.structurevis.StructureVisView;
+import nava.structurevis.SubstructureModelListener;
 import nava.structurevis.data.*;
 import nava.ui.ProjectModel;
 import nava.ui.ProjectView;
-import nava.utils.SafeListModel;
 
 /**
  *
  * @author Michael
  */
-public class DataOverlayTreeModel extends DefaultTreeModel implements Serializable, ProjectView, StructureVisView {
+public class DataOverlayTreeModel extends DefaultTreeModel implements Serializable, ProjectView, StructureVisView, SubstructureModelListener {
 
     private static final long serialVersionUID = -1625375843157333064L;
     DefaultMutableTreeNode oneDimensionalData = null;
@@ -37,7 +34,7 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
     public DataOverlayTreeModel(DefaultMutableTreeNode root, StructureVisController structureVisController) {
         super(root);
         this.structureVisModel = structureVisController.structureVisModel;
-
+        structureVisController.structureVisModel.substructureModel.addSubstructureModelListener(this);
         setup();
     }
 
@@ -191,7 +188,6 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
      */
     @Override
     public void dataOverlayAdded(Overlay overlay) {
-        System.out.println("dataOverlayAdded" + overlay);
         addDataOverlay(overlay);
     }
 
@@ -202,7 +198,6 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
 
     @Override
     public void dataOverlayChanged(Overlay oldOverlay, Overlay newOverlay) {
-        System.out.println("DataOverlayTreeModel.dataOverlayChanged" + oldOverlay + "\t" + newOverlay);
         DataOverlayTreeNode node = this.findNode(oldOverlay);
         if (!oldOverlay.deleted && !newOverlay.deleted &&  node != null) {
             node.overlay = newOverlay;
@@ -222,7 +217,50 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
 
     @Override
     public void structureVisModelChanged(StructureVisModel newStructureVisModel) {
+        this.structureVisModel.substructureModel.removeSubstructureModelListener(this);
         this.structureVisModel = newStructureVisModel;
+        newStructureVisModel.substructureModel.addSubstructureModelListener(this);
 
+    }
+
+    @Override
+    public void substructureChanged(Substructure substructure) {
+        //throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void dataSource1DChanged(DataOverlay1D dataSource1D) {
+        //throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void dataSource2DChanged(DataOverlay2D dataSource2D) {
+        //throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void structureOverlayChanged(StructureOverlay structureOverlay) {
+        
+        //structureVisModel.substructureModel.setAsPrimaryOverlay(structureOverlay);
+        for(int i = 0 ; i < structureData.getChildCount() ; i++)
+        {
+            //if(structureData.)
+            DataOverlayTreeNode node = (DataOverlayTreeNode)structureData.getChildAt(i);
+        
+            DataOverlayTreeNode parent = (DataOverlayTreeNode) structureData.getChildAt(i).getParent();
+            int[] indices = {parent.getIndex(node)};
+            Object[] children = {node};
+            this.fireTreeNodesChanged(this, parent.getPath(), indices, children);
+        }
+    }
+
+    @Override
+    public void annotationSourceChanged(AnnotationSource annotationSource) {
+        //throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void nucleotideSourceChanged(NucleotideComposition nucleotideSource) {
+       // throw new UnsupportedOperationException("Not supported yet.");
     }
 }

@@ -19,6 +19,7 @@ import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import nava.experimental.CorrelatedSitesTest;
+import nava.experimental.Dijkstra;
 import nava.experimental.MappedData;
 
 /**
@@ -88,8 +89,28 @@ public class DistanceMatrix {
         this.n = pairedSites.length;
         this.binSize = 1;
         //this.radius = radius;
-        this.nd = n;
-        this.matrix = distCalc(pairedSites);
+        this.nd = n;        
+        /*
+        this.matrix = new int[nd][nd];
+        for (int i = 0; i < matrix.length; i++) {
+            Arrays.fill(matrix[i], Integer.MAX_VALUE);
+        }
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix.length; j++) {
+                matrix[i][j] = Math.abs(i - j);
+            }
+        }
+        for (int i = 0; i < pairedSites.length; i++) {
+            int x = (i) / binSize;
+            int y = (pairedSites[i] - 1) / binSize;
+            if (pairedSites[i] != 0) {
+                matrix[x][y] = 1;
+                matrix[y][x] = 1;
+            }
+        }
+        
+       // this.matrix = distCalc(pairedSites);*/
+        this.matrix = Dijkstra.getIntegerDistanceMatrix(pairedSites);
     }
 
     public static int getBestBinSize(int genomeLength, int radius) {
@@ -115,9 +136,6 @@ public class DistanceMatrix {
     public void computeFloydWarshall() {
         int diagRadius = radius / binSize;
         for (int k = 0; k < nd; k++) {
-            if (k % 100 == 0) {
-                System.out.println(k + " out of " + nd);
-            }
 
             // j < i
             for (int i = 0; i < nd; i++) {
@@ -311,7 +329,7 @@ public class DistanceMatrix {
 
     // zero offset
     public int getDistance(int i, int j) {
-        if(matrix != null)
+        if(matrix != null && i < matrix.length && j < matrix.length)
         {
             return matrix[i / binSize][j / binSize] * binSize;
         }

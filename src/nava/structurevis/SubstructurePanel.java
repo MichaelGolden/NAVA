@@ -44,7 +44,6 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         this.projectController = projectController;
 
         structureDrawPanel = new SubstructureDrawPanel(structureVisController.structureVisModel.substructureModel);
-        structureVisController.structureVisModel.substructureModel.addSubstructureModelListener(structureDrawPanel);
         fullGenomeDrawPanel = new FullGenomeDrawPanel(structureVisController);
 
         structureVisController.structureVisModel.substructureModel.addSubstructureModelListener(this);
@@ -89,9 +88,27 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
     public void populateSubtructureComboBox() {
         substructureComboBoxModel.removeAllElements();
         ArrayList<Substructure> list = structureVisController.structureVisModel.substructureModel.getSubstructures();
+        
+        // ensure the correct substructure is selected
+        int selectedSubstructure = 0;
+        if(structureVisController.structureVisModel.substructureModel.structureOverlay != null)
+        {
+            for(int i = 0 ; i < list.size() ; i++)
+            {
+                if(list.get(i).equals(structureVisController.structureVisModel.substructureModel.structureOverlay.selectedSubstructure))
+                {
+                    selectedSubstructure = i;
+                }
+            }
+        }
+        
         for (int i = 0; i < list.size(); i++) {
-            CustomItem<Substructure> item = new CustomItem<>(list.get(i), i + "");
+            CustomItem<Substructure> item = new CustomItem<>(list.get(i), i + "");   
             substructureComboBoxModel.addElement(item);
+        }
+        if(list.size() > 0)
+        {
+            this.substructureComboBoxModel.setSelectedItem(substructureComboBoxModel.getElementAt(selectedSubstructure));
         }
     }
 
@@ -190,11 +207,6 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         jProgressBar.setPreferredSize(new java.awt.Dimension(146, 20));
 
         substructureComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        substructureComboBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                substructureComboBoxActionPerformed(evt);
-            }
-        });
 
         jLabel1.setText("Structure");
 
@@ -266,10 +278,6 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         dialog.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void substructureComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_substructureComboBoxActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_substructureComboBoxActionPerformed
-
     private void structureComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_structureComboBoxActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_structureComboBoxActionPerformed
@@ -298,24 +306,12 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
     @Override
     public void itemStateChanged(ItemEvent e) {
 
-        System.out.println(e.getSource());
         if (e.getSource().equals(structureComboBox)) {
-            StructureOverlay structureSource = (StructureOverlay) structureComboBox.getSelectedItem();
+            StructureOverlay structureOverlay = (StructureOverlay) structureComboBox.getSelectedItem();
 
-            if (structureSource != null && structureSource.mappingSource != null) {
-                structureVisController.structureVisModel.substructureModel.setStructureOverlay(structureSource);
+            if (structureOverlay != null && structureOverlay.mappingSource != null) {
+                structureVisController.structureVisModel.substructureModel.setStructureOverlay(structureOverlay);
             }
-
-            /*
-             * if (structureSource != null && structureSource.mappingSource !=
-             * null) {
-             * //structureVisController.addStructureSource(structureSource);
-             * structureSource.loadData();
-             * structureVisController.substructureModel.setStructureSource(structureSource);
-             * if (structureSource.substructures.size() > 0) {
-             * structureDrawPanel.openSubstructure(structureSource.substructures.get(0));
-             * } populateSubtructureComboBox(); }
-             */
         } else if (e.getSource().equals(substructureComboBox)) {
             CustomItem<Substructure> comboBoxItem = (CustomItem<Substructure>) substructureComboBoxModel.getSelectedItem();
             if (comboBoxItem != null) {
@@ -377,18 +373,29 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
 
    
     @Override
-    public void structureSourceChanged(StructureOverlay structureSource) {
-        if (structureSource != null && structureSource.mappingSource != null) {
+    public void structureOverlayChanged(StructureOverlay structureOverlay) {
+
+        if (structureOverlay != null && structureOverlay.mappingSource != null) {
             //structureVisController.addStructureSource(structureSource);
-            structureSource.loadData();
+            structureOverlay.loadData();
             //System.out.println("structureSource.substructures.size() = "+structureSource.substructures.size());
-            if (structureSource.substructureList.substructures.size() > 0) {
-                this.structureVisController.structureVisModel.substructureModel.openSubstructure(structureSource.substructureList.substructures.get(0));
+            System.out.println("CACHED SUBSTRUCTURE = "+structureOverlay.selectedSubstructure);
+            if(structureOverlay.selectedSubstructure != null)
+            {
+                this.structureVisController.structureVisModel.substructureModel.openSubstructure(structureOverlay.selectedSubstructure);
+            }
+            else
+            if (structureOverlay.substructureList.substructures.size() > 0) {
+                this.structureVisController.structureVisModel.substructureModel.openSubstructure(structureOverlay.substructureList.substructures.get(0));
             } else {
                 this.structureVisController.structureVisModel.substructureModel.openSubstructure(null);
             }
             populateSubtructureComboBox();
         } else {
+            if(structureOverlay != null && structureOverlay.selectedSubstructure != null)
+            {
+                this.structureVisController.structureVisModel.substructureModel.openSubstructure(structureOverlay.selectedSubstructure);
+            }
             this.structureVisController.structureVisModel.substructureModel.openSubstructure(null);
         }
         DataOverlay1D dataOverlay1D = structureVisController.structureVisModel.substructureModel.data1D;

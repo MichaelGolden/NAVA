@@ -379,7 +379,7 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
 
     @Override
     public void structureVisModelChanged(StructureVisModel newStructureVisModel) {
-        System.out.println("DataOverlayTreePanel structureVisModelChanged aaxcaf");
+        
         this.overlayTree.setModel(newStructureVisModel.overlayNavigatorTreeModel);
         newStructureVisModel.overlayNavigatorTreeModel.addTreeModelListener(this);
     }

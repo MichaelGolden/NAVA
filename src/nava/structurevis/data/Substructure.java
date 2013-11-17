@@ -9,6 +9,7 @@ import nava.utils.RNAFoldingTools;
  * @author Michael Golden
  */
 public class Substructure implements Serializable {
+    private static final long serialVersionUID = -9100660823526593325L;
 
     public int[] pairedSites;
     public String name = "";

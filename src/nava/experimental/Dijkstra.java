@@ -120,6 +120,26 @@ public class Dijkstra {
 
         return distanceMatrix;
     }
+    
+     public static int[][] getIntegerDistanceMatrix(int[] pairedSites) {
+        int[][] distanceMatrix = new int[pairedSites.length][pairedSites.length];
+        Vertex[] vertices = Dijkstra.getPairedSitesGraph(pairedSites);
+
+
+        for (int i = 0; i < pairedSites.length; i++) {
+            for (Vertex v : vertices) {
+                v.minDistance = Double.POSITIVE_INFINITY;
+                v.previous = null;
+            }
+
+            computePaths(vertices[i]);
+            for (Vertex v : vertices) {
+                distanceMatrix[i][v.index] = (short) v.minDistance;
+            }
+        }
+
+        return distanceMatrix;
+    }
 
     public static double getDistance(int[] pairedSites, String alignedSequence, int i, int j) {
         StringBuffer sb = new StringBuffer(RNAFoldingTools.getDotBracketStringFromPairedSites(pairedSites));

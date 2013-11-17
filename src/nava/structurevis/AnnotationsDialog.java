@@ -6,6 +6,7 @@ package nava.structurevis;
 
 import nava.structurevis.layerpanel.AnnotationsPanel;
 import java.awt.BorderLayout;
+import javax.swing.ImageIcon;
 import nava.structurevis.data.AnnotationSource;
 import nava.ui.ProjectModel;
 
@@ -31,6 +32,7 @@ public class AnnotationsDialog extends javax.swing.JDialog {
 
         annotationsPanel = new AnnotationsPanel(projectModel);
         this.jPanel1.add(annotationsPanel, BorderLayout.CENTER);
+        this.setIconImage(new ImageIcon(ClassLoader.getSystemResource("resources/icons/icon-32x32.png")).getImage());
         //this.jPanel1.add(annotationsPanel, BorderLayout.CENTER);
     }
 
@@ -49,10 +51,16 @@ public class AnnotationsDialog extends javax.swing.JDialog {
         jPanel1 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Select an annotation source");
 
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jButton3.setText("Cancel");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
         jPanel2.add(jButton3);
 
         addButton.setText("Add");
@@ -87,6 +95,11 @@ public class AnnotationsDialog extends javax.swing.JDialog {
        this.annotationSource = annotationsPanel.getAnnotationsSource();
         this.dispose();
     }//GEN-LAST:event_addButtonActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        this.annotationSource = null;
+        this.dispose();
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * @param args the command line arguments

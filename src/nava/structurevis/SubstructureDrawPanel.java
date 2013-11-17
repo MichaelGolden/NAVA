@@ -36,7 +36,6 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import nava.structure.StructureAlign;
-import nava.structurevis.data.*;
 import nava.structurevis.layout.RadiateView;
 import nava.ui.MainFrame;
 import nava.utils.ColorUtils;
@@ -49,7 +48,7 @@ import net.hanjava.svg.SVG2EMF;
  *
  * @author Michael Golden
  */
-public class SubstructureDrawPanel extends JPanel implements ActionListener, MouseListener, MouseMotionListener, MouseWheelListener, SubstructureModelListener {
+public class SubstructureDrawPanel extends JPanel implements ActionListener, MouseListener, MouseMotionListener, MouseWheelListener {
 
     Color linkColor = Color.lightGray;
     public static final int SHOW = 0;
@@ -137,7 +136,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
     JRadioButtonMenuItem radiateViewFlatMode = new JRadioButtonMenuItem("Radiate (Flat base)");
 
     public void openSubstructure(Substructure substructure)
-    {
+    {        
         if (substructure == null) {
             this.noStructure = true;
             repaint();
@@ -146,10 +145,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             //substructureModel.substructure = substructure;
             if (substructureModel.substructure.length < 500) {
                 substructureModel.substructureDistanceMatrix = new DistanceMatrix(substructureModel.substructure.pairedSites);
-                System.out.println("Computing floyd warshall");
-                if (substructureModel.fullDistanceMatrix != null) {
-                    // substructureModel.fullDistanceMatrix.computeFloydWarshall();
-                }
+               
             } else {
                 substructureModel.substructureDistanceMatrix = null;
             }
@@ -164,39 +160,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
         }
         
         redraw();
-    }
-    
-    @Override
-    public void substructureChanged(Substructure substructure) {
-        System.out.println("Substructure changed!!!! "+substructure);
-        
-    }
-
-    @Override
-    public void dataSource1DChanged(DataOverlay1D dataSource1D) {
-        //throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void dataSource2DChanged(DataOverlay2D dataSource2D) {
-        //throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void structureSourceChanged(StructureOverlay structureSource) {
-        //throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void annotationSourceChanged(AnnotationSource annotationSource) {
-        //throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void nucleotideSourceChanged(NucleotideComposition nucleotideSource) {
-        //throw new UnsupportedOperationException("Not supported yet.");
-    }
-    
+    }    
 
     public enum DrawingMode {
 
@@ -206,7 +170,16 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
 
     public void setModel(SubstructureModel substructureModel) {
         this.substructureModel = substructureModel;
-        this.substructureModel.openSubstructure(substructureModel.substructure);
+        if(this.substructureModel.structureOverlay != null && this.substructureModel.structureOverlay.selectedSubstructure != null)
+        {
+            System.out.println("ENTRY A");
+            this.substructureModel.openSubstructure(this.substructureModel.structureOverlay.selectedSubstructure );
+        }
+        else
+        {
+            System.out.println("ENTRY B");
+            this.substructureModel.openSubstructure(substructureModel.substructure);
+        }
     }
 
     //public boolean drawUsingSVG = false; // if true draw graphic using SVG, otherwise use native java graphics

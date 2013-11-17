@@ -338,7 +338,7 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
     }
 
     @Override
-    public void structureSourceChanged(StructureOverlay structureSource) {
+    public void structureOverlayChanged(StructureOverlay structureSource) {
         if (structureVisController.structureVisModel.substructureModel != null && structureVisController.structureVisModel.substructureModel.getAnnotationSource() != null) {
            structureVisController.structureVisModel.layerModel.setAnnotationSource(structureVisController.structureVisModel.substructureModel.getAnnotationSource());          
         }
@@ -384,6 +384,5 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
     @Override
     public void substructureChanged(Substructure substructure) {
         this.substructurePanel.structureDrawPanel.openSubstructure(substructure);
-        //this.substructurePanel.structureDrawPanel.redraw();
     }
 }

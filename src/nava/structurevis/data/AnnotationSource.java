@@ -249,7 +249,7 @@ public class AnnotationSource implements Serializable {
             annotationSource.mappedFeatures.add(mappedFeature);
         }
 
-        annotationSource.assignColors();
+        //annotationSource.assignColors();
         return annotationSource;
     }
 

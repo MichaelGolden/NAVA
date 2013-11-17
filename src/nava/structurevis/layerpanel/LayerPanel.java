@@ -251,7 +251,7 @@ public class LayerPanel extends javax.swing.JPanel implements Scrollable, LayerM
     }
 
     @Override
-    public void structureSourceChanged(StructureOverlay structureSource) {
+    public void structureOverlayChanged(StructureOverlay structureSource) {
     }
 
     @Override
@@ -295,7 +295,7 @@ public class LayerPanel extends javax.swing.JPanel implements Scrollable, LayerM
       //  this.annotationsLayer.updateSubstructures();
        this.annotationsLayer.selectedSubstructure = substructure;
         this.annotationsLayer.repaint();
-        //this.annotationsLayer.highlightSubstructure(substructure);
+        this.annotationsLayer.highlightSubstructure(substructure);
          this.annotationsLayer.selectedSubstructures(substructure);
     }
 }

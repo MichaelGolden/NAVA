@@ -40,6 +40,7 @@ public class AnnotationsPanel extends javax.swing.JPanel implements ItemListener
         this.annotationsSourceComboBox.addItemListener(this);
 
         populateAnnotationsSourceComboBox(projectModel.dataSources.getArrayListShallowCopy());
+        annotationsSourceComboBox.setWide(true);
     }
 
     public void populateAnnotationsSourceComboBox(List<DataSource> dataSources) {
@@ -75,12 +76,10 @@ public class AnnotationsPanel extends javax.swing.JPanel implements ItemListener
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        annotationsSourceComboBox = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
-
-        annotationsSourceComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        annotationsSourceComboBox = new nava.ui.WiderDropDownComboBox();
 
         jLabel1.setText("Select data source");
 
@@ -95,8 +94,8 @@ public class AnnotationsPanel extends javax.swing.JPanel implements ItemListener
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(annotationsSourceComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(annotationsSourceComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -108,15 +107,15 @@ public class AnnotationsPanel extends javax.swing.JPanel implements ItemListener
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(annotationsSourceComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1)
                     .addComponent(jButton1)
-                    .addComponent(jLabel2))
+                    .addComponent(jLabel2)
+                    .addComponent(annotationsSourceComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox annotationsSourceComboBox;
+    private nava.ui.WiderDropDownComboBox annotationsSourceComboBox;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

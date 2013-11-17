@@ -35,9 +35,9 @@ public class StructureOverlay extends Overlay implements Serializable {
     public boolean nonOverlappingSubstructures = false;
     public transient SecondaryStructureData data;
     public transient int[] pairedSites;
-    //public ArrayList<Substructure> substructures = new ArrayList<>();
     public SubstructureList substructureList;
     public boolean circular = false;
+    public Substructure selectedSubstructure = null;
 
     public StructureOverlay() {
     }
@@ -90,10 +90,6 @@ public class StructureOverlay extends Overlay implements Serializable {
                 }
             }
             genomeLength *= 2;
-        }
-
-        for (int i = 0; i < pairedSites.length; i++) {
-            System.out.println("% " + i + "\t" + pairedSites[i]);
         }
 
 

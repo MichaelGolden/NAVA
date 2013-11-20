@@ -4,25 +4,19 @@
  */
 package nava.structurevis.data;
 
-import com.kitfox.svg.SVGException;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Line2D;
-import java.awt.geom.QuadCurve2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import nava.structurevis.SubstructureDrawPanel;
 import nava.ui.MainFrame;
-import nava.utils.ColorUtils;
 import nava.utils.GraphicsUtils;
 import net.hanjava.svg.SVG2EMF;
 

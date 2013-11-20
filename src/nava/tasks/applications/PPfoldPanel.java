@@ -36,20 +36,11 @@ public class PPfoldPanel extends javax.swing.JPanel implements ApplicationPanelI
 
     public void update() {
         associatedTrees.removeAllElements();
-        System.out.println("APE1" + application);
-        if (application != null) {
-            System.out.println("APE2" + application.projectController);
-            // System.out.println("APE3" + application.projectController.projectModel);
-        }
         if (application != null && application.projectController != null && application.projectController.projectModel != null) {
-            System.out.println("WWW0?");
             for (int i = 0; i < application.projectController.projectModel.dataSources.size(); i++) {
-                System.out.println("WWW1?" + application.projectController.projectModel.dataSources.get(i));
-                if (application.projectController.projectModel.dataSources.get(i) instanceof Tree) {
+                   if (application.projectController.projectModel.dataSources.get(i) instanceof Tree) {
                     Tree tree = (Tree) application.projectController.projectModel.dataSources.get(i);
-                    System.out.println("WWW2?" + tree);
-                    System.out.println("WWW3?" + tree.parentSource + "\t" + alignment);
-                    if (tree.parentSource.equals(alignment)) {
+                        if (tree.parentSource.equals(alignment)) {
                         associatedTrees.addElement(tree);
                     }
                 }

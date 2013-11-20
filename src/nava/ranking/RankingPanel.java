@@ -37,7 +37,7 @@ public class RankingPanel extends javax.swing.JPanel {
     ArrayList<StructureOverlay> structureOverlays = new ArrayList();
     RankingTable rankingTable = null;
     public RankingThread currentThread = null;
-    StructureVisController structureVisController;
+    final StructureVisController structureVisController;
     NHistogramPanel nHistPanel = new NHistogramPanel();
     //StructureOverlay structureOverlay;
 
@@ -75,9 +75,16 @@ public class RankingPanel extends javax.swing.JPanel {
                 int row = target.getSelectedRow();
                 int column = target.getSelectedColumn();
 
-                int s = ((Integer) rankingTable.table.getModel().getValueAt(row, 0)).intValue() - 1;
-                Ranking ranking = (Ranking) rankingTable.table.getModel().getValueAt(row, 13);
+                Ranking<Substructure> ranking = (Ranking) rankingTable.table.getModel().getValueAt(row, 12);
                 nHistPanel.setNHistogram(ranking.nhist);
+                
+                if(e.getClickCount() == 2)
+                {
+                    if(ranking.object != null)
+                    {
+                        RankingPanel.this.structureVisController.structureVisModel.substructureModel.openSubstructure(ranking.object);
+                    }
+                }
             }
         });
         histogramPanel.add(nHistPanel);
@@ -186,11 +193,14 @@ public class RankingPanel extends javax.swing.JPanel {
                     statusLabel.setText("Ranking (" + (i + 1) + " of " + structures.size() + ")");
                     Substructure structure = structures.get(i);
                     Mapping mapping = structureVisController.getMapping(structureOverlay.mappingSource, dataOverlay1D.mappingSource);
-                    //System.out.println("Mapping "+(mapping == null));
+                    
                     Ranking ranking = RankingAnalyses.rankSequenceData1D(dataOverlay1D, mapping, structure, structureOverlay.pairedSites, paired, unpaired, i + 1);
-
-                    //System.out.println(ranking.zScore + "\t" + StatUtil.erf(Math.abs(ranking.zScore/2)) + "\t" + StatUtil.erfc(Math.abs(ranking.zScore))+ "\t" + StatUtil.erfcx(Math.abs(ranking.zScore))+ "\t" + StatUtil.getInvCDF(Math.abs(ranking.zScore), true)+"\t"+RankingAnalyses.NormalZ(Math.abs(ranking.zScore))/2);
-                    final Object[] row = {new Integer(i + 1), structure.name, new Location(structure.startPosition, structure.startPosition + structure.length), new Integer(structure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore), ranking};
+                    if(i > 0)
+                    {
+                        ranking.object = structures.get(i);
+                    }
+                    
+                    final Object[] row = {structure.name, new Location(structure.startPosition, structure.startPosition + structure.length), new Integer(structure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore), ranking};
 
                     rankingTable.tableDataModel.addRow(row);
                     rankingTable.repaint();
@@ -224,12 +234,15 @@ public class RankingPanel extends javax.swing.JPanel {
                 for (int i = rows.size(); running && i < structures.size(); i++) {
                     statusLabel.setText("Ranking (" + (i + 1) + " of " + structures.size() + ")");
                     Substructure structure = structures.get(i);
-
+                    
                     Ranking ranking;
                     try {
                         ranking = RankingAnalyses.rankSequenceData2D(dataOverlay2D, structureVisController.getMapping(structureOverlay.mappingSource, dataOverlay2D.mappingSource), structure, structureOverlay.pairedSites, paired, unpaired, fullGenomeList, fullGenomeValues, fullHist, i + 1);
-
-                        final Object[] row = {new Integer(i + 1), structure.name, new Location(structure.startPosition, structure.startPosition + structure.length), new Integer(structure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore), ranking};
+                        if(i > 0)
+                        {
+                            ranking.object = structures.get(i);
+                        }
+                        final Object[] row = {structure.name, new Location(structure.startPosition, structure.startPosition + structure.length), new Integer(structure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore), ranking};
 
                         rankingTable.tableDataModel.addRow(row);
                         rankingTable.repaint();

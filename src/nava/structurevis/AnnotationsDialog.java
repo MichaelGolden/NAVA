@@ -93,6 +93,7 @@ public class AnnotationsDialog extends javax.swing.JDialog {
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
        this.annotationSource = annotationsPanel.getAnnotationsSource();
+        AnnotationSource.stackFeatures(annotationSource);
         this.dispose();
     }//GEN-LAST:event_addButtonActionPerformed
 

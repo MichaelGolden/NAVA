@@ -64,11 +64,10 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
     Font annotationsFont = MainFrame.fontLiberationSans.deriveFont(12);
     StructureVisController structureVisController;
     ProjectController projectController;
-    /*
-     * Structure selected = null; ArrayList<Structure> structures = null;
-     * ArrayList<StructureAndMouseoverRegion> structurePositions = null;
-     */
+    
     public Layer parent;
+    JColorChooser colorChooser;
+    JDialog colorDialog;
 
     public AnnotationsLayer(Layer parent, StructureVisController structureVisController, ProjectController projectController) {
 
@@ -122,12 +121,18 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
         popupMenu.add(saveAsSVGItem);
 
         ToolTipManager.sharedInstance().registerComponent(this);
+        
+        colorChooser = new JColorChooser();
+        colorDialog = JColorChooser.createDialog(MainFrame.self, "Choose an annotation colour", true, colorChooser, this, this);
+        
+        this.updatePreferredHeight();
     }
     boolean forceRepaint = true;
-
-    public int chooseBestTickMarkSize(int genomeLength) {
+    
+    public int chooseBestTickMarkSize(int genomeLength, double panelWidth)
+    {
         for (int i = tickMarkPossibilities.length - 1; i >= 0; i--) {
-            double distanceBetweenTicks = (double) getWidth() / (double) genomeLength * (double) tickMarkPossibilities[i];
+            double distanceBetweenTicks = (double) panelWidth / (double) genomeLength * (double) tickMarkPossibilities[i];
             if (distanceBetweenTicks < 40) {
                 if (i < tickMarkPossibilities.length - 1) {
                     return tickMarkPossibilities[i + 1];
@@ -138,6 +143,11 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
         }
         return 1;
     }
+
+    public int chooseBestTickMarkSize(int genomeLength) {
+        return chooseBestTickMarkSize(genomeLength, (double) getWidth());
+    }
+    
     public static Comparator<CustomJMenuItem<Feature>> removeFeatureComparator = new Comparator<CustomJMenuItem<Feature>>() {
 
         public int compare(CustomJMenuItem<Feature> item1, CustomJMenuItem<Feature> item2) {
@@ -240,9 +250,13 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
 
     public void updatePreferredHeight() {
         int numRows = 0;
-        for (int i = 0; i < annotationData.mappedFeatures.size(); i++) {
-            numRows = Math.max(numRows, annotationData.mappedFeatures.get(i).row);
+        if(annotationData != null)
+        {
+            for (int i = 0; i < annotationData.mappedFeatures.size(); i++) {
+                numRows = Math.max(numRows, annotationData.mappedFeatures.get(i).row);
+            }
         }
+        //numRows = Math.max(numRows, 2);
         setPreferredSize(new Dimension(10000, rulerHeight + numRows * blockHeight + blockHeight + 5));
         if (this.parent != null) {
             this.parent.preferredHeight = rulerHeight + numRows * blockHeight + blockHeight + 5;
@@ -279,7 +293,7 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
         pw.println("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \n\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">");
         pw.println("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"" + panelWidth + "\" height=\"" + panelHeight + "\" style=\"fill:none;stroke-width:16\">");
 
-        minorTickMark = chooseBestTickMarkSize(annotationData.mappedSequenceLength);
+        minorTickMark = chooseBestTickMarkSize(genomeLength, panelWidth);
         majorTickMark = minorTickMark * 2;
 
         pw.println("<g>");
@@ -415,9 +429,7 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
 
             minorTickMark = chooseBestTickMarkSize(annotationData.mappedSequenceLength);
             majorTickMark = minorTickMark * 2;
-
            
-
             // draw blocks
             this.featurePositions = new ArrayList<>();
             for (int i = 0; i < annotationData.mappedFeatures.size(); i++) {
@@ -535,8 +547,8 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
 
     
     
-     ArrayList<SubstructureMouseoverRegion> highlightedSubstructures = new ArrayList<>();     
-     ArrayList<SubstructureMouseoverRegion> selectedSubstructures = new ArrayList<>();
+    ArrayList<SubstructureMouseoverRegion> highlightedSubstructures = new ArrayList<>();     
+    ArrayList<SubstructureMouseoverRegion> selectedSubstructures = new ArrayList<>();
     
     int popupMenuX = 0;
     int popupMenuY = 0;
@@ -753,11 +765,14 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
     
     public Substructure getStructureAtIndex(int index)
     {
-        for(Substructure s : structureList)
+        if(structureList != null)
         {
-            if(s.index == index)
+            for(Substructure s : structureList)
             {
-                return s;
+                if(s.index == index)
+                {
+                    return s;
+                }
             }
         }
         return null;
@@ -877,7 +892,11 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
                 if (featurePosition.getLeft().contains(popupMenuX, popupMenuY)) {
                     int index = annotationData.mappedFeatures.indexOf(featurePosition.getRight());
                     if (index >= 0) {
-                        Color retColor = JColorChooser.showDialog(this, "Select a color", annotationData.features.get(index).blocks.get(0).color);
+                        colorChooser.setColor(annotationData.features.get(index).blocks.get(0).color);
+                        GraphicsUtils.centerWindowOnWindow(colorDialog, MainFrame.self);
+                        colorDialog.setVisible(true);
+                        Color retColor = colorChooser.getColor();
+                        //Color retColor = JColorChooser.showDialog(this, "Select a color", annotationData.features.get(index).blocks.get(0).color);
                         if (retColor != null) {
                             for (Block block : annotationData.features.get(index).blocks) {
                                 block.color = retColor;

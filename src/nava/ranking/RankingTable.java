@@ -35,7 +35,7 @@ public class RankingTable extends JPanel {
         TableSorter sorter = new TableSorter(tableDataModel);
         table = new JTable(sorter);
         sorter.setTableHeader(table.getTableHeader());
-        sorter.sortOnColumn(table.getTableHeader(),table.getColumnCount()-1,1);
+        sorter.sortOnColumn(table.getTableHeader(),table.getColumnCount()-2,1);
         table.setFillsViewportHeight(true);
         table.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
@@ -44,7 +44,6 @@ public class RankingTable extends JPanel {
                     int row = target.getSelectedRow();
                     int column = target.getSelectedColumn();
 
-                    int s = ((Integer) table.getModel().getValueAt(row, 0)).intValue() - 1;
                     // TODO fire an event here to open substructure
                 }
             }
@@ -56,8 +55,8 @@ public class RankingTable extends JPanel {
 
     class TableDataModel extends AbstractTableModel {
 
-        String[] columnNames = {"Structure #", "Structure ID", "Location", "Structure Length", "Structure N", "Genome N", "Structure Mean", "Genome Mean", "Structure Median", "Genome Median", "Mann-Whitney U stat.", "p-value", "z-score"};
-        Class[] columnClasses = {Integer.class, String.class, Location.class, Integer.class, Integer.class, Integer.class, Double.class, Double.class, Double.class, Double.class, Double.class, Double.class, Double.class};
+        String[] columnNames = {"ID", "Location", "Length", "Substructure N", "Full N", "Substructure Mean", "Full Mean", "Substructure Median", "Full Median", "Mann-Whitney U stat", "p-value", "z-score"};
+        Class[] columnClasses = {String.class, Location.class, Integer.class, Integer.class, Integer.class, Double.class, Double.class, Double.class, Double.class, Double.class, Double.class, Double.class};
         public ArrayList<Object[]> rows = new ArrayList<>();
         public ArrayList<Mapping> mappings = new ArrayList<>();
         public ArrayList<File> mappingFiles = new ArrayList<>();

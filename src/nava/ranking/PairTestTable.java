@@ -5,6 +5,7 @@
 package nava.ranking;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -15,6 +16,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
+import nava.structurevis.data.Substructure;
 import nava.utils.Mapping;
 import nava.utils.TableSorter;
 
@@ -35,7 +39,7 @@ public class PairTestTable extends JPanel {
         TableSorter sorter = new TableSorter(tableDataModel);
         table = new JTable(sorter);
         sorter.setTableHeader(table.getTableHeader());
-        sorter.sortOnColumn(table.getTableHeader(),table.getColumnCount()-1,1);
+        sorter.sortOnColumn(table.getTableHeader(),table.getColumnCount()-2,1);
         table.setFillsViewportHeight(true);
         table.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
@@ -43,26 +47,28 @@ public class PairTestTable extends JPanel {
                     JTable target = (JTable) e.getSource();
                     int row = target.getSelectedRow();
                     int column = target.getSelectedColumn();
-
-                    int s = ((Integer) table.getModel().getValueAt(row, 0)).intValue() - 1;
+                    
+                  
+                    //int s = ((Integer) table.getModel().getValueAt(row, 0)).intValue() - 1;
                     // TODO fire an event here to open substructure
                 }
             }
         });
         
+        
+        
         scrollPane = new JScrollPane(table);
         add(scrollPane);
     }
+    
+    
 
     class TableDataModel extends AbstractTableModel {
 
-        String[] columnNames = {"Structure #", "Structure ID", "Location", "Structure Length", "Paired sites N", "Unpaired sites N", "Paired sites mean", "Unpaired sites mean", "Paired sites median", "Unpaired sites median", "Mann-Whitney U stat.", "p-value", "z-score"};
-        Class[] columnClasses = {Integer.class, String.class, Location.class, Integer.class, Integer.class, Integer.class, Double.class, Double.class, Double.class, Double.class, Double.class, Double.class, Double.class};
+        String[] columnNames = {"ID", "Location", "Length", "Paired N", "Unpaired N", "Paired mean", "Unpaired mean", "Paired median", "Unpaired median", "Mann-Whitney U stat.", "p-value", "z-score"};
+        Class[] columnClasses = {String.class, Location.class, Integer.class, Integer.class, Integer.class, Double.class, Double.class, Double.class, Double.class, Double.class, Double.class, Double.class};
         public ArrayList<Object[]> rows = new ArrayList<>();
-        public ArrayList<Mapping> mappings = new ArrayList<>();
-        public ArrayList<File> mappingFiles = new ArrayList<>();
-        public ArrayList<Ranking> rankings = new ArrayList<>();
-
+ 
         public int getColumnCount() {
             return columnNames.length;
         }
@@ -113,14 +119,10 @@ public class PairTestTable extends JPanel {
         }
 
         public void move(int index, int value) {
-
+            // rows
             Object[] array = rows.remove(index);
             rows.add(index + value, array);
-            /*
-             * if(value < 0) { rows.add(index+value, array); } else {
-             *
-             * }
-             */
+            
             fireTableDataChanged();
         }
 

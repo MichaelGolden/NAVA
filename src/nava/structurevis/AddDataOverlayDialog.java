@@ -5,9 +5,13 @@
 package nava.structurevis;
 
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+import nava.data.types.Alignment;
+import nava.data.types.Matrix;
+import nava.data.types.SecondaryStructure;
+import nava.data.types.Tabular;
 import nava.ui.MainFrame;
 import nava.ui.ProjectController;
-import nava.ui.ProjectModel;
 import nava.utils.GraphicsUtils;
 
 /**
@@ -135,39 +139,70 @@ public class AddDataOverlayDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     private void addNucleotideButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addNucleotideButtonActionPerformed
-        this.dispose();
-        NucleotideCompositionDialog d = new NucleotideCompositionDialog(null, true, projectController.projectModel, structureVisController);
-        d.setSize(500, 150);
-        GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
-        d.setEditMode(null);
-        d.setVisible(true);
+      
+        if(projectController.projectModel.dataSourcesContainInstanceOf(Alignment.class))
+        {
+            this.dispose();
+            NucleotideCompositionDialog d = new NucleotideCompositionDialog(null, true, projectController.projectModel, structureVisController);
+            d.setSize(500, 150);
+            GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
+            d.setEditMode(null);
+            d.setVisible(true);
+        }
+        else
+        {
+               JOptionPane.showMessageDialog(MainFrame.self, "You need to import or create an alignment data source in the\n'Data input' tab before adding a nucleotide data overlay.", "Cannot create nucleotide overlay",  JOptionPane.WARNING_MESSAGE);
+        }        
     }//GEN-LAST:event_addNucleotideButtonActionPerformed
 
     private void add1DButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_add1DButtonActionPerformed
-        this.dispose();
-        Data1DDialog d = new Data1DDialog(null, true, projectController.projectModel, structureVisController);
-        d.setSize(920, 690);
-        GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
-        d.setEditMode(null);
-        d.setVisible(true);
+        if(projectController.projectModel.dataSourcesContainInstanceOf(Tabular.class))
+        {
+            this.dispose();
+            Data1DDialog d = new Data1DDialog(null, true, projectController.projectModel, structureVisController);
+            d.setSize(920, 690);
+            GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
+            d.setEditMode(null);
+            d.setVisible(true);
+        }
+        else
+        {
+               JOptionPane.showMessageDialog(MainFrame.self, "You need to import or create a tabular data source in the\n'Data input' tab before adding a one-dimensional data overlay.", "Cannot create one-dimensional overlay",  JOptionPane.WARNING_MESSAGE);
+        }  
     }//GEN-LAST:event_add1DButtonActionPerformed
 
     private void add2DButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_add2DButtonActionPerformed
-        this.dispose();
-        Data2DDialog d = new Data2DDialog(null, true, projectController.projectModel, structureVisController);
-        d.setSize(750, 720);
-        GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
-        d.setEditMode(null);
-        d.setVisible(true);
+
+        if(projectController.projectModel.dataSourcesContainInstanceOf(Matrix.class))
+        {
+            this.dispose();
+            Data2DDialog d = new Data2DDialog(null, true, projectController.projectModel, structureVisController);
+            d.setSize(750, 720);
+            GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
+            d.setEditMode(null);
+            d.setVisible(true);
+        }
+        else
+        {
+               JOptionPane.showMessageDialog(MainFrame.self, "You need to import or create a matrix data source in the\n'Data input' tab before adding a two-dimensional data overlay.", "Cannot create two-dimensional overlay",  JOptionPane.WARNING_MESSAGE);
+        } 
     }//GEN-LAST:event_add2DButtonActionPerformed
 
     private void addStructureButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addStructureButtonActionPerformed
-        this.dispose();
-        StructureOverlayDialog d = new StructureOverlayDialog(null, true, projectController.projectModel, structureVisController);
-        d.setSize(640, 580);
-        GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
-        d.setEditMode(null);
-        d.setVisible(true);
+        if(projectController.projectModel.dataSourcesContainInstanceOf(SecondaryStructure.class))
+        {
+            this.dispose();
+            StructureOverlayDialog d = new StructureOverlayDialog(null, true, projectController.projectModel, structureVisController);
+            d.setSize(640, 580);
+            GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
+            d.setEditMode(null);
+            d.setVisible(true);
+        }
+        else
+        {
+               JOptionPane.showMessageDialog(MainFrame.self, "You need to import or create a secondary structure data source in the\n'Data input' tab before adding a structure overlay.", "Cannot create structure overlay",  JOptionPane.WARNING_MESSAGE);
+        } 
+        
     }//GEN-LAST:event_addStructureButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton add1DButton;

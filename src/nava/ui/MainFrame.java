@@ -246,7 +246,7 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
         });
         jMenu4.add(jMenuItem5);
 
-        jMenuItem4.setText("Ranking");
+        jMenuItem4.setText("Substructure ranking");
         jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem4ActionPerformed(evt);
@@ -306,7 +306,7 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
 
-        JFrame frame = new JFrame("Structure ranking");
+        JFrame frame = new JFrame("Substructure ranking");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setIconImage(getIconImage());
 
@@ -325,6 +325,7 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
         frame.setContentPane(newContentPane);
         //Display the window.
         frame.pack();
+        GraphicsUtils.centerWindowOnWindow(frame, MainFrame.self);
         frame.setVisible(true);
     }//GEN-LAST:event_jMenuItem4ActionPerformed
 
@@ -344,9 +345,11 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
                 newContentPane.kill();
             }
         });
+        
 
         //Display the window.
-        frame.pack();
+        frame.pack();        
+        GraphicsUtils.centerWindowOnWindow(frame, MainFrame.self);
         frame.setVisible(true);
     }//GEN-LAST:event_jMenuItem5ActionPerformed
 

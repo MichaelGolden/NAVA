@@ -24,7 +24,6 @@ import nava.structurevis.StructureVisController;
 import nava.structurevis.data.*;
 import nava.ui.MainFrame;
 import nava.utils.Mapping;
-import nava.utils.Pair;
 
 /**
  *
@@ -36,7 +35,7 @@ public class PairTestPanel extends javax.swing.JPanel {
     ArrayList<StructureOverlay> structureOverlays = new ArrayList();
     PairTestTable pairTable = null;
     public RankingThread currentThread = null;
-    StructureVisController structureVisController;
+    final StructureVisController structureVisController;
     NHistogramPanel nHistPanel = new NHistogramPanel();
     //StructureOverlay structureOverlay;
 
@@ -73,15 +72,25 @@ public class PairTestPanel extends javax.swing.JPanel {
                 JTable target = (JTable) e.getSource();
                 int row = target.getSelectedRow();
                 int column = target.getSelectedColumn();
-
-                int s = ((Integer) pairTable.table.getModel().getValueAt(row, 0)).intValue() - 1;
-                Ranking ranking = (Ranking) pairTable.table.getModel().getValueAt(row, 13);
+                
+                Ranking<Substructure> ranking = (Ranking) pairTable.table.getModel().getValueAt(row, 12);
                 nHistPanel.setNHistogram(ranking.nhist);
+                
+
+                if(e.getClickCount() == 2)
+                {
+                    if(ranking.object != null)
+                    {
+                        PairTestPanel.this.structureVisController.structureVisModel.substructureModel.openSubstructure(ranking.object);
+                    }
+                }
             }
         });
         histogramPanel.add(nHistPanel);
 
         this.nHistPanel.setNullText("Click on a substructure to compare the distribution of it's paired nucleotides to that of it's unpaired nucleotides.");
+        
+       // GraphicsUtils.resizeColumnWidth(pairTable.table);
     }
     Hashtable<PairTestKey, ArrayList> rowCache = new Hashtable<>();
 
@@ -156,8 +165,6 @@ public class PairTestPanel extends javax.swing.JPanel {
 
             if (dataOverlay instanceof DataOverlay1D) {
                 DataOverlay1D dataOverlay1D = (DataOverlay1D) dataOverlay;
-                //String cacheKey = dataOverlay1D.name + "_" + PAIR_PARAMETER;
-                // Pair<Overlay, Integer> cacheKey = new Pair((Overlay) dataOverlay1D, new Integer(PAIR_PARAMETER));
                 PairTestKey key = new PairTestKey(dataOverlay1D, structureOverlay);
                 ArrayList rows = getListFromCache(key);
                 pairTable.tableDataModel.addRows(rows);
@@ -166,15 +173,19 @@ public class PairTestPanel extends javax.swing.JPanel {
                 structures.addAll(structureOverlay.substructureList.substructures);
                 for (int i = rows.size(); running && i < structures.size(); i++) {
                     statusLabel.setText("Ranking (" + (i + 1) + " of " + structures.size() + ")");
-                    Substructure structure = structures.get(i);
+                    Substructure substructure = structures.get(i);
                     Mapping mapping = structureVisController.getMapping(structureOverlay.mappingSource, dataOverlay1D.mappingSource);
 
-                    Ranking ranking = RankingAnalyses.basePairComparison1D(dataOverlay1D, mapping, structure, structureOverlay.pairedSites, i + 1);
-
-                    Object[] row1 = {new Integer(i), structure.name, new Location(structure.startPosition, structure.startPosition + structure.length), new Integer(structure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore), ranking};
+                    Ranking<Substructure> ranking = RankingAnalyses.basePairComparison1D(dataOverlay1D, mapping, substructure, structureOverlay.pairedSites, i + 1);
+                    if(i > 0)
+                    {
+                        ranking.object = structures.get(i);
+                    }
+                    
+                    Object[] row1 = {substructure.name, new Location(substructure.startPosition, substructure.startPosition + substructure.length), new Integer(substructure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore), ranking};
                     final Object[] row;
                     if (i == 0) {
-                        Object[] row2 = {new Integer(i), "Full genome", new Location(structure.startPosition, structure.startPosition + structure.length), new Integer(structure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore), ranking};
+                        Object[] row2 = {"Full sequence", new Location(substructure.startPosition, substructure.startPosition + substructure.length), new Integer(substructure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore), ranking};
                         row = row2;
                     } else {
                         row = row1;
@@ -200,21 +211,24 @@ public class PairTestPanel extends javax.swing.JPanel {
                 structures.addAll(structureOverlay.substructureList.substructures);
                 for (int i = rows.size(); running && i < structures.size(); i++) {
                     statusLabel.setText("Ranking (" + (i + 1) + " of " + structures.size() + ")");
-                    Substructure structure = structures.get(i);
+                    Substructure substructure = structures.get(i);
 
-                    Ranking ranking;
+                    Ranking<Substructure> ranking;
                     try {
-                        ranking = RankingAnalyses.basePairComparison2D(dataOverlay2D, structureVisController.getMapping(structureOverlay.mappingSource, dataOverlay2D.mappingSource), structure, structureOverlay.pairedSites, i + 1);
-
-                        Object[] row1 = {new Integer(i), structure.name, new Location(structure.startPosition, structure.startPosition + structure.length), new Integer(structure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore), ranking};
+                        ranking = RankingAnalyses.basePairComparison2D(dataOverlay2D, structureVisController.getMapping(structureOverlay.mappingSource, dataOverlay2D.mappingSource), substructure, structureOverlay.pairedSites, i + 1);
+                        if(i > 0)
+                        {
+                            ranking.object = structures.get(i);
+                        }
+                        
+                        Object[] row1 = {substructure.name, new Location(substructure.startPosition, substructure.startPosition + substructure.length), new Integer(substructure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore), ranking};
                         final Object[] row;
                         if (i == 0) {
-                            Object[] row2 = {new Integer(i), "Full genome", new Location(structure.startPosition, structure.startPosition + structure.length), new Integer(structure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore), ranking};
+                            Object[] row2 = {"Full sequence", new Location(substructure.startPosition, substructure.startPosition + substructure.length), new Integer(substructure.length), new Integer(ranking.xN), new Integer(ranking.yN), new Double(ranking.xMean), new Double(ranking.yMean), new Double(ranking.xMedian), new Double(ranking.yMedian), new Double(ranking.mannWhitneyU), new Double(RankingAnalyses.NormalZ(Math.abs(ranking.zScore)) / 2), new Double(ranking.zScore), ranking};
                             row = row2;
                         } else {
                             row = row1;
                         }
-
                         pairTable.tableDataModel.addRow(row);
                         pairTable.repaint();
 

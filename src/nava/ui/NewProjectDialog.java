@@ -95,7 +95,6 @@ public class NewProjectDialog extends javax.swing.JDialog implements KeyListener
         jLabel1.setText("Workspace directory");
 
         workspaceDirectoryField.setEditable(false);
-        workspaceDirectoryField.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         workspaceDirectoryField.setText("jTextField1");
 
         browseButton.setText("Browse");
@@ -112,7 +111,6 @@ public class NewProjectDialog extends javax.swing.JDialog implements KeyListener
         jLabel3.setText("Project location");
 
         projectLocationField.setEditable(false);
-        projectLocationField.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         projectLocationField.setText("jTextField3");
 
         createProjectButton.setText("Create project");

@@ -10,7 +10,7 @@ import nava.structurevis.data.NHistogram;
  *
  * @author Michael
  */
-public class Ranking {
+public class Ranking<T> {
 
     NHistogram nhist;
     public double mannWhitneyU;
@@ -21,4 +21,5 @@ public class Ranking {
     public double yMean;
     public double xMedian;
     public double yMedian;
+    public T object;
 }

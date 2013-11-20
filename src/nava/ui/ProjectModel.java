@@ -27,6 +27,7 @@ public class ProjectModel implements Serializable {
     public long dataSourceCounter = 0;
     public long importCounter = 0;
     public static String path = "";
+    
 
     public ProjectModel() {
     }
@@ -34,6 +35,20 @@ public class ProjectModel implements Serializable {
     public ProjectModel(String path) {
         ProjectModel.path = path;
         navigatorTreeModel = new NavigatorTreeModel(new DefaultMutableTreeNode(), this);
+    }
+    
+    public boolean dataSourcesContainInstanceOf(Class classType)
+    {
+        for(int i = 0; i < dataSources.size() ; i++)
+        {
+            DataSource d = dataSources.get(i);
+            if(classType.isInstance(d))
+            {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     public void saveProject(File outFile) {

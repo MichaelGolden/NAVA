@@ -29,7 +29,15 @@ public class SubstructureList implements Serializable {
 
     public SubstructureList(StructureOverlay structureOverlay) {
         this.structureOverlay = structureOverlay;
-        this.title = structureOverlay.title + " substructures";
+        this.structureOverlay.loadData();
+        if(structureOverlay.title != null)
+        {
+            this.title = structureOverlay.title+ " substructures";
+        }
+        else
+        {
+            this.title = "Substructure list";
+        }
         if (substructures == null) {
             generateSubstructureList(structureOverlay, this.title, this.min, this.max, structureOverlay.circular, this.recursive);
         }

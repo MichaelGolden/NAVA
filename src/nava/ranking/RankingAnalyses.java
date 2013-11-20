@@ -5,13 +5,10 @@
 package nava.ranking;
 
 import java.awt.Color;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
-import nava.structurevis.data.*;
 import nava.structurevis.data.PersistentSparseMatrix.Element;
+import nava.structurevis.data.*;
 import nava.utils.Mapping;
 import nava.utils.Pair;
 
@@ -153,7 +150,7 @@ public class RankingAnalyses {
         MyMannWhitney mw = new MyMannWhitney(pairedValues, unpairedValues);
 
         Ranking r = new Ranking();
-        NHistogramClass substructureHist = new NHistogramClass("Substructure #" + structureNo, Color.green, pairedValues);
+        NHistogramClass substructureHist = new NHistogramClass("Substructure " + substructure.name, Color.green, pairedValues);
         NHistogramClass fullHist = new NHistogramClass("Full sequence", Color.red, unpairedValues);
         r.nhist = new NHistogram(dataOverlay1D.minValue, dataOverlay1D.maxValue, 30, dataOverlay1D.dataTransform);
         r.nhist.title = "Histograms comparing the " + dataOverlay1D.title + " distributions for " + "paired nucleotides and unpaired nucleotides  (" + (substructure.startPosition) + "-" + (substructure.startPosition + substructure.length) + ").";
@@ -240,10 +237,10 @@ public class RankingAnalyses {
         MyMannWhitney mw = new MyMannWhitney(substructureValues, fullGenomeValues);
 
         Ranking r = new Ranking();
-        NHistogramClass substructureHist = new NHistogramClass("Substructure #" + structureNo, Color.green, substructureList);
+        NHistogramClass substructureHist = new NHistogramClass("Substructure " + substructure.name, Color.green, substructureList);
         NHistogramClass fullHist = new NHistogramClass("Full sequence", Color.red, fullGenomeList);
         r.nhist = new NHistogram(dataOverlay1D.minValue, dataOverlay1D.maxValue, 30, dataOverlay1D.dataTransform);
-        r.nhist.title = "Histograms comparing the " + dataOverlay1D.title + " distributions for " + "substructure #" + structureNo + " and the full sequence.";
+        r.nhist.title = "Histograms comparing the " + dataOverlay1D.title + " distributions for " + "substructure " + substructure.name + " and the full sequence.";
         r.nhist.add(substructureHist);
         r.nhist.add(fullHist);
         r.nhist.calculate();
@@ -258,7 +255,7 @@ public class RankingAnalyses {
 
         fullHist.setName("Full sequence (median = " + r.nhist.transform.getFormattedString(fullGenomeMedian, 2) + ", N = " + fullGenomeList.size() + ")");
         fullHist.setMedian(fullGenomeMedian);
-        substructureHist.setName("Substructure #" + structureNo + " (median = " + r.nhist.transform.getFormattedString(substructureMedian, 2) + ", N = " + substructureList.size() + ")");
+        substructureHist.setName("Substructure " + substructure.name + " (median = " + r.nhist.transform.getFormattedString(substructureMedian, 2) + ", N = " + substructureList.size() + ")");
         substructureHist.setMedian(substructureMedian);
 
         return r;
@@ -367,9 +364,9 @@ public class RankingAnalyses {
         MyMannWhitney mw = new MyMannWhitney(substructureValues, fullGenomeValues);
 
         Ranking r = new Ranking();
-        NHistogramClass substructureHist = new NHistogramClass("Substructure #" + structureNo, Color.green, substructureList);
+        NHistogramClass substructureHist = new NHistogramClass("Substructure " + substructure.name, Color.green, substructureList);
         r.nhist = new NHistogram(dataOverlay2D.minValue, dataOverlay2D.maxValue, 30, dataOverlay2D.dataTransform);
-        r.nhist.title = "Histograms comparing the " + dataOverlay2D.title + " distributions for " + "substructure #" + structureNo + " and the full sequence.";
+        r.nhist.title = "Histograms comparing the " + dataOverlay2D.title + " distributions for " + "substructure " + substructure.name + " and the full sequence.";
         r.nhist.add(substructureHist);
         r.nhist.add(fullHist);
         r.nhist.calculate();
@@ -383,7 +380,7 @@ public class RankingAnalyses {
         r.yMedian = fullGenomeMedian;
         fullHist.setName("Full sequence (median = " + r.nhist.transform.getFormattedString(fullGenomeMedian, 2) + ", N = " + fullGenomeList.size() + ")");
         fullHist.setMedian(fullGenomeMedian);
-        substructureHist.setName("Substructure #" + structureNo + " (median = " + r.nhist.transform.getFormattedString(substructureMedian, 2) + ", N = " + substructureList.size() + ")");
+        substructureHist.setName("Substructure " + substructure.name + " (median = " + r.nhist.transform.getFormattedString(substructureMedian, 2) + ", N = " + substructureList.size() + ")");
         substructureHist.setMedian(substructureMedian);
 
         return r;

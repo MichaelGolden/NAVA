@@ -17,7 +17,10 @@ import java.util.Comparator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
+import nava.data.types.Annotations;
+import nava.data.types.Tabular;
 import nava.structurevis.AnnotationsDialog;
+import nava.structurevis.Data1DDialog;
 import nava.structurevis.StructureVisController;
 import nava.structurevis.data.*;
 import nava.ui.MainFrame;
@@ -921,21 +924,29 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
              * updatePreferredHeight(); repaint(); if (parent != null) {
              * parent.updatePanel(); }
              */
-        } else if (e.getSource().equals(this.addAnnotationFromSourceItem)) {
-            AnnotationsDialog d = new AnnotationsDialog(null, true, projectController.projectModel, structureVisController);
-            d.setSize(500, 150);
-            GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
-            d.setVisible(true);
+        } else if (e.getSource().equals(this.addAnnotationFromSourceItem)) {            
+            if(projectController.projectModel.dataSourcesContainInstanceOf(Annotations.class))
+            {
 
-            if (structureVisController.structureVisModel.substructureModel.getAnnotationSource() == null) {
-                structureVisController.addAnnotationsSource(d.annotationSource);
-                structureVisController.structureVisModel.substructureModel.setAnnotationSource(d.annotationSource);
-                this.setAnnotationData(structureVisController.structureVisModel.substructureModel.getAnnotationSource());
-            } else {
-                structureVisController.structureVisModel.substructureModel.getAnnotationSource().addAnnotations(d.annotationSource);
-                structureVisController.structureVisModel.substructureModel.setAnnotationSource(structureVisController.structureVisModel.substructureModel.getAnnotationSource());
-                this.setAnnotationData(structureVisController.structureVisModel.substructureModel.getAnnotationSource());
+                AnnotationsDialog d = new AnnotationsDialog(null, true, projectController.projectModel, structureVisController);
+                d.setSize(500, 150);
+                GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
+                d.setVisible(true);
+
+                if (structureVisController.structureVisModel.substructureModel.getAnnotationSource() == null) {
+                    structureVisController.addAnnotationsSource(d.annotationSource);
+                    structureVisController.structureVisModel.substructureModel.setAnnotationSource(d.annotationSource);
+                    this.setAnnotationData(structureVisController.structureVisModel.substructureModel.getAnnotationSource());
+                } else {
+                    structureVisController.structureVisModel.substructureModel.getAnnotationSource().addAnnotations(d.annotationSource);
+                    structureVisController.structureVisModel.substructureModel.setAnnotationSource(structureVisController.structureVisModel.substructureModel.getAnnotationSource());
+                    this.setAnnotationData(structureVisController.structureVisModel.substructureModel.getAnnotationSource());
+                }
             }
+            else
+            {
+                JOptionPane.showMessageDialog(MainFrame.self, "You need to import an annotations source such as a GenBank file\n in the 'Data input' tab before adding annotations.", "Cannot add annotations",  JOptionPane.WARNING_MESSAGE);
+            } 
             // this.setAnnotationData(structureVisController.structureVisModel.substructureModel.getAnnotationSource());
 
         } else if (e.getActionCommand().equals("REMOVE_FEATURE")) {

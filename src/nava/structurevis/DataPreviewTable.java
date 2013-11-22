@@ -7,6 +7,7 @@ package nava.structurevis;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -16,7 +17,9 @@ import javax.swing.border.Border;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 import nava.structurevis.data.DataOverlay1D;
+import nava.ui.ProjectModel;
 import nava.utils.TableSorter;
+import nava.utils.Utils;
 
 /**
  *
@@ -53,19 +56,21 @@ public class DataPreviewTable extends JPanel {
     class TableDataModel extends AbstractTableModel {
 
         String[] columnNames = {"Position", "Sequence", "Value"};
-        Class[] columnClasses = {Integer.class, String.class, String.class};
+        Class[] columnClasses = {String.class, String.class, String.class};
         public ArrayList<Object[]> rows = new ArrayList<>();
-
-        public void setDataSource1D(DataOverlay1D dataSource1D) {
+        
+        public void setDataSource1D(DataOverlay1D dataSource1D, ProjectModel projectModel) {
             if (dataSource1D != null) {
                 ArrayList<Object[]> rows = new ArrayList<>();
                 int j = 1;
 
+                String mappingSequence = dataSource1D.mappingSource.getRepresentativeSequence(projectModel);
+        
                 for (int i = 0; i < dataSource1D.dataOffsetCorrected; i++) {
                     if ((!dataSource1D.codonPositions || i % 3 == 0) && i < dataSource1D.stringData.length) {
-                        Object[] row = {-1, "?", dataSource1D.stringData[i] == null ? "" : dataSource1D.stringData[i]};
-                        if (dataSource1D.mappingSequence != null && i < dataSource1D.mappingSequence.length()) {
-                            row[1] = dataSource1D.mappingSequence.charAt(i) + "";
+                        Object[] row = {"Header", "", dataSource1D.stringData[i] == null ? "" : dataSource1D.stringData[i]};
+                        if (mappingSequence != null && i < mappingSequence.length()) {
+                            //row[1] = mappingSequence.charAt(i) + "";
                         }
                         rows.add(row);
                     }
@@ -73,8 +78,8 @@ public class DataPreviewTable extends JPanel {
 
                 for (int i = dataSource1D.dataOffsetCorrected; i < dataSource1D.data.length; i++) {
                     Object[] row = {j, "?", dataSource1D.stringData[i] == null ? "" : dataSource1D.stringData[i]};
-                    if (dataSource1D.mappingSequence != null && i < dataSource1D.mappingSequence.length()) {
-                        row[1] = dataSource1D.mappingSequence.charAt(i) + "";
+                    if (mappingSequence != null && j-1< mappingSequence.length()) {
+                        row[1] = mappingSequence.charAt(j-1) + "";
                     }
 
                     //addRow(row);
@@ -176,16 +181,21 @@ public class DataPreviewTable extends JPanel {
         }
     }
 
+    Color headerColor = new Color(210,230,230);
     public class ColorRenderer extends JLabel
             implements TableCellRenderer {
 
         Border unselectedBorder = null;
         Border selectedBorder = null;
         boolean isBordered = true;
-
+        Font plainFont;
+        Font boldFont;
+        
         public ColorRenderer(boolean isBordered) {
             this.isBordered = isBordered;
             setOpaque(true); //MUST do this for background to show up.
+            plainFont = this.getFont();
+            boldFont = plainFont.deriveFont(Font.BOLD);
         }
 
         public Component getTableCellRendererComponent(
@@ -193,11 +203,13 @@ public class DataPreviewTable extends JPanel {
                 boolean isSelected, boolean hasFocus,
                 int row, int column) {
             
-            
-            if(table.getValueAt(row, 0) == null || ((Integer)table.getValueAt(row, 0)).intValue() == -1)
+            this.setFont(plainFont);
+            String posValue = table.getValueAt(row, 0).toString();
+            if(table.getValueAt(row, 0) == null || !Utils.isInteger(posValue))
             {
                // System.out.println("HERE"+((Integer)object).intValue());
-                this.setBackground(new Color(255,230,230));
+                this.setBackground(Color.white);
+                this.setFont(boldFont);
             }
             else            
             if(row % 2 == 0)

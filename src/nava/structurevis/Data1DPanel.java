@@ -181,11 +181,11 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
         }
     }
     ArrayList<Double> values = new ArrayList<>();
-
     public void updateLegend() {
         if (selectedField != null) {
             if (!selectedField.equals(dataLoadedForField)) {
-                values = (ArrayList<Double>) selectedField.getObject(projectModel.getProjectPathString(), MainFrame.dataSourceCache).getNumericValues();
+                TabularFieldData fieldData = selectedField.getObject(projectModel.getProjectPathString(), MainFrame.dataSourceCache);
+                values = (ArrayList<Double>) fieldData.getNumericValues();
                 dataLoadedForField = selectedField;
             }
 
@@ -199,6 +199,8 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
         }
     }
 
+    Color mappingWarningColor = new Color(255, 125, 0);
+    Color mappingOkayColor = new Color(15,175,50);
     public void update() {
         this.selectedTransform = new DataTransform(dataMinField.getValue() == null ? 0 : (Double) dataMinField.getValue(), dataMaxField.getValue() == null ? 0 : (Double) dataMaxField.getValue(), (DataTransform.TransformType) transformComboBoxModel.getSelectedItem());
         this.updateLegend();
@@ -208,14 +210,15 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
 
             dataSource1D = DataOverlay1D.getDataOverlay1D((Tabular) dataSourceComboBox.getSelectedItem(), selectedField, dataTitleField.getText(), (TabularField) positionComboBox.getSelectedItem(), naturalRadioButton.isSelected(), onePositionRadioButton.isSelected(), headerCheckButton.isSelected() ? 1 : 0, codonCheckButton.isSelected(), (Double) dataMinField.getValue(), (Double) dataMaxField.getValue(), missingDataRadioButton.isSelected(), selectedTransform, dataLegend.colorGradient, mappingSource);
             dataSource1D.loadData();
-            previewTable.tableDataModel.setDataSource1D(dataSource1D);
+            previewTable.tableDataModel.setDataSource1D(dataSource1D, projectModel);
 
-            if (mappingSource != null && values.size() != mappingSource.getLength()) {
-                mappingSourceTextArea.setForeground(Color.red);
-                mappingSourceTextArea.setText("The length of the mapping source (" + mappingSource.getLength() + ") does not match the length of the data source (" + values.size() + ")");
+            int dataLength = dataSource1D.data.length;
+            if (mappingSource != null && dataLength != mappingSource.getLength()) {
+                mappingSourceTextArea.setForeground(mappingWarningColor);
+                mappingSourceTextArea.setText("The length of the mapping source (" + mappingSource.getLength() + ") does not match the length of the data source (" + dataLength + ")");
             } else {
-                mappingSourceTextArea.setForeground(Color.green);
-                mappingSourceTextArea.setText("The length of the mapping source (" + mappingSource.getLength() + ") matches the length of the data source (" + values.size() + ")");
+                mappingSourceTextArea.setForeground(mappingOkayColor);
+                mappingSourceTextArea.setText("The length of the mapping source (" + mappingSource.getLength() + ") matches the length of the data source (" + dataLength + ")");
             }
             
         }
@@ -239,7 +242,8 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
         this.clampedRadioButton.setSelected(!dataSource1D.excludeValuesOutOfRange);
         this.transformComboBoxModel.setSelectedItem(dataSource1D.dataTransform.type);
         this.dataLegend.setLegend(null, dataSource1D.dataTransform, dataSource1D.colorGradient, dataSource1D.defaultColorGradient, dataSource1D.useLowerThreshold, dataSource1D.useUpperThreshold, dataSource1D.thresholdMinPerc, dataSource1D.thresholdMaxPerc, dataSource1D);
-        this.mappingSourceComboBoxModel.setSelectedItem(dataSource1D.mappingSequence == null ? dataSource1D.mappingSource.alignmentSource : null);
+                this.mappingSourceComboBoxModel.setSelectedItem(dataSource1D.mappingSource.alignmentSource);
+//        this.mappingSourceComboBoxModel.setSelectedItem(dataSource1D.mappingSequence == null ? dataSource1D.mappingSource.alignmentSource : null);
     }
 
     /**
@@ -312,13 +316,18 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
         codonCheckButton.setText("Positions are codon positions");
 
         firstPositionGroup.add(zeroPositionRadioButton);
-        zeroPositionRadioButton.setSelected(true);
         zeroPositionRadioButton.setText("Zero");
         zeroPositionRadioButton.setEnabled(false);
 
         firstPositionGroup.add(onePositionRadioButton);
+        onePositionRadioButton.setSelected(true);
         onePositionRadioButton.setText("One");
         onePositionRadioButton.setEnabled(false);
+        onePositionRadioButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                onePositionRadioButtonActionPerformed(evt);
+            }
+        });
 
         firstPositionLabel.setText("Numbering starts at");
         firstPositionLabel.setEnabled(false);
@@ -342,38 +351,37 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(naturalRadioButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(naturalRadioButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(headerCheckButton))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(fromFieldRadioButton)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(positionComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE)))
-                        .addGap(32, 32, 32))
+                                .addComponent(positionComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap())
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(21, 21, 21)
-                                .addComponent(firstPositionLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGap(18, 18, 18)
-                                .addComponent(zeroPositionRadioButton))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(headerCheckButton)
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addComponent(codonCheckButton)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(positionHelpLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(21, 21, 21)
+                        .addComponent(firstPositionLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
+                        .addComponent(zeroPositionRadioButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(onePositionRadioButton)
-                        .addGap(43, 43, 43))))
+                        .addGap(43, 43, 43))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(codonCheckButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(positionHelpLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(naturalRadioButton)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(naturalRadioButton)
+                    .addComponent(headerCheckButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(fromFieldRadioButton)
@@ -383,9 +391,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
                     .addComponent(firstPositionLabel)
                     .addComponent(zeroPositionRadioButton)
                     .addComponent(onePositionRadioButton))
-                .addGap(6, 6, 6)
-                .addComponent(headerCheckButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(codonCheckButton)
                     .addComponent(positionHelpLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -523,7 +529,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
                     .addComponent(jLabel6)
                     .addComponent(dataMinField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel9))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel7)
                     .addComponent(dataMaxField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -535,7 +541,8 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
                     .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(missingDataRadioButton)
                         .addComponent(clampedRadioButton))
-                    .addComponent(rangeHelpLabel)))
+                    .addComponent(rangeHelpLabel))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("3. Map the data values to the structure"));
@@ -596,7 +603,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
                             .addComponent(mappingSourceComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(mappingHelpLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(mappingSourceTextArea, javax.swing.GroupLayout.DEFAULT_SIZE, 49, Short.MAX_VALUE)
+                .addComponent(mappingSourceTextArea, javax.swing.GroupLayout.DEFAULT_SIZE, 70, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton1)
                 .addGap(5, 5, 5))
@@ -721,6 +728,10 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
         selectBestAlignment();
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void onePositionRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_onePositionRadioButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_onePositionRadioButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton clampedRadioButton;
     private javax.swing.JCheckBox codonCheckButton;
@@ -769,12 +780,15 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
 
     public void selectBestAlignment()
     {
-           Alignment bestAlignment = null;
+        if(dataSource1D != null)
+        {
+            dataSource1D.loadData();
+            Alignment bestAlignment = null;
             int minDifference = Integer.MAX_VALUE;
             for(int i = 0 ; i < this.mappingSourceComboBoxModel.getSize() ; i++)
             {
                 Alignment alignment = mappingSourceComboBoxModel.getElementAt(i);
-                int difference = Math.abs(alignment.length - values.size());
+                int difference = Math.abs(alignment.length - dataSource1D.data.length);
                 if(bestAlignment == null || difference < minDifference)
                 {
                     bestAlignment = alignment;
@@ -782,6 +796,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
                 }
             }
             mappingSourceComboBox.setSelectedItem(bestAlignment);
+        }
     }
     
     @Override
@@ -797,6 +812,17 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
                 this.selectedField = field;
             }
         } else if (e.getSource().equals(this.naturalRadioButton) || e.getSource().equals(this.fromFieldRadioButton)) {
+            
+            if(e.getSource().equals(this.naturalRadioButton) && naturalRadioButton.isSelected())
+            {
+                this.headerCheckButton.setSelected(true);
+            }
+            
+            if(e.getSource().equals(this.fromFieldRadioButton) && fromFieldRadioButton.isSelected())
+            {
+                this.headerCheckButton.setSelected(false);
+            }
+            
             boolean enable = false;
             if (fromFieldRadioButton.isSelected()) {
                 enable = true;

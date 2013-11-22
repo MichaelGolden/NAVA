@@ -23,6 +23,11 @@ public class TabularFieldData {
         this.values = values;
     }
     
+    public int getLength()
+    {
+        return values.size();
+    }
+    
     public ArrayList<Double> getNumericValues()
     {
         ArrayList<Double> ret = new  ArrayList<>();

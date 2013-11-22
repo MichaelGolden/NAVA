@@ -329,7 +329,7 @@ public class DistanceMatrix {
 
     // zero offset
     public int getDistance(int i, int j) {
-        if(matrix != null && i < matrix.length && j < matrix.length)
+        if(matrix != null && i < matrix.length && j < matrix.length && i >= 0 && j >= 0)
         {
             return matrix[i / binSize][j / binSize] * binSize;
         }

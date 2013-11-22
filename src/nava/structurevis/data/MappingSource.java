@@ -5,15 +5,19 @@
 package nava.structurevis.data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Objects;
 import nava.data.types.Alignment;
 import nava.data.types.Sequence;
+import nava.ui.MainFrame;
+import nava.ui.ProjectModel;
 
 /**
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
 public class MappingSource implements Serializable {
+    private static final long serialVersionUID = -912648825685262857L;
     
     public enum Type{ALIGNMENT, SEQUENCE, STRING};
     
@@ -39,6 +43,31 @@ public class MappingSource implements Serializable {
     {
         this.sequence = sequence;
         this.mappingType = Type.STRING;
+    }
+    
+    public String getRepresentativeSequence(ProjectModel projectModel)
+    {
+        switch(mappingType)
+        {
+            case ALIGNMENT:
+                if(alignmentSource != null)
+                {
+                    ArrayList<String> sequences = alignmentSource.getObject(projectModel.getProjectPathString(), MainFrame.dataSourceCache).sequences;                
+                    return sequences.size() > 0 ? sequences.get(0) : "";
+                }
+                return "";
+            case SEQUENCE:
+                if(sequenceSource != null)
+                {
+                   // return sequenceSource.getObject(projectModel.getProjectPathString(), MainFrame.dataSourceCache);
+                }
+                return "";
+            case STRING:
+                return sequence;
+            default:
+                return "";
+                
+        }
     }
     
     public int getLength()

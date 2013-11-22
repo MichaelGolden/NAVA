@@ -155,7 +155,8 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
         this.jIndexTextField.addKeyListener(this);
 
         this.dataLegendPanel.add(dataLegend, BorderLayout.CENTER);
-        dataLegend.setLegend(null, new DataTransform(0, 1, DataTransform.TransformType.LINEAR), new ColorGradient(Color.white, Color.red), new ColorGradient(Color.white, Color.red), true, true, 0, 1, null);
+        ColorGradient gradient = new ColorGradient(new Color(255,255,255,0), Color.red);
+        dataLegend.setLegend(null, new DataTransform(0, 1, DataTransform.TransformType.LINEAR), gradient, gradient, true, true, 0, 1, null);
         dataLegend.showEditMode();
 
         this.naturalRadioButtonOneOffset.addItemListener(this);
@@ -220,6 +221,8 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
         }
     }
 
+    Color mappingWarningColor = new Color(255, 125, 0);
+    Color mappingOkayColor = new Color(15,175,50);
     public void update() {
         this.selectedTransform = new DataTransform(dataMinField.getValue() == null ? 0 : (Double) dataMinField.getValue(), dataMaxField.getValue() == null ? 0 : (Double) dataMaxField.getValue(), (DataTransform.TransformType) transformComboBoxModel.getSelectedItem());
         this.updateLegend();
@@ -251,10 +254,10 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
 
 
             if (mappingSource != null && (dataSource2D.dataMatrix.n != mappingSource.getLength() || dataSource2D.dataMatrix.m != mappingSource.getLength())) {
-                mappingSourceTextArea.setForeground(Color.red);
+                mappingSourceTextArea.setForeground(mappingWarningColor);
                 mappingSourceTextArea.setText("The length of the mapping source (" + mappingSource.getLength() + ") does not match the length of the data source (" + dataSource2D.dataMatrix.n + ", " + dataSource2D.dataMatrix.m + ")");
             } else {
-                mappingSourceTextArea.setForeground(Color.green);
+                mappingSourceTextArea.setForeground(mappingOkayColor);
                 mappingSourceTextArea.setText("The length of the mapping source (" + mappingSource.getLength() + ") matches the length of the data source (" + dataSource2D.dataMatrix.n + ", " + dataSource2D.dataMatrix.m + ")");
             }
         }

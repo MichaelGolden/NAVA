@@ -22,6 +22,7 @@ import nava.utils.Utils;
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
 public class DataOverlay1D extends Overlay implements Serializable {
+    private static final long serialVersionUID = -885453141421496912L;
 
     public ColorGradient defaultColorGradient;
     public ColorGradient colorGradient;
@@ -30,7 +31,7 @@ public class DataOverlay1D extends Overlay implements Serializable {
     public TabularField dataField;
     public TabularField positionField;
     public MappingSource mappingSource;
-    public String mappingSequence;
+    //public String mappingSequence;
     public boolean naturalPositions;
     public boolean oneOffset;
     public boolean codonPositions;

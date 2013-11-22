@@ -1934,7 +1934,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             }
             
 
-            if (substructureModel.data1D != null  && nucSelected) {
+            if (substructureModel.data1D != null  && nucSelected && pos < substructureModel.data1D.data.length) {
                 double p = substructureModel.data1D.data[pos];
                 interactionText += "1D data: pos=" + (pos + 1) + ", value=" + substructureModel.data1D.dataTransform.getFormattedString(p, 6) + "";                
                 interactionText += "\n";

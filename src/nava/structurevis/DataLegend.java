@@ -14,7 +14,6 @@ import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,11 +25,11 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import nava.structurevis.data.DataTransform;
-import nava.structurevis.data.DataTransform.TransformType;
 import nava.structurevis.data.Histogram;
 import nava.structurevis.data.Overlay;
 import nava.ui.MainFrame;
 import nava.utils.ColorGradient;
+import nava.utils.GraphicsUtils;
 import net.hanjava.svg.SVG2EMF;
 
 /**
@@ -42,7 +41,6 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
     public static final String EDIT_MODE_STRING = "Change color gradient";
     public static final String RANGE_MODE_STRING = "Set numeric range";
     protected javax.swing.event.EventListenerList listenerList = new javax.swing.event.EventListenerList();
-    //public JColorChooser colorChooser = new JColorChooser();
     public static final int HORIZONTAL = 0;
     public static final int VERTICAL = 1;
     public int orientation = HORIZONTAL;
@@ -101,6 +99,8 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
     int missingAndFilteredDataBlockSize = 14;
     int missingAndFilteredDataPadding = 10;
 
+    final static JColorChooser  colorChooser = new JColorChooser();
+    final static JDialog colorDialog =  JColorChooser.createDialog(MainFrame.self, "Pick a color", true, colorChooser, null, null);
     public DataLegend() {
 
         modeItem.addActionListener(this);
@@ -131,6 +131,11 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
         saveAsEMFItem.addActionListener(this);
         saveImageMenu.add(saveAsEMFItem);
         editPopupMenu.add(saveImageMenu);
+        
+        
+        
+        //colorDialog = JColorChooser.createDialog(MainFrame.self, "Pick a color", true, colorChooser, this, this);
+        
 
         addMouseListener(this);
         addMouseMotionListener(this);
@@ -537,10 +542,14 @@ public class DataLegend extends JPanel implements ActionListener, MouseListener,
                 if (edit) {
                     // if edit show ColorChooser
                     if (colorSliderSelected != -1) {
-                        Color c = JColorChooser.showDialog(this, "Pick a color", colorGradient.colours[colorSliderSelected]);
-                        if (c != null) {
-                            colorGradient.colours[colorSliderSelected] = c;
-                        }
+                        colorChooser.setColor(colorGradient.colours[colorSliderSelected]);
+                        GraphicsUtils.centerWindowOnWindow(colorDialog, MainFrame.self);
+                        colorDialog.setVisible(true);
+                        Color retColor = colorChooser.getColor();
+                        //Color retColor = JColorChooser.showDialog(this, "Select a color", annotationData.features.get(index).blocks.get(0).color);
+                        if (retColor != null) {
+                            colorGradient.colours[colorSliderSelected] = retColor;
+                        }                        
                         colorSliderSelected = -1;
                     }
                 } else {

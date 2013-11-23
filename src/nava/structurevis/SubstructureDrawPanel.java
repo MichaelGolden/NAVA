@@ -172,12 +172,10 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
         this.substructureModel = substructureModel;
         if(this.substructureModel.structureOverlay != null && this.substructureModel.structureOverlay.selectedSubstructure != null)
         {
-            System.out.println("ENTRY A");
             this.substructureModel.openSubstructure(this.substructureModel.structureOverlay.selectedSubstructure );
         }
         else
         {
-            System.out.println("ENTRY B");
             this.substructureModel.openSubstructure(substructureModel.substructure);
         }
     }
@@ -335,7 +333,6 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
         }
 
         //np = mainapp.getStructureCoordinates(structure.getDotBracketString());
-        System.out.println("B " + structure.getDotBracketString());
         pairedSites = RNAFoldingTools.getPairedSitesFromDotBracketString(structure.getDotBracketString());
 
         edit = new SubstructureEdit(pairedSites);
@@ -724,223 +721,226 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             return;
         }
 
-        // draw the base pair interactions
-        if (showBonds) {
-            //System.out.println("here");
-            for (int i = 0; i < nucleotidePositions.length; i++) {
-                int a = i % substructureModel.structureOverlay.pairedSites.length;
-                int b = edit.pairedSites[i] - 1 % substructureModel.structureOverlay.pairedSites.length;
-                if (i + 1 < edit.pairedSites[i]) {
-                    Line2D bond = new Line2D.Double(nucleotidePositions[a], nucleotidePositions[b]);
-                    g.setStroke(new BasicStroke(bondThickness));
+        if(nucleotidePositions != null)
+        {
+            // draw the base pair interactions
+            if (showBonds) {
+                //System.out.println("here");
+                for (int i = 0; i < nucleotidePositions.length; i++) {
+                    int a = i % substructureModel.structureOverlay.pairedSites.length;
+                    int b = edit.pairedSites[i] - 1 % substructureModel.structureOverlay.pairedSites.length;
+                    if (i + 1 < edit.pairedSites[i] && a < nucleotidePositions.length && b < nucleotidePositions.length) {
+                        Line2D bond = new Line2D.Double(nucleotidePositions[a], nucleotidePositions[b]);
+                        g.setStroke(new BasicStroke(bondThickness));
 
-                    g.setColor(bondColor);
-                    if ((selectedNuc1 == a && selectedNuc2 == b) || (selectedNuc1 == b && selectedNuc2 == a)) {
-                        g.setColor(Color.red);
+                        g.setColor(bondColor);
+                        if ((selectedNuc1 == a && selectedNuc2 == b) || (selectedNuc1 == b && selectedNuc2 == a)) {
+                            g.setColor(Color.red);
+                        }
+                        g.draw(bond);
                     }
+                }
+                if (selectedNuc1 != -1 && selectedNuc2 != -1 && selectedNuc1 < nucleotidePositions.length && selectedNuc2 < nucleotidePositions.length) {
+                    Line2D bond = new Line2D.Double(nucleotidePositions[selectedNuc1], nucleotidePositions[selectedNuc2]);
+
+                    float dash[] = {10.0f};
+                    g.setStroke(new BasicStroke(bondThickness, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash, 0.0f));
+
+                    g.setColor(Color.red);
                     g.draw(bond);
                 }
-            }
-            if (selectedNuc1 != -1 && selectedNuc2 != -1 && selectedNuc1 < nucleotidePositions.length && selectedNuc2 < nucleotidePositions.length) {
-                Line2D bond = new Line2D.Double(nucleotidePositions[selectedNuc1], nucleotidePositions[selectedNuc2]);
 
-                float dash[] = {10.0f};
-                g.setStroke(new BasicStroke(bondThickness, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash, 0.0f));
-
-                g.setColor(Color.red);
-                g.draw(bond);
             }
 
-        }
-
-
-        g.setColor(Color.black);
-        int length = substructureModel.substructure.length;
-     
-        covariationInteractions.clear();
-        if (show2DData && substructureModel.data2D != null) {
-            for (int i = substructureModel.substructure.getStartPosition(); i < substructureModel.substructure.getEndPosition(); i++) {
-                for (int j = substructureModel.substructure.getStartPosition(); j < substructureModel.substructure.getEndPosition(); j++) {
-                    int k = i - substructureModel.substructure.getStartPosition();
-                    int l = j - substructureModel.substructure.getStartPosition();
-                   // System.out.println("Pmax distance = " + substructureModel.maxDistance+"\t"+substructureModel.substructureDistanceMatrix +"\t"+i+"\t"+j+"\t"+substructureModel.substructureDistanceMatrix.getDistance(k, l));
-                    if ((substructureModel != null && substructureModel.maxDistance == -1) ||  (substructureModel.substructureDistanceMatrix == null || substructureModel.substructureDistanceMatrix.getDistance(k, l) <= substructureModel.maxDistance)) {
-                    //if ((substructureModel != null && substructureModel.maxDistance == -1) || (substructureModel.substructureDistanceMatrix != null && substructureModel.substructureDistanceMatrix.getDistance(k, l) <= substructureModel.maxDistance) || (substructureModel.substructureDistanceMatrix == null && substructureModel.substructureDistanceMatrix.getDistance(i, j) <= substructureModel.maxDistance)) {
-                        Color c = null;
-                        //double p = model.data2D.emptyValue;
-                       // double p = substructureModel.data2D.get(i, j, substructureModel.mapping2D);
-                        double p = substructureModel.data2D.get(i%substructureModel.structureOverlay.pairedSites.length, j%substructureModel.structureOverlay.pairedSites.length, substructureModel.mapping2D);
-                        //System.out.println("P"+(i-1)+"\t"+(j-1)+"\t"+model.data2D.get(i - 1, j - 1, model.mapping2D));
-                        if (p == substructureModel.data2D.emptyValue) {
-                            c = null;
-                        } else if (((!substructureModel.data2D.useLowerThreshold || p >= substructureModel.data2D.thresholdMin) && (!substructureModel.data2D.useUpperThreshold || p <= substructureModel.data2D.thresholdMax))) {
-                            if (substructureModel.data2D != null) {
-                                //System.out.println(p);
-                                c = substructureModel.data2D.colorGradient.getColor((float) substructureModel.data2D.dataTransform.transform(p));
-                            }
-                        }
-
-                        if (c != null && c.getAlpha() != 0) {
-
-                            //System.out.println(k + "\t" + l + "\t" + i + "\t" + j + "\t" + nucleotidePositions.length);
-                            double x1 = nucleotidePositions[k].getX();
-                            double y1 = nucleotidePositions[k].getY();
-                            double x2 = nucleotidePositions[l].getX();
-                            double y2 = nucleotidePositions[l].getY();
-
-                            Shape shape = null;
-                            int structureMidpoint = substructureModel.substructure.getStartPosition() + (substructureModel.substructure.length / 2);
-
-                            /*
-                             * if (i >= structure.gapStartA && i <=
-                             * structure.gapEndA && j > structureMidpoint && j <
-                             * structure.gapStartB) { shape = new
-                             * QuadCurve2D.Double(x1, y1, (x1 + x2) / 2, y2, x2,
-                             * y2); } else if (i > structure.gapEndA && i <=
-                             * structureMidpoint && j > structure.gapStartB && j
-                             * < structure.gapEndB) { shape = new
-                             * QuadCurve2D.Double(x1, y1, (x1 + x2) / 2, y1, x2,
-                             * y2); } else if (i >= structure.gapEndA && i <=
-                             * structure.gapStartB && j >= structure.gapEndA &&
-                             * j <= structure.gapStartB) { shape = new
-                             * Line2D.Double(nucleotidePositions[k],
-                             * nucleotidePositions[l]); } else
-                             */
-                            if (substructureModel.substructure.pairedSites[k] == l + 1) {
-                                shape = new Line2D.Double(nucleotidePositions[k], nucleotidePositions[l]);
-                            } else if (i <= structureMidpoint && j <= structureMidpoint) { // both on left side
-                                double x1p = Math.max(x1 - Math.abs((y1 - y2) / 2), 0);
-                                shape = new QuadCurve2D.Double(x1, y1, x1p, (y1 + y2) / 2, x2, y2);
-                            } else if (i > structureMidpoint && j > structureMidpoint) { // both on right side
-                                double x2p = Math.min(x2 + Math.abs((y1 - y2) / 2), panelWidth);
-                                shape = new QuadCurve2D.Double(x1, y1, x2p, (y1 + y2) / 2, x2, y2);
-                            } else {
-                                shape = new Line2D.Double(nucleotidePositions[k], nucleotidePositions[l]);
-                            }
-                       
-                            covariationInteractions.add(new Interaction(shape, i, j));
-                       
-
-                            g.setColor(c);
-                            g.setStroke(normalStroke);
-                            g.draw(shape);
-
-                            g.setColor(Color.black);
-                            g.setStroke(new BasicStroke());
-                        }
-                    }
-                }
-            }
-        }
-
-        int[] tetraloop = new int[nucleotidePositions.length];
-        /*
-         * for (int i = 0; i < nucleotidePositions.length; i++) { if
-         * (consensusSequence.substring(i).matches("^G[ACGT][GA]A.*")) {
-         * tetraloop[i] = 1; tetraloop[i + 1] = 1; tetraloop[i + 2] = 1;
-         * tetraloop[i + 3] = 1; //System.out.println("MATCH GNRA " + i); } if
-         * (consensusSequence.substring(i).matches("^A[ACGT]CG.*")) {
-         * tetraloop[i] = 2; tetraloop[i + 1] = 2; tetraloop[i + 2] = 2;
-         * tetraloop[i + 3] = 2; //System.out.println("MATCH ANCG " + i); } if
-         * (consensusSequence.substring(i).matches("^CAAG.*")) { tetraloop[i] =
-         * 3; tetraloop[i + 1] = 3; tetraloop[i + 2] = 3; tetraloop[i + 3] = 3;
-         * //System.out.println("MATCH CAAG " + i); } }
-         */
-
-        // draw the nucleotides
-        for (int i = 0; i < nucleotidePositions.length; i++) {
-            int structurePos = (substructureModel.substructure.startPosition + i) % substructureModel.structureOverlay.pairedSites.length;
-            //lllll
-            int pos = structurePos;
-            if (substructureModel.mapping1D != null) {
-                int pos2 = substructureModel.mapping1D.aToB(pos);
-                if (pos2 != -1) {
-                    pos = pos2;
-                }
-            }
-            Ellipse2D stemNucleotide = getCircleCenteredAt(nucleotidePositions[i].getX(), nucleotidePositions[i].getY(), nucleotideDiameter);
-            g.setColor(Color.white);
-            Color nucleotideBackgroundColor = substructureModel.missingDataColor;
-            if (oneDimensionalData == SHOW && substructureModel.data1D != null && pos >= 0 && substructureModel.data1D.used != null && pos < substructureModel.data1D.used.length && substructureModel.data1D.used[pos]) {
-                double p = substructureModel.data1D.data[pos];
-                if (substructureModel.data1D.used[pos] && ((!substructureModel.data1D.useLowerThreshold || p >= substructureModel.data1D.thresholdMin) && (!substructureModel.data1D.useUpperThreshold || p <= substructureModel.data1D.thresholdMax))) {
-                    nucleotideBackgroundColor = substructureModel.data1D.colorGradient.getColor(substructureModel.data1D.dataTransform.transform((float) p));
-                } else if (!((!substructureModel.data1D.useLowerThreshold || p >= substructureModel.data1D.thresholdMin) && (!substructureModel.data1D.useUpperThreshold || p <= substructureModel.data1D.thresholdMax))) {
-                    nucleotideBackgroundColor = substructureModel.filteredDataColor;
-                }
-                g.setColor(nucleotideBackgroundColor);
-                g.fill(stemNucleotide);
-                g.setColor(Color.black);
-                // drawStringCentred(g, nucleotidePositions[i].getX(), nucleotidePositions[i].getY()+10, val.toString());
-            } else {
-                g.setColor(nucleotideBackgroundColor);
-                g.fill(stemNucleotide);
-            }
 
             g.setColor(Color.black);
-            g.draw(stemNucleotide);
-            g.setStroke(new BasicStroke());
+            int length = substructureModel.substructure.length;
+
+            covariationInteractions.clear();
+            if (show2DData && substructureModel.data2D != null) {
+                for (int i = substructureModel.substructure.getStartPosition(); i < substructureModel.substructure.getEndPosition(); i++) {
+                    for (int j = substructureModel.substructure.getStartPosition(); j < substructureModel.substructure.getEndPosition(); j++) {
+                        int k = i - substructureModel.substructure.getStartPosition();
+                        int l = j - substructureModel.substructure.getStartPosition();
+                    // System.out.println("Pmax distance = " + substructureModel.maxDistance+"\t"+substructureModel.substructureDistanceMatrix +"\t"+i+"\t"+j+"\t"+substructureModel.substructureDistanceMatrix.getDistance(k, l));
+                        if ((substructureModel != null && substructureModel.maxDistance == -1) ||  (substructureModel.substructureDistanceMatrix == null || substructureModel.substructureDistanceMatrix.getDistance(k, l) <= substructureModel.maxDistance)) {
+                        //if ((substructureModel != null && substructureModel.maxDistance == -1) || (substructureModel.substructureDistanceMatrix != null && substructureModel.substructureDistanceMatrix.getDistance(k, l) <= substructureModel.maxDistance) || (substructureModel.substructureDistanceMatrix == null && substructureModel.substructureDistanceMatrix.getDistance(i, j) <= substructureModel.maxDistance)) {
+                            Color c = null;
+                            //double p = model.data2D.emptyValue;
+                        // double p = substructureModel.data2D.get(i, j, substructureModel.mapping2D);
+                            double p = substructureModel.data2D.get(i%substructureModel.structureOverlay.pairedSites.length, j%substructureModel.structureOverlay.pairedSites.length, substructureModel.mapping2D);
+                            //System.out.println("P"+(i-1)+"\t"+(j-1)+"\t"+model.data2D.get(i - 1, j - 1, model.mapping2D));
+                            if (p == substructureModel.data2D.emptyValue) {
+                                c = null;
+                            } else if (((!substructureModel.data2D.useLowerThreshold || p >= substructureModel.data2D.thresholdMin) && (!substructureModel.data2D.useUpperThreshold || p <= substructureModel.data2D.thresholdMax))) {
+                                if (substructureModel.data2D != null) {
+                                    //System.out.println(p);
+                                    c = substructureModel.data2D.colorGradient.getColor((float) substructureModel.data2D.dataTransform.transform(p));
+                                }
+                            }
+
+                            if (c != null && c.getAlpha() != 0 && k < nucleotidePositions.length && l < nucleotidePositions.length) {
+
+                                //System.out.println(k + "\t" + l + "\t" + i + "\t" + j + "\t" + nucleotidePositions.length);
+                                double x1 = nucleotidePositions[k].getX();
+                                double y1 = nucleotidePositions[k].getY();
+                                double x2 = nucleotidePositions[l].getX();
+                                double y2 = nucleotidePositions[l].getY();
+
+                                Shape shape = null;
+                                int structureMidpoint = substructureModel.substructure.getStartPosition() + (substructureModel.substructure.length / 2);
+
+                                /*
+                                * if (i >= structure.gapStartA && i <=
+                                * structure.gapEndA && j > structureMidpoint && j <
+                                * structure.gapStartB) { shape = new
+                                * QuadCurve2D.Double(x1, y1, (x1 + x2) / 2, y2, x2,
+                                * y2); } else if (i > structure.gapEndA && i <=
+                                * structureMidpoint && j > structure.gapStartB && j
+                                * < structure.gapEndB) { shape = new
+                                * QuadCurve2D.Double(x1, y1, (x1 + x2) / 2, y1, x2,
+                                * y2); } else if (i >= structure.gapEndA && i <=
+                                * structure.gapStartB && j >= structure.gapEndA &&
+                                * j <= structure.gapStartB) { shape = new
+                                * Line2D.Double(nucleotidePositions[k],
+                                * nucleotidePositions[l]); } else
+                                */
+                                if (substructureModel.substructure.pairedSites[k] == l + 1) {
+                                    shape = new Line2D.Double(nucleotidePositions[k], nucleotidePositions[l]);
+                                } else if (i <= structureMidpoint && j <= structureMidpoint) { // both on left side
+                                    double x1p = Math.max(x1 - Math.abs((y1 - y2) / 2), 0);
+                                    shape = new QuadCurve2D.Double(x1, y1, x1p, (y1 + y2) / 2, x2, y2);
+                                } else if (i > structureMidpoint && j > structureMidpoint) { // both on right side
+                                    double x2p = Math.min(x2 + Math.abs((y1 - y2) / 2), panelWidth);
+                                    shape = new QuadCurve2D.Double(x1, y1, x2p, (y1 + y2) / 2, x2, y2);
+                                } else {
+                                    shape = new Line2D.Double(nucleotidePositions[k], nucleotidePositions[l]);
+                                }
+
+                                covariationInteractions.add(new Interaction(shape, i, j));
 
 
-            /*
-             *
-             * if (tetraloop[i] > 0) { g.setColor(Color.magenta);
-             * g.setStroke(new BasicStroke((float) 3)); g.draw(stemNucleotide);
-             * } else { g.setColor(Color.black); g.draw(stemNucleotide); }
-             * g.setStroke(new BasicStroke());
-             */
+                                g.setColor(c);
+                                g.setStroke(normalStroke);
+                                g.draw(shape);
 
-            // draw the information
-            g.setColor(ColorUtils.selectBestForegroundColor(nucleotideBackgroundColor, Color.white, Color.black));
-            if (substructureModel.nucleotideSource != null) {
-                int nucPos = i;
-                if (substructureModel.nucleotideCompositionType == NucleotideComposition.Type.SHANNON_ENTROPY) {
-                    double[] nucfa = substructureModel.nucleotideSource.getMappedShannonEntropyAtNucleotide(substructureModel.nucleotideMapping, structurePos);
-                    if (nucfa != null) {
-                        double[] fa = Arrays.copyOf(nucfa, 5);
-                        for (int k = 0; k < fa.length; k++) // java Arrays.copy causes fatal error
-                        {
-                            if (Double.isNaN(fa[k])) {
-                                fa[k] = 0; // java crashes fatally if this is not done
+                                g.setColor(Color.black);
+                                g.setStroke(new BasicStroke());
                             }
                         }
-                        for (int k = 0; k < 4; k++) {
-                            fa[k] = fa[k] / 2;
-                        }
-                        drawSequenceLogo(g, nucleotidePositions[i].getX(), nucleotidePositions[i].getY() - (nucleotideDiameter / 2) + 0, nucleotideDiameter, nucleotideDiameter - 5, fa);
-                        g.setFont(f2);
-                    }
-                } else if (substructureModel.nucleotideCompositionType == NucleotideComposition.Type.FREQUENCY) {
-                    double[] nucfa = substructureModel.nucleotideSource.getMappedFrequencyAtNucleotide(substructureModel.nucleotideMapping, structurePos);
-                    if (nucfa != null) {
-                        double[] fa = nucfa;
-                        drawSequenceLogo(g, nucleotidePositions[i].getX(), nucleotidePositions[i].getY() - (nucleotideDiameter / 2) + 0, nucleotideDiameter, nucleotideDiameter - 5, fa);
-                        g.setFont(f2);
                     }
                 }
             }
-        }
 
-        // draw position lines
-        for (int i = 0; i < nucleotidePositions.length; i++) {
-            int offsetx = 0;
-            double side = 1;
-            if (i < length / 2) {
-                offsetx = -(int) (nucleotideDiameter - 3);
+            int[] tetraloop = new int[nucleotidePositions.length];
+            /*
+            * for (int i = 0; i < nucleotidePositions.length; i++) { if
+            * (consensusSequence.substring(i).matches("^G[ACGT][GA]A.*")) {
+            * tetraloop[i] = 1; tetraloop[i + 1] = 1; tetraloop[i + 2] = 1;
+            * tetraloop[i + 3] = 1; //System.out.println("MATCH GNRA " + i); } if
+            * (consensusSequence.substring(i).matches("^A[ACGT]CG.*")) {
+            * tetraloop[i] = 2; tetraloop[i + 1] = 2; tetraloop[i + 2] = 2;
+            * tetraloop[i + 3] = 2; //System.out.println("MATCH ANCG " + i); } if
+            * (consensusSequence.substring(i).matches("^CAAG.*")) { tetraloop[i] =
+            * 3; tetraloop[i + 1] = 3; tetraloop[i + 2] = 3; tetraloop[i + 3] = 3;
+            * //System.out.println("MATCH CAAG " + i); } }
+            */
 
-                side = -1;
-            } else {
-                offsetx = (int) (nucleotideDiameter - 3);
+            // draw the nucleotides
+            for (int i = 0; i < nucleotidePositions.length; i++) {
+                int structurePos = (substructureModel.substructure.startPosition + i) % substructureModel.structureOverlay.pairedSites.length;
+                //lllll
+                int pos = structurePos;
+                if (substructureModel.mapping1D != null) {
+                    int pos2 = substructureModel.mapping1D.aToB(pos);
+                    if (pos2 != -1) {
+                        pos = pos2;
+                    }
+                }
+                Ellipse2D stemNucleotide = getCircleCenteredAt(nucleotidePositions[i].getX(), nucleotidePositions[i].getY(), nucleotideDiameter);
+                g.setColor(Color.white);
+                Color nucleotideBackgroundColor = substructureModel.missingDataColor;
+                if (oneDimensionalData == SHOW && substructureModel.data1D != null && pos >= 0 && substructureModel.data1D.used != null && pos < substructureModel.data1D.used.length && substructureModel.data1D.used[pos]) {
+                    double p = substructureModel.data1D.data[pos];
+                    if (substructureModel.data1D.used[pos] && ((!substructureModel.data1D.useLowerThreshold || p >= substructureModel.data1D.thresholdMin) && (!substructureModel.data1D.useUpperThreshold || p <= substructureModel.data1D.thresholdMax))) {
+                        nucleotideBackgroundColor = substructureModel.data1D.colorGradient.getColor(substructureModel.data1D.dataTransform.transform((float) p));
+                    } else if (!((!substructureModel.data1D.useLowerThreshold || p >= substructureModel.data1D.thresholdMin) && (!substructureModel.data1D.useUpperThreshold || p <= substructureModel.data1D.thresholdMax))) {
+                        nucleotideBackgroundColor = substructureModel.filteredDataColor;
+                    }
+                    g.setColor(nucleotideBackgroundColor);
+                    g.fill(stemNucleotide);
+                    g.setColor(Color.black);
+                    // drawStringCentred(g, nucleotidePositions[i].getX(), nucleotidePositions[i].getY()+10, val.toString());
+                } else {
+                    g.setColor(nucleotideBackgroundColor);
+                    g.fill(stemNucleotide);
+                }
+
+                g.setColor(Color.black);
+                g.draw(stemNucleotide);
+                g.setStroke(new BasicStroke());
+
+
+                /*
+                *
+                * if (tetraloop[i] > 0) { g.setColor(Color.magenta);
+                * g.setStroke(new BasicStroke((float) 3)); g.draw(stemNucleotide);
+                * } else { g.setColor(Color.black); g.draw(stemNucleotide); }
+                * g.setStroke(new BasicStroke());
+                */
+
+                // draw the information
+                g.setColor(ColorUtils.selectBestForegroundColor(nucleotideBackgroundColor, Color.white, Color.black));
+                if (substructureModel.nucleotideSource != null) {
+                    int nucPos = i;
+                    if (substructureModel.nucleotideCompositionType == NucleotideComposition.Type.SHANNON_ENTROPY) {
+                        double[] nucfa = substructureModel.nucleotideSource.getMappedShannonEntropyAtNucleotide(substructureModel.nucleotideMapping, structurePos);
+                        if (nucfa != null) {
+                            double[] fa = Arrays.copyOf(nucfa, 5);
+                            for (int k = 0; k < fa.length; k++) // java Arrays.copy causes fatal error
+                            {
+                                if (Double.isNaN(fa[k])) {
+                                    fa[k] = 0; // java crashes fatally if this is not done
+                                }
+                            }
+                            for (int k = 0; k < 4; k++) {
+                                fa[k] = fa[k] / 2;
+                            }
+                            drawSequenceLogo(g, nucleotidePositions[i].getX(), nucleotidePositions[i].getY() - (nucleotideDiameter / 2) + 0, nucleotideDiameter, nucleotideDiameter - 5, fa);
+                            g.setFont(f2);
+                        }
+                    } else if (substructureModel.nucleotideCompositionType == NucleotideComposition.Type.FREQUENCY) {
+                        double[] nucfa = substructureModel.nucleotideSource.getMappedFrequencyAtNucleotide(substructureModel.nucleotideMapping, structurePos);
+                        if (nucfa != null) {
+                            double[] fa = nucfa;
+                            drawSequenceLogo(g, nucleotidePositions[i].getX(), nucleotidePositions[i].getY() - (nucleotideDiameter / 2) + 0, nucleotideDiameter, nucleotideDiameter - 5, fa);
+                            g.setFont(f2);
+                        }
+                    }
+                }
             }
 
-            if (nucleotidePositions[i] != null) {
-                g.setColor(Color.black);
-                g.setFont(f2);
-                int pos = (substructureModel.substructure.getStartPosition() + i) % substructureModel.sequenceLength + 1;
-                if (substructureModel.numbering != 0 && pos % substructureModel.numbering == 0) {
-                    drawStringCentred(g, offsetx + nucleotidePositions[i].getX(), nucleotidePositions[i].getY() - 2, "" + pos);
+            // draw position lines
+            for (int i = 0; i < nucleotidePositions.length; i++) {
+                int offsetx = 0;
+                double side = 1;
+                if (i < length / 2) {
+                    offsetx = -(int) (nucleotideDiameter - 3);
+
+                    side = -1;
+                } else {
+                    offsetx = (int) (nucleotideDiameter - 3);
+                }
+
+                if (nucleotidePositions[i] != null) {
                     g.setColor(Color.black);
-                    g.draw(new Line2D.Double(nucleotidePositions[i].getX() + (side * nucleotideDiameter / 2) - 2, nucleotidePositions[i].getY(), nucleotidePositions[i].getX() + (side * nucleotideDiameter / 2) + 2, nucleotidePositions[i].getY()));
+                    g.setFont(f2);
+                    int pos = (substructureModel.substructure.getStartPosition() + i) % substructureModel.sequenceLength + 1;
+                    if (substructureModel.numbering != 0 && pos % substructureModel.numbering == 0) {
+                        drawStringCentred(g, offsetx + nucleotidePositions[i].getX(), nucleotidePositions[i].getY() - 2, "" + pos);
+                        g.setColor(Color.black);
+                        g.draw(new Line2D.Double(nucleotidePositions[i].getX() + (side * nucleotideDiameter / 2) - 2, nucleotidePositions[i].getY(), nucleotidePositions[i].getX() + (side * nucleotideDiameter / 2) + 2, nucleotidePositions[i].getY()));
+                    }
                 }
             }
         }
@@ -1357,7 +1357,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             setPreferredSize(new Dimension(preferredWidth, preferredHeight));
             revalidate();
             // g.scale(zoomScale, zoomScale);
-            if (mouseoverNucleotide != -1) {
+            if (mouseoverNucleotide >= 0 &&  mouseoverNucleotide < nucleotidePositions.length) {
                 g.setColor(Color.black);
                 g.setStroke(new BasicStroke((float) 2.25));
                 g.drawOval((int) nucleotidePositions[mouseoverNucleotide].x - (nucleotideDiameter / 2), (int) nucleotidePositions[mouseoverNucleotide].y - (nucleotideDiameter / 2), (int) (nucleotideDiameter), (int) (nucleotideDiameter));

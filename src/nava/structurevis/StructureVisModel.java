@@ -53,8 +53,6 @@ public class StructureVisModel implements Serializable {
         }
 
         // re-add the listeners, this is only necessary if the application stays open
-
-        System.out.println("StructureVis project saved");
     }
 
     public static StructureVisModel loadProject(File inFile, StructureVisController structureVisController) throws IOException, ClassNotFoundException {
@@ -64,8 +62,6 @@ public class StructureVisModel implements Serializable {
         ret.initialise(structureVisController);
         in.close();
 
-
-        System.out.println("StructureVis project loaded");
         return ret;
     }
 

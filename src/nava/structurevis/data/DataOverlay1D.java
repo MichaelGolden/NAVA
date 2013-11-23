@@ -161,11 +161,6 @@ public class DataOverlay1D extends Overlay implements Serializable {
             }
         }
 
-        System.out.println("dataOffsetCorrected "+dataOffsetCorrected);
-        for (int i = 0; i < dataOffsetCorrected && i < used.length; i++) {
-            //used[i] = false;
-            System.out.println(i+"\t"+used[i]);
-        }
     }
 
     public static DataOverlay1D getDataOverlay1D(Tabular dataTable, TabularField field, String title, TabularField positionField, boolean naturalPositions, boolean oneOffset, int dataOffset, boolean codonPositions, double min, double max, boolean excludeValuesOutOfRange, DataTransform dataTransform, ColorGradient colorGradient, MappingSource mappingSource) {

@@ -67,7 +67,6 @@ public class GraphLayer extends JPanel implements ActionListener, MouseListener 
     public void setDataOverlay1D(DataOverlay1D dataOverlay1D) {
         setData(dataOverlay1D, windowSizes[currentWindowIndex]);
         redraw();
-        System.out.println("setDataOverlay1D 2" + dataOverlay1D);
     }
 
     public void setData(DataOverlay1D dataOverlay1D, int windowSize) {
@@ -109,7 +108,6 @@ public class GraphLayer extends JPanel implements ActionListener, MouseListener 
     public void redraw() {
         forceRepaint = true;
         repaint();
-        System.out.println("redrawing");
     }
     BufferedImage bufferedImage = null;
 

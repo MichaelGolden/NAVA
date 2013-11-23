@@ -105,10 +105,11 @@ public class StructureOverlayDialog extends javax.swing.JDialog {
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
         if (editOverlay == null) {
-            structureVisController.addStructureSource(structureDataPanel.getStructureSource());
+            structureVisController.addStructureOverlay(structureDataPanel.getStructureOverlay());                        
         } else {
-            structureVisController.setStructureSource(editOverlay, structureDataPanel.getStructureSource());
+            structureVisController.editStructureOverlay(editOverlay, structureDataPanel.getStructureOverlay());
         }
+        structureVisController.structureVisModel.substructureModel.setStructureOverlay(structureDataPanel.getStructureOverlay());
         this.dispose();
     }//GEN-LAST:event_addButtonActionPerformed
 

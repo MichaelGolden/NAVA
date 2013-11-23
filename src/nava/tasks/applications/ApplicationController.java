@@ -47,7 +47,7 @@ public class ApplicationController implements TaskListener {
         {
             if(task instanceof Application)
             {
-                System.out.println(task.getName()+"Finished");
+                
             }
         }
     }

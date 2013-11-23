@@ -32,12 +32,9 @@ public class AnnotationMappingTask extends UITask {
 
     @Override
     public void task() {
-        System.out.println("Annotations mapping task start");
         this.mappedAnnotationSource = AnnotationSource.getMappedAnnotations(annotationSource, structureSource, structureVisController);
         this.annotationsLayer.setAnnotationData(mappedAnnotationSource);
         this.annotationsLayer.showAnnotations();
-        System.out.println(mappedAnnotationSource);        
-        System.out.println("Annotations mapping task end");
     }
 
     @Override

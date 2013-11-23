@@ -151,13 +151,11 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
 
     @Override
     public void dataSourcesLoaded() {
-        System.out.println("Datasources loaded");
         setup();
     }
 
     @Override
     public void dataSourcesIntervalAdded(ListDataEvent e) {
-        System.out.println("NavigatorTreeModel dataSourcesIntervalAdded");
         for (int i = e.getIndex0(); i < e.getIndex1() + 1; i++) {
 //            addDataSource(projectModel.dataSources.get(i));
         }
@@ -166,13 +164,11 @@ public class DataOverlayTreeModel extends DefaultTreeModel implements Serializab
 
     @Override
     public void dataSourcesIntervalRemoved(ListDataEvent e) {
-        System.out.println("dataSourcesIntervalRemoved");
         //throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public void dataSourcesContentsChanged(ListDataEvent e) {
-        System.out.println("dataSourcesContentsChanged");
         //throw new UnsupportedOperationException("Not supported yet.");
     }
 

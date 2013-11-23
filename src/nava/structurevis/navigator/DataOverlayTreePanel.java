@@ -61,8 +61,7 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
         if (structureVisController.structureVisModel.overlayNavigatorTreeModel == null) {
             structureVisController.structureVisModel.overlayNavigatorTreeModel = new DataOverlayTreeModel(new DefaultMutableTreeNode(), structureVisController);
         }
-
-        System.out.println("Adding tree listenr" + structureVisController.structureVisModel.overlayNavigatorTreeModel);
+        
         structureVisController.structureVisModel.overlayNavigatorTreeModel.addTreeModelListener(this);
 
         DataOverlayTreeRenderer navigatorRenderer = new DataOverlayTreeRenderer();

@@ -53,7 +53,6 @@ public class SynonymousRatesOverall {
             }
         }
         
-        System.out.println("structures "+structureData.size());
         if(structureData.size() == 0)
         {
             return;

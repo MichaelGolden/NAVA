@@ -255,7 +255,7 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
 
             if (mappingSource != null && (dataSource2D.dataMatrix.n != mappingSource.getLength() || dataSource2D.dataMatrix.m != mappingSource.getLength())) {
                 mappingSourceTextArea.setForeground(mappingWarningColor);
-                mappingSourceTextArea.setText("The length of the mapping source (" + mappingSource.getLength() + ") does not match the length of the data source (" + dataSource2D.dataMatrix.n + ", " + dataSource2D.dataMatrix.m + ")");
+                mappingSourceTextArea.setText("Warning: the length of the mapping source (" + mappingSource.getLength() + ") does not match the length of the data source (" + dataSource2D.dataMatrix.n + ", " + dataSource2D.dataMatrix.m + ")");
             } else {
                 mappingSourceTextArea.setForeground(mappingOkayColor);
                 mappingSourceTextArea.setText("The length of the mapping source (" + mappingSource.getLength() + ") matches the length of the data source (" + dataSource2D.dataMatrix.n + ", " + dataSource2D.dataMatrix.m + ")");
@@ -437,7 +437,7 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(dataTitleField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("5. Specify the numeric range"));
@@ -633,7 +633,7 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(useUpperMatrixRadioButton)
                     .addComponent(useLowerMatrixRadioButton))
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addGap(0, 1, Short.MAX_VALUE))
         );
 
         jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder("Query matrix position"));
@@ -684,7 +684,7 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
                     .addComponent(jLabel2))
                 .addGap(8, 8, 8)
                 .addComponent(valueField)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("4. Map the data values to the structure"));
@@ -740,7 +740,7 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
                     .addComponent(mappingSourceComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(mappingHelpLabel))
                 .addGap(4, 4, 4)
-                .addComponent(mappingSourceTextArea, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(mappingSourceTextArea, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton1)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -779,7 +779,7 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, 73, Short.MAX_VALUE)
+                        .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)

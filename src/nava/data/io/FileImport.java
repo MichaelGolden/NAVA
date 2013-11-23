@@ -150,8 +150,6 @@ public class FileImport {
             }
         }
 
-        System.out.println("Possible datatypes " + possibleDataTypes);
-
         return possibleDataTypes;
     }
 

@@ -144,7 +144,7 @@ public class AddDataOverlayDialog extends javax.swing.JDialog {
         {
             this.dispose();
             NucleotideCompositionDialog d = new NucleotideCompositionDialog(null, true, projectController.projectModel, structureVisController);
-            d.setSize(500, 150);
+            d.setSize(375, 150);
             GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
             d.setEditMode(null);
             d.setVisible(true);
@@ -160,7 +160,7 @@ public class AddDataOverlayDialog extends javax.swing.JDialog {
         {
             this.dispose();
             Data1DDialog d = new Data1DDialog(null, true, projectController.projectModel, structureVisController);
-            d.setSize(920, 690);
+            d.setSize(Data1DDialog.defaultWidth, Data1DDialog.defaultHeight);
             GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
             d.setEditMode(null);
             d.setVisible(true);
@@ -177,7 +177,7 @@ public class AddDataOverlayDialog extends javax.swing.JDialog {
         {
             this.dispose();
             Data2DDialog d = new Data2DDialog(null, true, projectController.projectModel, structureVisController);
-            d.setSize(750, 720);
+            d.setSize(Data2DDialog.defaultWidth, Data2DDialog.defaultHeight);
             GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
             d.setEditMode(null);
             d.setVisible(true);
@@ -202,7 +202,6 @@ public class AddDataOverlayDialog extends javax.swing.JDialog {
         {
                JOptionPane.showMessageDialog(MainFrame.self, "You need to import or create a secondary structure data source in the\n'Data input' tab before adding a structure overlay.", "Cannot create structure overlay",  JOptionPane.WARNING_MESSAGE);
         } 
-        
     }//GEN-LAST:event_addStructureButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton add1DButton;

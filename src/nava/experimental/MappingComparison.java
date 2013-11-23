@@ -128,6 +128,7 @@ public class MappingComparison {
         vprValues.remove(0);
         mappableData.add(new MappableData(vprAlignment, vprValues, true, "vpr"));
 
+        System.out.print("");
 
         File vpuCsv = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_vpu_300_nooverlap_aligned.csv");
         File vpuAlignment = new File("C:/dev/thesis/hiv_full/hiv1/300/clean/hiv1_vpu_300_nooverlap_aligned.fas");

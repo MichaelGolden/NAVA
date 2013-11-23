@@ -25,7 +25,6 @@ public class DataInspectorAlignmentPanel extends javax.swing.JPanel implements I
         initComponents();
         this.projectController = projectController;
         this.alignment = alignment;
-        System.out.println("Alignment type: " + alignment.alignmentType);
         switch (alignment.alignmentType) {
             case NUCLEOTIDE_ALIGNMENT:
                 this.nucleotideRadioButton.setSelected(true);

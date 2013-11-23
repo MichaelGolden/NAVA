@@ -68,7 +68,7 @@ public class DataPreviewTable extends JPanel {
         
                 for (int i = 0; i < dataSource1D.dataOffsetCorrected; i++) {
                     if ((!dataSource1D.codonPositions || i % 3 == 0) && i < dataSource1D.stringData.length) {
-                        Object[] row = {"Header", "", dataSource1D.stringData[i] == null ? "" : dataSource1D.stringData[i]};
+                        Object[] row = {"", "", dataSource1D.stringData[i] == null ? "" : dataSource1D.stringData[i]};
                         if (mappingSequence != null && i < mappingSequence.length()) {
                             //row[1] = mappingSequence.charAt(i) + "";
                         }
@@ -181,7 +181,8 @@ public class DataPreviewTable extends JPanel {
         }
     }
 
-    Color headerColor = new Color(210,230,230);
+    //Color headerColor = new Color(210,230,230);
+    Color headerColor = new Color(220,244,235);
     public class ColorRenderer extends JLabel
             implements TableCellRenderer {
 
@@ -208,7 +209,7 @@ public class DataPreviewTable extends JPanel {
             if(table.getValueAt(row, 0) == null || !Utils.isInteger(posValue))
             {
                // System.out.println("HERE"+((Integer)object).intValue());
-                this.setBackground(Color.white);
+                this.setBackground(headerColor);
                 this.setFont(boldFont);
             }
             else            

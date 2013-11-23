@@ -51,7 +51,7 @@ public class FastTreeApplication extends Application {
         
         try {
             String cmd = "cmd /c "+new File(FAST_TREE_EXECUTABLE).getAbsolutePath() + " " + arguments + " " + inFastaFile.getAbsolutePath() + " > " + outNewickFile.getAbsolutePath();
-            System.out.println("cmd "+cmd);
+     
             process = Runtime.getRuntime().exec(cmd, null, tempDir);
 
             startConsoleInputBuffer(process);

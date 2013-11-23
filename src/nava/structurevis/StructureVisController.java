@@ -105,7 +105,6 @@ public class StructureVisController implements SafeListListener, ProjectView {
 
             for (int j = 0; j < structureVisModel.nucleotideSources.size(); j++) {
                 NucleotideComposition nucleotideComposition = structureVisModel.nucleotideSources.get(j);
-                System.out.println("CREATING NUC " + j + "\t" + nucleotideComposition);
                 if (s.mappingSource != null && nucleotideComposition.mappingSource != null) {
                     if (!structureVisModel.mappings.containsKey(new Pair<>(s.mappingSource, nucleotideComposition.mappingSource))) {
                         MainFrame.taskManager.queueTask(new MappingTask(this, s.mappingSource, nucleotideComposition.mappingSource), true);
@@ -115,7 +114,7 @@ public class StructureVisController implements SafeListListener, ProjectView {
         }
     }
 
-    public void addStructureSource(StructureOverlay structureSource) {
+    public void addStructureOverlay(StructureOverlay structureSource) {
         if (!structureVisModel.structureSources.contains(structureSource)) {
             if (structureSource.addMappingSourceAsNucleotideOverlay) {
                 addAssociatedStructureMappingSource(structureSource);
@@ -165,7 +164,7 @@ public class StructureVisController implements SafeListListener, ProjectView {
      * @param currentOverlay
      * @param structureSource
      */
-    public void setStructureSource(Overlay currentOverlay, StructureOverlay structureSource) {
+    public void editStructureOverlay(Overlay currentOverlay, StructureOverlay structureSource) {
         int index = structureVisModel.structureSources.indexOf(currentOverlay);
         if (index >= 0) {
             structureVisModel.structureSources.set(index, structureSource);
@@ -245,7 +244,6 @@ public class StructureVisController implements SafeListListener, ProjectView {
 
     public void addStructureVisDataSource2D(DataOverlay2D dataSource) {
         structureVisModel.structureVisDataOverlays2D.addElement(dataSource);
-        System.out.println(structureVisModel.structureVisDataOverlays2D);
         refreshMappings();
     }
 
@@ -337,7 +335,6 @@ public class StructureVisController implements SafeListListener, ProjectView {
         //nucleotideSourcesPersistent = Collections.list(nucleotideSources.elements());
 
 
-        System.out.println(structureVisModel.overlayNavigatorTreeModel.getTreeModelListeners().length);
         ArrayList<TreeModelListener> treeListenersList = new ArrayList<>();
         TreeModelListener[] overlayTreeListeners = structureVisModel.overlayNavigatorTreeModel.getTreeModelListeners();
         for (int i = 0; i < overlayTreeListeners.length; i++) {
@@ -359,8 +356,6 @@ public class StructureVisController implements SafeListListener, ProjectView {
          * substructureModel.overlayNavigatorTreeModel.removeTreeModelListener(projectTreeListneers[i]);
          * }
          */
-
-        System.out.println(structureVisModel.overlayNavigatorTreeModel.getTreeModelListeners().length);
 
         try {
             ObjectOutput out = new ObjectOutputStream(new FileOutputStream(outFile));

@@ -27,7 +27,7 @@ public class FigTreeApplication extends Application {
     @Override
     protected void start() {
          File treeFile = new File(inputDataSource.getNormalisedDataSourcePath(ProjectModel.path));
-         System.out.println("Tree file "+treeFile);
+ 
         String cmd = "java -jar \""+new File(FIGTREE_EXECUTABLE).getAbsolutePath() + "\" \""+treeFile.getAbsolutePath()+"\"";
         try {
             Runtime.getRuntime().exec(cmd);

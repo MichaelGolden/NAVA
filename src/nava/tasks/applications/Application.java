@@ -53,7 +53,6 @@ public abstract class Application extends Task {
     public void setProjectController(ProjectController projectController)
     {
         this.projectController = projectController;
-        System.out.println("setting model " + projectController);
     }
 
     public void setApplicationPanel(JPanel applicationPanel) {

@@ -106,9 +106,16 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
             CustomItem<Substructure> item = new CustomItem<>(list.get(i), i + "");   
             substructureComboBoxModel.addElement(item);
         }
-        if(list.size() > 0)
+        try
         {
-            this.substructureComboBoxModel.setSelectedItem(substructureComboBoxModel.getElementAt(selectedSubstructure));
+            if(list.size() > 0)
+            {
+                this.substructureComboBoxModel.setSelectedItem(substructureComboBoxModel.getElementAt(selectedSubstructure));
+            }
+        }
+        catch(Exception ex)
+        {
+             this.structureComboBox.setSelectedIndex(0);
         }
     }
 
@@ -378,16 +385,18 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
         if (structureOverlay != null && structureOverlay.mappingSource != null) {
             //structureVisController.addStructureSource(structureSource);
             structureOverlay.loadData();
-            //System.out.println("structureSource.substructures.size() = "+structureSource.substructures.size());
-            System.out.println("CACHED SUBSTRUCTURE = "+structureOverlay.selectedSubstructure);
+
             if(structureOverlay.selectedSubstructure != null)
             {
-                this.structureVisController.structureVisModel.substructureModel.openSubstructure(structureOverlay.selectedSubstructure);
+                this.structureVisController.structureVisModel.substructureModel.openSubstructure(structureOverlay.selectedSubstructure);                
+                System.out.println("MAGIC 1"+structureOverlay.selectedSubstructure);
             }
             else
             if (structureOverlay.substructureList.substructures.size() > 0) {
+                System.out.println("MAGIC 3");
                 this.structureVisController.structureVisModel.substructureModel.openSubstructure(structureOverlay.substructureList.substructures.get(0));
             } else {
+                System.out.println("MAGIC 2");
                 this.structureVisController.structureVisModel.substructureModel.openSubstructure(null);
             }
             populateSubtructureComboBox();
@@ -397,6 +406,8 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
                 this.structureVisController.structureVisModel.substructureModel.openSubstructure(structureOverlay.selectedSubstructure);
             }
             this.structureVisController.structureVisModel.substructureModel.openSubstructure(null);
+            
+                System.out.println("MAGIC 4");
         }
         DataOverlay1D dataOverlay1D = structureVisController.structureVisModel.substructureModel.data1D;
         if (dataOverlay1D != null) {

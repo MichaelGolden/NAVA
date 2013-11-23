@@ -64,7 +64,7 @@ public class AmbiguityCodes {
                 scores[i] /= ((double) standardBases.length());
             }
         } else {
-            System.out.println(ambiguityCode);
+            //System.out.println(ambiguityCode);
         }
 
         return scores;

@@ -32,7 +32,6 @@ public class ResolveImportAmbiguityDialog extends javax.swing.JDialog implements
         super(parent, modal);
         initComponents();
         this.possibleDataTypes = possibleDataTypes;
-        System.out.println(possibleDataTypes);
         this.alignmentComboBox.setModel(alignmentComboBoxModel);
         this.annotationsComboBox.setModel(annotationsComboBoxModel);
         this.matrixComboBox.setModel(matrixComboBoxModel);
@@ -295,7 +294,6 @@ public class ResolveImportAmbiguityDialog extends javax.swing.JDialog implements
 
     private void importButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importButtonActionPerformed
        updateSelectedDataType();
-       System.out.println(this.selectedDataType);
        this.dispose();
     }//GEN-LAST:event_importButtonActionPerformed
 

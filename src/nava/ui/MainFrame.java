@@ -359,7 +359,6 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
         GraphicsUtils.centerWindowOnScreen(newProjectDialog);
         newProjectDialog.setVisible(true);
         if (newProjectDialog.createNewProject) {
-            System.out.println(newProjectDialog.projectFile);
             createNewProject(newProjectDialog.projectFile);
         }
     }//GEN-LAST:event_jMenuItem6ActionPerformed
@@ -509,12 +508,10 @@ public class MainFrame extends javax.swing.JFrame implements WindowListener, Act
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        System.out.println(e.getSource());
         if (e.getSource() instanceof JMenuItem) {
             JMenuItem menuItem = (JMenuItem) e.getSource();
             MenuAction action = (MenuAction) menuItem.getAction();
             File projectFile = (File) action.getValue("file");
-            System.out.println("Opening project file " + projectFile);
             openProject(projectFile);
         }
     }

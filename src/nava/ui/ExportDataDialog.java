@@ -202,7 +202,6 @@ public class ExportDataDialog extends javax.swing.JDialog implements ItemListene
             public void run() {
                 File file = new File(browseField.getText());
                 File directory = file;
-                System.out.println("isFileDirectory"+file+"\t"+file.isDirectory());
                 if (!file.isDirectory()) {
                     directory = file.getParentFile();
                 } else {

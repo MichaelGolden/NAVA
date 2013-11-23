@@ -72,8 +72,6 @@ public class NHistogramClass {
         }
         
         median = RankingAnalyses.getMedian(values);
-        System.out.println("Median="+median);
-        System.out.println("N="+values.size());
     }
     
     public void print() {

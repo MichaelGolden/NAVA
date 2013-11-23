@@ -131,10 +131,10 @@ public class StructureOverlay extends Overlay implements Serializable {
                                 if (pairedSitesSub[j] != 0 && j < pairedSitesSub.length / 2 + 1) {
                                     pairedSitesSub[pairedSitesSub[j] - 1] = j + 1;
                                 }
-                                System.out.println(s.startPosition + "\t" + (j + 1) + "\t" + pairedSitesSub[j] + "\t" + pairedSitesSub.length);
+                                //System.out.println(s.startPosition + "\t" + (j + 1) + "\t" + pairedSitesSub[j] + "\t" + pairedSitesSub.length);
                             }
                         }
-                        System.out.println(structures.size() + "\t" + s.getDotBracketString());
+                        //System.out.println(structures.size() + "\t" + s.getDotBracketString());
                         structures.add(s);
                     }
                 }

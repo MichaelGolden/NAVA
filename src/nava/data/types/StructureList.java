@@ -19,6 +19,7 @@ import nava.data.io.FileImport.ParserException;
  * @author Michael
  */
 public class StructureList extends DataSource {
+    private static final long serialVersionUID = 4354919826670808779L;
 
     public ArrayList<SecondaryStructure> structures = new ArrayList<>();
     

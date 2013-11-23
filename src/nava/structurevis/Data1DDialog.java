@@ -20,6 +20,9 @@ public class Data1DDialog extends javax.swing.JDialog {
     Data1DPanel data1DPanel;
     boolean editMode = false;
     
+    public static int defaultWidth = 945;
+    public static int defaultHeight = 665;
+    
     
     /**
      * Creates new form Data1DDialog

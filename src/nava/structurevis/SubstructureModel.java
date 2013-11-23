@@ -76,10 +76,8 @@ public class SubstructureModel implements Serializable {
     public void openSubstructure(Substructure substructure)
     {
         this.substructure = substructure;
-        System.out.println("AFAFAF");
         if(this.structureOverlay != null)
         {
-            System.out.println("Setting cached substructure"+substructure);
             this.structureOverlay.selectedSubstructure = substructure;
         }
         fireSubstructureChanged(substructure);
@@ -351,7 +349,6 @@ public class SubstructureModel implements Serializable {
         // and the second is the listener instance
         for (int i = 0; i < listeners.length; i += 2) {
             if (listeners[i] == SubstructureModelListener.class) {
-                System.out.println("fireStructureOverlayChanged " + ((SubstructureModelListener) listeners[i + 1]));
                 ((SubstructureModelListener) listeners[i + 1]).structureOverlayChanged(structureSource);
             }
         }

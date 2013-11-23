@@ -103,7 +103,6 @@ public class NucleotideComposition extends Overlay implements Serializable {
         if (sequences.size() > 1500) {
             weights = new double[sequences.size()];
             Arrays.fill(weights, 1.0);
-            System.out.println(weights.length);
         } else if (sequences.size() > 750) {
             weights = getWeightsFast(sequences, 100);
         } else if (sequences.size() > 250) {
@@ -116,12 +115,10 @@ public class NucleotideComposition extends Overlay implements Serializable {
         shannonComposition = getShannonEntropyComposition(sequences, weights);
         nonGapCount = getNumNonGappedCharacters(sequences);
 
-        System.out.println("weights=");
-        for (int i = 0; i < weights.length; i++) {
+        /*for (int i = 0; i < weights.length; i++) {
 
             System.out.print(weights[i] + "\t");
-        }
-        System.out.println();
+        }*/
         consensus = "";
         // determine consensus sequence
         for (int i = 0; i < frequencyComposition.length; i++) {
@@ -132,10 +129,11 @@ public class NucleotideComposition extends Overlay implements Serializable {
                 }
             }
 
+            /*
             for (int n = 0; n < 4; n++) {
                 System.out.print(frequencyComposition[i][n] + "\t");
             }
-            System.out.println();
+            System.out.println();*/
 
             if (frequencyComposition[i][maxFrequencyIndex] == 0) {
                 consensus += "-";

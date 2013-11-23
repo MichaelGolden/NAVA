@@ -32,7 +32,6 @@ public class PPfoldApplication extends Application {
     public PPfoldApplication() {
         this.showWarningForUnalignedAlignmentInputs = true;
         this.slotUsage = Runtime.getRuntime().availableProcessors();
-       /// System.out.println("VALUE " + this);
         ppfoldPanel =  new PPfoldPanel(this, inputDataSource);
         setApplicationPanel(ppfoldPanel);
     }
@@ -47,7 +46,7 @@ public class PPfoldApplication extends Application {
 
         try {
             String cmd = "java -Xms2048M -jar " + new File(PPFOLD_EXECUTABLE).getAbsolutePath() + " \"" + inFastaFile.getAbsolutePath() + "\" "+arguments+"  --exports";
-            System.out.println(cmd);
+       
             process = Runtime.getRuntime().exec(cmd, null, tempDir);
 
             startConsoleInputBuffer(process);

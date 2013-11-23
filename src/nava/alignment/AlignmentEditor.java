@@ -353,7 +353,7 @@ public class AlignmentEditor extends javax.swing.JPanel implements ActionListene
 
     @Override
     public void valueChanged(ListSelectionEvent e) {
-        System.out.println(e.getSource());
+        
     }
 
     @Override

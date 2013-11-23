@@ -188,6 +188,10 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
                 structureList = this.structureVisController.structureVisModel.substructureModel.structureOverlay.substructureList.substructures;
             }
         }
+        
+        highlightSubstructure(selectedSubstructure);
+        selectedSubstructures(selectedSubstructure);         
+        repaint();
     }
 
     public void setAnnotationData(AnnotationSource annotationData, boolean map) {
@@ -802,7 +806,6 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
                     break;
                 }
             }
-            System.out.println(rectLevel);
             level = Math.max(level, rectLevel);
             rect.setRect(x + xoffset, rulerHeight + rectLevel * h, regionWidth, h);
             rectangles.add(new SubstructureMouseoverRegion(structures.get(i), rect, rectLevel));
@@ -929,7 +932,7 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
             {
 
                 AnnotationsDialog d = new AnnotationsDialog(null, true, projectController.projectModel, structureVisController);
-                d.setSize(500, 150);
+                d.setSize(365, 150);
                 GraphicsUtils.centerWindowOnWindow(d, MainFrame.self);
                 d.setVisible(true);
 
@@ -1001,7 +1004,6 @@ public class AnnotationsLayer extends JPanel implements ActionListener, MouseLis
                     break;
                 }
             }
-            System.out.println(rectLevel);
             level = Math.max(level, rectLevel);
             rect.setRect(x + xoffset, rulerHeight + rectLevel * h, regionWidth, h);
             rectangles.add(new SubstructureMouseoverRegion(structures.get(i), rect, rectLevel));

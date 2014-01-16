@@ -44,7 +44,7 @@ public class TabularField extends DataSource {
     
     @Override
     public String getTypeName() {
-        return "Tabular";
+        return "Tabular column";
     }
 
     @Override

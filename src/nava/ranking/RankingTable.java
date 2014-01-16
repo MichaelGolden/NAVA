@@ -8,6 +8,7 @@ import java.awt.BorderLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import javax.swing.JFrame;
@@ -16,6 +17,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import nava.utils.Mapping;
+import nava.utils.ScientificNotation;
 import nava.utils.TableSorter;
 
 /**
@@ -56,7 +58,7 @@ public class RankingTable extends JPanel {
     class TableDataModel extends AbstractTableModel {
 
         String[] columnNames = {"ID", "Location", "Length", "Substructure N", "Full N", "Substructure Mean", "Full Mean", "Substructure Median", "Full Median", "Mann-Whitney U stat", "p-value", "z-score"};
-        Class[] columnClasses = {String.class, Location.class, Integer.class, Integer.class, Integer.class, Double.class, Double.class, Double.class, Double.class, Double.class, Double.class, Double.class};
+        Class[] columnClasses = {String.class, Location.class, Integer.class, Integer.class, Integer.class, Double.class, Double.class, Double.class, Double.class, Double.class, ScientificNotation.class, Double.class};
         public ArrayList<Object[]> rows = new ArrayList<>();
         public ArrayList<Mapping> mappings = new ArrayList<>();
         public ArrayList<File> mappingFiles = new ArrayList<>();
@@ -74,8 +76,13 @@ public class RankingTable extends JPanel {
         public String getColumnName(int col) {
             return columnNames[col];
         }
-
+        
         public Object getValueAt(int row, int col) {
+            
+            if(columnNames.length - 2 == col)
+            {
+                return new ScientificNotation((Double)rows.get(row)[col]);
+            }
             return rows.get(row)[col];
         }
         boolean hasMappedData = false;

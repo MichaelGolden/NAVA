@@ -45,7 +45,7 @@ public class SubstructureListTable extends JPanel implements ChangeListener {
         TableSorter sorter = new TableSorter(tableDataModel);
         table = new JTable(sorter);
         sorter.setTableHeader(table.getTableHeader());
-        sorter.sortOnColumn(table.getTableHeader(), table.getColumnCount() - 1, 1);
+        sorter.sortOnColumn(table.getTableHeader(), 0, 1);
         table.setFillsViewportHeight(true);
         table.addMouseListener(new MouseAdapter() {
 

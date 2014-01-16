@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import nava.structurevis.StructureVisController;
+import nava.utils.ColorUtils;
 import nava.utils.Mapping;
 import org.biojava.bio.BioException;
 import org.biojava.bio.symbol.Location;
@@ -26,15 +27,20 @@ import org.biojavax.bio.seq.RichSequenceIterator;
  */
 public class AnnotationSource implements Serializable {
 
-    public static Color[] featureColours = {
-        new Color(255, 190, 190),
-        new Color(190, 255, 255),
-        new Color(190, 190, 255),
-        new Color(255, 190, 255),
-        new Color(200, 255, 190),
-        new Color(255, 255, 190),
-        new Color(255, 200, 100),
-        new Color(220, 180, 210)
+    public static Color[] featureColours = { 
+        Color.decode("#BBFFBB"),   
+        Color.decode("#DDFF99"),
+        Color.decode("#FFDD99"),            
+        Color.decode("#99DDFF"), 
+        Color.decode("#FFFF99"),             
+        Color.decode("#BBBBFF"),
+        Color.decode("#DDDDFF"),
+        Color.decode("#FFDDDD"),
+        Color.decode("#DDFFDD"),  
+        Color.decode("#BBFFDD"),        
+        Color.decode("#DDBBFF"),          
+        Color.decode("#FFBBBB"),            
+        Color.decode("#BBFFFF")
     };
     public int sequenceLength;
     public ArrayList<Feature> features = new ArrayList<>();

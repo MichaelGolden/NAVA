@@ -20,6 +20,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import nava.structurevis.data.Substructure;
 import nava.utils.Mapping;
+import nava.utils.ScientificNotation;
 import nava.utils.TableSorter;
 
 /**
@@ -66,7 +67,7 @@ public class PairTestTable extends JPanel {
     class TableDataModel extends AbstractTableModel {
 
         String[] columnNames = {"ID", "Location", "Length", "Paired N", "Unpaired N", "Paired mean", "Unpaired mean", "Paired median", "Unpaired median", "Mann-Whitney U stat.", "p-value", "z-score"};
-        Class[] columnClasses = {String.class, Location.class, Integer.class, Integer.class, Integer.class, Double.class, Double.class, Double.class, Double.class, Double.class, Double.class, Double.class};
+        Class[] columnClasses = {String.class, Location.class, Integer.class, Integer.class, Integer.class, Double.class, Double.class, Double.class, Double.class, Double.class, ScientificNotation.class, Double.class};
         public ArrayList<Object[]> rows = new ArrayList<>();
  
         public int getColumnCount() {
@@ -83,6 +84,11 @@ public class PairTestTable extends JPanel {
         }
 
         public Object getValueAt(int row, int col) {
+             
+            if(columnNames.length - 2 == col)
+            {
+                return new ScientificNotation((Double)rows.get(row)[col]);
+            }
             return rows.get(row)[col];
         }
         boolean hasMappedData = false;

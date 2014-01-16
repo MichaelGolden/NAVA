@@ -159,6 +159,7 @@ public class SubstructureCoevolution {
         static DecimalFormat df2 = new DecimalFormat("0.00E0");
       public static void printTable(double [][] counts, String [] colLabels, String [] rowLabels)
     {
+        
         for(int i = 0 ; i < counts.length ; i++)
         {
             System.out.print(colLabels[i]+"\t");
@@ -200,9 +201,11 @@ public class SubstructureCoevolution {
     
     public static void main(String [] args) throws Exception
     {
+         DecimalFormat df = new DecimalFormat("0.000");
+        DecimalFormat df2 = new DecimalFormat("0.00E0");
         try {
             
-            /*File coevolutionFile = new File("C:/dev/thesis/hcv/coevolution/hcv-formation.clm");
+         /* File coevolutionFile = new File("C:/dev/thesis/hcv/coevolution/hcv-formation.clm");
             File coevolutionAlignment = new File("C:/dev/thesis/hcv/coevolution/HCV_mafft_aligned_250_resave.fas");
             File structureAlignment = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.dbn");
             File sequenceFile = new File("C:/dev/thesis/hcv/hcv_genotypes2_aligned.fas");
@@ -216,7 +219,7 @@ public class SubstructureCoevolution {
             substructures.add( new Substructure("8948 - 9086"));
             substructures.add( new Substructure("9382 - 9796")); // 9796
              substructures.add( new Substructure("0 - 100000"));*/
-           File coevolutionFile = new File("C:/dev/thesis/hiv_full/coevolution/hiv-formation.clm");
+           /*File coevolutionFile = new File("C:/dev/thesis/hiv_full/coevolution/hiv-formation.clm");
             File coevolutionAlignment = new File("C:/dev/thesis/hiv_full/coevolution/hiv2010-500-seperated.fas.fas");
             File structureAlignment = new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.dbn");
             File sequenceFile = new File("C:/dev/thesis/hiv_full/hiv_not_siv_full_aligned.fas");
@@ -229,9 +232,9 @@ public class SubstructureCoevolution {
             substructures.add( new Substructure("3610 - 3763")); // 1576-1695
             substructures.add( new Substructure("7593 - 7734")); // 5884-6023
             substructures.add( new Substructure("9493 - 9840")); // 7289-7609
-             substructures.add( new Substructure("0 - 100000"));
-            
-         /* File coevolutionFile = new File("C:/dev/thesis/jev/coevolution/jev-formation.clm");
+             substructures.add( new Substructure("0 - 100000"));*/
+          
+          /*File coevolutionFile = new File("C:/dev/thesis/jev/coevolution/jev-formation.clm");
             File coevolutionAlignment = new File("C:/dev/thesis/jev/coevolution/jev_200_seperated.fas");
             File structureAlignment =  new File("C:/dev/thesis/jev/jev-alignment.dbn");
             File sequenceFile = new File("C:/dev/thesis/jev/jev-alignment.fas");
@@ -245,7 +248,7 @@ public class SubstructureCoevolution {
              substructures.add( new Substructure("0 - 100000"));*/
             
             
-          /* File coevolutionFile = new File("C:/dev/thesis/dengue/coevolution/dengue-formation.clm");
+          File coevolutionFile = new File("C:/dev/thesis/dengue/coevolution/dengue-formation.clm");
             File coevolutionAlignment = new File("C:/dev/thesis/dengue/coevolution/dengue_all_300_aligned_curated.fas");
             File structureAlignment =  new File("C:/dev/thesis/dengue/dengue-alignment.dbn");
             File sequenceFile = new File("C:/dev/thesis/dengue/dengue-alignment.fas");
@@ -255,7 +258,7 @@ public class SubstructureCoevolution {
             substructures.add( new Substructure("3176 - 3268"));
             substructures.add( new Substructure("5208 - 5284"));
             substructures.add( new Substructure("10937 - 11012"));
-             substructures.add( new Substructure("0 - 100000"));*/
+             substructures.add( new Substructure("0 - 100000"));
     
             ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(structureAlignment, DataType.FileFormat.VIENNA_DOT_BRACKET);
             double [] [] pairedMatrix = getPairedMatrix(structureData);
@@ -394,12 +397,22 @@ public class SubstructureCoevolution {
                             unpairedValues.add(elem.pval);
                         }*/
                         
-                        if(pairedMatrix[x][y]>0&& x >= s.start && x <= s.end && y >= s.start && y <= s.end)
+                        double cutoff = 0.0;
+                        if(pairedMatrix[x][y]>cutoff&& x >= s.start && x <= s.end && y >= s.start && y <= s.end)
                         {
                              pairedValues.add(elem.pval);   
                         }
+                        /*else
+                            if(pairedMatrix[x][y]==0&& x >= s.start && x <= s.end && y >= s.start && y <= s.end)
+                        {
+                             unpairedValues.add(elem.pval);   
+                        }*/
                         else
-                        if(pairedMatrix[x][y]>0)
+                            if(pairedMatrix[x][y]<=cutoff)
+                        {
+                             unpairedValues.add(elem.pval);   
+                        }
+                        /*if(pairedMatrix[x][y]>0)
                         //if(all[x] == y +1)
                         {
                             boolean in_substructure = false;
@@ -416,16 +429,16 @@ public class SubstructureCoevolution {
                             {
                                 unpairedValues.add(elem.pval);
                             }
-                        }
+                        }*/
                         
                     }
                 }
 
 
                 System.out.println(s);
-                System.out.println(pairedValues.size() +"\t"+unpairedValues.size()+"\t"+ RankingAnalyses.getMedian(pairedValues)+"\t"+ RankingAnalyses.getMedian(unpairedValues));
+                System.out.println(pairedValues.size() +"\t"+unpairedValues.size()+"\t"+ df.format(RankingAnalyses.getMedian(pairedValues))+"\t"+ df.format(RankingAnalyses.getMedian(unpairedValues)));
                     MyMannWhitney mw = new MyMannWhitney(pairedValues, unpairedValues);
-                    System.out.println(mw.getZ()+"\t"+RankingAnalyses.NormalZ(mw.getZ()));
+                    System.out.println(df.format(mw.getZ())+"\t"+df2.format(RankingAnalyses.NormalZ(mw.getZ())));
             }
             
         } catch (IOException ex) {

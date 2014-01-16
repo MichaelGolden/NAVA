@@ -342,7 +342,8 @@ public class Mapping implements Serializable {
                 alignmentBlength = Math.max(seq.length(), alignmentBlength);
             }
 
-            for (int i = 0; i < select && i < sequencesA.size(); i++) {
+            int select2 = Integer.MAX_VALUE;
+            for (int i = 0; i < select2 && i < sequencesA.size(); i++) {
                 writer1.write(">a" + i);
                 writer1.newLine();
                 writer1.write(Utils.padStringLeft(sequencesA.get(i), alignmentAlength, '-').replaceAll("-", GAP_CHARACTER + ""));
@@ -350,7 +351,7 @@ public class Mapping implements Serializable {
                 //aLen = sequencesA.get(i).length();
             }
             writer1.close();
-            for (int i = 0; i < select && i < sequencesB.size(); i++) {
+            for (int i = 0; i < select2 && i < sequencesB.size(); i++) {
                 writer2.write(">b" + i);
                 writer2.newLine();
                 if (reverseComplementB) {

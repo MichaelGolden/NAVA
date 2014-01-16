@@ -137,6 +137,7 @@ public class DataOverlayTreePanel extends javax.swing.JPanel implements ActionLi
         popupMenu.add(saveItem);
 
         overlayTree.addMouseListener(this);
+        overlayTree.expandRow(0);
     }
 
     /**

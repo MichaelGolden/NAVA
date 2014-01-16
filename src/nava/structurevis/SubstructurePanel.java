@@ -321,7 +321,7 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
             }
         } else if (e.getSource().equals(substructureComboBox)) {
             CustomItem<Substructure> comboBoxItem = (CustomItem<Substructure>) substructureComboBoxModel.getSelectedItem();
-            if (comboBoxItem != null) {
+            if (comboBoxItem != null && !comboBoxItem.getObject().equals(this.structureVisController.structureVisModel.substructureModel.getSelectedSubstructure())) {
                 this.structureVisController.structureVisModel.substructureModel.openSubstructure(comboBoxItem.getObject());
             }
         }
@@ -389,14 +389,11 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
             if(structureOverlay.selectedSubstructure != null)
             {
                 this.structureVisController.structureVisModel.substructureModel.openSubstructure(structureOverlay.selectedSubstructure);                
-                System.out.println("MAGIC 1"+structureOverlay.selectedSubstructure);
             }
             else
             if (structureOverlay.substructureList.substructures.size() > 0) {
-                System.out.println("MAGIC 3");
                 this.structureVisController.structureVisModel.substructureModel.openSubstructure(structureOverlay.substructureList.substructures.get(0));
             } else {
-                System.out.println("MAGIC 2");
                 this.structureVisController.structureVisModel.substructureModel.openSubstructure(null);
             }
             populateSubtructureComboBox();
@@ -406,8 +403,6 @@ public class SubstructurePanel extends javax.swing.JPanel implements ChangeListe
                 this.structureVisController.structureVisModel.substructureModel.openSubstructure(structureOverlay.selectedSubstructure);
             }
             this.structureVisController.structureVisModel.substructureModel.openSubstructure(null);
-            
-                System.out.println("MAGIC 4");
         }
         DataOverlay1D dataOverlay1D = structureVisController.structureVisModel.substructureModel.data1D;
         if (dataOverlay1D != null) {

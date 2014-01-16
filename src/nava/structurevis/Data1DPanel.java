@@ -19,6 +19,8 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.text.DefaultFormatter;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
@@ -36,7 +38,7 @@ import nava.utils.Utils;
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class Data1DPanel extends javax.swing.JPanel implements KeyListener, ItemListener {
+public class Data1DPanel extends javax.swing.JPanel implements KeyListener, ItemListener, ChangeListener {
 
     DefaultComboBoxModel<Tabular> dataSourceComboBoxModel = new DefaultComboBoxModel<>();
     DefaultComboBoxModel<TabularField> dataFieldComboBoxModel = new DefaultComboBoxModel<>();
@@ -124,6 +126,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
 
         this.dataLegendPanel.add(dataLegend, BorderLayout.CENTER);
         dataLegend.setLegend(null, new DataTransform(0, 1, DataTransform.TransformType.LINEAR), new ColorGradient(Color.white, Color.red), new ColorGradient(Color.white, Color.red),true,true,0,1, null);
+        dataLegend.addChangeListener(this);
         dataLegend.showEditMode();
 
         this.naturalRadioButton.addItemListener(this);
@@ -211,6 +214,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
             dataSource1D = DataOverlay1D.getDataOverlay1D((Tabular) dataSourceComboBox.getSelectedItem(), selectedField, dataTitleField.getText(), (TabularField) positionComboBox.getSelectedItem(), naturalRadioButton.isSelected(), onePositionRadioButton.isSelected(), headerCheckButton.isSelected() ? 1 : 0, codonCheckButton.isSelected(), (Double) dataMinField.getValue(), (Double) dataMaxField.getValue(), missingDataRadioButton.isSelected(), selectedTransform, dataLegend.colorGradient, mappingSource);
             dataSource1D.loadData();
             previewTable.tableDataModel.setDataSource1D(dataSource1D, projectModel);
+            previewTable.tableRenderer.setDataOverlay1D(dataSource1D);
 
             int dataLength = dataSource1D.data.length;
             if (mappingSource != null && dataLength != mappingSource.getLength()) {
@@ -402,7 +406,7 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
 
         jLabel1.setText("Data table");
 
-        jLabel2.setText("Data field");
+        jLabel2.setText("Data column");
 
         jLabel3.setText("Title");
 
@@ -418,9 +422,9 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
                     .addComponent(jLabel3))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(dataTitleField, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(dataSourceComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(dataFieldComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(dataTitleField, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(dataSourceComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 224, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(dataFieldComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 224, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
@@ -852,6 +856,11 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
 
     @Override
     public void keyReleased(KeyEvent e) {
+        update();
+    }
+
+    @Override
+    public void stateChanged(ChangeEvent e) {
         update();
     }
 }

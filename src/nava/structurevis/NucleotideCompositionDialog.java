@@ -6,7 +6,9 @@ package nava.structurevis;
 
 import java.awt.BorderLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import nava.data.types.Alignment;
 import nava.structurevis.data.AnnotationSource;
 import nava.structurevis.data.NucleotideComposition;
 import nava.structurevis.data.Overlay;
@@ -108,35 +110,56 @@ public class NucleotideCompositionDialog extends javax.swing.JDialog {
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
 
-        Thread taskThread = new Thread() {
-
-            public void run() {
-                try {
-                    SwingUtilities.invokeAndWait(
-                            new Runnable() {
-
-                                public void run() {
-                                    MainFrame.progressBarMonitor.set(true, ProgressBarMonitor.ADDING_DATA_OVERLAY, 0);
-                                    MainFrame.self.setEnabled(false);
-                                }
-                            });
-
-                    NucleotideComposition nucleotideComposition = nucleotidePanel.getNucleotideSource();
-                    if (editOverlay == null) {
-                        structureVisController.addNucleotideCompositionSource(nucleotideComposition);
-                    } else {
-                        structureVisController.setNucleotideCompositionSource(editOverlay, nucleotideComposition);
-                    }
-
-                    MainFrame.progressBarMonitor.set(false, ProgressBarMonitor.INACTIVE, ProgressBarMonitor.INACTIVE_VALUE);
-                    MainFrame.self.setEnabled(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
+       boolean allowRun = true;
+       if(nucleotidePanel.getNucleotideSource() != null)
+       {
+            Alignment al = nucleotidePanel.getNucleotideSource().alignment;
+            if(!al.aligned)
+            {
+                int n = JOptionPane.showConfirmDialog(MainFrame.self,
+                        "Warning you are about to use an alignment source that may be unaligned.\nDo you still wish to add this alignment as a nucleotide overlay?",
+                        "Requires an aligned source",
+                        JOptionPane.YES_NO_OPTION);
+                if(n != 0)
+                {
+                    allowRun = false;
                 }
-            }
-        };
-        taskThread.start();
-        this.dispose();
+            }     
+       } 
+       
+        if(allowRun)
+        {
+        
+            Thread taskThread = new Thread() {
+
+                public void run() {
+                    try {
+                        SwingUtilities.invokeAndWait(
+                                new Runnable() {
+
+                                    public void run() {
+                                        MainFrame.progressBarMonitor.set(true, ProgressBarMonitor.ADDING_DATA_OVERLAY, 0);
+                                        MainFrame.self.setEnabled(false);
+                                    }
+                                });
+
+                        NucleotideComposition nucleotideComposition = nucleotidePanel.getNucleotideSource();
+                        if (editOverlay == null) {
+                            structureVisController.addNucleotideCompositionSource(nucleotideComposition);
+                        } else {
+                            structureVisController.setNucleotideCompositionSource(editOverlay, nucleotideComposition);
+                        }
+
+                        MainFrame.progressBarMonitor.set(false, ProgressBarMonitor.INACTIVE, ProgressBarMonitor.INACTIVE_VALUE);
+                        MainFrame.self.setEnabled(true);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            taskThread.start();
+            this.dispose();
+        }
     }//GEN-LAST:event_addButtonActionPerformed
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed

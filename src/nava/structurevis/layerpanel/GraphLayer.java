@@ -71,6 +71,16 @@ public class GraphLayer extends JPanel implements ActionListener, MouseListener 
 
     public void setData(DataOverlay1D dataOverlay1D, int windowSize) {
         this.dataOverlay1D = dataOverlay1D;
+        for(int i = 0 ; i < windowSizes.length ; i++)
+        {
+            if(windowSizes[i] == windowSize)
+            {
+                if(!slidingWindowItems[i].isSelected())
+                {
+                    slidingWindowItems[i].setSelected(true);
+                }
+            }
+        }
         setSlidingWindow(windowSize);
     }
 

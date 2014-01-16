@@ -48,20 +48,9 @@ public class NucleotideComposition extends Overlay implements Serializable {
     public double[] getMappedFrequencyAtNucleotide(Mapping mapping, int structurePos) {
         if (mapping != null) {
             int mappedPos = mapping.aToB(structurePos);
-            // System.out.println("MFAN" + mappedPos + "->" + structurePos);
-
-
-            for (int i = 0; i < frequencyComposition.length; i++) {
-                //System.out.println(i + "\t" + frequencyComposition[i][0] + "\t" + frequencyComposition[i][1] + "\t" + frequencyComposition[i][2] + "\t" + frequencyComposition[i][3] + "\t" + frequencyComposition[i][4] + "\t");
-            }
 
             if (mappedPos != -1 && mappedPos < frequencyComposition.length) {
                 return frequencyComposition[mappedPos];
-            } else {
-                //System.out.println(mapping);
-                //System.err.println(structurePos+"\t"+mappedPos+"\t"+frequencyComposition.length);
-                // System.err.println(">"+structurePos+"\t"+mapping.aToB(structurePos)+"\t"+frequencyComposition.length);
-                //System.out.println(mapping.mapString());
             }
         }
         return null;
@@ -79,8 +68,9 @@ public class NucleotideComposition extends Overlay implements Serializable {
 
     public int getMappedNonGapCountAtNucleotide(Mapping mapping, int structurePos) {
         if (mapping != null) {
-            int mappedPos = mapping.bToA(structurePos);
-            if (mappedPos != -1 && mappedPos < nonGapCount.length) {
+            int mappedPos = mapping.aToB(structurePos);
+
+            if (mappedPos != -1 && mappedPos < frequencyComposition.length) {
                 return nonGapCount[mappedPos];
             }
         }

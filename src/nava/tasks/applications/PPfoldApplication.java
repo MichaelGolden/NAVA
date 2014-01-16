@@ -211,6 +211,6 @@ public class PPfoldApplication extends Application {
 
     @Override
     public String getDescription() {
-        return "Predicts a consensus RNA secondary structure from a set of aligned sequences using a Stochastic-Context Free Grammer (SCFG) approach.";
+        return "Predicts a consensus RNA secondary structure from a set of aligned sequences using a Stochastic-Context Free Grammar (SCFG) approach.";
     }
 }

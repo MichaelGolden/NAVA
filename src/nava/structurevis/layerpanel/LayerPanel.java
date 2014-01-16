@@ -179,7 +179,7 @@ public class LayerPanel extends javax.swing.JPanel implements Scrollable, LayerM
         resizeWidth(width);
     }
 
-    AnnotationsLayer annotationsLayer = null;
+    public AnnotationsLayer annotationsLayer = null;
     public void addItems(int index0, int index1) {
         for (int i = index0; i <= index1; i++) {
             LayerItem item = structureVisController.structureVisModel.layerModel.items.get(i);
@@ -303,7 +303,6 @@ public class LayerPanel extends javax.swing.JPanel implements Scrollable, LayerM
       //  this.annotationsLayer.updateSubstructures();
        this.annotationsLayer.selectedSubstructure = substructure;
         this.annotationsLayer.highlightSubstructure(substructure);
-         this.annotationsLayer.selectedSubstructures(substructure);         
-        this.annotationsLayer.repaint();
+         this.annotationsLayer.selectedSubstructure(substructure);
     }
 }

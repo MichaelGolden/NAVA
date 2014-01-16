@@ -286,28 +286,6 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
         return new Ellipse2D.Double(x - (diameter / 2), y - (diameter / 2), diameter, diameter);
     }
 
-    /*
-     * public void previousStructure() { currentStructure = (currentStructure -
-     * 1); structure =
-     * mainapp.structureCollection.structures.get(currentStructure); if
-     * (currentStructure < 0) { currentStructure += numStructures; }
-     * openStructure(structure); }
-     *
-     * public void nextStructure() { currentStructure = (currentStructure + 1) %
-     * numStructures; if (mainapp.structureCollection != null &&
-     * mainapp.structureCollection.structures != null) { structure =
-     * mainapp.structureCollection.structures.get(currentStructure); }
-     * openStructure(structure); }
-     */
-    /*
-     * public void gotoStructure(int i) { currentStructure = (i + 1) %
-     * numStructures; structure =
-     * mainapp.structureCollection.structures.get(currentStructure);
-     * //complexStructure = ComplexStructure.getComplexStructure(structure,
-     * mainapp.fs.naspStructuresFile, mainapp.fs.naspAlignmentFile); if (mainapp
-     * != null) { mainapp.setInfoLabel("id = " + structure.name + ", len = " +
-     * structure.length); } computeAndDraw(); }
-     */
     public void computeAndDraw() {
         computeStructureToBeDrawn(substructureModel.substructure);
         repaint = true;
@@ -332,7 +310,6 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             return;
         }
 
-        //np = mainapp.getStructureCoordinates(structure.getDotBracketString());
         pairedSites = RNAFoldingTools.getPairedSitesFromDotBracketString(structure.getDotBracketString());
 
         edit = new SubstructureEdit(pairedSites);
@@ -389,18 +366,6 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
 
         uri = SVGCache.getSVGUniverse().loadSVG(reader, "myImage");
         diagram = SVGCache.getSVGUniverse().getDiagram(uri);
-
-        /*
-         * SVGElement b = diagram.getElement("logo_1_0"); if(b != null) {
-         * System.out.println("here1"); if(b instanceof Text) {
-         * System.out.println("here2"); Text text = (Text) b;
-         * //text.appendText("A"); // text.appendText("C");
-         * text.appendText("G"); //text.appendText("T"); try { text.build(); }
-         * catch (SVGException ex) { ex.printStackTrace(); }
-         * //tspan.setText("DDDDDDD"+tspan.getText()+"DDDDDDD"); //
-         * diagram.setElement("base", tspan); try { diagram.updateTime(0); }
-         * catch (SVGException ex) { ex.printStackTrace(); } } }
-         */
     }
 
     public String drawStructure(boolean drawSequenceLogo) {
@@ -725,7 +690,6 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
         {
             // draw the base pair interactions
             if (showBonds) {
-                //System.out.println("here");
                 for (int i = 0; i < nucleotidePositions.length; i++) {
                     int a = i % substructureModel.structureOverlay.pairedSites.length;
                     int b = edit.pairedSites[i] - 1 % substructureModel.structureOverlay.pairedSites.length;
@@ -1348,7 +1312,6 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             //g.drawImage(bufferedImage, 0, 0, this);
             //System.out.println("REPAINT COMPLETELY");
         }
-       // System.out.println("MINCE MEAT");
 
 
         int preferredWidth = (int) Math.ceil(panelWidth * zoomScale);
@@ -1808,7 +1771,6 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
             openSubstructureDialog.setVisible(true);
             int length = openSubstructureDialog.end - openSubstructureDialog.start + 1;
             int[] substructurePairedSites = StructureAlign.getSubstructure(substructureModel.structureOverlay.pairedSites, openSubstructureDialog.start - 1, length);
-            //System.out.println("A "+RNAFoldingTools.getDotBracketStringFromPairedSites(substructurePairedSites));
             Substructure substructure = new Substructure(openSubstructureDialog.start - 1, substructurePairedSites);
             this.substructureModel.openSubstructure(substructure);
         } else if (e.getSource().equals(this.naViewMode)) {
@@ -1830,7 +1792,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                     currentZoomIndex = i;
                     this.zoomScale = (double) zoomLevels[currentZoomIndex] / 100.0;
                     drawComplexStructure();
-                    //createStructureSVG();
+                    redraw();
                     break;
                 }
             }
@@ -1867,7 +1829,7 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
     }
     
     @Override
-      public String getToolTipText(MouseEvent e) {
+    public String getToolTipText(MouseEvent e) {
           
          String interactionText = "";
 
@@ -1929,17 +1891,20 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
 
               interactionText += " [nucleotides=" + nonGapCount + "]";              
               interactionText += "\n";
-            } else {
-                //interactionText += "Composition: none";
             }
             
 
             if (substructureModel.data1D != null  && nucSelected && pos < substructureModel.data1D.data.length) {
                 double p = substructureModel.data1D.data[pos];
-                interactionText += "1D data: pos=" + (pos + 1) + ", value=" + substructureModel.data1D.dataTransform.getFormattedString(p, 6) + "";                
+                if(substructureModel.data1D.used[pos])
+                {
+                    interactionText += "1D data: pos=" + (pos + 1) + ", value=" + substructureModel.data1D.dataTransform.getFormattedString(p, 6) + "";                
+                }
+                else
+                {
+                    interactionText += "1D data: pos=" + (pos + 1) + ", value=none";                
+                }
                 interactionText += "\n";
-            } else {
-                //interactionText += "1D data: none";
             }
         }
 
@@ -1983,11 +1948,8 @@ public class SubstructureDrawPanel extends JPanel implements ActionListener, Mou
                 interactionText += "2D data: " + i + " ~ " + j + ", value=" + substructureModel.data2D.dataTransform.getFormattedString(p, 6) + "";
                 this.selectedNucleotideX = interaction.nucleotidei - 1;
                 this.selectedNucleotideY = interaction.nucleotidej - 1;
-            } else {
-                //interactionText += "2D data: none";
             }
 
-            //mainapp.data2DLabel.setText(interactionText);
 
             if (oldSelectedNucleotideX != selectedNucleotideX || oldSelectedNucleotideY != selectedNucleotideY) {
                 repaint();

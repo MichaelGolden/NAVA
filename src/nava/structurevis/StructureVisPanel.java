@@ -384,5 +384,9 @@ public class StructureVisPanel extends javax.swing.JPanel implements ItemListene
     @Override
     public void substructureChanged(Substructure substructure) {
         this.substructurePanel.structureDrawPanel.openSubstructure(substructure);
+        if(this.layerPanel.annotationsLayer != null)
+        {
+            this.layerPanel.annotationsLayer.updateSubstructures();
+        }
     }
 }

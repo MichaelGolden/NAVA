@@ -275,6 +275,10 @@ public class SubstructureModel implements Serializable {
             };
             taskThread.start();
         }
+        else
+        {            
+            fireNucleotideOverlayChanged(nucleotideOverlay);
+        }
 
         for (int i = 0; i < structureVisController.structureVisModel.nucleotideSources.size(); i++) {
             if (structureVisController.structureVisModel.nucleotideSources.get(i).equals(nucleotideOverlay)) {
@@ -283,6 +287,12 @@ public class SubstructureModel implements Serializable {
                 structureVisController.structureVisModel.nucleotideSources.get(i).setState(Overlay.OverlayState.UNSELECTED);
             }
         }
+        
+    }
+    
+    public Substructure getSelectedSubstructure()
+    {
+        return substructure;
     }
 
     public AnnotationSource getAnnotationSource() {

@@ -68,7 +68,6 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
         populateStructureComboBox(projectModel.dataSources.getArrayListShallowCopy());
         populateAlignmentComboBox(projectModel.dataSources.getArrayListShallowCopy());
         structureComboBox.setWide(true);
-        alignmentComboBox.setWide(true);
         
         this.embeddedSequenceRadioButton.addItemListener(this);
         this.fromAlignmentRadioButton.addItemListener(this);
@@ -331,7 +330,7 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
                     .addComponent(jLabel2)
                     .addComponent(linearRadioButton)
                     .addComponent(circularRadioButton))
-                .addGap(8, 8, 8)
+                .addGap(18, 18, 18)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -349,7 +348,7 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
                 structureOverlay.substructureList = new SubstructureList(structureOverlay);
             }
             SubstructureListDialog dialog = new SubstructureListDialog(new javax.swing.JFrame(), true, structureOverlay.substructureList.clone());
-            GraphicsUtils.centerWindowOnScreen(dialog);
+            GraphicsUtils.centerWindowOnWindow(dialog, MainFrame.self);
             dialog.setVisible(true);
             if (dialog.save) {
                 structureOverlay.substructureList = dialog.substructureList;
@@ -503,10 +502,10 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
             {
                 if (dataLength != mappingSource.getLength()) {
                     mappingSourceTextArea.setForeground(mappingWarningColor);
-                    mappingSourceTextArea.setText("Warning: the length of the mapping source (" + mappingSource.getLength() + ") does not match the length of the data source (" + dataLength + ")");
+                    mappingSourceTextArea.setText("Warning: the length of the mapping source (" + mappingSource.getLength() + ") does not match the length of the structure (" + dataLength + ")");
                 } else {
                     mappingSourceTextArea.setForeground(mappingOkayColor);
-                    mappingSourceTextArea.setText("The length of the mapping source (" + mappingSource.getLength() + ") matches the length of the data source (" + dataLength + ")");
+                    mappingSourceTextArea.setText("The length of the mapping source (" + mappingSource.getLength() + ") matches the length of the structure (" + dataLength + ")");
                 }
             }
             else

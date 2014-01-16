@@ -28,6 +28,7 @@ import nava.utils.Utils;
 public class DataPreviewTable extends JPanel {
 
     public TableDataModel tableDataModel;
+    public ColorRenderer tableRenderer;
     final JTable table;
     JScrollPane scrollPane;
 
@@ -35,10 +36,11 @@ public class DataPreviewTable extends JPanel {
         super(new BorderLayout());
 
         tableDataModel = new TableDataModel();
-        TableSorter sorter = new TableSorter(tableDataModel);
+       TableSorter sorter = new TableSorter(tableDataModel);
         table = new JTable(sorter);
-        table.setDefaultRenderer(Object.class, new ColorRenderer(true));
-        sorter.setTableHeader(table.getTableHeader());
+        tableRenderer = new ColorRenderer(true);
+        table.setDefaultRenderer(Object.class, tableRenderer);
+        //sorter.setTableHeader(table.getTableHeader());
         // sorter.sortOnColumn(table.getTableHeader(),table.getColumnCount()-1,-1);
         table.setFillsViewportHeight(true);
         table.addMouseListener(new MouseAdapter() {
@@ -51,37 +53,79 @@ public class DataPreviewTable extends JPanel {
 
         scrollPane = new JScrollPane(table);
         add(scrollPane);
+        
+        
+        table.getColumnModel().getColumn(3).setWidth(table.getRowHeight());
+        table.getColumnModel().getColumn(3).setPreferredWidth(table.getRowHeight());
+        table.getColumnModel().getColumn(3).setMinWidth(table.getRowHeight());
+        table.getColumnModel().getColumn(3).setMaxWidth(table.getRowHeight());
+        
+        
+          table.getColumnModel().getColumn(0).setWidth(40);
+        table.getColumnModel().getColumn(0).setPreferredWidth(40);
+        
+          table.getColumnModel().getColumn(1).setWidth(table.getRowHeight()+4);
+        table.getColumnModel().getColumn(1).setPreferredWidth(table.getRowHeight()+4);
+        
+        
+      
     }
 
     class TableDataModel extends AbstractTableModel {
 
-        String[] columnNames = {"Position", "Sequence", "Value"};
-        Class[] columnClasses = {String.class, String.class, String.class};
+        String[] columnNames = {"Position", "Mapping sequence", "Value", ""};
+        Class[] columnClasses = {String.class, String.class, String.class, String.class};
         public ArrayList<Object[]> rows = new ArrayList<>();
+        DataOverlay1D dataOverlay1D;
         
-        public void setDataSource1D(DataOverlay1D dataSource1D, ProjectModel projectModel) {
-            if (dataSource1D != null) {
+        public void setDataSource1D(DataOverlay1D dataOverlay1D, ProjectModel projectModel) {
+            if (dataOverlay1D != null) {
+                this.dataOverlay1D = dataOverlay1D;
+                this.dataOverlay1D.loadData();
                 ArrayList<Object[]> rows = new ArrayList<>();
                 int j = 1;
 
-                String mappingSequence = dataSource1D.mappingSource.getRepresentativeSequence(projectModel);
+                String mappingSequence = dataOverlay1D.mappingSource.getRepresentativeSequence(projectModel);
         
-                for (int i = 0; i < dataSource1D.dataOffsetCorrected; i++) {
-                    if ((!dataSource1D.codonPositions || i % 3 == 0) && i < dataSource1D.stringData.length) {
-                        Object[] row = {"", "", dataSource1D.stringData[i] == null ? "" : dataSource1D.stringData[i]};
+                for (int i = 0; i < dataOverlay1D.dataOffsetCorrected; i++) {
+                    if ((!dataOverlay1D.codonPositions || i % 3 == 0) && i < dataOverlay1D.stringData.length) {
+                        Object[] row = {"", "", dataOverlay1D.stringData[i] == null ? "" : dataOverlay1D.stringData[i],""};
                         if (mappingSequence != null && i < mappingSequence.length()) {
                             //row[1] = mappingSequence.charAt(i) + "";
                         }
+                        
                         rows.add(row);
+                        
                     }
                 }
 
-                for (int i = dataSource1D.dataOffsetCorrected; i < dataSource1D.data.length; i++) {
-                    Object[] row = {j, "?", dataSource1D.stringData[i] == null ? "" : dataSource1D.stringData[i]};
+                for (int i = dataOverlay1D.dataOffsetCorrected; i < dataOverlay1D.data.length; i++) {
+                    Object[] row = {j, "?", dataOverlay1D.stringData[i] == null ? "" : dataOverlay1D.stringData[i],""};
                     if (mappingSequence != null && j-1< mappingSequence.length()) {
                         row[1] = mappingSequence.charAt(j-1) + "";
                     }
-
+                    
+                    if(dataOverlay1D.used[j-1])
+                    {                        
+                        double p = dataOverlay1D.data[j-1];
+                        if(!dataOverlay1D.excludeValuesOutOfRange)
+                        {
+                            // in range
+                        }
+                        else
+                        if (((!dataOverlay1D.useLowerThreshold || p >= dataOverlay1D.thresholdMin) && (!dataOverlay1D.useUpperThreshold || p <= dataOverlay1D.thresholdMax))) 
+                        {
+                            // in range
+                        }
+                        else
+                        {
+                            row[3]= "-";
+                        }
+                    }
+                    else
+                    {
+                        row[3]= "-";
+                    }
                     //addRow(row);
                     rows.add(row);
                     j++;
@@ -191,12 +235,19 @@ public class DataPreviewTable extends JPanel {
         boolean isBordered = true;
         Font plainFont;
         Font boldFont;
+        DataOverlay1D dataOverlay1D;
+        
         
         public ColorRenderer(boolean isBordered) {
             this.isBordered = isBordered;
             setOpaque(true); //MUST do this for background to show up.
             plainFont = this.getFont();
             boldFont = plainFont.deriveFont(Font.BOLD);
+        }
+        
+        public void setDataOverlay1D(DataOverlay1D dataOverlay1D)
+        {
+            this.dataOverlay1D = dataOverlay1D;
         }
 
         public Component getTableCellRendererComponent(
@@ -215,13 +266,58 @@ public class DataPreviewTable extends JPanel {
             else            
             if(row % 2 == 0)
             {
+                
+                if(column == 3)
+                {
+                    this.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.white));
+                }
+                else
+                {
+                    this.setBorder(BorderFactory.createEmptyBorder());
+                }
                 this.setBackground(Color.white);
             }
             else
             {
-                this.setBackground(new Color(240,240,240));                
+                this.setBackground(new Color(240,240,240));   
+                if(column == 3)
+                {
+                    this.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, new Color(240,240,240)));
+                }
+                else
+                {
+                    this.setBorder(BorderFactory.createEmptyBorder());
+                }                
             }
-            //this.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.white));
+            
+            if(Utils.isInteger(posValue) && column == 3)
+            {
+                this.setHorizontalAlignment(SwingConstants.CENTER);
+                int pos = Integer.parseInt(posValue)-1;
+
+                double p = dataOverlay1D.data[pos];
+                
+                Color c = dataOverlay1D.colorGradient.getColor(dataOverlay1D.dataTransform.transform((float) p));            
+                if(dataOverlay1D.used[pos])
+                {
+                    if(dataOverlay1D.excludeValuesOutOfRange)
+                    {
+                        if (((!dataOverlay1D.useLowerThreshold || p >= dataOverlay1D.thresholdMin) && (!dataOverlay1D.useUpperThreshold || p <= dataOverlay1D.thresholdMax))) 
+                        {
+
+                            this.setBackground(c);
+                        }
+                    }
+                    else
+                    {
+                        this.setBackground(c);
+                    }
+                }
+            }
+            else
+            {         
+                this.setHorizontalAlignment(SwingConstants.LEFT);
+            }
                  
             this.setText(object.toString());
             return this;

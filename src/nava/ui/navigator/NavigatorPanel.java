@@ -134,6 +134,9 @@ public class NavigatorPanel extends javax.swing.JPanel implements ActionListener
         popupMenu.add(exportItem);
         deleteItem.addActionListener(this);
         popupMenu.add(deleteItem);
+        
+        //projectController.projectModel.navigatorTreeModel.
+        navigationTree.expandRow(0);
     }
 
     /**
@@ -233,6 +236,7 @@ public class NavigatorPanel extends javax.swing.JPanel implements ActionListener
         this.projectController.projectModel = newProjectModel;
         navigationTree.setModel(newProjectModel.navigatorTreeModel);
         newProjectModel.navigatorTreeModel.addTreeModelListener(this);
+        navigationTree.expandRow(0);
     }
 
     @Override

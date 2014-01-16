@@ -206,8 +206,8 @@ public class ProjectController implements SafeListListener {
             if (outputFile.object != null) {
                 SecondaryStructure structure = (SecondaryStructure) outputFile.dataSource;
                 structure.setImportId(getNextImportId());
-                structure.originalDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "orig.dbn").toString();
-                structure.importedDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "dbn").toString();
+                structure.originalDataSourcePath = generatePath(structure.getImportId(), "orig.dbn").toString();
+                structure.importedDataSourcePath = generatePath(structure.getImportId(), "dbn").toString();
                 structure.title = outputFile.dataSource.title;
                 structure.persistObject(projectModel.getProjectPathString(), outputFile.object);
 
@@ -219,8 +219,8 @@ public class ProjectController implements SafeListListener {
             if (outputFile.file != null) {
                 Matrix matrix = (Matrix) outputFile.dataSource;
                 matrix.setImportId(getNextImportId());
-                matrix.originalDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "orig.matrix").toString();
-                matrix.importedDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "matrix").toString();
+                matrix.originalDataSourcePath = generatePath(matrix.getImportId(), "orig.matrix").toString();
+                matrix.importedDataSourcePath = generatePath(matrix.getImportId(), "matrix").toString();
                 matrix.title = outputFile.dataSource.title;
                 
                 try {
@@ -239,9 +239,9 @@ public class ProjectController implements SafeListListener {
         } else if (outputFile.dataSource instanceof Alignment) {
             Alignment alignment = (Alignment) outputFile.dataSource;
             alignment.setImportId(getNextImportId());
-            alignment.originalDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "orig.fas").toString();
-            alignment.importedDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "fas").toString();
-            alignment.normalisedDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "norm.fas").toString();
+            alignment.originalDataSourcePath = generatePath(alignment.getImportId(), "orig.fas").toString();
+            alignment.importedDataSourcePath = generatePath(alignment.getImportId(), "fas").toString();
+            alignment.normalisedDataSourcePath = generatePath(alignment.getImportId(), "norm.fas").toString();
             alignment.title = outputFile.dataSource.title;
 
             ArrayList<String> sequences = new ArrayList<>();
@@ -267,8 +267,8 @@ public class ProjectController implements SafeListListener {
             try {
                 Tabular tabular = CsvReader.getTabularRepresentation(outputFile.dataSource.originalFile);
                 tabular.setImportId(getNextImportId());
-                tabular.originalDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "orig.csv").toString();
-                tabular.importedDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "csv").toString();
+                tabular.originalDataSourcePath = generatePath(tabular.getImportId(), "orig.csv").toString();
+                tabular.importedDataSourcePath = generatePath(tabular.getImportId(), "csv").toString();
                 tabular.title = outputFile.dataSource.title;
 
                 IO.copyFile(outputFile.dataSource.originalFile, new File(tabular.getOriginalDataSourcePath(projectModel.getProjectPathString())));
@@ -282,9 +282,9 @@ public class ProjectController implements SafeListListener {
         } else if (outputFile.dataSource instanceof Tree) {
             Tree tree = new Tree();
             tree.setImportId(getNextImportId());
-            tree.originalDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "orig.nwk").toString();
-            tree.importedDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "nwk").toString();
-             tree.normalisedDataSourcePath = generatePath(outputFile.dataSource.getImportId(), "norm." + "nwk").toString();
+            tree.originalDataSourcePath = generatePath(tree.getImportId(), "orig.nwk").toString();
+            tree.importedDataSourcePath = generatePath(tree.getImportId(), "nwk").toString();
+            tree.normalisedDataSourcePath = generatePath(tree.getImportId(), "norm." + "nwk").toString();
             tree.title = outputFile.dataSource.title;
             tree.parentSource = outputFile.dataSource.parentSource;
 

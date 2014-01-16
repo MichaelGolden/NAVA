@@ -25,21 +25,35 @@ public class PairedSitesHistogram {
        // File structureAlignment = new File("C:/dev/thesis/dengue_50x4.dbn");
         //File structureAlignment = new File("C:/dev/thesis/westnile/westnile_all_200.dbn");
         File structureAlignment = new File("C:/dev/thesis/hiv_full/hiv_full.dbn");
-        File outFile = new File(structureAlignment.getAbsolutePath() + "_distances.csv");
+        File outFile = new File(structureAlignment.getAbsolutePath() + "_distances2.csv");
         System.out.println(outFile);
         BufferedWriter buffer = new BufferedWriter(new FileWriter(outFile));
         //buffer.write("Distance\n");
         ArrayList<SecondaryStructureData> structureData = FileImport.loadStructures(structureAlignment, DataType.FileFormat.VIENNA_DOT_BRACKET);
         Random random = new Random();
         for (SecondaryStructureData d : structureData) {
+            int helixLength = 0;
             for (int i = 0; i < d.pairedSites.length; i++) {
-                if (d.pairedSites[i] != 0 && i < d.pairedSites[i] - 1) {
+                if(d.pairedSites[i] == 0)
+                {
+                    if(helixLength > 0)
+                    {
+                        buffer.write(helixLength+"\n");
+                        helixLength = 0;
+                    }                    
+                }
+                else
+                {
+                    helixLength++;
+                }
+                
+                /*if (d.pairedSites[i] != 0 && i < d.pairedSites[i] - 1) {
                     int distance = d.pairedSites[i] - 1 - i;
                     if (distance <= 250 && random.nextDouble() < 0.5) {
                         buffer.write(distance + "\n");
                     }
 
-                }
+                }*/
             }
         }
         buffer.close();

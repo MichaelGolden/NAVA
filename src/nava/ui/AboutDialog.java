@@ -11,9 +11,16 @@
 
 package nava.ui;
 
-import java.util.MissingResourceException;
-import java.util.PropertyResourceBundle;
-import java.util.ResourceBundle;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 
 /**
  *
@@ -22,9 +29,60 @@ import java.util.ResourceBundle;
 public class AboutDialog extends javax.swing.JDialog {
 
     /** Creates new form AboutDialog */
+    
+    
     public AboutDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
+        
+        
+        
         initComponents();
+        
+        try {
+            //Calendar  cal = new Calendar(new File(getClass().getClassLoader().getResource(getClass().getCanonicalName().replace('.', '/') + ".class").toURI()).lastModified())
+            File file = null;
+            try
+            {
+                file = new File(getClass().getClassLoader().getResource(getClass().getCanonicalName().replace('.', '/') + ".class").toURI());
+                throw new IllegalArgumentException("");
+            }
+            catch(IllegalArgumentException ex)
+            {
+               
+                String s = getClass().getClassLoader().getResource(getClass().getCanonicalName().replace('.', '/') + ".class").toString().replaceAll("!.*", "").replaceAll(".*file:/", "");
+              
+                file = new File(s);
+            }
+            
+            Date date = new Date(file.lastModified());
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+            
+            BufferedImage img = ImageIO.read(getClass().getResource("/resources/icons/about.png"));
+            Graphics2D g = (Graphics2D) img.getGraphics();            
+            g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g.setFont(g.getFont().deriveFont(Font.PLAIN, 13.5f));
+            g.setColor(Color.black);
+            String text = "Michael Golden, Darren Martin";
+            g.drawString(text, img.getWidth()-g.getFontMetrics().stringWidth(text)-5, img.getHeight()-25);
+            String day = cal.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault());
+            System.out.println(date);
+            text = cal.get(Calendar.DAY_OF_MONTH) + " " + day + " " + cal.get(Calendar.YEAR)  +" [version 1."+(cal.get(Calendar.YEAR)%10)+"."+""+cal.get(Calendar.DAY_OF_YEAR)+"]";
+            g.drawString(text, img.getWidth()-g.getFontMetrics().stringWidth(text)-5, img.getHeight()-7);
+            
+            ImageIcon icon = new ImageIcon(img);
+            closeButton.setIcon(icon);
+            Dimension d = new Dimension(icon.getIconWidth(), icon.getIconHeight());
+            closeButton.setPreferredSize(d);
+            setSize(d);
+        } catch (IOException ex) {
+            Logger.getLogger(AboutDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }  
+        catch(URISyntaxException ex)
+        {
+            Logger.getLogger(AboutDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /** This method is called from within the constructor to
@@ -43,7 +101,6 @@ public class AboutDialog extends javax.swing.JDialog {
         setResizable(false);
         setUndecorated(true);
 
-        closeButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/about.png"))); // NOI18N
         closeButton.setBorder(null);
         closeButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         closeButton.addActionListener(new java.awt.event.ActionListener() {

@@ -5,18 +5,18 @@
 package nava.experimental;
 
 import java.io.*;
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import nava.data.io.CsvReader;
 import nava.data.io.IO;
 import nava.experimental.AutomatedFolding.Fold;
-import nava.experimental.CorrelatedSitesTest.PairedSitesPermutationTestResult;
 import nava.ranking.MyMannWhitney;
 import nava.ranking.RankingAnalyses;
-import nava.ranking.StatUtils;
 import nava.structure.MountainMetrics;
 import nava.structure.StructureAlign;
 import nava.utils.Mapping;
@@ -1536,16 +1536,16 @@ public class RecombinationFoldDisruption {
                             System.out.println("5' vs. 3' (real)\t" + j + "\t" + RankingAnalyses.getMedian(real5PrimePairingValues) + "\t" + RankingAnalyses.getMedian(real3PrimePairingValues) + "\t" + mw5prime3prime.getZ());
                             System.out.println("5' vs. 3' (permuted)\t" + j + "\t" + RankingAnalyses.getMedian(permuted5PrimePairingValues) + "\t" + RankingAnalyses.getMedian(permuted3PrimePairingValues) + "\t" + mw5prime3primepermuted.getZ());
                             if (!fast) {
-                                System.out.println("energy\t" + j + "\t" + RankingAnalyses.getMedian(realEnergyValues) + "\t" + RankingAnalyses.getMedian(permutedEnergyValues) + "\t" + mwenergy.getZ() + "\t" + realEnergyValues.size() + "\t" + permutedEnergyValues.size());
+                                //System.out.println("energy\t" + j + "\t" + RankingAnalyses.getMedian(realEnergyValues) + "\t" + RankingAnalyses.getMedian(permutedEnergyValues) + "\t" + mwenergy.getZ() + "\t" + realEnergyValues.size() + "\t" + permutedEnergyValues.size());
                                 System.out.println("similarity\t" + j + "\t" + RankingAnalyses.getMedian(realSimilarityValues) + "\t" + RankingAnalyses.getMedian(permutedSimilarityValues) + "\t" + mwsimilarity.getZ() + "\t" + realSimilarityValues.size() + "\t" + permutedSimilarityValues.size());
                                 System.out.println("similarity (minor)\t" + j + "\t" + RankingAnalyses.getMedian(realMinorSimilarityValues) + "\t" + RankingAnalyses.getMedian(permutedMinorSimilarityValues) + "\t" + mwminorsimilarity.getZ());
                                 System.out.println("similarity (major)\t" + j + "\t" + RankingAnalyses.getMedian(realMajorSimilarityValues) + "\t" + RankingAnalyses.getMedian(permutedMajorSimilarityValues) + "\t" + mwmajorsimilarity.getZ());
                                 System.out.println("disruption (AND)\t" + j + "\t" + RankingAnalyses.getMedian(realDisruptionANDValues) + "\t" + RankingAnalyses.getMedian(permutedDisruptionANDValues) + "\t" + mwdisruptionAND.getZ() + "\t" + realDisruptionANDValues.size() + "\t" + permutedDisruptionANDValues.size());
                                 System.out.println("disruption (OR)\t" + j + "\t" + RankingAnalyses.getMedian(realDisruptionORValues) + "\t" + RankingAnalyses.getMedian(permutedDisruptionORValues) + "\t" + mwdisruptionOR.getZ() + "\t" + realDisruptionORValues.size() + "\t" + permutedDisruptionORValues.size());
                                 System.out.println("disruption (simple)\t" + j + "\t" + RankingAnalyses.getMedian(realDisruptionSimpleValues) + "\t" + RankingAnalyses.getMedian(permutedDisruptionSimpleValues) + "\t" + mwdisruptionSimple.getZ());
-                                System.out.println("distance (minor)\t" + j + "\t" + RankingAnalyses.getMedian(realDistanceScoresMinor) + "\t" + RankingAnalyses.getMedian(permutedDistanceScoresMinor) + "\t" + mwdistanceminor.getZ());
-                                System.out.println("distance (major)\t" + j + "\t" + RankingAnalyses.getMedian(realDistanceScoresMajor) + "\t" + RankingAnalyses.getMedian(permutedDistanceScoresMajor) + "\t" + mwdistancemajor.getZ());
-                                System.out.println("distance (recombinant)\t" + j + "\t" + RankingAnalyses.getMedian(realDistanceScoresRecombinant) + "\t" + RankingAnalyses.getMedian(permutedDistanceScoresRecombinant) + "\t" + mwdistancerecombinant.getZ());
+                                //System.out.println("distance (minor)\t" + j + "\t" + RankingAnalyses.getMedian(realDistanceScoresMinor) + "\t" + RankingAnalyses.getMedian(permutedDistanceScoresMinor) + "\t" + mwdistanceminor.getZ());
+                                //System.out.println("distance (major)\t" + j + "\t" + RankingAnalyses.getMedian(realDistanceScoresMajor) + "\t" + RankingAnalyses.getMedian(permutedDistanceScoresMajor) + "\t" + mwdistancemajor.getZ());
+                                //System.out.println("distance (recombinant)\t" + j + "\t" + RankingAnalyses.getMedian(realDistanceScoresRecombinant) + "\t" + RankingAnalyses.getMedian(permutedDistanceScoresRecombinant) + "\t" + mwdistancerecombinant.getZ());
                                 /*
                                  * ChiSquareTest chiPairingTest = new
                                  * ChiSquareTest(); for (int recombinant = 0;
@@ -1957,8 +1957,33 @@ public class RecombinationFoldDisruption {
         }
         return count / total;
     }
+    
+    public int getDisruptionScore(String minorParentDotBracket, String majorParentDotBracket, String recombinantDotBracket, boolean presentInRecombinant) {
+        
+        int[] minorSites = RNAFoldingTools.getPairedSitesFromDotBracketString(minorParentDotBracket);
+        int[] majorSites = RNAFoldingTools.getPairedSitesFromDotBracketString(majorParentDotBracket);
+        int[] recombinantSites = RNAFoldingTools.getPairedSitesFromDotBracketString(recombinantDotBracket);
 
-    public int getDisruptionScore(String minorParentDotBracket, String majorParentDotBracket, String recombinantDotBracket, boolean useAND) {
+        int disruption = 0;
+        for (int i = 0; i < recombinantSites.length; i++) {
+                if (presentInRecombinant) {
+                    if (recombinantSites[i] != 0 && minorSites[i] != recombinantSites[i] && majorSites[i] != recombinantSites[i]) {
+                        disruption++;
+                    }
+                }
+                else
+                {
+                    if(minorSites[i] == majorSites[i] && minorSites[i] != recombinantSites[i])
+                    {
+                         disruption++;
+                    }
+                }
+        }
+        return disruption/2;
+  
+    }
+
+    public int getDisruptionScoreOld(String minorParentDotBracket, String majorParentDotBracket, String recombinantDotBracket, boolean useAND) {
         
         int[] minorSites = RNAFoldingTools.getPairedSitesFromDotBracketString(minorParentDotBracket);
         int[] majorSites = RNAFoldingTools.getPairedSitesFromDotBracketString(majorParentDotBracket);
@@ -1972,7 +1997,7 @@ public class RecombinationFoldDisruption {
             //if((i >= 7540 && i < 7851)) // coding
               // if((i >= 8872 && i < 9184))
             //if((i >= 2248 && i < 2371) )
-            {
+            //{
             if(1==1)
             {
 
@@ -1996,7 +2021,7 @@ public class RecombinationFoldDisruption {
                 }*/
           
            }
-            }
+           // }
         
             
             

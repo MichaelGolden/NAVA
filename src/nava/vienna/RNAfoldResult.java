@@ -10,9 +10,10 @@ package nava.vienna;
  */
 public class RNAfoldResult 
 {
-    Structure mfeStructure;
-    double mfeEnsembleFrequency = Double.NaN;
-    double ensembleDiversity = Double.NaN;
+    public Structure mfeStructure;
+    public double mfeEnsembleFrequency = Double.NaN;
+    public double ensembleDiversity = Double.NaN;
+    public double [][] basePairProb;
     
     public Structure getMFEstructure()
     {

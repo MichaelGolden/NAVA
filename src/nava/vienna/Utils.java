@@ -6,6 +6,7 @@ package nava.vienna;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Random;
 import nava.data.io.IO;
 import nava.utils.RNAFoldingTools;
 
@@ -17,6 +18,12 @@ public class Utils {
     
     public static int init = (int)(System.currentTimeMillis() % 1000000);
     public static long id = 0;
+    
+    static Random random = new Random(7482684246432636275L);
+    public static String getTemporaryName(String prefix)
+    {
+        return id+"_"+Math.abs(random.nextInt());
+    }
     
     public static File createTemporaryDirectory(String prefix)
     {

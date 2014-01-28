@@ -106,8 +106,10 @@ public class RNAinverse {
         
     }*/
     
-    public ArrayList<Structure> inverse(int [] pairedSites, String startSequence, double tempCelsius, int repeats, boolean useMFE, boolean usePartitionFunction) throws IOException, InterruptedException
+    public ArrayList<Structure> inverse(int [] target, String startSequence, double tempCelsius, int repeats, boolean useMFE, boolean usePartitionFunction, boolean applyConstraintMaskForStackingBases) throws IOException, InterruptedException
     {
+       boolean forceConstraint = true;
+        
        String folding = "";     
        if(useMFE && usePartitionFunction)
        {
@@ -131,14 +133,29 @@ public class RNAinverse {
         Process process = Runtime.getRuntime().exec(cmd);
         
         BufferedOutputStream stdin = new BufferedOutputStream(process.getOutputStream());
-        stdin.write((RNAFoldingTools.getDotBracketStringFromPairedSites(pairedSites)+"\n").getBytes());
+        stdin.write((RNAFoldingTools.getDotBracketStringFromPairedSites(target)+"\n").getBytes());
         if(startSequence != null)
         {
-            stdin.write((startSequence+"\n").getBytes());
+            if(applyConstraintMaskForStackingBases)
+            {
+                StringBuilder sb = new StringBuilder(startSequence);
+                for(int i = 0 ; i < target.length ; i++)
+                {
+                    if(target[i] != 0)
+                    {
+                        sb.setCharAt(i, Character.toLowerCase(startSequence.charAt(i)));
+                    }
+                }
+                stdin.write((sb.toString()+"\n").getBytes());
+            }
+            else
+            {
+                stdin.write((startSequence+"\n").getBytes());
+            }
         }
         else
         {
-            stdin.write((Utils.nChars('N', pairedSites.length)+"\n").getBytes());
+            stdin.write((Utils.nChars('N', target.length)+"\n").getBytes());
         }
         stdin.write("@\n".getBytes());
         stdin.close();
@@ -154,8 +171,21 @@ public class RNAinverse {
             
             String [] split = textline.split("(\\s)+",3);
             
-            s.sequence = split[0];
-            s.pairedSites = pairedSites;
+            s.sequence = split[0].toUpperCase();
+            if(forceConstraint && applyConstraintMaskForStackingBases && startSequence != null) // sometimes RNAinverse likes to ignore the constraints
+            {
+                StringBuilder sb = new StringBuilder(split[0].toUpperCase());
+                for(int i = 0 ; i < s.sequence.length() ; i++)
+                {
+                    if(Character.isLowerCase(startSequence.charAt(i)))
+                    {
+                        sb.setCharAt(i, Character.toUpperCase(startSequence.charAt(i)));
+                    }
+                }
+                s.sequence = sb.toString();
+            }
+            
+            s.pairedSites = target;
             if(split.length > 2)
             {
                 if(split[2].startsWith("d="))

@@ -30,19 +30,27 @@ public class MountainMetrics {
         int[] sz = RNAFoldingTools.getPairedSitesFromDotBracketString("..............");
         System.out.println(calculateWeightedMountainDistance(s1, sz));
     }
+    
+    public static double calculateNormalizedMountainDistance(int[] pairedSites1, int[] pairedSites2, int p) {
+        return calculateMountainDistance(pairedSites1, pairedSites2, p) / calculateMountainDiameter(pairedSites1.length, p);
+    }
 
     public static double calculateNormalizedWeightedMountainDistance(int[] pairedSites1, int[] pairedSites2) {
         return calculateWeightedMountainDistance(pairedSites1, pairedSites2) / calculateWeightedMountainDiameter(pairedSites1.length);
     }
 
     public static double calculateWeightedMountainDistance(int[] pairedSites1, int[] pairedSites2) {
-        double[] f1 = getMountainVector(pairedSites1, true);
-        double[] f2 = getMountainVector(pairedSites2, true);
+        double[] f1 = getMountainVectorWeighted(pairedSites1);
+        double[] f2 = getMountainVectorWeighted(pairedSites2);
         double d = 0;
         for (int i = 0; i < f1.length; i++) {
             d += Math.abs(f1[i] - f2[i]);
         }
         return d;
+    }
+    
+    public static double calculateMountainDiameter(int length, int p) {
+        return calculateMountainDistance(getStructureStar(length), getStructureZero(length), p);
     }
 
     public static double calculateWeightedMountainDiameter(int length) {
@@ -50,8 +58,8 @@ public class MountainMetrics {
     }
 
     public static double calculateMountainDistance(int[] pairedSites1, int[] pairedSites2, int p) {
-        double[] f1 = getMountainVector(pairedSites1, false);
-        double[] f2 = getMountainVector(pairedSites2, false);
+        double[] f1 = getMountainVector(pairedSites1);
+        double[] f2 = getMountainVector(pairedSites2);
         double d = 0;
         for (int i = 0; i < f1.length; i++) {
             d += Math.pow(Math.abs(f1[i] - f2[i]), p);
@@ -66,55 +74,64 @@ public class MountainMetrics {
      * @param weighted
      * @return
      */
-    public static double[] getMountainVector(int[] pairedSites, boolean weighted) {
+    public static double[] getMountainVectorWeighted(int[] pairedSites) {
         double[] f1 = new double[pairedSites.length];
-        if (weighted) {
-            if (pairedSites[0] != 0) {
-                if(pairedSites[0] > 0)
+        if (pairedSites[0] != 0) {
+            if(pairedSites[0] > 0)
+            {
+                f1[0] += 1 / ((double) (pairedSites[0] - 1 - 0));
+            }
+            else
+            {
+                f1[0] -= 1 / ((double) (-pairedSites[0] - 1 - 0)); // handle negative indices
+            }
+        }
+
+        for (int i = 1; i < pairedSites.length; i++) {
+            f1[i] = f1[i - 1];
+            if (pairedSites[i] != 0) {
+                if(pairedSites[i] > i)
                 {
-                    f1[0] += 1 / ((double) (pairedSites[0] - 1 - 0));
+                    f1[i] += 1 / ((double) (pairedSites[i] - 1 - i));
                 }
                 else
                 {
-                    f1[0] -= 1 / ((double) (-pairedSites[0] - 1 - 0)); // handle negative indices
+                    f1[i] -= 1 / ((double) (i - (pairedSites[i] - 1)));  // handle negative indices
                 }
             }
-
-            for (int i = 1; i < pairedSites.length; i++) {
-                f1[i] = f1[i - 1];
-                if (pairedSites[i] != 0) {
-                    if(pairedSites[0] > 0)
-                    {
-                        f1[i] += 1 / ((double) (pairedSites[i] - 1 - i));
-                    }
-                    else
-                    {
-                        f1[i] -= 1 / ((double) (-pairedSites[i] - 1 - i));  // handle negative indices
-                    }
-                }
-            }
-            return f1;
-        } else {
-            if (pairedSites[0] != 0) {
-                if (pairedSites[0] > 0) {
-                    f1[0] += 1;
-                } else {
-                    f1[0] -= 1;
-                }
-            }
-
-            for (int i = 1; i < pairedSites.length; i++) {
-                f1[i] = f1[i - 1];
-                if (pairedSites[i] != 0) {
-                    if (pairedSites[i] > i) {
-                        f1[i] += 1;
-                    } else {
-                        f1[i] -= 1;
-                    }
-                }
-            }
-            return f1;
         }
+        return f1;
+    }
+    
+    public static double[] getMountainVector(int[] pairedSites, boolean weighted) {     
+        if(weighted)
+        {
+            return getMountainVectorWeighted(pairedSites);
+        }
+        return getMountainVector(pairedSites);
+    }
+    
+    public static double[] getMountainVector(int[] pairedSites) {     
+        double[] f1 = new double[pairedSites.length];
+        if (pairedSites[0] != 0) {
+            if (pairedSites[0] > 0) {
+                f1[0] += 1;
+            } else {
+                f1[0] -= 1;
+            }
+        }
+
+        for (int i = 1; i < pairedSites.length; i++) {
+            f1[i] = f1[i - 1];
+            if (pairedSites[i] != 0) {
+                if (pairedSites[i] > i) {
+                    f1[i] += 1;
+                } else {
+                    f1[i] -= 1;
+                }
+            }
+        }
+        return f1;
     }
 
     public static double[] getMountainVector2(int[] pairedSites, boolean weighted) {

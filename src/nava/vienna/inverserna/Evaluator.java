@@ -12,20 +12,31 @@ import java.util.List;
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
 public abstract class Evaluator {
-        
-    public abstract List<EvaluationCriterion> evaluate(TargetAndCandidate targetAndCandidate);
     
-    public List<EvaluationCriterion> evaluate(MultiTargetAndCandidate targetAndCandidates)
+    EvaluationTypeRegister typeRegister;
+    
+    public Evaluator(EvaluationTypeRegister typeRegister)
     {
-        ArrayList<EvaluationCriterion> criteria = new ArrayList<>();
+        this.typeRegister = typeRegister;
+    }    
+    
+    public abstract List<EvaluationValue> evaluate(TargetAndCandidate targetAndCandidate);
+            
+    public List<EvaluationValue> evaluate(MultiTargetAndCandidate targetAndCandidates)
+    {
+        ArrayList<EvaluationValue> criteria = new ArrayList<>();
         for(int i = 0 ; i < targetAndCandidates.targetStructures.size() ; i++)
         {
             TargetStructure target = targetAndCandidates.targetStructures.get(i);
-            List<EvaluationCriterion> targetCriteria = evaluate(new TargetAndCandidate(target, targetAndCandidates.sequence));
-            for(EvaluationCriterion criterion : targetCriteria)
+            List<EvaluationValue> targetCriteria = evaluate(new TargetAndCandidate(target, targetAndCandidates.sequence));
+            for(EvaluationValue criterion : targetCriteria)
             {
-                criterion.target = target;   
-                if(criterion.criterionIsTargetDependent)
+                System.out.println(criterion);
+                System.out.println(criterion.type);
+                System.out.println(criterion.type.target);
+                criterion.type.target = target;
+                
+                if(criterion.type.criterionIsTargetDependent)
                 {             
                     criteria.add(criterion);
                 }

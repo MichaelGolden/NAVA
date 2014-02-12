@@ -4,21 +4,9 @@
  */
 package nava.vienna.inverserna;
 
-import nava.vienna.*;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Random;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import nava.structure.BenchmarkMetrics;
-import nava.structure.MountainMetrics;
-import nava.utils.RNAFoldingTools;
-import nava.vienna.inverserna.EvaluationCriterion.ParetoRanking;
-import nava.vienna.inverserna.criteria.SimpleCriterion;
-import org.apache.commons.math3.stat.correlation.SpearmansCorrelation;
+import nava.vienna.inverserna.EvaluationType.ParetoRanking;
 
 /**
  *
@@ -26,13 +14,15 @@ import org.apache.commons.math3.stat.correlation.SpearmansCorrelation;
  */
 public class ParetoOptimization {
     
+    EvaluationType paretoCriterion = new EvaluationType("pareto_rank", null, ParetoRanking.NONE,false,0,Double.POSITIVE_INFINITY);
+    
     int paretoRank;
     int maxParetoRank;
     
     ParetoOptimization nextLevel = null;
     
 
-    ArrayList<ParetoItem> items = new ArrayList<>();
+    public ArrayList<ParetoItem> items = new ArrayList<>();
     Collection<String> criteria;
     
     public ParetoOptimization(int rank, int maxParetoRank)
@@ -72,7 +62,7 @@ public class ParetoOptimization {
             if(dominatedByAtLeastOne(items.get(i)))
             {
                 ParetoItem item = items.remove(i);
-                item.setCriterion("pareto_rank", new SimpleCriterion("pareto_rank", -this.maxParetoRank, ParetoRanking.NONE,false,0,Double.POSITIVE_INFINITY));
+                item.setCriterion("pareto_rank", new EvaluationValue(-this.maxParetoRank, paretoCriterion));
                 if(this.paretoRank < this.maxParetoRank)
                 {
                     if(nextLevel == null)
@@ -88,7 +78,7 @@ public class ParetoOptimization {
     
     public void addItem(ParetoItem item)
     {
-        item.setCriterion("pareto_rank", new SimpleCriterion("pareto_rank", this.paretoRank, ParetoRanking.NONE,false,0,Double.POSITIVE_INFINITY));
+        item.setCriterion("pareto_rank", new EvaluationValue(this.paretoRank, paretoCriterion));
         items.add(item);
         removeAllNonDominant();
     }
@@ -97,9 +87,9 @@ public class ParetoOptimization {
     { 
         for(String key : criteria)
         {
-            EvaluationCriterion criterion = a.getEvaluatedCriteria().get(key);
-            EvaluationCriterion otherCriterion =  b.getEvaluatedCriteria().get(key);
-            switch(criterion.ranking)
+            EvaluationValue criterion = a.getEvaluatedCriteria().get(key);
+            EvaluationValue otherCriterion =  b.getEvaluatedCriteria().get(key);
+            switch(criterion.type.ranking)
             {
                 case HIGHER_IS_BETTER:
                     if(criterion.value < otherCriterion.value)

@@ -77,7 +77,7 @@ public class AnnotationsPanel extends javax.swing.JPanel implements ItemListener
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        annotationsSourceComboBox = new nava.ui.WiderDropDownComboBox();
+        annotationsSourceComboBox = new nava.utils.WiderDropDownComboBox();
 
         jLabel1.setText("Select data source");
 
@@ -103,7 +103,7 @@ public class AnnotationsPanel extends javax.swing.JPanel implements ItemListener
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private nava.ui.WiderDropDownComboBox annotationsSourceComboBox;
+    private nava.utils.WiderDropDownComboBox annotationsSourceComboBox;
     private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
 

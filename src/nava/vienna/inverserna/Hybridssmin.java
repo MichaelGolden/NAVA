@@ -82,8 +82,9 @@ public class Hybridssmin {
     
      public static ArrayList<Fold> fold(List<String> sequences, int threads, boolean circular, double temp, boolean dna)
     {
-            //File tempDir = Utils.createTemporaryDirectory("unafold.ssmin");
-        
+           // File tempDir = Utils.createTemporaryDirectory("unafold.ssmin");
+        String tempName = "fold";
+            //String tempName = Utils.getTemporaryName("unafold.ssmin");
             ArrayList<Fold> folds = new ArrayList<>(sequences.size());
         
             ArrayList<String> seq = new ArrayList<>(sequences.size());
@@ -93,14 +94,20 @@ public class Hybridssmin {
                 seqName.add("seq"+i);
                 seq.add(sequences.get(i));
             }
-            File foldFastaFile = new File(Utils.getTemporaryName("unafold.ssmin")+"fold.fas");
+            File foldFastaFile = new File((circular ? workingDirOld.getAbsolutePath() : workingDir.getAbsolutePath()) +File.separatorChar+tempName+".fas");
+            System.out.println(foldFastaFile);
+            //File foldFastaFile = new File(workingDirOld.getAbsolutePath() +File.separatorChar+"fold.fas");
+            //File foldFastaFile = new File(Utils.getTemporaryName("unafold.ssmin")+"fold.fas");
             //File workingDirectory = new File("");
             IO.saveToFASTAfile(seq, seqName, foldFastaFile);
             try {
 
                 File tempCtFile = new File((circular ? workingDirOld.getAbsolutePath() : workingDir.getAbsolutePath()) + File.separator +foldFastaFile.getName()+ ".ct");
+               // File tempCtFile = new File((circular ? tempDir.getAbsolutePath() : tempDir.getAbsolutePath()) + File.separator +foldFastaFile.getName()+ ".ct");
                 String cmd = new File(HYBRIDSSMIN_EXECUTABLE).getAbsolutePath() + " " + foldFastaFile.getAbsolutePath() + " --threads="+threads;
                  //String cmd = new File(HYBRIDSSMIN_EXECUTABLE).getAbsolutePath() + " --threads="+threads;
+               // cmd += " --output=\""+tempDir.getAbsolutePath()+File.separatorChar+"\"";
+                System.out.println(cmd);
                 if(circular)
                 {
                     cmd += " --circular ";
@@ -116,6 +123,7 @@ public class Hybridssmin {
                 
               // cmd += " --stream";
                // cmd += " \""+tempDir.getAbsolutePath()+File.separatorChar+"out\"";
+                //Process process = Runtime.getRuntime().exec(cmd, null, (circular ? workingDirOld : workingDir));
                 Process process = Runtime.getRuntime().exec(cmd, null, (circular ? workingDirOld : workingDir));
                 
                  /*BufferedOutputStream stdin = new BufferedOutputStream(process.getOutputStream());
@@ -127,7 +135,7 @@ public class Hybridssmin {
                
                 stdin.close();*/
                 
-               /* BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                /*BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
                 String textline = null;
                 while((textline = reader.readLine()) != null)
                 {
@@ -157,6 +165,8 @@ public class Hybridssmin {
                     
                 }
                 tempCtFile.delete();
+                //new File("").listFiles(null)
+                //new File((circular ? workingDirOld.getAbsolutePath() : workingDir.getAbsolutePath()) + File.separator +foldFastaFile.getName()+ ".ct");
 
             } catch (InterruptedException ex) {
                 Logger.getLogger(GeneFinder.class.getName()).log(Level.SEVERE, null, ex);
@@ -175,10 +185,11 @@ public class Hybridssmin {
             seqName.add("sequence");
             File foldFastaFile = new File("fold.fas");
             //File workingDirectory = new File("");
+            File tempCtFile = new File((circular ? workingDirOld.getAbsolutePath() : workingDir.getAbsolutePath()) + File.separator + "fold.fas.ct");
+            tempCtFile.delete();
             IO.saveToFASTAfile(seq, seqName, foldFastaFile);
             try {
-
-                File tempCtFile = new File((circular ? workingDirOld.getAbsolutePath() : workingDir.getAbsolutePath()) + File.separator + "fold.fas.ct");
+                
                 String cmd = new File(HYBRIDSSMIN_EXECUTABLE).getAbsolutePath() + " " + foldFastaFile.getAbsolutePath() + " --threads="+threads;
                 if(circular)
                 {

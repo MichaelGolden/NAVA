@@ -271,14 +271,14 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
         firstPositionLabel = new javax.swing.JLabel();
         headerCheckButton = new javax.swing.JCheckBox();
         positionHelpLabel = new javax.swing.JLabel();
-        positionComboBox = new nava.ui.WiderDropDownComboBox();
+        positionComboBox = new nava.utils.WiderDropDownComboBox();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         dataTitleField = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        dataSourceComboBox = new nava.ui.WiderDropDownComboBox();
-        dataFieldComboBox = new nava.ui.WiderDropDownComboBox();
+        dataSourceComboBox = new nava.utils.WiderDropDownComboBox();
+        dataFieldComboBox = new nava.utils.WiderDropDownComboBox();
         jPanel3 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
@@ -295,12 +295,12 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
         mappingHelpLabel = new javax.swing.JLabel();
         mappingSourceTextArea = new javax.swing.JTextArea();
         jButton1 = new javax.swing.JButton();
-        mappingSourceComboBox = new nava.ui.WiderDropDownComboBox();
+        mappingSourceComboBox = new nava.utils.WiderDropDownComboBox();
         jPanel5 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         dataLegendPanel = new javax.swing.JPanel();
         transformHelpLabel = new javax.swing.JLabel();
-        transformComboBox = new nava.ui.WiderDropDownComboBox();
+        transformComboBox = new nava.utils.WiderDropDownComboBox();
         previewPanel = new javax.swing.JPanel();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("2. Specify how the values are positioned"));
@@ -739,11 +739,11 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton clampedRadioButton;
     private javax.swing.JCheckBox codonCheckButton;
-    private nava.ui.WiderDropDownComboBox dataFieldComboBox;
+    private nava.utils.WiderDropDownComboBox dataFieldComboBox;
     private javax.swing.JPanel dataLegendPanel;
     private javax.swing.JFormattedTextField dataMaxField;
     private javax.swing.JFormattedTextField dataMinField;
-    private nava.ui.WiderDropDownComboBox dataSourceComboBox;
+    private nava.utils.WiderDropDownComboBox dataSourceComboBox;
     private javax.swing.JTextField dataTitleField;
     private javax.swing.ButtonGroup firstPositionGroup;
     private javax.swing.JLabel firstPositionLabel;
@@ -765,18 +765,18 @@ public class Data1DPanel extends javax.swing.JPanel implements KeyListener, Item
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JLabel mappingHelpLabel;
-    private nava.ui.WiderDropDownComboBox mappingSourceComboBox;
+    private nava.utils.WiderDropDownComboBox mappingSourceComboBox;
     private javax.swing.JTextArea mappingSourceTextArea;
     private javax.swing.JRadioButton missingDataRadioButton;
     private javax.swing.JRadioButton naturalRadioButton;
     private javax.swing.JRadioButton onePositionRadioButton;
-    private nava.ui.WiderDropDownComboBox positionComboBox;
+    private nava.utils.WiderDropDownComboBox positionComboBox;
     private javax.swing.ButtonGroup positionGroup;
     private javax.swing.JLabel positionHelpLabel;
     private javax.swing.JPanel previewPanel;
     private javax.swing.JLabel rangeHelpLabel;
     private javax.swing.JButton restMinMaxButton;
-    private nava.ui.WiderDropDownComboBox transformComboBox;
+    private nava.utils.WiderDropDownComboBox transformComboBox;
     private javax.swing.JLabel transformHelpLabel;
     private javax.swing.ButtonGroup valueGroup;
     private javax.swing.JRadioButton zeroPositionRadioButton;

@@ -8,20 +8,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import nava.vienna.*;
-import nava.vienna.inverserna.criteria.SimpleCriterion;
 
 /**
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
 public class AlternativeStructureEvaluator extends Evaluator {
+    
+    public AlternativeStructureEvaluator(EvaluationTypeRegister typeRegister)
+    {
+        super(typeRegister);               
+    }
 
     @Override
-    public List<EvaluationCriterion> evaluate(TargetAndCandidate tc) {
-        ArrayList<EvaluationCriterion> evaluatedCriteria = new ArrayList<>();
-        evaluatedCriteria.add(new SimpleCriterion("simple alt. helix 3 free energy", alternativeHelixEnergyScore(tc.target.pairedSites,tc.sequence,3,false), EvaluationCriterion.ParetoRanking.NONE));
-        evaluatedCriteria.add(new SimpleCriterion("simple alt. helix 3 norm. free energy", alternativeHelixEnergyScore(tc.target.pairedSites,tc.sequence,3,true), EvaluationCriterion.ParetoRanking.NONE));
-        evaluatedCriteria.add(new SimpleCriterion("simple alt. helix score 3", simpleAlternativeHelixScore(tc.target.pairedSites,tc.sequence,3), EvaluationCriterion.ParetoRanking.NONE));
+    public List<EvaluationValue> evaluate(TargetAndCandidate tc) {
+        ArrayList<EvaluationValue> evaluatedCriteria = new ArrayList<>();
+        evaluatedCriteria.add(new EvaluationValue(alternativeHelixEnergyScore(tc.target.pairedSites,tc.sequence,3,false), typeRegister.getType("simple alt. helix 3 free energy", tc.target, EvaluationType.ParetoRanking.NONE, true,Double.NEGATIVE_INFINITY,Double.POSITIVE_INFINITY)));
+        evaluatedCriteria.add(new EvaluationValue(alternativeHelixEnergyScore(tc.target.pairedSites,tc.sequence,3,true), typeRegister.getType("simple alt. helix 3 norm. free energy", tc.target, EvaluationType.ParetoRanking.NONE, true,Double.NEGATIVE_INFINITY,Double.POSITIVE_INFINITY)));
+        evaluatedCriteria.add(new EvaluationValue(simpleAlternativeHelixScore(tc.target.pairedSites,tc.sequence,3), typeRegister.getType("simple alt. helix score 3", tc.target, EvaluationType.ParetoRanking.NONE, true,Double.NEGATIVE_INFINITY,Double.POSITIVE_INFINITY)));     
         return evaluatedCriteria;
     }
     

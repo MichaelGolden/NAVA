@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package nava.vienna;
+package nava.vienna.inverserna.ui;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -27,20 +27,20 @@ public class ScatterPlot extends JPanel {
     public ArrayList<Double> x = null;
     public ArrayList<Double> y = null;
     
-    public double xmin = Double.MAX_VALUE;
-    public double xmax = Double.MIN_VALUE;
-    public double ymin = Double.MAX_VALUE;
-    public double ymax = Double.MIN_VALUE;
-    public double xrange = 0;
-    public double yrange = 0;
+    public double xmin = 0;
+    public double xmax = 1;
+    public double ymin = 0;
+    public double ymax = 1;
+    public double xrange = 1;
+    public double yrange = 1;
     
     DecimalFormat xFormatDecimal = new DecimalFormat("0.00000");
     DecimalFormat yFormatDecimal = new DecimalFormat("0.00000");
     DecimalFormat xFormatScientific = new DecimalFormat("0.00E00");
     DecimalFormat yFormatScientific = new DecimalFormat("0.00E00");
     
-    public String xlab = "";
-    public String ylab = "";
+    public String xlab = "x-axis";
+    public String ylab = "y-axis";
     
     Font labelFont = new Font("Sans serif", Font.PLAIN, 12);
     Font axisLabelFont = new Font("Sans serif", Font.PLAIN, 10);
@@ -129,35 +129,52 @@ public class ScatterPlot extends JPanel {
                 double xpos =  graphBorderLeft+graphInsetBorder + ((x.get(i)-xmin) / (xrange))*(graphWidth-graphInsetBorder*2);
                 double ypos =  graphBorderTop+graphInsetBorder + (graphHeight-graphInsetBorder*2) - ((y.get(i)-ymin) / (yrange))*(graphHeight-graphInsetBorder*2);
                 Ellipse2D.Double circle = new Ellipse2D.Double(xpos-(circleSize/2), ypos-(circleSize/2), circleSize, circleSize);
-                g.setColor(Color.red);
+                g.setColor(new Color(255,0,0,175));
                 g.fill(circle);
             }
         }
     }
     
+    public void setData(ArrayList<Double> x, ArrayList<Double> y)
+    {
+        this.x = x;
+        this.y = y;
+        xmin = Double.MAX_VALUE;
+        xmax = Double.MIN_VALUE;
+        ymin = Double.MAX_VALUE;
+        ymax = Double.MIN_VALUE;
+        xrange = 0;
+        yrange = 0;
+        autoSetAxes();
+        repaint();
+    }
+    
     public void autoSetAxes()
     {
-        for(int i = 0 ; i < x.size() ; i++)
-        {
-            xmin = Math.min(xmin, x.get(i));
-            xmax = Math.max(xmax, x.get(i));
-            ymin = Math.min(ymin, y.get(i));
-            ymax = Math.max(ymax, y.get(i));           
-        }
-        
-        xrange = xmax - xmin;
-        yrange = ymax - ymin;
-        if(xrange == 0)
-        {
-            xrange = 2;
-            xmin = xmin-1;
-            xmax = xmax+1;
-        }
-        if(yrange == 0)
-        {
-            yrange = 2;
-            ymin = ymin-1;
-            ymax = ymax+1;
+        if(x != null && y != null)
+        {        
+            for(int i = 0 ; i < x.size() ; i++)
+            {
+                xmin = Math.min(xmin, x.get(i));
+                xmax = Math.max(xmax, x.get(i));
+                ymin = Math.min(ymin, y.get(i));
+                ymax = Math.max(ymax, y.get(i));           
+            }
+
+            xrange = xmax - xmin;
+            yrange = ymax - ymin;
+            if(xrange == 0)
+            {
+                xrange = 2;
+                xmin = xmin-1;
+                xmax = xmax+1;
+            }
+            if(yrange == 0)
+            {
+                yrange = 2;
+                ymin = ymin-1;
+                ymax = ymax+1;
+            }
         }
     }
     

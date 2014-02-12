@@ -22,7 +22,7 @@ public class Utils {
     static Random random = new Random(7482684246432636275L);
     public static String getTemporaryName(String prefix)
     {
-        return id+"_"+Math.abs(random.nextInt());
+        return prefix+"_"+id+"_"+Math.abs(random.nextInt());
     }
     
     public static File createTemporaryDirectory(String prefix)

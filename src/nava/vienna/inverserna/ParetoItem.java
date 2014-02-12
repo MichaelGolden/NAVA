@@ -12,22 +12,22 @@ import java.util.*;
  */
 public abstract class ParetoItem {
     
-    HashMap<String, EvaluationCriterion> evaluatedCriteria = new HashMap<>();
+    HashMap<String, EvaluationValue> evaluatedCriteria = new HashMap<>();
     
-    public void addEvaluatedCriteria(List<EvaluationCriterion> evaluatedCriteria)
+    public void addEvaluatedCriteria(List<EvaluationValue> evaluatedCriteria)
     {
-        for(EvaluationCriterion criterion : evaluatedCriteria)
+        for(EvaluationValue criterion : evaluatedCriteria)
         {
-            setCriterion(criterion.getUniqueIdentifier(), criterion);
+            setCriterion(criterion.type.getUniqueIdentifier(), criterion);
         }
     }
     
-    public void setCriterion(String name, EvaluationCriterion criterion)
+    public void setCriterion(String name, EvaluationValue criterion)
     {
         evaluatedCriteria.put(name, criterion);
     }
     
-    public EvaluationCriterion getCriterion(String name)
+    public EvaluationValue getCriterion(String name)
     {
         return evaluatedCriteria.get(name);
     }
@@ -44,7 +44,7 @@ public abstract class ParetoItem {
         return list;
     }
     
-    public HashMap<String, EvaluationCriterion> getEvaluatedCriteria() {
+    public HashMap<String, EvaluationValue> getEvaluatedCriteria() {
         return evaluatedCriteria;
     }
     

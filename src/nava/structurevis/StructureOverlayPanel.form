@@ -221,7 +221,7 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pasteButtonActionPerformed"/>
           </Events>
         </Component>
-        <Component class="nava.ui.WiderDropDownComboBox" name="alignmentComboBox">
+        <Component class="nava.utils.WiderDropDownComboBox" name="alignmentComboBox">
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="alignmentComboBoxActionPerformed"/>
           </Events>
@@ -328,7 +328,7 @@
         <Property name="text" type="java.lang.String" value="Circular"/>
       </Properties>
     </Component>
-    <Component class="nava.ui.WiderDropDownComboBox" name="structureComboBox">
+    <Component class="nava.utils.WiderDropDownComboBox" name="structureComboBox">
     </Component>
   </SubComponents>
 </Form>

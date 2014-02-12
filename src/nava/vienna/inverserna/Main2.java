@@ -9,17 +9,19 @@ import java.awt.BorderLayout;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
 import nava.utils.RNAFoldingTools;
 import nava.vienna.*;
+import org.apache.batik.ext.awt.image.codec.tiff.TIFFDecodeParam;
 
 /**
  *
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
-public class Main {
+public class Main2 {
     public static void batchEvaluation(ArrayList<MultiTargetAndCandidate> mtcs, Evaluator evaluator)
     {
          long startTime = System.nanoTime();
@@ -37,12 +39,12 @@ public class Main {
             ViennaRuntime viennaRuntime = new ViennaRuntime(new File("C:/Program Files (x86)/ViennaRNA Package/"), ViennaRuntime.OS.WINDOWS);
             RNAinverse rnainverse = new RNAinverse(viennaRuntime);
             IncaRNAtion2 incarnation = new IncaRNAtion2();
-            int incarnationSampleSize = 5;
+            int incarnationSampleSize = 10;
             double tempCelsius = 37;
             //int [] target = RNAFoldingTools.getPairedSitesFromDotBracketString(".....(((((.............))))).........(((((((.....)).))..)))...........((((..........))))....(((.(((.....(((......)))......((((((................)))))).))))))...");
-           int [] target = RNAFoldingTools.getPairedSitesFromDotBracketString("(((.((((....((((((((((............(((.......)))))))))))))....)))))))((.......................................................))(((((....((((((((.........))))))))...))))).......(((.....)))......................");
-           TargetStructure target1 = new TargetStructure("target1",target, 37);
-           //TargetStructure target1 = new TargetStructure("target1",RNAFoldingTools.getPairedSitesFromDotBracketString(".((((((((((((....................)))))))))).))(((((((((((((..............)))))))))))))...."), 37);
+            int [] target = RNAFoldingTools.getPairedSitesFromDotBracketString("(((.((((....((((((((((............(((.......)))))))))))))....)))))))((.......................................................))(((((....((((((((.........))))))))...))))).......(((.....)))......................");
+            TargetStructure target1 = new TargetStructure("target1",target, 37);
+            //TargetStructure target1 = new TargetStructure("target1",RNAFoldingTools.getPairedSitesFromDotBracketString(".((((((((((((....................)))))))))).))(((((((((((((..............)))))))))))))...."), 37);
             //TargetStructure target2 = new TargetStructure("target2",RNAFoldingTools.getPairedSitesFromDotBracketString(".((((((((((((....................)))))))))).))(((((((((((((..(((...)))...)))))))))))))...."), 34);
             ArrayList<TargetStructure> targetStructures = new ArrayList<>();
             targetStructures.add(target1);
@@ -77,17 +79,6 @@ public class Main {
                    mtcs.add(mtc);
                 }
                 
-                  
-                System.out.println(linEvaluator);
-                batchEvaluation(mtcs,linEvaluator);
-                System.out.println(rnaFoldEvaluator);
-                batchEvaluation(mtcs,rnaFoldEvaluator);
-                System.out.println(rnaFoldEvaluatorNoPartition);
-                batchEvaluation(mtcs,rnaFoldEvaluatorNoPartition);                
-                System.out.println(alternativeEvaluator);
-                batchEvaluation(mtcs,alternativeEvaluator);
-                System.out.println(unafoldEvaluator);
-                batchEvaluation(mtcs,unafoldEvaluator);
                 
                 
                 /*
@@ -118,6 +109,7 @@ public class Main {
                 }*/
                 
                 
+                ArrayList<String> sortedCriteria = null;
                 /*for(String s : sequences)
                 {
                     MultiTargetAndCandidate t = new MultiTargetAndCandidate(targetStructures, s);
@@ -139,34 +131,25 @@ public class Main {
                     System.out.println(pareto.items.size());
                 }*/
 
-                ArrayList<MultiTargetAndCandidate> mtcs2 = new ArrayList<>(sequences.size());
 
-                boolean refineWithRNAinverse = true;
+                boolean refineWithRNAinverse = false;
                 if(refineWithRNAinverse)
                 {
                     // now refine using sequences using rna inverse
                     for(TargetStructure t : targetStructures)
                     {
-                        for(MultiTargetAndCandidate mtc : mtcs)
+                        for(String s : sequences)
                         {
                             boolean useMFE = false;
-                            boolean usePartitionFunction = true;
+                            boolean usePartitionFunction = false;
                             boolean applyConstraintMaskForStackingBases = true;     
-                            ArrayList<Structure> sample = rnainverse.inverse(t.pairedSites, mtc.sequence, t.tempCelsius, 2, useMFE, usePartitionFunction, applyConstraintMaskForStackingBases);
-                            
-                                                        
+                            ArrayList<Structure> sample = rnainverse.inverse(t.pairedSites, s, t.tempCelsius, 2, useMFE, usePartitionFunction, applyConstraintMaskForStackingBases);
+
                             if(sample != null)
                             {
                                 for(Structure structure : sample)
                                 {
-                                    MultiTargetAndCandidate refinedMTC = new MultiTargetAndCandidate(targetStructures, structure.sequence);
-                                    ArrayList<String> criteria = mtc.getAlphabeticalCriteria();
-                                    for(String critName : criteria)
-                                    {
-                                        EvaluationValue criterion = mtc.getCriterion(critName);
-                                        refinedMTC.setCriterion("sampled::"+criterion.type.getUniqueIdentifier(), criterion);
-                                    }                                    
-                                    mtcs2.add(refinedMTC);
+                                    mtcs.add(new MultiTargetAndCandidate(targetStructures, structure.sequence));
                                 }
                             }
                         /* if(sample != null)
@@ -196,18 +179,17 @@ public class Main {
                 }
                 
                 System.out.println(linEvaluator);
-                batchEvaluation(mtcs2,linEvaluator);
+                batchEvaluation(mtcs,linEvaluator);
                 System.out.println(rnaFoldEvaluator);
-                batchEvaluation(mtcs2,rnaFoldEvaluator);
+                batchEvaluation(mtcs,rnaFoldEvaluator);
                 System.out.println(rnaFoldEvaluatorNoPartition);
-                batchEvaluation(mtcs2,rnaFoldEvaluatorNoPartition);                
+                batchEvaluation(mtcs,rnaFoldEvaluatorNoPartition);                
                 System.out.println(alternativeEvaluator);
-                batchEvaluation(mtcs2,alternativeEvaluator);
+                batchEvaluation(mtcs,alternativeEvaluator);
                 System.out.println(unafoldEvaluator);
-                batchEvaluation(mtcs2,unafoldEvaluator);
+                batchEvaluation(mtcs,unafoldEvaluator);
                 
-                ArrayList<String> sortedCriteria = null;
-                for(MultiTargetAndCandidate mtc : mtcs2)
+                for(MultiTargetAndCandidate mtc : mtcs)
                 {
                     pareto.addItem(mtc);
 

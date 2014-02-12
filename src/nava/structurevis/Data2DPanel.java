@@ -315,7 +315,7 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
         jLabel1 = new javax.swing.JLabel();
         dataTitleField = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        dataMatrixComboBox = new nava.ui.WiderDropDownComboBox();
+        dataMatrixComboBox = new nava.utils.WiderDropDownComboBox();
         jPanel3 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
@@ -349,7 +349,7 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
         mappingHelpLabel = new javax.swing.JLabel();
         mappingSourceTextArea = new javax.swing.JTextArea();
         jButton1 = new javax.swing.JButton();
-        mappingSourceComboBox = new nava.ui.WiderDropDownComboBox();
+        mappingSourceComboBox = new nava.utils.WiderDropDownComboBox();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("2. Specify how the values are positioned"));
 
@@ -833,7 +833,7 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
     private javax.swing.JRadioButton clampedRadioButton;
     private javax.swing.JCheckBox codonCheckButton;
     private javax.swing.JPanel dataLegendPanel;
-    private nava.ui.WiderDropDownComboBox dataMatrixComboBox;
+    private nava.utils.WiderDropDownComboBox dataMatrixComboBox;
     private javax.swing.JFormattedTextField dataMaxField;
     private javax.swing.JFormattedTextField dataMinField;
     private javax.swing.JTextField dataTitleField;
@@ -860,7 +860,7 @@ public class Data2DPanel extends javax.swing.JPanel implements KeyListener, Item
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JLabel mappingHelpLabel;
-    private nava.ui.WiderDropDownComboBox mappingSourceComboBox;
+    private nava.utils.WiderDropDownComboBox mappingSourceComboBox;
     private javax.swing.JTextArea mappingSourceTextArea;
     private javax.swing.ButtonGroup matrixGroup;
     private javax.swing.JLabel matrixHelpLabel;

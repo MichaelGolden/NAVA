@@ -44,7 +44,7 @@
         <Property name="text" type="java.lang.String" value="Select data source"/>
       </Properties>
     </Component>
-    <Component class="nava.ui.WiderDropDownComboBox" name="annotationsSourceComboBox">
+    <Component class="nava.utils.WiderDropDownComboBox" name="annotationsSourceComboBox">
     </Component>
   </SubComponents>
 </Form>

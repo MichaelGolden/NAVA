@@ -44,7 +44,7 @@
         <Property name="text" type="java.lang.String" value="Select nucleotide source"/>
       </Properties>
     </Component>
-    <Component class="nava.ui.WiderDropDownComboBox" name="widerDropDownComboBox1">
+    <Component class="nava.utils.WiderDropDownComboBox" name="widerDropDownComboBox1">
       <Properties>
         <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
           <Dimension value="[100, 32767]"/>

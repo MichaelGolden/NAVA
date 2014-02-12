@@ -11,9 +11,9 @@ import java.util.Arrays;
  * @author Michael Golden <michaelgolden0@gmail.com>
  */
 public class TargetStructure {
-    String uniqueIdentifier;
-    int [] pairedSites;
-    double tempCelsius;
+    public String uniqueIdentifier;
+    public int [] pairedSites;
+    public double tempCelsius;
     
     public TargetStructure(String uniqueIdentifier, int [] pairedSites, double tempCelsius)
     {
@@ -23,6 +23,12 @@ public class TargetStructure {
     }
     
     public String getUniqueIdentifier()
+    {
+        return uniqueIdentifier;
+    }
+    
+    @Override
+    public String toString()
     {
         return uniqueIdentifier;
     }

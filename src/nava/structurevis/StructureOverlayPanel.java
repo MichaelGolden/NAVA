@@ -115,7 +115,7 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
         sequenceTextField = new javax.swing.JTextField();
         addMappingAlignmentAsOverlayCheckBox = new javax.swing.JCheckBox();
         pasteButton = new javax.swing.JButton();
-        alignmentComboBox = new nava.ui.WiderDropDownComboBox();
+        alignmentComboBox = new nava.utils.WiderDropDownComboBox();
         mappingSourceTextArea = new javax.swing.JTextArea();
         guessBestMappingAlignmentButton = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
@@ -124,7 +124,7 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
         linearRadioButton = new javax.swing.JRadioButton();
         jLabel2 = new javax.swing.JLabel();
         circularRadioButton = new javax.swing.JRadioButton();
-        structureComboBox = new nava.ui.WiderDropDownComboBox();
+        structureComboBox = new nava.utils.WiderDropDownComboBox();
 
         jLabel1.setText("Select structure");
 
@@ -393,7 +393,7 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox addMappingAlignmentAsOverlayCheckBox;
-    private nava.ui.WiderDropDownComboBox alignmentComboBox;
+    private nava.utils.WiderDropDownComboBox alignmentComboBox;
     private javax.swing.JRadioButton circularRadioButton;
     private javax.swing.ButtonGroup conformationGroup;
     private javax.swing.JRadioButton embeddedSequenceRadioButton;
@@ -412,7 +412,7 @@ public class StructureOverlayPanel extends javax.swing.JPanel implements ChangeL
     private javax.swing.JTextArea mappingSourceTextArea;
     private javax.swing.JButton pasteButton;
     private javax.swing.JTextField sequenceTextField;
-    private nava.ui.WiderDropDownComboBox structureComboBox;
+    private nava.utils.WiderDropDownComboBox structureComboBox;
     private javax.swing.ButtonGroup substructureGroup;
     // End of variables declaration//GEN-END:variables
 

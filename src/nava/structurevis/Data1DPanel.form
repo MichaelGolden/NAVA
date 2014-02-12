@@ -219,7 +219,7 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="nava.ui.WiderDropDownComboBox" name="positionComboBox">
+        <Component class="nava.utils.WiderDropDownComboBox" name="positionComboBox">
         </Component>
       </SubComponents>
     </Container>
@@ -293,9 +293,9 @@
             <Property name="text" type="java.lang.String" value="Title"/>
           </Properties>
         </Component>
-        <Component class="nava.ui.WiderDropDownComboBox" name="dataSourceComboBox">
+        <Component class="nava.utils.WiderDropDownComboBox" name="dataSourceComboBox">
         </Component>
-        <Component class="nava.ui.WiderDropDownComboBox" name="dataFieldComboBox">
+        <Component class="nava.utils.WiderDropDownComboBox" name="dataFieldComboBox">
         </Component>
       </SubComponents>
     </Container>
@@ -551,7 +551,7 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
           </Events>
         </Component>
-        <Component class="nava.ui.WiderDropDownComboBox" name="mappingSourceComboBox">
+        <Component class="nava.utils.WiderDropDownComboBox" name="mappingSourceComboBox">
         </Component>
       </SubComponents>
     </Container>
@@ -628,7 +628,7 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="nava.ui.WiderDropDownComboBox" name="transformComboBox">
+        <Component class="nava.utils.WiderDropDownComboBox" name="transformComboBox">
         </Component>
       </SubComponents>
     </Container>

@@ -80,7 +80,7 @@ public class NucleotideCompositionPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        widerDropDownComboBox1 = new nava.ui.WiderDropDownComboBox();
+        widerDropDownComboBox1 = new nava.utils.WiderDropDownComboBox();
 
         jLabel1.setText("Select nucleotide source");
 
@@ -109,6 +109,6 @@ public class NucleotideCompositionPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
-    private nava.ui.WiderDropDownComboBox widerDropDownComboBox1;
+    private nava.utils.WiderDropDownComboBox widerDropDownComboBox1;
     // End of variables declaration//GEN-END:variables
 }
